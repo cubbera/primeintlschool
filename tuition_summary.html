@@ -1,683 +1,361 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Tuition Summary</title>
-  <style>
+<meta charset="UTF-8">
+<title>Add Student & Create Tuition Plan</title>
+<style>
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #0f172a;
-      padding: 24px;
+        font-family: Arial, sans-serif;
+        background: #f3f4f6;
+        padding: 30px;
     }
-    .page {
-      max-width: 1200px;
-      margin: 0 auto;
-      background: #ffffff;
-      border-radius: 12px;
-      padding: 24px 28px 32px;
-      box-shadow: 0 12px 30px rgba(15,23,42,0.35);
+
+    .container {
+        max-width: 860px;
+        margin: auto;
+        background: #fff;
+        padding: 28px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     }
+
     h1 {
-      margin-top: 0;
-      margin-bottom: 4px;
+        margin-top: 0;
+        margin-bottom: 10px;
     }
-    .subtitle {
-      color: #6b7280;
-      margin-bottom: 20px;
-      font-size: 13px;
+
+    h2 {
+        margin-top: 28px;
+        border-bottom: 2px solid #e5e7eb;
+        padding-bottom: 6px;
+        font-size: 18px;
     }
+
+    label {
+        display: block;
+        font-weight: bold;
+        margin-top: 12px;
+        margin-bottom: 4px;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        margin-bottom: 6px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    .two-col {
+        display: flex;
+        gap: 16px;
+    }
+
+    .two-col > div {
+        flex: 1;
+    }
+
+    .discount-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 8px;
+        padding: 8px 10px;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        background: #f9fafb;
+    }
+
+    .discount-row select {
+        width: 68%;
+        margin-bottom: 0;
+    }
+
+    .discount-amount {
+        font-weight: bold;
+        color: red;
+        text-align: right;
+        width: 30%;
+        font-variant-numeric: tabular-nums;
+    }
+
     table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 8px;
-      font-size: 13px;
+        width: 100%;
+        margin-top: 16px;
+        border-collapse: collapse;
     }
-    thead th {
-      text-align: left;
-      background: #111827;
-      color: #e5e7eb;
-      border-bottom: 1px solid #374151;
-      font-weight: 600;
-      font-size: 12px;
-      padding: 8px 6px;
-      white-space: nowrap;
+
+    table td {
+        padding: 6px 4px;
+        font-size: 14px;
     }
-    tbody td {
-      padding: 6px 6px;
-      border-bottom: 1px solid #e5e7eb;
+
+    table td:nth-child(2) {
+        text-align: right;
+        font-weight: bold;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
     }
-    tbody tr:nth-child(odd) {
-      background: #f9fafb;
+
+    .btn-add {
+        margin-top: 10px;
+        background: #1d4ed8;
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
     }
-    .right {
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-      white-space: nowrap;
+
+    .btn-add:hover {
+        background: #1e40af;
     }
-    .section-title {
-      margin-top: 26px;
-      margin-bottom: 4px;
-      font-weight: 700;
-      font-size: 15px;
+
+    .btn-submit {
+        margin-top: 22px;
+        width: 100%;
+        background: #059669;
+        color: #fff;
+        font-size: 18px;
+        padding: 14px;
+        border-radius: 8px;
+        cursor: pointer;
+        border: none;
+        font-weight: bold;
     }
-    .summary-table tbody tr:nth-child(odd) {
-      background: #f3f4f6;
+
+    .btn-submit:hover {
+        background: #047857;
     }
-    .total-row td {
-      border-top: 2px solid #4b5563;
-      font-weight: 700;
-      background: #e5e7eb;
+
+    .note {
+        font-size: 12px;
+        color: #6b7280;
+        margin-top: 4px;
     }
-    .subtotal-row td {
-      border-top: 2px solid #9ca3af;
-      font-weight: 700;
-      background: #e5e7eb;
+</style>
+
+<script>
+function autoFillTuition() {
+    const division = document.getElementById("division").value;
+    const level = document.getElementById("level").value;
+    const plan = document.getElementById("paymentPlan").value;
+    const tuitionInput = document.getElementById("tuitionBefore");
+
+    if (!division || !level || !plan) {
+        return;
     }
-    .late-row {
-      color: #b91c1c;
-      font-weight: 600;
+
+    // Determine group: Preschool or Primary
+    let group;
+    if (division === "Preschool" || ["SR","EY1","EY2"].includes(level)) {
+        group = "Preschool";
+    } else {
+        group = "Primary";
     }
-    .status-badge {
-      font-weight: 600;
-      font-size: 11px;
-      padding: 2px 6px;
-      border-radius: 999px;
-      display: inline-block;
-      background: #e5f6ff;
-      color: #0369a1;
+
+    let amount = 0;
+    if (group === "Preschool") {
+        if (plan === "Annual") amount = 3900000;
+        else if (plan === "Termly") amount = 4200000;
+        else if (plan === "Monthly") amount = 4200000;
+    } else { // Primary
+        if (plan === "Annual") amount = 4200000;
+        else if (plan === "Termly") amount = 4500000;
+        else if (plan === "Monthly") amount = 4500000;
     }
-    .status-badge.left {
-      background: #fef2f2;
-      color: #b91c1c;
-    }
-    .group-label {
-      font-size: 12px;
-      color: #6b7280;
-      margin-bottom: 4px;
-    }
-    .sort-header span {
-      font-size: 9px;
-      opacity: 0.6;
-      margin-left: 3px;
-    }
-  </style>
+
+    tuitionInput.value = amount;
+    updateDiscounts();
+}
+
+function addDiscountRow() {
+    const container = document.getElementById("discountContainer");
+
+    const row = document.createElement("div");
+    row.className = "discount-row";
+
+    row.innerHTML = `
+        <select onchange="updateDiscounts()">
+            <option value="">-- Select Discount --</option>
+            <option value="early35">Early Bird 35%</option>
+            <option value="play15">Play &amp; Learn 15%</option>
+            <option value="ref100">Referral -100,000 MMK</option>
+            <option value="sib5">Sibling 5%</option>
+            <option value="sib10">Sibling 10%</option>
+        </select>
+        <div class="discount-amount">0</div>
+    `;
+
+    container.appendChild(row);
+    updateDiscounts();
+}
+
+function updateDiscounts() {
+    const tuition = parseInt(document.getElementById("tuitionBefore").value || 0, 10);
+    const discountRows = document.querySelectorAll("#discountContainer .discount-row");
+    let totalDiscount = 0;
+
+    discountRows.forEach(row => {
+        const select = row.querySelector("select");
+        const value = select.value;
+        const amountBox = row.querySelector(".discount-amount");
+        let amount = 0;
+
+        if (!value || tuition <= 0) {
+            amountBox.textContent = "0";
+            return;
+        }
+
+        switch (value) {
+            case "early35":
+                amount = tuition * 0.35;
+                break;
+            case "play15":
+                amount = tuition * 0.15;
+                break;
+            case "ref100":
+                amount = 100000;
+                break;
+            case "sib5":
+                amount = tuition * 0.05;
+                break;
+            case "sib10":
+                amount = tuition * 0.10;
+                break;
+        }
+
+        amount = Math.round(amount);
+        amountBox.textContent = "-" + amount.toLocaleString();
+        totalDiscount += amount;
+    });
+
+    const totalDiscountCell = document.getElementById("totalDiscount");
+    const afterDiscountCell = document.getElementById("afterDiscount");
+    const monthlyFeeCell = document.getElementById("monthlyFee");
+
+    totalDiscountCell.textContent = "-" + totalDiscount.toLocaleString();
+
+    const net = tuition - totalDiscount;
+    afterDiscountCell.textContent = net.toLocaleString();
+
+    // Monthly fee based on 10 installments (for quick reference)
+    const monthly = net > 0 ? Math.round(net / 10) : 0;
+    monthlyFeeCell.textContent = monthly.toLocaleString();
+}
+
+window.onload = function() {
+    // Initialize discount calculations based on default tuition
+    updateDiscounts();
+};
+</script>
+
 </head>
 <body>
-  <div class="page">
-    <h1>Tuition Summary</h1>
-    <div class="subtitle">
-      Academic Year 2025–2026 · Snapshot as of 06-Nov-25 · 30 students
+
+<div class="container">
+
+    <h1>Add New Student</h1>
+
+    <!-- SECTION 1 — STUDENT INFO -->
+    <h2>1. Student Information</h2>
+
+    <label>Full Name</label>
+    <input type="text" placeholder="e.g. Aye Aye">
+
+    <label>Father's Name</label>
+    <input type="text" placeholder="e.g. U Kyaw Win">
+
+    <div class="two-col">
+        <div>
+            <label>Gender</label>
+            <select>
+                <option value="">Select gender</option>
+                <option>Male</option>
+                <option>Female</option>
+            </select>
+        </div>
+        <div>
+            <label>Date of Birth</label>
+            <input type="date">
+        </div>
     </div>
 
-    <!-- TOP SUMMARY BY PAYMENT PLAN -->
-    <div class="section-title">Summary by Payment Plan</div>
-    <table class="summary-table">
-      <thead>
-        <tr>
-          <th>Payment Plan</th>
-          <th class="right">Students</th>
-          <th class="right">Tuition Before</th>
-          <th class="right">Tuition After</th>
-          <th class="right">Paid</th>
-          <th class="right">Unpaid</th>
-          <th class="right">Balance</th>
-          <th class="right">YTD Late (MMK)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Monthly</td>
-          <td class="right">20</td>
-          <td class="right">80,000,000</td>
-          <td class="right">52,000,000</td>
-          <td class="right">30,000,000</td>
-          <td class="right">22,000,000</td>
-          <td class="right">22,360,000</td>
-          <td class="right">18 (360,000)</td>
-        </tr>
-        <tr>
-          <td>Termly</td>
-          <td class="right">6</td>
-          <td class="right">24,000,000</td>
-          <td class="right">16,000,000</td>
-          <td class="right">10,000,000</td>
-          <td class="right">6,000,000</td>
-          <td class="right">6,120,000</td>
-          <td class="right">3 (60,000)</td>
-        </tr>
-        <tr>
-          <td>Annual</td>
-          <td class="right">4</td>
-          <td class="right">16,000,000</td>
-          <td class="right">12,000,000</td>
-          <td class="right">10,000,000</td>
-          <td class="right">2,000,000</td>
-          <td class="right">2,040,000</td>
-          <td class="right">2 (40,000)</td>
-        </tr>
-        <tr class="total-row">
-          <td><strong>GRAND TOTAL</strong></td>
-          <td class="right"><strong>30</strong></td>
-          <td class="right"><strong>120,000,000</strong></td>
-          <td class="right"><strong>80,000,000</strong></td>
-          <td class="right"><strong>50,000,000</strong></td>
-          <td class="right"><strong>30,000,000</strong></td>
-          <td class="right"><strong>30,520,000</strong></td>
-          <td class="right"><strong>23 (460,000)</strong></td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- SECTION 2 — ENROLLMENT -->
+    <h2>2. Enrollment</h2>
 
-    <!-- MONTHLY PLAN -->
-    <div class="section-title">Monthly Plan Students</div>
-    <div class="group-label">
-      20 students · Sorted by Student ID · rows in red had at least one late payment this year
+    <label>Academic Year</label>
+    <select>
+        <option>2025–2026</option>
+    </select>
+
+    <div class="two-col">
+        <div>
+            <label>Division</label>
+            <select id="division" onchange="autoFillTuition()">
+                <option value="">Select division</option>
+                <option value="Preschool">Preschool</option>
+                <option value="Primary">Primary</option>
+            </select>
+        </div>
+        <div>
+            <label>Level</label>
+            <select id="level" onchange="autoFillTuition()">
+                <option value="">Select level</option>
+                <option value="SR">SR</option>
+                <option value="EY1">EY1</option>
+                <option value="EY2">EY2</option>
+                <option value="Y1">Y1</option>
+                <option value="Y2">Y2</option>
+                <option value="Y3">Y3</option>
+            </select>
+        </div>
     </div>
+
+    <label>Payment Plan</label>
+    <select id="paymentPlan" onchange="autoFillTuition()">
+        <option value="">Select plan</option>
+        <option value="Monthly">Monthly</option>
+        <option value="Termly">Termly</option>
+        <option value="Annual">Annual</option>
+    </select>
+    <div class="note">
+        Tuition will be auto-filled based on Division + Level + Payment Plan.
+    </div>
+
+    <!-- SECTION 3 — TUITION CALC -->
+    <h2>3. Calculated Tuition Summary</h2>
+
+    <label>Tuition Before Discount</label>
+    <input type="number" id="tuitionBefore" value="4200000" onkeyup="updateDiscounts()">
+
+    <h3>Add Discounts</h3>
+    <div class="note">Choose one or more discounts. Amounts will be calculated automatically.</div>
+    <div id="discountContainer"></div>
+    <button type="button" class="btn-add" onclick="addDiscountRow()">+ Add Discount</button>
+
     <table>
-      <thead>
         <tr>
-          <th>Status</th>
-          <th>Student ID</th>
-          <th>Student Name</th>
-          <th>Class</th>
-          <th>Enrollment (AY 2025–2026)</th>
-          <th class="right">Tuition Before</th>
-          <th class="right">Tuition After</th>
-          <th class="right">Paid</th>
-          <th class="right">Unpaid</th>
-          <th class="right">Balance</th>
-          <th class="right">YTD Late Days (MMK)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Monthly students (20) -->
-        <tr class="late-row">
-          <td><span class="status-badge">Active</span></td>
-          <td>pr23001</td>
-          <td>Aye Aye</td>
-          <td>EY2-A</td>
-          <td>10-Jun-25 – present</td>
-          <td class="right">4,200,000</td>
-          <td class="right">2,940,000</td>
-          <td class="right">1,960,000</td>
-          <td class="right">980,000</td>
-          <td class="right">1,080,000</td>
-          <td class="right">10 (200,000)</td>
-        </tr>
-        <tr class="late-row">
-          <td><span class="status-badge left">LEFT (15-Oct-25)</span></td>
-          <td>pr23002</td>
-          <td>Mya Mya</td>
-          <td>EY2-B</td>
-          <td>04-Jun-25 – 15-Oct-25</td>
-          <td class="right">2,520,000</td>
-          <td class="right">1,764,000</td>
-          <td class="right">1,764,000</td>
-          <td class="right">0</td>
-          <td class="right">0</td>
-          <td class="right">5 (100,000)</td>
-        </tr>
-        <tr class="late-row">
-          <td><span class="status-badge">Active</span></td>
-          <td>pr23003</td>
-          <td>Hsu Mon</td>
-          <td>SR-A</td>
-          <td>12-Jun-25 – present</td>
-          <td class="right">4,200,000</td>
-          <td class="right">3,150,000</td>
-          <td class="right">2,100,000</td>
-          <td class="right">1,050,000</td>
-          <td class="right">1,110,000</td>
-          <td class="right">3 (60,000)</td>
+            <td>Total Discount</td>
+            <td id="totalDiscount">0</td>
         </tr>
         <tr>
-          <td><span class="status-badge">Active</span></td>
-          <td>pr23004</td>
-          <td>Thae Thae</td>
-          <td>SR-B</td>
-          <td>06-Jun-25 – present</td>
-          <td class="right">4,200,000</td>
-          <td class="right">3,570,000</td>
-          <td class="right">2,400,000</td>
-          <td class="right">1,170,000</td>
-          <td class="right">1,170,000</td>
-          <td class="right">0 (0)</td>
+            <td>After Discount</td>
+            <td id="afterDiscount">4,200,000</td>
         </tr>
         <tr>
-          <td><span class="status-badge">Active</span></td>
-          <td>pr23005</td>
-          <td>Phone Ko</td>
-          <td>EY1-A</td>
-          <td>24-Jun-25 – present</td>
-          <td class="right">3,780,000</td>
-          <td class="right">3,213,000</td>
-          <td class="right">1,890,000</td>
-          <td class="right">1,323,000</td>
-          <td class="right">1,323,000</td>
-          <td class="right">0 (0)</td>
+            <td>Monthly Fee (10 installments)</td>
+            <td id="monthlyFee">420,000</td>
         </tr>
-
-        <tr>
-          <td><span class="status-badge">Active</span></td>
-          <td>pr24001</td>
-          <td>Ei Mon</td>
-          <td>EY1-B</td>
-          <td>10-Jun-25 – present</td>
-          <td class="right">4,200,000</td>
-          <td class="right">3,360,000</td>
-          <td class="right">2,100,000</td>
-          <td class="right">1,260,000</td>
-          <td class="right">1,260,000</td>
-          <td class="right">0 (0)</td>
-        </tr>
-        <tr>
-          <td><span class="status-badge">Active</span></td>
-          <td>pr24002</td>
-          <td>Sandar Win</td>
-          <td>Y1-A</td>
-          <td>06-Jun-25 – present</td>
-          <td class="right">4,500,000</td>
-          <td class="right">3,825,000</td>
-          <td class="right">2,295,000</td>
-          <td class="right">1,530,000</td>
-          <td class="right">1,530,000</td>
-          <td class="right">0 (0)</td>
-        </tr>
-        <tr>
-          <td><span class="status-badge">Active</span></td>
-          <td>pr24003</td>
-          <td>Ni Ni</td>
-          <td>Y1-B</td>
-          <td>24-Jun-25 – present</td>
-          <td class="right">4,500,000</td>
-          <td class="right">3,600,000</td>
-          <td class="right">2,070,000</td>
-          <td class="right">1,530,000</td>
-          <td class="right">1,530,000</td>
-          <td class="right">0 (0)</td>
-        </tr>
-        <tr>
-          <td><span class="status-badge">Active</span></td>
-          <td>pr24004</td>
-          <td>Ko Ko</td>
-          <td>Y2-A</td>
-          <td>10-Jun-25 – present</td>
-          <td class="right">4,500,000</td>
-          <td class="right">3,150,000</td>
-          <td class="right">1,980,000</td>
-          <td class="right">1,170,000</td>
-          <td class="right">1,170,000</td>
-          <td class="right">0 (0)</td>
-        </tr>
-        <tr class="late-row">
-          <td><span class="status-badge">Active</span></td>
-          <td>pr24005</td>
-          <td>Moe Moe</td>
-          <td>Y2-B</td>
-          <td>18-Jun-25 – present</td>
-          <td class="right">4,500,000</td>
-          <td class="right">3,150,000</td>
-          <td class="right">1,980,000</td>
-          <td class="right">1,170,000</td>
-          <td class="right">1,230,000</td>
-          <td class="right">2 (40,000)</td>
-        </tr>
-
-        <tr>
-          <td><span class="status-badge">Active</span></td>
-          <td>pr24006</td>
-          <td>Htet Wai</td>
-          <td>SR-A</td>
-          <td>04-Jun-25 – present</td>
-          <td class="right">4,200,000</td>
-          <td class="right">3,360,000</td>
-          <td class="right">2,100,000</td>
-          <td class="right">1,260,000</td>
-          <td class="right">1,260,000</td>
-          <td class="right">0 (0)</td>
-        </tr>
-        <tr>
-          <td><span class="status-badge">Active</span></td>
-          <td>pr24007</td>
-          <td>Su Su</td>
-          <td>SR-B</td>
-          <td>06-Jun-25 – present</td>
-          <td class="right">4,200,000</td>
-          <td class="right">3,570,000</td>
-          <td class="right">2,400,000</td>
-          <td class="right">1,170,000</td>
-          <td class="right">1,170,000</td>
-          <td class="right">0 (0)</td>
-        </tr>
-        <tr>
-          <td><span class="status-badge left">LEFT (30-Sep-25)</span></td>
-          <td>pr24008</td>
-          <td>Min Khant</td>
-          <td>EY1-A</td>
-          <td>12-Jun-25 – 30-Sep-25</td>
-          <td class="right">2,100,000</td>
-          <td class="right">1,470,000</td>
-          <td class="right">1,470,000</td>
-          <td class="right">0</td>
-          <td class="right">0</td>
-          <td class="right">0 (0)</td>
-        </tr>
-        <tr>
-          <td><span class="status-badge">Active</span></td>
-          <td>pr24009</td>
-          <td>Nandar</td>
-          <td>EY1-B</td>
-          <td>24-Jun-25 – present</td>
-          <td class="right">4,200,000</td>
-          <td class="right">3,780,000</td>
-          <td class="right">2,520,000</td>
-          <td class="right">1,260,000</td>
-          <td class="right">1,260,000</td>
-          <td class="right">0 (0)</td>
-        </tr>
-        <tr>
-          <td><span class="status-badge">Active</span></td>
-          <td>pr24010</td>
-          <td>Moe Thiri</td>
-          <td>EY2-A</td>
-          <td>18-Jun-25 – present</td>
-          <td class="right">4,200,000</td>
-          <td class="right">3,570,000</td>
-          <td class="right">2,400,000</td>
-          <td class="right">1,170,000</td>
-          <td class="right">1,170,000</td>
-          <td class="right">0 (0)</td>
-        </tr>
-
-        <tr>
-          <td><span class="status-badge">Active</span></td>
-          <td>pr25001</td>
-          <td>Kyaw Zin</td>
-          <td>EY2-B</td>
-          <td>10-Jun-25 – present</td>
-          <td class="right">4,200,000</td>
-          <td class="right">3,360,000</td>
-          <td class="right">2,100,000</td>
-          <td class="right">1,260,000</td>
-          <td class="right">1,260,000</td>
-          <td class="right">0 (0)</td>
-        </tr>
-        <tr class="late-row">
-          <td><span class="status-badge">Active</span></td>
-          <td>pr25002</td>
-          <td>Swe Swe</td>
-          <td>Y1-A</td>
-          <td>24-Jun-25 – present</td>
-          <td class="right">4,500,000</td>
-          <td class="right">3,825,000</td>
-          <td class="right">2,295,000</td>
-          <td class="right">1,530,000</td>
-          <td class="right">1,590,000</td>
-          <td class="right">2 (40,000)</td>
-        </tr>
-        <tr>
-          <td><span class="status-badge">Active</span></td>
-          <td>pr25003</td>
-          <td>Mai Mai</td>
-          <td>Y1-B</td>
-          <td>18-Jul-25 – present</td>
-          <td class="right">4,050,000</td>
-          <td class="right">3,240,000</td>
-          <td class="right">1,944,000</td>
-          <td class="right">1,296,000</td>
-          <td class="right">1,296,000</td>
-          <td class="right">0 (0)</td>
-        </tr>
-        <tr>
-          <td><span class="status-badge">Active</span></td>
-          <td>pr25004</td>
-          <td>Yamin</td>
-          <td>Y2-A</td>
-          <td>06-Aug-25 – present</td>
-          <td class="right">3,600,000</td>
-          <td class="right">2,880,000</td>
-          <td class="right">1,440,000</td>
-          <td class="right">1,440,000</td>
-          <td class="right">1,440,000</td>
-          <td class="right">0 (0)</td>
-        </tr>
-        <tr>
-          <td><span class="status-badge">Active</span></td>
-          <td>pr25005</td>
-          <td>Thazin</td>
-          <td>Y2-B</td>
-          <td>24-Aug-25 – present</td>
-          <td class="right">3,150,000</td>
-          <td class="right">2,520,000</td>
-          <td class="right">1,260,000</td>
-          <td class="right">1,260,000</td>
-          <td class="right">1,260,000</td>
-          <td class="right">0 (0)</td>
-        </tr>
-        <tr>
-          <td><span class="status-badge">Active</span></td>
-          <td>pr25006</td>
-          <td>Khant Su</td>
-          <td>SR-A</td>
-          <td>01-Sep-25 – present</td>
-          <td class="right">2,520,000</td>
-          <td class="right">2,016,000</td>
-          <td class="right">1,008,000</td>
-          <td class="right">1,008,000</td>
-          <td class="right">1,008,000</td>
-          <td class="right">0 (0)</td>
-        </tr>
-
-        <tr class="subtotal-row">
-          <td colspan="5"><strong>Subtotal — Monthly (20 students)</strong></td>
-          <td class="right"><strong>80,000,000</strong></td>
-          <td class="right"><strong>52,000,000</strong></td>
-          <td class="right"><strong>30,000,000</strong></td>
-          <td class="right"><strong>22,000,000</strong></td>
-          <td class="right"><strong>22,360,000</strong></td>
-          <td class="right"><strong>18 (360,000)</strong></td>
-        </tr>
-      </tbody>
     </table>
 
-    <!-- TERMLY PLAN -->
-    <div class="section-title">Termly Plan Students</div>
-    <div class="group-label">
-      6 students · Payment split by academic terms · non-refundable per term once the term starts
-    </div>
-    <table>
-      <thead>
-        <tr>
-          <th>Status</th>
-          <th>Student ID</th>
-          <th>Student Name</th>
-          <th>Class</th>
-          <th>Enrollment (AY 2025–2026)</th>
-          <th class="right">Tuition Before</th>
-          <th class="right">Tuition After</th>
-          <th class="right">Paid</th>
-          <th class="right">Unpaid</th>
-          <th class="right">Balance</th>
-          <th class="right">YTD Late Days (MMK)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="late-row">
-          <td><span class="status-badge">Active</span></td>
-          <td>pr25007</td>
-          <td>Thet Htoo</td>
-          <td>SR-B</td>
-          <td>01-Jul-25 – present</td>
-          <td class="right">4,200,000</td>
-          <td class="right">3,360,000</td>
-          <td class="right">2,520,000</td>
-          <td class="right">840,000</td>
-          <td class="right">900,000</td>
-          <td class="right">3 (60,000)</td>
-        </tr>
-        <tr>
-          <td><span class="status-badge">Active</span></td>
-          <td>pr25008</td>
-          <td>Thura</td>
-          <td>EY1-A</td>
-          <td>06-Jun-25 – present</td>
-          <td class="right">4,200,000</td>
-          <td class="right">3,570,000</td>
-          <td class="right">2,520,000</td>
-          <td class="right">1,050,000</td>
-          <td class="right">1,050,000</td>
-          <td class="right">0 (0)</td>
-        </tr>
-        <tr>
-          <td><span class="status-badge">Active</span></td>
-          <td>pr25009</td>
-          <td>Pyae Sone</td>
-          <td>EY1-B</td>
-          <td>24-Jun-25 – present</td>
-          <td class="right">4,200,000</td>
-          <td class="right">3,360,000</td>
-          <td class="right">2,100,000</td>
-          <td class="right">1,260,000</td>
-          <td class="right">1,260,000</td>
-          <td class="right">0 (0)</td>
-        </tr>
-        <tr>
-          <td><span class="status-badge">Active</span></td>
-          <td>pr25010</td>
-          <td>Hnin Ei</td>
-          <td>EY2-A</td>
-          <td>06-Aug-25 – present</td>
-          <td class="right">3,360,000</td>
-          <td class="right">2,688,000</td>
-          <td class="right">1,344,000</td>
-          <td class="right">1,344,000</td>
-          <td class="right">1,344,000</td>
-          <td class="right">0 (0)</td>
-        </tr>
-        <tr>
-          <td><span class="status-badge">Active</span></td>
-          <td>pr25011</td>
-          <td>Cherry</td>
-          <td>EY2-B</td>
-          <td>24-Aug-25 – present</td>
-          <td class="right">3,360,000</td>
-          <td class="right">2,520,000</td>
-          <td class="right">1,260,000</td>
-          <td class="right">1,260,000</td>
-          <td class="right">1,260,000</td>
-          <td class="right">0 (0)</td>
-        </tr>
-        <tr>
-          <td><span class="status-badge">Active</span></td>
-          <td>pr25012</td>
-          <td>Yuri</td>
-          <td>Y1-A</td>
-          <td>01-Sep-25 – present</td>
-          <td class="right">3,480,000</td>
-          <td class="right">2,502,000</td>
-          <td class="right">1,476,000</td>
-          <td class="right">1,026,000</td>
-          <td class="right">1,056,000</td>
-          <td class="right">0 (0)</td>
-        </tr>
-        <tr class="subtotal-row">
-          <td colspan="5"><strong>Subtotal — Termly (6 students)</strong></td>
-          <td class="right"><strong>24,000,000</strong></td>
-          <td class="right"><strong>16,000,000</strong></td>
-          <td class="right"><strong>10,000,000</strong></td>
-          <td class="right"><strong>6,000,000</strong></td>
-          <td class="right"><strong>6,120,000</strong></td>
-          <td class="right"><strong>3 (60,000)</strong></td>
-        </tr>
-      </tbody>
-    </table>
+    <button class="btn-submit">Add Student &amp; Create Tuition Plan</button>
 
-    <!-- ANNUAL PLAN -->
-    <div class="section-title">Annual Plan Students</div>
-    <div class="group-label">
-      4 students · One-time annual payment · refund only for unused full terms
-    </div>
-    <table>
-      <thead>
-        <tr>
-          <th>Status</th>
-          <th>Student ID</th>
-          <th>Student Name</th>
-          <th>Class</th>
-          <th>Enrollment (AY 2025–2026)</th>
-          <th class="right">Tuition Before</th>
-          <th class="right">Tuition After</th>
-          <th class="right">Paid</th>
-          <th class="right">Unpaid</th>
-          <th class="right">Balance</th>
-          <th class="right">YTD Late Days (MMK)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="late-row">
-          <td><span class="status-badge">Active</span></td>
-          <td>pr25013</td>
-          <td>Hla Hla</td>
-          <td>Y1-B</td>
-          <td>04-Jun-25 – present</td>
-          <td class="right">4,200,000</td>
-          <td class="right">3,360,000</td>
-          <td class="right">3,360,000</td>
-          <td class="right">0</td>
-          <td class="right">40,000</td>
-          <td class="right">2 (40,000)</td>
-        </tr>
-        <tr>
-          <td><span class="status-badge">Active</span></td>
-          <td>pr25014</td>
-          <td>Thida</td>
-          <td>Y2-A</td>
-          <td>10-Jun-25 – present</td>
-          <td class="right">4,200,000</td>
-          <td class="right">3,570,000</td>
-          <td class="right">3,570,000</td>
-          <td class="right">0</td>
-          <td class="right">0</td>
-          <td class="right">0 (0)</td>
-        </tr>
-        <tr>
-          <td><span class="status-badge left">LEFT (10-Nov-25)</span></td>
-          <td>pr25015</td>
-          <td>Khaing</td>
-          <td>Y2-B</td>
-          <td>24-Jun-25 – 10-Nov-25</td>
-          <td class="right">4,200,000</td>
-          <td class="right">3,150,000</td>
-          <td class="right">3,150,000</td>
-          <td class="right">0</td>
-          <td class="right">0</td>
-          <td class="right">0 (0)</td>
-        </tr>
-        <tr>
-          <td><span class="status-badge">Active</span></td>
-          <td>pr25016</td>
-          <td>Ko Min</td>
-          <td>Y3-A</td>
-          <td>06-Jul-25 – present</td>
-          <td class="right">3,600,000</td>
-          <td class="right">1,920,000</td>
-          <td class="right">1,920,000</td>
-          <td class="right">0</td>
-          <td class="right">0</td>
-          <td class="right">0 (0)</td>
-        </tr>
-        <tr class="subtotal-row">
-          <td colspan="5"><strong>Subtotal — Annual (4 students)</strong></td>
-          <td class="right"><strong>16,000,000</strong></td>
-          <td class="right"><strong>12,000,000</strong></td>
-          <td class="right"><strong>10,000,000</strong></td>
-          <td class="right"><strong>2,000,000</strong></td>
-          <td class="right"><strong>2,040,000</strong></td>
-          <td class="right"><strong>2 (40,000)</strong></td>
-        </tr>
-      </tbody>
-    </table>
+</div>
 
-  </div>
 </body>
 </html>
