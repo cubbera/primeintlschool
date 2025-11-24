@@ -2,198 +2,327 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Add New Student</title>
-
+<title>Add Student & Create Tuition Plan</title>
 <style>
     body {
         font-family: Arial, sans-serif;
-        background: #f4f4f4;
-        padding: 20px;
+        background: #f3f4f6;
+        padding: 30px;
+    }
+
+    .container {
+        max-width: 860px;
+        margin: auto;
+        background: #fff;
+        padding: 28px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     }
 
     h1 {
-        margin-bottom: 20px;
-        font-size: 24px;
+        margin-top: 0;
+        margin-bottom: 10px;
     }
 
-    .form-box {
-        background: #fff;
-        padding: 20px;
-        border-radius: 10px;
-        max-width: 700px;
-        margin: auto;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-
-    .section-title {
-        margin-top: 25px;
+    h2 {
+        margin-top: 28px;
+        border-bottom: 2px solid #e5e7eb;
+        padding-bottom: 6px;
         font-size: 18px;
-        font-weight: bold;
     }
 
     label {
         display: block;
-        margin-top: 15px;
         font-weight: bold;
+        margin-top: 12px;
+        margin-bottom: 4px;
     }
 
     input, select {
         width: 100%;
-        padding: 8px 10px;
+        padding: 10px;
+        border: 1px solid #d1d5db;
         border-radius: 6px;
-        border: 1px solid #ccc;
+        margin-bottom: 6px;
         font-size: 14px;
         box-sizing: border-box;
     }
 
-    table {
-        width: 100%;
-        margin-top: 10px;
-        border-collapse: collapse;
+    .two-col {
+        display: flex;
+        gap: 16px;
     }
 
-    td {
-        padding: 6px 4px;
-        font-size: 14px;
-    }
-
-    .text-right {
-        text-align: right;
+    .two-col > div {
+        flex: 1;
     }
 
     .discount-row {
         display: flex;
+        justify-content: space-between;
         align-items: center;
         margin-top: 8px;
+        padding: 8px 10px;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        background: #f9fafb;
     }
 
-    .discount-row input {
-        width: 18px;
-        height: 18px;
-        margin-right: 6px;
+    .discount-row select {
+        width: 68%;
+        margin-bottom: 0;
     }
 
-    .discount-row label {
-        font-weight: normal;
+    .discount-amount {
+        font-weight: bold;
+        color: red;
+        text-align: right;
+        width: 30%;
+        font-variant-numeric: tabular-nums;
+    }
+
+    table {
+        width: 100%;
+        margin-top: 16px;
+        border-collapse: collapse;
+    }
+
+    table td {
+        padding: 6px 4px;
+        font-size: 14px;
+    }
+
+    table td:nth-child(2) {
+        text-align: right;
+        font-weight: bold;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+
+    .btn-add {
+        margin-top: 10px;
+        background: #1d4ed8;
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
     }
 
     .btn-submit {
-        background: #1f2937;
-        color: white;
-        padding: 14px;
-        font-size: 16px;
+        margin-top: 22px;
         width: 100%;
-        border: none;
+        background: #059669;
+        color: #fff;
+        font-size: 18px;
+        padding: 14px;
         border-radius: 8px;
-        margin-top: 25px;
         cursor: pointer;
+        border: none;
+        font-weight: bold;
+    }
+
+    .note {
+        font-size: 12px;
+        color: #6b7280;
+        margin-top: 4px;
     }
 </style>
-</head>
 
+<script>
+function autoFillTuition() {
+    const division = document.getElementById("division").value;
+    const level = document.getElementById("level").value;
+    const plan = document.getElementById("paymentPlan").value;
+    const tuitionInput = document.getElementById("tuitionBefore");
+
+    if (!division || !level || !plan) {
+        return;
+    }
+
+    let group;
+    if (division === "Preschool") group = "Preschool";
+    else group = "Primary";
+
+    let amount = 0;
+    if (group === "Preschool") {
+        if (plan === "Annual") amount = 3900000;
+        else amount = 4200000;
+    } else {
+        if (plan === "Annual") amount = 4200000;
+        else amount = 4500000;
+    }
+
+    tuitionInput.value = amount;
+    updateDiscounts();
+}
+
+function addDiscountRow() {
+    const container = document.getElementById("discountContainer");
+
+    const row = document.createElement("div");
+    row.className = "discount-row";
+
+    row.innerHTML = `
+        <select onchange="updateDiscounts()">
+            <option value="">-- Select Discount --</option>
+            <option value="early35">Early Bird 35%</option>
+            <option value="play15">Play & Learn 15%</option>
+            <option value="ref100">Referral -100,000 MMK</option>
+            <option value="sib5">Sibling 5%</option>
+            <option value="sib10">Sibling 10%</option>
+        </select>
+        <div class="discount-amount">0</div>
+    `;
+
+    container.appendChild(row);
+    updateDiscounts();
+}
+
+function updateDiscounts() {
+    const tuition = parseInt(document.getElementById("tuitionBefore").value || 0, 10);
+    const discountRows = document.querySelectorAll("#discountContainer .discount-row");
+    let totalDiscount = 0;
+
+    discountRows.forEach(row => {
+        const select = row.querySelector("select");
+        const value = select.value;
+        const amountBox = row.querySelector(".discount-amount");
+        let amount = 0;
+
+        if (!value || tuition <= 0) {
+            amountBox.textContent = "0";
+            return;
+        }
+
+        switch (value) {
+            case "early35": amount = tuition * 0.35; break;
+            case "play15": amount = tuition * 0.15; break;
+            case "ref100": amount = 100000; break;
+            case "sib5": amount = tuition * 0.05; break;
+            case "sib10": amount = tuition * 0.10; break;
+        }
+
+        amount = Math.round(amount);
+        amountBox.textContent = "-" + amount.toLocaleString();
+        totalDiscount += amount;
+    });
+
+    const totalDiscountCell = document.getElementById("totalDiscount");
+    const afterDiscountCell = document.getElementById("afterDiscount");
+    const monthlyFeeCell = document.getElementById("monthlyFee");
+
+    totalDiscountCell.textContent = "-" + totalDiscount.toLocaleString();
+
+    const net = tuition - totalDiscount;
+    afterDiscountCell.textContent = net.toLocaleString();
+
+    const monthly = net > 0 ? Math.round(net / 10) : 0;
+    monthlyFeeCell.textContent = monthly.toLocaleString();
+}
+
+function updateLevels() {
+    const div = document.getElementById("division").value;
+    const level = document.getElementById("level");
+
+    level.innerHTML = "";
+
+    if (div === "Preschool") {
+        level.innerHTML += `<option value="SR">SR</option>`;
+        level.innerHTML += `<option value="EY1">EY1</option>`;
+        level.innerHTML += `<option value="EY2">EY2</option>`;
+    }
+
+    if (div === "Primary") {
+        level.innerHTML += `<option value="Y1">Y1</option>`;
+        level.innerHTML += `<option value="Y2">Y2</option>`;
+        level.innerHTML += `<option value="Y3">Y3</option>`;
+    }
+}
+</script>
+
+</head>
 <body>
 
-<h1>Add New Student</h1>
+<div class="container">
 
-<div class="form-box">
+    <h1>Add New Student</h1>
 
-    <!-- 1. STUDENT INFO -->
-    <div class="section-title">1. Student Information</div>
+    <h2>1. Student Information</h2>
 
     <label>Full Name</label>
-    <input type="text" placeholder="Enter full name">
-
-    <label>Nickname</label>
-    <input type="text" placeholder="Enter nickname">
+    <input type="text">
 
     <label>Father's Name</label>
-    <input type="text" placeholder="Enter father's name">
+    <input type="text">
 
-    <label>Date of Birth</label>
-    <input type="date">
+    <div class="two-col">
+        <div>
+            <label>Gender</label>
+            <select>
+                <option value="">Select gender</option>
+                <option>Male</option>
+                <option>Female</option>
+            </select>
+        </div>
+        <div>
+            <label>Date of Birth</label>
+            <input type="date">
+        </div>
+    </div>
 
-    <label>Gender</label>
+    <h2>2. Enrollment</h2>
+
+    <label>Academic Year</label>
     <select>
-        <option value="">Select Gender</option>
-        <option>Male</option>
-        <option>Female</option>
+        <option>2025–2026</option>
     </select>
 
-    <!-- 2. ENROLLMENT -->
-    <div class="section-title">2. Enrollment</div>
+    <div class="two-col">
+        <div>
+            <label>Division</label>
+            <select id="division" onchange="updateLevels(); autoFillTuition();">
+                <option value="">Select division</option>
+                <option value="Preschool">Preschool</option>
+                <option value="Primary">Primary</option>
+            </select>
+        </div>
+        <div>
+            <label>Level</label>
+            <select id="level" onchange="autoFillTuition()">
+                <option value="">Select level</option>
+            </select>
+        </div>
+    </div>
 
-    <label>Division</label>
-    <select id="division" onchange="updateLevels()">
-        <option value="">Select Division</option>
-        <option value="Preschool">Preschool</option>
-        <option value="Primary">Primary</option>
+    <label>Payment Plan</label>
+    <select id="paymentPlan" onchange="autoFillTuition()">
+        <option value="">Select plan</option>
+        <option value="Monthly">Monthly</option>
+        <option value="Termly">Termly</option>
+        <option value="Annual">Annual</option>
     </select>
 
-    <label>Level</label>
-    <select id="level">
-        <option value="">Select Level</option>
-    </select>
+    <h2>3. Calculated Tuition Summary</h2>
 
-    <label>Payment Term</label>
-    <select>
-        <option>Annual</option>
-        <option>Termly</option>
-        <option>Monthly</option>
-    </select>
+    <label>Tuition Before Discount</label>
+    <input type="number" id="tuitionBefore" value="4200000" onkeyup="updateDiscounts()">
 
-    <!-- 3. TUITION SUMMARY -->
-    <div class="section-title">3. Calculated Tuition Summary</div>
+    <h3>Add Discounts</h3>
+    <div id="discountContainer"></div>
+    <button type="button" class="btn-add" onclick="addDiscountRow()">+ Add Discount</button>
 
     <table>
-        <tr><td>Tuition Before Discount</td><td class="text-right">4,200,000</td></tr>
-        <tr><td>Early Bird 35% Discount</td><td class="text-right" style="color:red;">-1,470,000</td></tr>
-        <tr><td>Play & Learn 15% Discount</td><td class="text-right" style="color:red;">-630,000</td></tr>
-        <tr><td>Referral 100,000 MMK Discount</td><td class="text-right" style="color:red;">-100,000</td></tr>
-        <tr><td><b>Total Discount</b></td><td class="text-right" style="color:red;"><b>-2,200,000</b></td></tr>
-        <tr><td><b>After Discount</b></td><td class="text-right"><b>2,000,000</b></td></tr>
-        <tr><td>Monthly Fee (10 months)</td><td class="text-right">200,000</td></tr>
+        <tr><td>Total Discount</td><td id="totalDiscount">0</td></tr>
+        <tr><td>After Discount</td><td id="afterDiscount">4,200,000</td></tr>
+        <tr><td>Monthly Fee (10 installments)</td><td id="monthlyFee">420,000</td></tr>
     </table>
-
-    <div class="section-title">Select Discount</div>
-
-    <div class="discount-row">
-        <input type="checkbox">
-        <label>Early Bird 35%</label>
-    </div>
-
-    <div class="discount-row">
-        <input type="checkbox">
-        <label>Play & Learn 15%</label>
-    </div>
-
-    <div class="discount-row">
-        <input type="checkbox">
-        <label>Referral 100,000 MMK</label>
-    </div>
 
     <button class="btn-submit">Add Student & Create Tuition Plan</button>
 
 </div>
-
-<script>
-function updateLevels() {
-    const div = document.getElementById("division").value;
-    const level = document.getElementById("level");
-    level.innerHTML = "";
-
-    if (div === "Preschool") {
-        level.innerHTML += `<option value="SR">SR (School Readiness)</option>`;
-        level.innerHTML += `<option value="EY1">EY1 (Early Years 1)</option>`;
-        level.innerHTML += `<option value="EY2">EY2 (Early Years 2)</option>`;
-    }
-
-    if (div === "Primary") {
-        level.innerHTML += `<option value="Y1">Year 1</option>`;
-        level.innerHTML += `<option value="Y2">Year 2</option>`;
-        level.innerHTML += `<option value="Y3">Year 3</option>`;
-    }
-}
-</script>
 
 </body>
 </html>
