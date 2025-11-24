@@ -5,119 +5,286 @@
 <title>Tuition Summary — Prime International School</title>
 
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #f4f4f4;
-        padding: 20px;
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    padding: 20px;
+  }
+
+  h1 {
+    margin-top: 0;
+    font-size: 26px;
+  }
+
+  p.small-note {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  /* TOP SUMMARY BOX */
+
+  .summary-box {
+    background: #fff;
+    padding: 18px;
+    margin-bottom: 22px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+
+  .summary-title {
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 16px;
+  }
+
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .summary-table th,
+  .summary-table td {
+    border: 1px solid #e5e7eb;
+    padding: 6px 8px;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .summary-table th:first-child,
+  .summary-table td:first-child {
+    text-align: left;
+  }
+
+  .summary-table th {
+    background: #111827;
+    color: #f9fafb;
+  }
+
+  .summary-table tfoot td {
+    font-weight: bold;
+    background: #f3f4f6;
+  }
+
+  /* FILTER + SEARCH BAR */
+
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .filter-tabs {
+    display: flex;
+    gap: 6px;
+  }
+
+  .filter-tab {
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid #d1d5db;
+    background: #f9fafb;
+    cursor: pointer;
+    font-size: 13px;
+  }
+
+  .filter-tab.active {
+    background: #1f2937;
+    color: #fff;
+    border-color: #1f2937;
+  }
+
+  .filter-select {
+    display: none;
+    padding: 6px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    font-size: 13px;
+  }
+
+  .search-box input {
+    padding: 7px 10px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    font-size: 13px;
+    min-width: 220px;
+  }
+
+  /* MAIN TABLE */
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+  }
+
+  th, td {
+    padding: 10px 8px;
+    font-size: 13px;
+    border-bottom: 1px solid #eee;
+    white-space: nowrap;
+  }
+
+  th {
+    background: #1f2937;
+    color: #fff;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  th .sort-icon {
+    font-size: 10px;
+    opacity: 0.6;
+    margin-left: 4px;
+  }
+
+  .left-status {
+    color: red;
+    font-weight: bold;
+  }
+
+  /* Responsive */
+
+  @media (max-width: 900px) {
+    table, thead, tbody, th, td, tr {
+      display: block;
     }
 
-    h1 {
-        margin-top: 0;
-        font-size: 26px;
+    thead { display: none; }
+
+    tr {
+      margin-bottom: 15px;
+      background: #fff;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
-    .summary-box {
-        background: #fff;
-        padding: 18px;
-        margin-bottom: 22px;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    td {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 6px;
+      border: none;
+      border-bottom: 1px dashed #eee;
     }
 
-    .summary-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 6px 0;
-        font-size: 15px;
+    td:last-child {
+      border-bottom: none;
     }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        background: #fff;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+    td:before {
+      content: attr(data-label);
+      font-weight: bold;
+      margin-right: 10px;
     }
+  }
 
-    th, td {
-        padding: 12px 10px;
-        font-size: 14px;
-        border-bottom: 1px solid #eee;
-        white-space: nowrap;
+  @media (max-width: 640px) {
+    .filter-tabs {
+      display: none;
     }
-
-    th {
-        background: #1f2937;
-        color: #fff;
-        cursor: pointer;
-        user-select: none;
+    .filter-select {
+      display: inline-block;
     }
-
-    th .sort-icon {
-        font-size: 10px;
-        opacity: 0.6;
-        margin-left: 4px;
-    }
-
-    .left-status {
-        color: red;
-        font-weight: bold;
-    }
-
-    @media(max-width: 900px) {
-        table, thead, tbody, th, td, tr {
-            display: block;
-        }
-
-        thead { display: none; }
-
-        tr {
-            margin-bottom: 15px;
-            background: #fff;
-            border-radius: 10px;
-            padding: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        td {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 6px;
-            border: none;
-        }
-
-        td:before {
-            content: attr(data-label);
-            font-weight: bold;
-        }
-    }
+  }
 </style>
 
 <script>
-// REAL TABLE SORTING
-function sortTable(colIndex) {
+  let currentPlanFilter = 'All';
+
+  function sortTable(colIndex) {
     const table = document.getElementById("tuitionTable");
     const tbody = table.tBodies[0];
     const rows = Array.from(tbody.querySelectorAll("tr"));
     const header = table.tHead.rows[0].cells[colIndex];
 
-    const isAsc = header.classList.toggle("asc");
-    header.classList.toggle("desc", !isAsc);
+    const currentlyAsc = header.classList.contains("asc");
+    Array.from(table.tHead.rows[0].cells).forEach(th => th.classList.remove("asc", "desc"));
+    const isAsc = !currentlyAsc;
+    header.classList.add(isAsc ? "asc" : "desc");
 
     rows.sort((a, b) => {
-        const cellA = a.children[colIndex].innerText.replace(/[^0-9.-]/g, '') || a.children[colIndex].innerText.toLowerCase();
-        const cellB = b.children[colIndex].innerText.replace(/[^0-9.-]/g, '') || b.children[colIndex].innerText.toLowerCase();
+      const getCellVal = (row, idx) =>
+        row.children[idx].innerText.replace(/[^0-9.\-]/g, '') || row.children[idx].innerText.toLowerCase();
 
-        if (!isNaN(cellA) && !isNaN(cellB)) {
-            return isAsc ? cellA - cellB : cellB - cellA;
-        }
-        return isAsc
-            ? cellA.localeCompare(cellB)
-            : cellB.localeCompare(cellA);
+      const cellA = getCellVal(a, colIndex);
+      const cellB = getCellVal(b, colIndex);
+
+      if (!isNaN(cellA) && cellA !== "" && !isNaN(cellB) && cellB !== "") {
+        return isAsc ? (Number(cellA) - Number(cellB)) : (Number(cellB) - Number(cellA));
+      }
+      return isAsc
+        ? cellA.localeCompare(cellB)
+        : cellB.localeCompare(cellA);
     });
 
     rows.forEach(row => tbody.appendChild(row));
+  }
+
+  function setPlanFilter(plan) {
+    currentPlanFilter = plan;
+
+    // Update tab active state
+    const tabs = document.querySelectorAll('.filter-tab');
+    tabs.forEach(tab => {
+      if (tab.dataset.plan === plan) tab.classList.add('active');
+      else tab.classList.remove('active');
+    });
+
+    // Sync dropdown
+    const select = document.getElementById('planFilterSelect');
+    if (select && select.value !== plan) {
+      select.value = plan;
+    }
+
+    applyFilters();
+  }
+
+  function onPlanSelectChange(sel) {
+    setPlanFilter(sel.value);
+  }
+
+  function applyFilters() {
+    const searchTerm = document.getElementById('searchBox').value.toLowerCase().trim();
+    const rows = document.querySelectorAll('#tuitionTable tbody tr');
+
+    rows.forEach(row => {
+      const rowPlan = row.getAttribute('data-plan');
+      const sid = row.getAttribute('data-id').toLowerCase();
+      const name = row.getAttribute('data-name').toLowerCase();
+
+      let visible = true;
+
+      if (currentPlanFilter !== 'All' && rowPlan !== currentPlanFilter) {
+        visible = false;
+      }
+
+      if (searchTerm) {
+        const match = sid.includes(searchTerm) || name.includes(searchTerm);
+        if (!match) visible = false;
+      }
+
+      row.style.display = visible ? '' : 'none';
+    });
+  }
+
+  function onSearchInput() {
+    applyFilters();
+  }
+
+  window.onload = function() {
+    // Default filter = All
+    setPlanFilter('All');
+  };
+
+  function runSearch() {
+  applyFilters();
 }
 </script>
 
@@ -125,67 +292,579 @@ function sortTable(colIndex) {
 <body>
 
 <h1>Tuition Summary — AY 2025–2026</h1>
+<p class="small-note">As of 06-Nov-25 · 30 students</p>
 
+<!-- TOP SUMMARY TABLE -->
 <div class="summary-box">
-    <div class="summary-row"><strong>Subtotal — Monthly (11 students)</strong> <span>48,000,000 | 33,670,000 | 7,300,000 | 26,370,000 | 26,930,000 | 28 (560,000)</span></div>
-    <div class="summary-row"><strong>Subtotal — Termly (6 students)</strong> <span>26,100,000 | 22,725,000 | 7,785,000 | 14,940,000 | 15,000,000 | 3 (60,000)</span></div>
-    <div class="summary-row"><strong>Subtotal — Annual (8 students)</strong> <span>34,800,000 | 31,515,000 | 31,515,000 | 0 | 0 | 0 (0)</span></div>
-    <hr>
-    <div class="summary-row"><strong>GRAND TOTAL (25 students)</strong> <span>108,900,000 | 87,910,000 | 46,600,000 | 41,310,000 | 41,930,000 | 31 (620,000)</span></div>
+  <div class="summary-title">Tuition Summary by Payment Plan</div>
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th>Payment Plan</th>
+        <th>Students</th>
+        <th>Tuition Before</th>
+        <th>Tuition After</th>
+        <th>Paid</th>
+        <th>Unpaid</th>
+        <th>Balance (Unpaid + Late)</th>
+        <th>YTD Late (days / MMK)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Monthly</td>
+        <td>20</td>
+        <td>70,500,000</td>
+        <td>55,214,000</td>
+        <td>38,986,000</td>
+        <td>16,228,000</td>
+        <td>16,748,000</td>
+        <td>26 (520,000)</td>
+      </tr>
+      <tr>
+        <td>Termly</td>
+        <td>6</td>
+        <td>20,790,000</td>
+        <td>16,422,000</td>
+        <td>11,508,000</td>
+        <td>4,914,000</td>
+        <td>5,014,000</td>
+        <td>5 (100,000)</td>
+      </tr>
+      <tr>
+        <td>Annual</td>
+        <td>4</td>
+        <td>13,000,000</td>
+        <td>10,400,000</td>
+        <td>10,160,000</td>
+        <td>240,000</td>
+        <td>280,000</td>
+        <td>2 (40,000)</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td>GRAND TOTAL</td>
+        <td>30</td>
+        <td>104,290,000</td>
+        <td>82,036,000</td>
+        <td>60,654,000</td>
+        <td>21,382,000</td>
+        <td>22,042,000</td>
+        <td>33 (660,000)</td>
+      </tr>
+    </tfoot>
+  </table>
 </div>
 
+<!-- FILTER + SEARCH TOOLBAR -->
+<div class="toolbar">
+  <div class="filter-tabs">
+    <button class="filter-tab" data-plan="All" onclick="setPlanFilter('All')">All</button>
+    <button class="filter-tab" data-plan="Monthly" onclick="setPlanFilter('Monthly')">Monthly</button>
+    <button class="filter-tab" data-plan="Termly" onclick="setPlanFilter('Termly')">Termly</button>
+    <button class="filter-tab" data-plan="Annual" onclick="setPlanFilter('Annual')">Annual</button>
+  </div>
+
+  <select id="planFilterSelect" class="filter-select" onchange="onPlanSelectChange(this)">
+    <option value="All">All</option>
+    <option value="Monthly">Monthly</option>
+    <option value="Termly">Termly</option>
+    <option value="Annual">Annual</option>
+  </select>
+
+  <div class="search-box">
+    <input id="searchBox" type="text"
+           placeholder="Search by Student ID or Name..."
+           onkeyup="if(event.key==='Enter'){ runSearch(); }" />
+    <button onclick="runSearch()" style="
+      margin-left:6px;
+      padding:7px 14px;
+      background:#1f2937;
+      color:white;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:13px;
+    ">Search</button>
+  </div>
+</div>
+
+
+<!-- MAIN TABLE -->
 <table id="tuitionTable">
-<thead>
-<tr>
-    <th onclick="sortTable(0)">Status <span class="sort-icon">▲▼</span></th>
-    <th onclick="sortTable(1)">Student ID <span class="sort-icon">▲▼</span></th>
-    <th onclick="sortTable(2)">Name <span class="sort-icon">▲▼</span></th>
-    <th onclick="sortTable(3)">Class <span class="sort-icon">▲▼</span></th>
-    <th onclick="sortTable(4)">Period <span class="sort-icon">▲▼</span></th>
-    <th onclick="sortTable(5)">Before <span class="sort-icon">▲▼</span></th>
-    <th onclick="sortTable(6)">After <span class="sort-icon">▲▼</span></th>
-    <th onclick="sortTable(7)">Paid <span class="sort-icon">▲▼</span></th>
-    <th onclick="sortTable(8)">Unpaid <span class="sort-icon">▲▼</span></th>
-    <th onclick="sortTable(9)">Next Due <span class="sort-icon">▲▼</span></th>
-    <th onclick="sortTable(10)">YTD Late (MMK) <span class="sort-icon">▲▼</span></th>
-</tr>
-</thead>
+  <thead>
+    <tr>
+      <th onclick="sortTable(0)">Status <span class="sort-icon">▲▼</span></th>
+      <th onclick="sortTable(1)">Student ID <span class="sort-icon">▲▼</span></th>
+      <th onclick="sortTable(2)">Name <span class="sort-icon">▲▼</span></th>
+      <th onclick="sortTable(3)">Class <span class="sort-icon">▲▼</span></th>
+      <th onclick="sortTable(4)">Period <span class="sort-icon">▲▼</span></th>
+      <th onclick="sortTable(5)">Pay Term <span class="sort-icon">▲▼</span></th>
+      <th onclick="sortTable(6)">Tuition Before <span class="sort-icon">▲▼</span></th>
+      <th onclick="sortTable(7)">Tuition After <span class="sort-icon">▲▼</span></th>
+      <th onclick="sortTable(8)">Paid <span class="sort-icon">▲▼</span></th>
+      <th onclick="sortTable(9)">Unpaid <span class="sort-icon">▲▼</span></th>
+      <th onclick="sortTable(10)">Next Due <span class="sort-icon">▲▼</span></th>
+      <th onclick="sortTable(11)">YTD Late (MMK) <span class="sort-icon">▲▼</span></th>
+    </tr>
+  </thead>
+  <tbody>
 
-<tbody>
+    <!-- 20 MONTHLY STUDENTS -->
+    <tr data-plan="Monthly" data-id="pr23001" data-name="Aye Aye">
+      <td data-label="Status">Present</td>
+      <td data-label="Student ID">pr23001</td>
+      <td data-label="Name">Aye Aye</td>
+      <td data-label="Class">EY2-A</td>
+      <td data-label="Period">04-Jun-25 – Now</td>
+      <td data-label="Pay Term">Monthly</td>
+      <td data-label="Tuition Before">4,200,000</td>
+      <td data-label="Tuition After">2,900,000</td>
+      <td data-label="Paid">1,900,000</td>
+      <td data-label="Unpaid">1,000,000</td>
+      <td data-label="Next Due">01-Dec-25</td>
+      <td data-label="YTD Late (MMK)">5 (100,000)</td>
+    </tr>
 
-<!-- EXAMPLE ROW 1 -->
-<tr>
-    <td data-label="Status">Present</td>
-    <td data-label="ID">pr25004</td>
-    <td data-label="Name">Aye Aye</td>
-    <td data-label="Class">EY2-A</td>
-    <td data-label="Period">04-Jun-25 – Now</td>
-    <td data-label="Before">4,200,000</td>
-    <td data-label="After">2,000,000</td>
-    <td data-label="Paid">700,000</td>
-    <td data-label="Unpaid">1,300,000</td>
-    <td data-label="Next Due">01-Dec-25</td>
-    <td data-label="Late">28 (560,000)</td>
-</tr>
+    <tr data-plan="Monthly" data-id="pr23002" data-name="Mya Mya">
+      <td data-label="Status" class="left-status">LEFT</td>
+      <td data-label="Student ID">pr23002</td>
+      <td data-label="Name">Mya Mya</td>
+      <td data-label="Class">EY2-B</td>
+      <td data-label="Period">04-Jun-25 – 15-Oct-25</td>
+      <td data-label="Pay Term">Monthly</td>
+      <td data-label="Tuition Before">2,520,000</td>
+      <td data-label="Tuition After">1,764,000</td>
+      <td data-label="Paid">1,764,000</td>
+      <td data-label="Unpaid">0</td>
+      <td data-label="Next Due">—</td>
+      <td data-label="YTD Late (MMK)">3 (60,000)</td>
+    </tr>
 
-<!-- EXAMPLE ROW 2 LEFT -->
-<tr>
-    <td data-label="Status" class="left-status">LEFT</td>
-    <td data-label="ID">pr23002</td>
-    <td data-label="Name">Mya Mya</td>
-    <td data-label="Class">EY2-B</td>
-    <td data-label="Period">04-Jun-25 – 15-Oct-25</td>
-    <td data-label="Before">2,520,000</td>
-    <td data-label="After">1,764,000</td>
-    <td data-label="Paid">1,764,000</td>
-    <td data-label="Unpaid">0</td>
-    <td data-label="Next Due">—</td>
-    <td data-label="Late">0 (0)</td>
-</tr>
+    <tr data-plan="Monthly" data-id="pr23003" data-name="Hsu Mon">
+      <td data-label="Status">Present</td>
+      <td data-label="Student ID">pr23003</td>
+      <td data-label="Name">Hsu Mon</td>
+      <td data-label="Class">SR-A</td>
+      <td data-label="Period">04-Jun-25 – Now</td>
+      <td data-label="Pay Term">Monthly</td>
+      <td data-label="Tuition Before">4,200,000</td>
+      <td data-label="Tuition After">3,000,000</td>
+      <td data-label="Paid">2,000,000</td>
+      <td data-label="Unpaid">1,000,000</td>
+      <td data-label="Next Due">01-Dec-25</td>
+      <td data-label="YTD Late (MMK)">2 (40,000)</td>
+    </tr>
 
-<!-- ADD YOUR 28 MORE STUDENTS HERE -->
+    <tr data-plan="Monthly" data-id="pr23004" data-name="Thae Thae">
+      <td data-label="Status">Present</td>
+      <td data-label="Student ID">pr23004</td>
+      <td data-label="Name">Thae Thae</td>
+      <td data-label="Class">SR-B</td>
+      <td data-label="Period">04-Jun-25 – Now</td>
+      <td data-label="Pay Term">Monthly</td>
+      <td data-label="Tuition Before">4,200,000</td>
+      <td data-label="Tuition After">3,360,000</td>
+      <td data-label="Paid">2,100,000</td>
+      <td data-label="Unpaid">1,260,000</td>
+      <td data-label="Next Due">01-Dec-25</td>
+      <td data-label="YTD Late (MMK)">0 (0)</td>
+    </tr>
 
-</tbody>
+    <tr data-plan="Monthly" data-id="pr23005" data-name="Phone Ko">
+      <td data-label="Status" class="left-status">LEFT</td>
+      <td data-label="Student ID">pr23005</td>
+      <td data-label="Name">Phone Ko</td>
+      <td data-label="Class">EY1-A</td>
+      <td data-label="Period">04-Jun-25 – 30-Sep-25</td>
+      <td data-label="Pay Term">Monthly</td>
+      <td data-label="Tuition Before">1,680,000</td>
+      <td data-label="Tuition After">1,344,000</td>
+      <td data-label="Paid">1,344,000</td>
+      <td data-label="Unpaid">0</td>
+      <td data-label="Next Due">—</td>
+      <td data-label="YTD Late (MMK)">2 (40,000)</td>
+    </tr>
+
+    <tr data-plan="Monthly" data-id="pr24001" data-name="Ei Mon">
+      <td data-label="Status">Present</td>
+      <td data-label="Student ID">pr24001</td>
+      <td data-label="Name">Ei Mon</td>
+      <td data-label="Class">EY1-B</td>
+      <td data-label="Period">04-Jun-25 – Now</td>
+      <td data-label="Pay Term">Monthly</td>
+      <td data-label="Tuition Before">4,200,000</td>
+      <td data-label="Tuition After">3,150,000</td>
+      <td data-label="Paid">2,100,000</td>
+      <td data-label="Unpaid">1,050,000</td>
+      <td data-label="Next Due">01-Dec-25</td>
+      <td data-label="YTD Late (MMK)">0 (0)</td>
+    </tr>
+
+    <tr data-plan="Monthly" data-id="pr24002" data-name="Sandar Win">
+      <td data-label="Status">Present</td>
+      <td data-label="Student ID">pr24002</td>
+      <td data-label="Name">Sandar Win</td>
+      <td data-label="Class">Y1-A</td>
+      <td data-label="Period">04-Jun-25 – Now</td>
+      <td data-label="Pay Term">Monthly</td>
+      <td data-label="Tuition Before">4,500,000</td>
+      <td data-label="Tuition After">3,375,000</td>
+      <td data-label="Paid">2,250,000</td>
+      <td data-label="Unpaid">1,125,000</td>
+      <td data-label="Next Due">01-Dec-25</td>
+      <td data-label="YTD Late (MMK)">3 (60,000)</td>
+    </tr>
+
+    <tr data-plan="Monthly" data-id="pr24003" data-name="Ni Ni">
+      <td data-label="Status">Present</td>
+      <td data-label="Student ID">pr24003</td>
+      <td data-label="Name">Ni Ni</td>
+      <td data-label="Class">Y1-B</td>
+      <td data-label="Period">04-Jun-25 – Now</td>
+      <td data-label="Pay Term">Monthly</td>
+      <td data-label="Tuition Before">4,500,000</td>
+      <td data-label="Tuition After">3,150,000</td>
+      <td data-label="Paid">2,025,000</td>
+      <td data-label="Unpaid">1,125,000</td>
+      <td data-label="Next Due">01-Dec-25</td>
+      <td data-label="YTD Late (MMK)">0 (0)</td>
+    </tr>
+
+    <tr data-plan="Monthly" data-id="pr24004" data-name="Ko Ko">
+      <td data-label="Status">Present</td>
+      <td data-label="Student ID">pr24004</td>
+      <td data-label="Name">Ko Ko</td>
+      <td data-label="Class">Y2-A</td>
+      <td data-label="Period">04-Jun-25 – Now</td>
+      <td data-label="Pay Term">Monthly</td>
+      <td data-label="Tuition Before">4,500,000</td>
+      <td data-label="Tuition After">3,600,000</td>
+      <td data-label="Paid">2,700,000</td>
+      <td data-label="Unpaid">900,000</td>
+      <td data-label="Next Due">01-Dec-25</td>
+      <td data-label="YTD Late (MMK)">0 (0)</td>
+    </tr>
+
+    <tr data-plan="Monthly" data-id="pr24005" data-name="Moe Moe">
+      <td data-label="Status" class="left-status">LEFT</td>
+      <td data-label="Student ID">pr24005</td>
+      <td data-label="Name">Moe Moe</td>
+      <td data-label="Class">Y2-B</td>
+      <td data-label="Period">04-Jun-25 – 15-Oct-25</td>
+      <td data-label="Pay Term">Monthly</td>
+      <td data-label="Tuition Before">2,250,000</td>
+      <td data-label="Tuition After">1,800,000</td>
+      <td data-label="Paid">1,800,000</td>
+      <td data-label="Unpaid">0</td>
+      <td data-label="Next Due">—</td>
+      <td data-label="YTD Late (MMK)">2 (40,000)</td>
+    </tr>
+
+    <tr data-plan="Monthly" data-id="pr24006" data-name="Htet Wai">
+      <td data-label="Status">Present</td>
+      <td data-label="Student ID">pr24006</td>
+      <td data-label="Name">Htet Wai</td>
+      <td data-label="Class">SR-A</td>
+      <td data-label="Period">04-Jun-25 – Now</td>
+      <td data-label="Pay Term">Monthly</td>
+      <td data-label="Tuition Before">4,200,000</td>
+      <td data-label="Tuition After">3,360,000</td>
+      <td data-label="Paid">2,100,000</td>
+      <td data-label="Unpaid">1,260,000</td>
+      <td data-label="Next Due">01-Dec-25</td>
+      <td data-label="YTD Late (MMK)">0 (0)</td>
+    </tr>
+
+    <tr data-plan="Monthly" data-id="pr24007" data-name="Su Su">
+      <td data-label="Status">Present</td>
+      <td data-label="Student ID">pr24007</td>
+      <td data-label="Name">Su Su</td>
+      <td data-label="Class">SR-B</td>
+      <td data-label="Period">04-Jun-25 – Now</td>
+      <td data-label="Pay Term">Monthly</td>
+      <td data-label="Tuition Before">4,200,000</td>
+      <td data-label="Tuition After">3,570,000</td>
+      <td data-label="Paid">2,380,000</td>
+      <td data-label="Unpaid">1,190,000</td>
+      <td data-label="Next Due">01-Dec-25</td>
+      <td data-label="YTD Late (MMK)">0 (0)</td>
+    </tr>
+
+    <tr data-plan="Monthly" data-id="pr24008" data-name="Min Khant">
+      <td data-label="Status" class="left-status">LEFT</td>
+      <td data-label="Student ID">pr24008</td>
+      <td data-label="Name">Min Khant</td>
+      <td data-label="Class">EY1-A</td>
+      <td data-label="Period">04-Jun-25 – 30-Sep-25</td>
+      <td data-label="Pay Term">Monthly</td>
+      <td data-label="Tuition Before">1,680,000</td>
+      <td data-label="Tuition After">1,260,000</td>
+      <td data-label="Paid">1,260,000</td>
+      <td data-label="Unpaid">0</td>
+      <td data-label="Next Due">—</td>
+      <td data-label="YTD Late (MMK)">0 (0)</td>
+    </tr>
+
+    <tr data-plan="Monthly" data-id="pr24009" data-name="Nandar">
+      <td data-label="Status">Present</td>
+      <td data-label="Student ID">pr24009</td>
+      <td data-label="Name">Nandar</td>
+      <td data-label="Class">EY1-B</td>
+      <td data-label="Period">04-Jun-25 – Now</td>
+      <td data-label="Pay Term">Monthly</td>
+      <td data-label="Tuition Before">4,200,000</td>
+      <td data-label="Tuition After">3,360,000</td>
+      <td data-label="Paid">2,100,000</td>
+      <td data-label="Unpaid">1,260,000</td>
+      <td data-label="Next Due">01-Dec-25</td>
+      <td data-label="YTD Late (MMK)">1 (20,000)</td>
+    </tr>
+
+    <tr data-plan="Monthly" data-id="pr24010" data-name="Moe Thiri">
+      <td data-label="Status">Present</td>
+      <td data-label="Student ID">pr24010</td>
+      <td data-label="Name">Moe Thiri</td>
+      <td data-label="Class">EY2-A</td>
+      <td data-label="Period">04-Jun-25 – Now</td>
+      <td data-label="Pay Term">Monthly</td>
+      <td data-label="Tuition Before">4,200,000</td>
+      <td data-label="Tuition After">3,780,000</td>
+      <td data-label="Paid">2,520,000</td>
+      <td data-label="Unpaid">1,260,000</td>
+      <td data-label="Next Due">01-Dec-25</td>
+      <td data-label="YTD Late (MMK)">0 (0)</td>
+    </tr>
+
+    <tr data-plan="Monthly" data-id="pr25001" data-name="Kyaw Zin">
+      <td data-label="Status">Present</td>
+      <td data-label="Student ID">pr25001</td>
+      <td data-label="Name">Kyaw Zin</td>
+      <td data-label="Class">EY2-B</td>
+      <td data-label="Period">10-Jun-25 – Now</td>
+      <td data-label="Pay Term">Monthly</td>
+      <td data-label="Tuition Before">4,200,000</td>
+      <td data-label="Tuition After">3,360,000</td>
+      <td data-label="Paid">2,100,000</td>
+      <td data-label="Unpaid">1,260,000</td>
+      <td data-label="Next Due">01-Dec-25</td>
+      <td data-label="YTD Late (MMK)">2 (40,000)</td>
+    </tr>
+
+    <tr data-plan="Monthly" data-id="pr25002" data-name="Swe Swe">
+      <td data-label="Status">Present</td>
+      <td data-label="Student ID">pr25002</td>
+      <td data-label="Name">Swe Swe</td>
+      <td data-label="Class">Y1-A</td>
+      <td data-label="Period">10-Jun-25 – Now</td>
+      <td data-label="Pay Term">Monthly</td>
+      <td data-label="Tuition Before">4,500,000</td>
+      <td data-label="Tuition After">3,825,000</td>
+      <td data-label="Paid">2,295,000</td>
+      <td data-label="Unpaid">1,530,000</td>
+      <td data-label="Next Due">01-Dec-25</td>
+      <td data-label="YTD Late (MMK)">3 (60,000)</td>
+    </tr>
+
+    <tr data-plan="Monthly" data-id="pr25003" data-name="Mai Mai">
+      <td data-label="Status" class="left-status">LEFT</td>
+      <td data-label="Student ID">pr25003</td>
+      <td data-label="Name">Mai Mai</td>
+      <td data-label="Class">Y1-B</td>
+      <td data-label="Period">18-Jul-25 – 15-Oct-25</td>
+      <td data-label="Pay Term">Monthly</td>
+      <td data-label="Tuition Before">2,160,000</td>
+      <td data-label="Tuition After">1,728,000</td>
+      <td data-label="Paid">1,728,000</td>
+      <td data-label="Unpaid">0</td>
+      <td data-label="Next Due">—</td>
+      <td data-label="YTD Late (MMK)">2 (40,000)</td>
+    </tr>
+
+    <tr data-plan="Monthly" data-id="pr25004" data-name="Yamin">
+      <td data-label="Status" class="left-status">LEFT</td>
+      <td data-label="Student ID">pr25004</td>
+      <td data-label="Name">Yamin</td>
+      <td data-label="Class">Y2-A</td>
+      <td data-label="Period">06-Aug-25 – 31-Oct-25</td>
+      <td data-label="Pay Term">Monthly</td>
+      <td data-label="Tuition Before">1,890,000</td>
+      <td data-label="Tuition After">1,512,000</td>
+      <td data-label="Paid">1,512,000</td>
+      <td data-label="Unpaid">0</td>
+      <td data-label="Next Due">—</td>
+      <td data-label="YTD Late (MMK)">1 (20,000)</td>
+    </tr>
+
+    <tr data-plan="Monthly" data-id="pr25005" data-name="Thazin">
+      <td data-label="Status">Present</td>
+      <td data-label="Student ID">pr25005</td>
+      <td data-label="Name">Thazin</td>
+      <td data-label="Class">Y2-B</td>
+      <td data-label="Period">24-Aug-25 – Now</td>
+      <td data-label="Pay Term">Monthly</td>
+      <td data-label="Tuition Before">2,520,000</td>
+      <td data-label="Tuition After">2,016,000</td>
+      <td data-label="Paid">1,008,000</td>
+      <td data-label="Unpaid">1,008,000</td>
+      <td data-label="Next Due">01-Dec-25</td>
+      <td data-label="YTD Late (MMK)">0 (0)</td>
+    </tr>
+
+    <!-- 6 TERMLY STUDENTS -->
+    <tr data-plan="Termly" data-id="pr25006" data-name="Khant Su">
+      <td data-label="Status">Present</td>
+      <td data-label="Student ID">pr25006</td>
+      <td data-label="Name">Khant Su</td>
+      <td data-label="Class">SR-A</td>
+      <td data-label="Period">01-Sep-25 – Now</td>
+      <td data-label="Pay Term">Termly</td>
+      <td data-label="Tuition Before">3,150,000</td>
+      <td data-label="Tuition After">2,520,000</td>
+      <td data-label="Paid">1,680,000</td>
+      <td data-label="Unpaid">840,000</td>
+      <td data-label="Next Due">01-Jan-26</td>
+      <td data-label="YTD Late (MMK)">0 (0)</td>
+    </tr>
+
+    <tr data-plan="Termly" data-id="pr25007" data-name="Thet Htoo">
+      <td data-label="Status">Present</td>
+      <td data-label="Student ID">pr25007</td>
+      <td data-label="Name">Thet Htoo</td>
+      <td data-label="Class">SR-B</td>
+      <td data-label="Period">04-Jun-25 – Now</td>
+      <td data-label="Pay Term">Termly</td>
+      <td data-label="Tuition Before">4,200,000</td>
+      <td data-label="Tuition After">3,360,000</td>
+      <td data-label="Paid">2,240,000</td>
+      <td data-label="Unpaid">1,120,000</td>
+      <td data-label="Next Due">01-Jan-26</td>
+      <td data-label="YTD Late (MMK)">2 (40,000)</td>
+    </tr>
+
+    <tr data-plan="Termly" data-id="pr25008" data-name="Thura">
+      <td data-label="Status" class="left-status">LEFT</td>
+      <td data-label="Student ID">pr25008</td>
+      <td data-label="Name">Thura</td>
+      <td data-label="Class">EY1-A</td>
+      <td data-label="Period">04-Jun-25 – 30-Sep-25</td>
+      <td data-label="Pay Term">Termly</td>
+      <td data-label="Tuition Before">2,100,000</td>
+      <td data-label="Tuition After">1,680,000</td>
+      <td data-label="Paid">1,680,000</td>
+      <td data-label="Unpaid">0</td>
+      <td data-label="Next Due">—</td>
+      <td data-label="YTD Late (MMK)">1 (20,000)</td>
+    </tr>
+
+    <tr data-plan="Termly" data-id="pr25009" data-name="Pyae Sone">
+      <td data-label="Status">Present</td>
+      <td data-label="Student ID">pr25009</td>
+      <td data-label="Name">Pyae Sone</td>
+      <td data-label="Class">EY1-B</td>
+      <td data-label="Period">04-Jun-25 – Now</td>
+      <td data-label="Pay Term">Termly</td>
+      <td data-label="Tuition Before">4,200,000</td>
+      <td data-label="Tuition After">3,150,000</td>
+      <td data-label="Paid">2,100,000</td>
+      <td data-label="Unpaid">1,050,000</td>
+      <td data-label="Next Due">01-Jan-26</td>
+      <td data-label="YTD Late (MMK)">0 (0)</td>
+    </tr>
+
+    <tr data-plan="Termly" data-id="pr25010" data-name="Hnin Ei">
+      <td data-label="Status">Present</td>
+      <td data-label="Student ID">pr25010</td>
+      <td data-label="Name">Hnin Ei</td>
+      <td data-label="Class">EY2-A</td>
+      <td data-label="Period">01-Jul-25 – Now</td>
+      <td data-label="Pay Term">Termly</td>
+      <td data-label="Tuition Before">3,780,000</td>
+      <td data-label="Tuition After">3,024,000</td>
+      <td data-label="Paid">2,016,000</td>
+      <td data-label="Unpaid">1,008,000</td>
+      <td data-label="Next Due">01-Jan-26</td>
+      <td data-label="YTD Late (MMK)">0 (0)</td>
+    </tr>
+
+    <tr data-plan="Termly" data-id="pr25011" data-name="Cherry">
+      <td data-label="Status">Present</td>
+      <td data-label="Student ID">pr25011</td>
+      <td data-label="Name">Cherry</td>
+      <td data-label="Class">EY2-B</td>
+      <td data-label="Period">10-Jul-25 – Now</td>
+      <td data-label="Pay Term">Termly</td>
+      <td data-label="Tuition Before">3,360,000</td>
+      <td data-label="Tuition After">2,688,000</td>
+      <td data-label="Paid">1,792,000</td>
+      <td data-label="Unpaid">896,000</td>
+      <td data-label="Next Due">01-Jan-26</td>
+      <td data-label="YTD Late (MMK)">2 (40,000)</td>
+    </tr>
+
+    <!-- 4 ANNUAL STUDENTS -->
+    <tr data-plan="Annual" data-id="pr25012" data-name="Yuri">
+      <td data-label="Status">Present</td>
+      <td data-label="Student ID">pr25012</td>
+      <td data-label="Name">Yuri</td>
+      <td data-label="Class">Y1-A</td>
+      <td data-label="Period">01-Aug-25 – Now</td>
+      <td data-label="Pay Term">Annual</td>
+      <td data-label="Tuition Before">3,900,000</td>
+      <td data-label="Tuition After">3,120,000</td>
+      <td data-label="Paid">3,120,000</td>
+      <td data-label="Unpaid">0</td>
+      <td data-label="Next Due">—</td>
+      <td data-label="YTD Late (MMK)">0 (0)</td>
+    </tr>
+
+    <tr data-plan="Annual" data-id="pr25013" data-name="Hla Hla">
+      <td data-label="Status">Present</td>
+      <td data-label="Student ID">pr25013</td>
+      <td data-label="Name">Hla Hla</td>
+      <td data-label="Class">Y1-B</td>
+      <td data-label="Period">04-Jun-25 – Now</td>
+      <td data-label="Pay Term">Annual</td>
+      <td data-label="Tuition Before">4,200,000</td>
+      <td data-label="Tuition After">3,360,000</td>
+      <td data-label="Paid">3,360,000</td>
+      <td data-label="Unpaid">0</td>
+      <td data-label="Next Due">—</td>
+      <td data-label="YTD Late (MMK)">0 (0)</td>
+    </tr>
+
+    <tr data-plan="Annual" data-id="pr25014" data-name="Thida">
+      <td data-label="Status" class="left-status">LEFT</td>
+      <td data-label="Student ID">pr25014</td>
+      <td data-label="Name">Thida</td>
+      <td data-label="Class">Y2-A</td>
+      <td data-label="Period">04-Jun-25 – 31-Oct-25</td>
+      <td data-label="Pay Term">Annual</td>
+      <td data-label="Tuition Before">2,800,000</td>
+      <td data-label="Tuition After">2,240,000</td>
+      <td data-label="Paid">2,240,000</td>
+      <td data-label="Unpaid">0</td>
+      <td data-label="Next Due">—</td>
+      <td data-label="YTD Late (MMK)">1 (20,000)</td>
+    </tr>
+
+    <tr data-plan="Annual" data-id="pr25015" data-name="Ko Min">
+      <td data-label="Status">Present</td>
+      <td data-label="Student ID">pr25015</td>
+      <td data-label="Name">Ko Min</td>
+      <td data-label="Class">Y3-A</td>
+      <td data-label="Period">10-Jul-25 – Now</td>
+      <td data-label="Pay Term">Annual</td>
+      <td data-label="Tuition Before">2,100,000</td>
+      <td data-label="Tuition After">1,680,000</td>
+      <td data-label="Paid">1,440,000</td>
+      <td data-label="Unpaid">240,000</td>
+      <td data-label="Next Due">01-Dec-25</td>
+      <td data-label="YTD Late (MMK)">1 (20,000)</td>
+    </tr>
+
+  </tbody>
 </table>
 
 </body>
