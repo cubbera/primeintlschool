@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tuition Summary</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f8f8f8;
+      padding: 24px;
+    }
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 24px 28px 32px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    h1 {
+      margin-top: 0;
+      margin-bottom: 4px;
+    }
+    .subtitle {
+      color: #555;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 6px;
+      font-size: 13px;
+    }
+    th, td {
+      padding: 6px 6px;
+    }
+    th {
+      text-align: left;
+      background: #f0f3ff;
+      border-bottom: 2px solid #d4ddff;
+      font-weight: 600;
+      font-size: 12px;
+    }
+    td {
+      border-bottom: 1px solid #eee;
+    }
+    .right {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .section-title {
+      margin-top: 26px;
+      margin-bottom: 6px;
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .summary-table th, .summary-table td {
+      border-bottom: 1px solid #e5e5e5;
+    }
+    .total-row td {
+      border-top: 2px solid #cbd0ff;
+      font-weight: 700;
+      background: #fafbff;
+    }
+    .late-row td {
+      color: #b10000;
+    }
+    .sort-header {
+      white-space: nowrap;
+    }
+    .sort-header span {
+      font-size: 9px;
+      opacity: 0.6;
+      margin-left: 2px;
+    }
+    .group-label {
+      font-size: 12px;
+      color: #777;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>Tuition Summary</h1>
+    <div class="subtitle">Academic Year 2025–2026 · Snapshot as of 6 Nov 2025 · 30 students</div>
+
+    <div class="section-title">Summary by Payment Plan</div>
+    <table class="summary-table">
+      <thead>
+        <tr>
+          <th>Payment Plan</th>
+          <th class="right">Students</th>
+          <th class="right">Tuition Before</th>
+          <th class="right">Tuition After</th>
+          <th class="right">Paid</th>
+          <th class="right">Unpaid</th>
+          <th class="right">Balance</th>
+          <th class="right">YTD Late (MMK)</th>
+        </tr>
+      </thead>
+      <tbody>
+    <tr>
+      <td>Monthly</td>
+      <td class="right">20</td>
+      <td class="right">84,000,000</td>
+      <td class="right">21,420,000</td>
+      <td class="right">12,558,000</td>
+      <td class="right">8,862,000</td>
+      <td class="right">9,222,000</td>
+      <td class="right">18 (360,000)</td>
+    </tr>
+    <tr>
+      <td>Termly</td>
+      <td class="right">6</td>
+      <td class="right">21,420,000</td>
+      <td class="right">12,306,000</td>
+      <td class="right">6,504,000</td>
+      <td class="right">5,802,000</td>
+      <td class="right">5,862,000</td>
+      <td class="right">3 (60,000)</td>
+    </tr>
+    <tr>
+      <td>Annual</td>
+      <td class="right">4</td>
+      <td class="right">11,700,000</td>
+      <td class="right">6,337,500</td>
+      <td class="right">4,397,000</td>
+      <td class="right">1,940,500</td>
+      <td class="right">1,980,500</td>
+      <td class="right">2 (40,000)</td>
+    </tr>
+    <tr class="total-row">
+      <td><strong>GRAND TOTAL</strong></td>
+      <td class="right"><strong>30</strong></td>
+      <td class="right"><strong>117,120,000</strong></td>
+      <td class="right"><strong>40,063,500</strong></td>
+      <td class="right"><strong>23,459,000</strong></td>
+      <td class="right"><strong>16,604,500</strong></td>
+      <td class="right"><strong>17,064,500</strong></td>
+      <td class="right"><strong>23 (460,000)</strong></td>
+    </tr>
+      </tbody>
+    </table>
+
+    <div class="section-title">Monthly Plan Students</div>
+    <div class="group-label">Sorted by Student ID · rows in red have at least one late payment this year</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Student ID</th>
+          <th>Student Name</th>
+          <th>Class</th>
+          <th>Enrollment (AY 2025–2026)</th>
+          <th class="right">Tuition Before</th>
+          <th class="right">Tuition After</th>
+          <th class="right">Paid</th>
+          <th class="right sort-header">Unpaid <span>&#9650;</span></th>
+          <th class="right sort-header">Balance <span>&#9650;</span></th>
+          <th>Next Payment Due</th>
+          <th class="right sort-header">YTD Late Days (MMK) <span>&#9650;</span></th>
+        </tr>
+      </thead>
+      <tbody>
+      <tr class="late-row">
+        <td>pr23001</td>
+        <td>Aye Aye</td>
+        <td>SR-A</td>
+        <td>10-Jun-2025 – present</td>
+        <td class="right">4,200,000</td>
+        <td class="right">420,000</td>
+        <td class="right">168,000</td>
+        <td class="right">252,000</td>
+        <td class="right">312,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">3 (60,000)</td>
+      </tr>
+      <tr class="late-row">
+        <td>pr23002</td>
+        <td>Mya Mya</td>
+        <td>SR-B</td>
+        <td>10-Jun-2025 – present</td>
+        <td class="right">4,200,000</td>
+        <td class="right">420,000</td>
+        <td class="right">252,000</td>
+        <td class="right">168,000</td>
+        <td class="right">268,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">5 (100,000)</td>
+      </tr>
+      <tr class="late-row">
+        <td>pr23003</td>
+        <td>Hsu Mon</td>
+        <td>EY1-A</td>
+        <td>10-Jun-2025 – present</td>
+        <td class="right">4,200,000</td>
+        <td class="right">1,050,000</td>
+        <td class="right">840,000</td>
+        <td class="right">210,000</td>
+        <td class="right">410,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">10 (200,000)</td>
+      </tr>
+      <tr>
+        <td>pr23004</td>
+        <td>Thae Thae</td>
+        <td>EY1-B</td>
+        <td>10-Jun-2025 – present</td>
+        <td class="right">4,200,000</td>
+        <td class="right">1,260,000</td>
+        <td class="right">756,000</td>
+        <td class="right">504,000</td>
+        <td class="right">504,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      <tr>
+        <td>pr23005</td>
+        <td>Phone Ko</td>
+        <td>EY2-A</td>
+        <td>10-Jun-2025 – present</td>
+        <td class="right">4,200,000</td>
+        <td class="right">420,000</td>
+        <td class="right">336,000</td>
+        <td class="right">84,000</td>
+        <td class="right">84,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      <tr>
+        <td>pr24001</td>
+        <td>Ei Mon</td>
+        <td>EY2-B</td>
+        <td>10-Jun-2025 – present</td>
+        <td class="right">4,200,000</td>
+        <td class="right">1,260,000</td>
+        <td class="right">504,000</td>
+        <td class="right">756,000</td>
+        <td class="right">756,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      <tr>
+        <td>pr24002</td>
+        <td>Sandar Win</td>
+        <td>Y1-A</td>
+        <td>10-Jun-2025 – present</td>
+        <td class="right">4,200,000</td>
+        <td class="right">1,260,000</td>
+        <td class="right">756,000</td>
+        <td class="right">504,000</td>
+        <td class="right">504,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      <tr>
+        <td>pr24003</td>
+        <td>Ni Ni</td>
+        <td>Y1-B</td>
+        <td>10-Jun-2025 – present</td>
+        <td class="right">4,200,000</td>
+        <td class="right">2,100,000</td>
+        <td class="right">840,000</td>
+        <td class="right">1,260,000</td>
+        <td class="right">1,260,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      <tr>
+        <td>pr24004</td>
+        <td>Ko Ko</td>
+        <td>Y2-A</td>
+        <td>10-Jun-2025 – present</td>
+        <td class="right">4,200,000</td>
+        <td class="right">1,890,000</td>
+        <td class="right">1,134,000</td>
+        <td class="right">756,000</td>
+        <td class="right">756,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      <tr>
+        <td>pr24005</td>
+        <td>Moe Moe</td>
+        <td>Y2-B</td>
+        <td>10-Jun-2025 – present</td>
+        <td class="right">4,200,000</td>
+        <td class="right">1,470,000</td>
+        <td class="right">588,000</td>
+        <td class="right">882,000</td>
+        <td class="right">882,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      <tr>
+        <td>pr24006</td>
+        <td>Htet Wai</td>
+        <td>SR-A</td>
+        <td>10-Jun-2025 – present</td>
+        <td class="right">4,200,000</td>
+        <td class="right">1,470,000</td>
+        <td class="right">882,000</td>
+        <td class="right">588,000</td>
+        <td class="right">588,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      <tr>
+        <td>pr24007</td>
+        <td>Su Su</td>
+        <td>SR-B</td>
+        <td>10-Jun-2025 – present</td>
+        <td class="right">4,200,000</td>
+        <td class="right">1,890,000</td>
+        <td class="right">756,000</td>
+        <td class="right">1,134,000</td>
+        <td class="right">1,134,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      <tr>
+        <td>pr24008</td>
+        <td>Min Khant</td>
+        <td>EY1-A</td>
+        <td>10-Jun-2025 – present</td>
+        <td class="right">4,200,000</td>
+        <td class="right">1,470,000</td>
+        <td class="right">588,000</td>
+        <td class="right">882,000</td>
+        <td class="right">882,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      <tr>
+        <td>pr24009</td>
+        <td>Nandar</td>
+        <td>EY1-B</td>
+        <td>10-Jun-2025 – present</td>
+        <td class="right">4,200,000</td>
+        <td class="right">2,310,000</td>
+        <td class="right">1,386,000</td>
+        <td class="right">924,000</td>
+        <td class="right">924,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      <tr>
+        <td>pr24010</td>
+        <td>Moe Thiri</td>
+        <td>EY2-A</td>
+        <td>10-Jun-2025 – present</td>
+        <td class="right">4,200,000</td>
+        <td class="right">1,890,000</td>
+        <td class="right">756,000</td>
+        <td class="right">1,134,000</td>
+        <td class="right">1,134,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      <tr>
+        <td>pr25001</td>
+        <td>Kyaw Zin</td>
+        <td>EY2-B</td>
+        <td>10-Jun-2025 – present</td>
+        <td class="right">4,200,000</td>
+        <td class="right">1,890,000</td>
+        <td class="right">1,134,000</td>
+        <td class="right">756,000</td>
+        <td class="right">756,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      <tr>
+        <td>pr25002</td>
+        <td>Swe Swe</td>
+        <td>Y1-A</td>
+        <td>10-Jun-2025 – present</td>
+        <td class="right">4,200,000</td>
+        <td class="right">2,100,000</td>
+        <td class="right">840,000</td>
+        <td class="right">1,260,000</td>
+        <td class="right">1,260,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      <tr>
+        <td>pr25003</td>
+        <td>Mai Mai</td>
+        <td>Y1-B</td>
+        <td>10-Jun-2025 – present</td>
+        <td class="right">4,200,000</td>
+        <td class="right">2,100,000</td>
+        <td class="right">1,260,000</td>
+        <td class="right">840,000</td>
+        <td class="right">840,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      <tr>
+        <td>pr25004</td>
+        <td>Yamin</td>
+        <td>Y2-A</td>
+        <td>10-Jun-2025 – present</td>
+        <td class="right">4,200,000</td>
+        <td class="right">2,310,000</td>
+        <td class="right">1,386,000</td>
+        <td class="right">924,000</td>
+        <td class="right">924,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      <tr>
+        <td>pr25005</td>
+        <td>Thazin</td>
+        <td>Y2-B</td>
+        <td>10-Jun-2025 – present</td>
+        <td class="right">4,200,000</td>
+        <td class="right">2,100,000</td>
+        <td class="right">840,000</td>
+        <td class="right">1,260,000</td>
+        <td class="right">1,260,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      </tbody>
+    </table>
+
+    <div class="section-title">Termly Plan Students</div>
+    <div class="group-label">Payment split by academic terms · non-refundable per term</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Student ID</th>
+          <th>Student Name</th>
+          <th>Class</th>
+          <th>Enrollment (AY 2025–2026)</th>
+          <th class="right">Tuition Before</th>
+          <th class="right">Tuition After</th>
+          <th class="right">Paid</th>
+          <th class="right sort-header">Unpaid <span>&#9650;</span></th>
+          <th class="right sort-header">Balance <span>&#9650;</span></th>
+          <th>Next Payment Due</th>
+          <th class="right sort-header">YTD Late Days (MMK) <span>&#9650;</span></th>
+        </tr>
+      </thead>
+      <tbody>
+      <tr class="late-row">
+        <td>pr25006</td>
+        <td>Khant Su</td>
+        <td>SR-A</td>
+        <td>01-Jul-2025 – present</td>
+        <td class="right">3,780,000</td>
+        <td class="right">1,323,000</td>
+        <td class="right">436,000</td>
+        <td class="right">887,000</td>
+        <td class="right">947,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">3 (60,000)</td>
+      </tr>
+      <tr>
+        <td>pr25007</td>
+        <td>Thet Htoo</td>
+        <td>SR-B</td>
+        <td>01-Jul-2025 – present</td>
+        <td class="right">3,780,000</td>
+        <<td class="right">1,512,000</td>
+        <td class="right">996,000</td>
+        <td class="right">516,000</td>
+        <td class="right">516,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      <tr>
+        <td>pr25008</td>
+        <td>Thura</td>
+        <td>EY1-A</td>
+        <td>01-Jul-2025 – present</td>
+        <td class="right">3,780,000</td>
+        <td class="right">1,323,000</td>
+        <td class="right">436,000</td>
+        <td class="right">887,000</td>
+        <td class="right">887,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      <tr>
+        <td>pr25009</td>
+        <td>Pyae Sone</td>
+        <td>EY1-B</td>
+        <td>01-Aug-2025 – present</td>
+        <td class="right">3,360,000</td>
+        <td class="right">1,176,000</td>
+        <td class="right">388,000</td>
+        <td class="right">788,000</td>
+        <td class="right">788,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      <tr>
+        <td>pr25010</td>
+        <td>Hnin Ei</td>
+        <td>EY2-A</td>
+        <td>01-Aug-2025 – present</td>
+        <td class="right">3,360,000</td>
+        <td class="right">1,344,000</td>
+        <td class="right">886,000</td>
+        <td class="right">458,000</td>
+        <td class="right">458,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      <tr>
+        <td>pr25011</td>
+        <td>Cherry</td>
+        <td>EY2-B</td>
+        <td>01-Aug-2025 – present</td>
+        <td class="right">3,360,000</td>
+        <td class="right">1,176,000</td>
+        <td class="right">388,000</td>
+        <td class="right">788,000</td>
+        <td class="right">788,000</td>
+        <td>01-Dec-2025</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      </tbody>
+    </table>
+
+    <div class="section-title">Annual Plan Students</div>
+    <div class="group-label">One-time annual payment · term-based refund rules apply</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Student ID</th>
+          <th>Student Name</th>
+          <th>Class</th>
+          <th>Enrollment (AY 2025–2026)</th>
+          <th class="right">Tuition Before</th>
+          <th class="right">Tuition After</th>
+          <th class="right">Paid</th>
+          <th class="right sort-header">Unpaid <span>&#9650;</span></th>
+          <th class="right sort-header">Balance <span>&#9650;</span></th>
+          <th>Next Payment Due</th>
+          <th class="right sort-header">YTD Late Days (MMK) <span>&#9650;</span></th>
+        </tr>
+      </thead>
+      <tbody>
+      <tr class="late-row">
+        <td>pr25012</td>
+        <td>Yuri</td>
+        <td>Y1-A</td>
+        <td>01-Aug-2025 – present</td>
+        <td class="right">3,120,000</td>
+        <td class="right">1,092,000</td>
+        <td class="right">1,092,000</td>
+        <td class="right">0</td>
+        <td class="right">40,000</td>
+        <td>-</td>
+        <td class="right">2 (40,000)</td>
+      </tr>
+      <tr>
+        <td>pr25013</td>
+        <td>Hla Hla</td>
+        <td>Y1-B</td>
+        <td>01-Aug-2025 – present</td>
+        <td class="right">3,120,000</td>
+        <td class="right">1,404,000</td>
+        <td class="right">1,404,000</td>
+        <td class="right">0</td>
+        <td class="right">0</td>
+        <td>-</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      <tr>
+        <td>pr25014</td>
+        <td>Thida</td>
+        <td>Y2-A</td>
+        <td>01-Sep-2025 – present</td>
+        <td class="right">2,730,000</td>
+        <td class="right">1,048,500</td>
+        <td class="right">524,000</td>
+        <td class="right">524,500</td>
+        <td class="right">524,500</td>
+        <td>-</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      <tr>
+        <td>pr25015</td>
+        <td>Khaing</td>
+        <td>Y2-B</td>
+        <td>01-Sep-2025 – present</td>
+        <td class="right">2,730,000</td>
+        <td class="right">1,404,000</td>
+        <td class="right">1,377,000</td>
+        <td class="right">27,000</td>
+        <td class="right">27,000</td>
+        <td>-</td>
+        <td class="right">0 (0)</td>
+      </tr>
+      </tbody>
+    </table>
+
+  </div>
+</body>
+</html>
