@@ -2,360 +2,191 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Add Student & Create Tuition Plan</title>
+<title>Tuition Summary — Prime International School</title>
+
 <style>
     body {
         font-family: Arial, sans-serif;
-        background: #f3f4f6;
-        padding: 30px;
-    }
-
-    .container {
-        max-width: 860px;
-        margin: auto;
-        background: #fff;
-        padding: 28px;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        background: #f4f4f4;
+        padding: 20px;
     }
 
     h1 {
         margin-top: 0;
-        margin-bottom: 10px;
+        font-size: 26px;
     }
 
-    h2 {
-        margin-top: 28px;
-        border-bottom: 2px solid #e5e7eb;
-        padding-bottom: 6px;
-        font-size: 18px;
+    .summary-box {
+        background: #fff;
+        padding: 18px;
+        margin-bottom: 22px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
-    label {
-        display: block;
-        font-weight: bold;
-        margin-top: 12px;
-        margin-bottom: 4px;
-    }
-
-    input, select {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #d1d5db;
-        border-radius: 6px;
-        margin-bottom: 6px;
-        font-size: 14px;
-        box-sizing: border-box;
-    }
-
-    .two-col {
-        display: flex;
-        gap: 16px;
-    }
-
-    .two-col > div {
-        flex: 1;
-    }
-
-    .discount-row {
+    .summary-row {
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        margin-top: 8px;
-        padding: 8px 10px;
-        border: 1px solid #e5e7eb;
-        border-radius: 6px;
-        background: #f9fafb;
-    }
-
-    .discount-row select {
-        width: 68%;
-        margin-bottom: 0;
-    }
-
-    .discount-amount {
-        font-weight: bold;
-        color: red;
-        text-align: right;
-        width: 30%;
-        font-variant-numeric: tabular-nums;
+        padding: 6px 0;
+        font-size: 15px;
     }
 
     table {
         width: 100%;
-        margin-top: 16px;
         border-collapse: collapse;
+        background: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.08);
     }
 
-    table td {
-        padding: 6px 4px;
+    th, td {
+        padding: 12px 10px;
         font-size: 14px;
-    }
-
-    table td:nth-child(2) {
-        text-align: right;
-        font-weight: bold;
-        font-variant-numeric: tabular-nums;
+        border-bottom: 1px solid #eee;
         white-space: nowrap;
     }
 
-    .btn-add {
-        margin-top: 10px;
-        background: #1d4ed8;
+    th {
+        background: #1f2937;
         color: #fff;
-        padding: 8px 16px;
-        border-radius: 6px;
-        border: none;
         cursor: pointer;
-        font-size: 13px;
-        font-weight: 600;
+        user-select: none;
     }
 
-    .btn-add:hover {
-        background: #1e40af;
+    th .sort-icon {
+        font-size: 10px;
+        opacity: 0.6;
+        margin-left: 4px;
     }
 
-    .btn-submit {
-        margin-top: 22px;
-        width: 100%;
-        background: #059669;
-        color: #fff;
-        font-size: 18px;
-        padding: 14px;
-        border-radius: 8px;
-        cursor: pointer;
-        border: none;
+    .left-status {
+        color: red;
         font-weight: bold;
     }
 
-    .btn-submit:hover {
-        background: #047857;
-    }
+    @media(max-width: 900px) {
+        table, thead, tbody, th, td, tr {
+            display: block;
+        }
 
-    .note {
-        font-size: 12px;
-        color: #6b7280;
-        margin-top: 4px;
+        thead { display: none; }
+
+        tr {
+            margin-bottom: 15px;
+            background: #fff;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        td {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 6px;
+            border: none;
+        }
+
+        td:before {
+            content: attr(data-label);
+            font-weight: bold;
+        }
     }
 </style>
 
 <script>
-function autoFillTuition() {
-    const division = document.getElementById("division").value;
-    const level = document.getElementById("level").value;
-    const plan = document.getElementById("paymentPlan").value;
-    const tuitionInput = document.getElementById("tuitionBefore");
+// REAL TABLE SORTING
+function sortTable(colIndex) {
+    const table = document.getElementById("tuitionTable");
+    const tbody = table.tBodies[0];
+    const rows = Array.from(tbody.querySelectorAll("tr"));
+    const header = table.tHead.rows[0].cells[colIndex];
 
-    if (!division || !level || !plan) {
-        return;
-    }
+    const isAsc = header.classList.toggle("asc");
+    header.classList.toggle("desc", !isAsc);
 
-    // Determine group: Preschool or Primary
-    let group;
-    if (division === "Preschool" || ["SR","EY1","EY2"].includes(level)) {
-        group = "Preschool";
-    } else {
-        group = "Primary";
-    }
+    rows.sort((a, b) => {
+        const cellA = a.children[colIndex].innerText.replace(/[^0-9.-]/g, '') || a.children[colIndex].innerText.toLowerCase();
+        const cellB = b.children[colIndex].innerText.replace(/[^0-9.-]/g, '') || b.children[colIndex].innerText.toLowerCase();
 
-    let amount = 0;
-    if (group === "Preschool") {
-        if (plan === "Annual") amount = 3900000;
-        else if (plan === "Termly") amount = 4200000;
-        else if (plan === "Monthly") amount = 4200000;
-    } else { // Primary
-        if (plan === "Annual") amount = 4200000;
-        else if (plan === "Termly") amount = 4500000;
-        else if (plan === "Monthly") amount = 4500000;
-    }
-
-    tuitionInput.value = amount;
-    updateDiscounts();
-}
-
-function addDiscountRow() {
-    const container = document.getElementById("discountContainer");
-
-    const row = document.createElement("div");
-    row.className = "discount-row";
-
-    row.innerHTML = `
-        <select onchange="updateDiscounts()">
-            <option value="">-- Select Discount --</option>
-            <option value="early35">Early Bird 35%</option>
-            <option value="play15">Play &amp; Learn 15%</option>
-            <option value="ref100">Referral -100,000 MMK</option>
-            <option value="sib5">Sibling 5%</option>
-            <option value="sib10">Sibling 10%</option>
-        </select>
-        <div class="discount-amount">0</div>
-    `;
-
-    container.appendChild(row);
-    updateDiscounts();
-}
-
-function updateDiscounts() {
-    const tuition = parseInt(document.getElementById("tuitionBefore").value || 0, 10);
-    const discountRows = document.querySelectorAll("#discountContainer .discount-row");
-    let totalDiscount = 0;
-
-    discountRows.forEach(row => {
-        const select = row.querySelector("select");
-        const value = select.value;
-        const amountBox = row.querySelector(".discount-amount");
-        let amount = 0;
-
-        if (!value || tuition <= 0) {
-            amountBox.textContent = "0";
-            return;
+        if (!isNaN(cellA) && !isNaN(cellB)) {
+            return isAsc ? cellA - cellB : cellB - cellA;
         }
-
-        switch (value) {
-            case "early35":
-                amount = tuition * 0.35;
-                break;
-            case "play15":
-                amount = tuition * 0.15;
-                break;
-            case "ref100":
-                amount = 100000;
-                break;
-            case "sib5":
-                amount = tuition * 0.05;
-                break;
-            case "sib10":
-                amount = tuition * 0.10;
-                break;
-        }
-
-        amount = Math.round(amount);
-        amountBox.textContent = "-" + amount.toLocaleString();
-        totalDiscount += amount;
+        return isAsc
+            ? cellA.localeCompare(cellB)
+            : cellB.localeCompare(cellA);
     });
 
-    const totalDiscountCell = document.getElementById("totalDiscount");
-    const afterDiscountCell = document.getElementById("afterDiscount");
-    const monthlyFeeCell = document.getElementById("monthlyFee");
-
-    totalDiscountCell.textContent = "-" + totalDiscount.toLocaleString();
-
-    const net = tuition - totalDiscount;
-    afterDiscountCell.textContent = net.toLocaleString();
-
-    // Monthly fee based on 10 installments (for quick reference)
-    const monthly = net > 0 ? Math.round(net / 10) : 0;
-    monthlyFeeCell.textContent = monthly.toLocaleString();
+    rows.forEach(row => tbody.appendChild(row));
 }
-
-window.onload = function() {
-    // Initialize discount calculations based on default tuition
-    updateDiscounts();
-};
 </script>
 
 </head>
 <body>
 
-<div class="container">
+<h1>Tuition Summary — AY 2025–2026</h1>
 
-    <h1>Add New Student</h1>
-
-    <!-- SECTION 1 — STUDENT INFO -->
-    <h2>1. Student Information</h2>
-
-    <label>Full Name</label>
-    <input type="text" placeholder="e.g. Aye Aye">
-
-    <label>Father's Name</label>
-    <input type="text" placeholder="e.g. U Kyaw Win">
-
-    <div class="two-col">
-        <div>
-            <label>Gender</label>
-            <select>
-                <option value="">Select gender</option>
-                <option>Male</option>
-                <option>Female</option>
-            </select>
-        </div>
-        <div>
-            <label>Date of Birth</label>
-            <input type="date">
-        </div>
-    </div>
-
-    <!-- SECTION 2 — ENROLLMENT -->
-    <h2>2. Enrollment</h2>
-
-    <label>Academic Year</label>
-    <select>
-        <option>2025–2026</option>
-    </select>
-
-    <div class="two-col">
-        <div>
-            <label>Division</label>
-            <select id="division" onchange="autoFillTuition()">
-                <option value="">Select division</option>
-                <option value="Preschool">Preschool</option>
-                <option value="Primary">Primary</option>
-            </select>
-        </div>
-        <div>
-            <label>Level</label>
-            <select id="level" onchange="autoFillTuition()">
-                <option value="">Select level</option>
-                <option value="SR">SR</option>
-                <option value="EY1">EY1</option>
-                <option value="EY2">EY2</option>
-                <option value="Y1">Y1</option>
-                <option value="Y2">Y2</option>
-                <option value="Y3">Y3</option>
-            </select>
-        </div>
-    </div>
-
-    <label>Payment Plan</label>
-    <select id="paymentPlan" onchange="autoFillTuition()">
-        <option value="">Select plan</option>
-        <option value="Monthly">Monthly</option>
-        <option value="Termly">Termly</option>
-        <option value="Annual">Annual</option>
-    </select>
-    <div class="note">
-        Tuition will be auto-filled based on Division + Level + Payment Plan.
-    </div>
-
-    <!-- SECTION 3 — TUITION CALC -->
-    <h2>3. Calculated Tuition Summary</h2>
-
-    <label>Tuition Before Discount</label>
-    <input type="number" id="tuitionBefore" value="4200000" onkeyup="updateDiscounts()">
-
-    <h3>Add Discounts</h3>
-    <div class="note">Choose one or more discounts. Amounts will be calculated automatically.</div>
-    <div id="discountContainer"></div>
-    <button type="button" class="btn-add" onclick="addDiscountRow()">+ Add Discount</button>
-
-    <table>
-        <tr>
-            <td>Total Discount</td>
-            <td id="totalDiscount">0</td>
-        </tr>
-        <tr>
-            <td>After Discount</td>
-            <td id="afterDiscount">4,200,000</td>
-        </tr>
-        <tr>
-            <td>Monthly Fee (10 installments)</td>
-            <td id="monthlyFee">420,000</td>
-        </tr>
-    </table>
-
-    <button class="btn-submit">Add Student &amp; Create Tuition Plan</button>
-
+<div class="summary-box">
+    <div class="summary-row"><strong>Subtotal — Monthly (11 students)</strong> <span>48,000,000 | 33,670,000 | 7,300,000 | 26,370,000 | 26,930,000 | 28 (560,000)</span></div>
+    <div class="summary-row"><strong>Subtotal — Termly (6 students)</strong> <span>26,100,000 | 22,725,000 | 7,785,000 | 14,940,000 | 15,000,000 | 3 (60,000)</span></div>
+    <div class="summary-row"><strong>Subtotal — Annual (8 students)</strong> <span>34,800,000 | 31,515,000 | 31,515,000 | 0 | 0 | 0 (0)</span></div>
+    <hr>
+    <div class="summary-row"><strong>GRAND TOTAL (25 students)</strong> <span>108,900,000 | 87,910,000 | 46,600,000 | 41,310,000 | 41,930,000 | 31 (620,000)</span></div>
 </div>
+
+<table id="tuitionTable">
+<thead>
+<tr>
+    <th onclick="sortTable(0)">Status <span class="sort-icon">▲▼</span></th>
+    <th onclick="sortTable(1)">Student ID <span class="sort-icon">▲▼</span></th>
+    <th onclick="sortTable(2)">Name <span class="sort-icon">▲▼</span></th>
+    <th onclick="sortTable(3)">Class <span class="sort-icon">▲▼</span></th>
+    <th onclick="sortTable(4)">Period <span class="sort-icon">▲▼</span></th>
+    <th onclick="sortTable(5)">Before <span class="sort-icon">▲▼</span></th>
+    <th onclick="sortTable(6)">After <span class="sort-icon">▲▼</span></th>
+    <th onclick="sortTable(7)">Paid <span class="sort-icon">▲▼</span></th>
+    <th onclick="sortTable(8)">Unpaid <span class="sort-icon">▲▼</span></th>
+    <th onclick="sortTable(9)">Next Due <span class="sort-icon">▲▼</span></th>
+    <th onclick="sortTable(10)">YTD Late (MMK) <span class="sort-icon">▲▼</span></th>
+</tr>
+</thead>
+
+<tbody>
+
+<!-- EXAMPLE ROW 1 -->
+<tr>
+    <td data-label="Status">Present</td>
+    <td data-label="ID">pr25004</td>
+    <td data-label="Name">Aye Aye</td>
+    <td data-label="Class">EY2-A</td>
+    <td data-label="Period">04-Jun-25 – Now</td>
+    <td data-label="Before">4,200,000</td>
+    <td data-label="After">2,000,000</td>
+    <td data-label="Paid">700,000</td>
+    <td data-label="Unpaid">1,300,000</td>
+    <td data-label="Next Due">01-Dec-25</td>
+    <td data-label="Late">28 (560,000)</td>
+</tr>
+
+<!-- EXAMPLE ROW 2 LEFT -->
+<tr>
+    <td data-label="Status" class="left-status">LEFT</td>
+    <td data-label="ID">pr23002</td>
+    <td data-label="Name">Mya Mya</td>
+    <td data-label="Class">EY2-B</td>
+    <td data-label="Period">04-Jun-25 – 15-Oct-25</td>
+    <td data-label="Before">2,520,000</td>
+    <td data-label="After">1,764,000</td>
+    <td data-label="Paid">1,764,000</td>
+    <td data-label="Unpaid">0</td>
+    <td data-label="Next Due">—</td>
+    <td data-label="Late">0 (0)</td>
+</tr>
+
+<!-- ADD YOUR 28 MORE STUDENTS HERE -->
+
+</tbody>
+</table>
 
 </body>
 </html>
