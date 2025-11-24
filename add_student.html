@@ -1,206 +1,282 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Add New Student</title>
-<style>
+  <meta charset="UTF-8" />
+  <title>Add New Student</title>
+
+  <style>
     body {
-        font-family: Arial, sans-serif;
-        background: #f5f5f5;
-        padding: 20px;
-        max-width: 900px;
-        margin: auto;
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      padding: 20px;
+    }
+
+    .container {
+      width: 900px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 25px 35px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 24px;
     }
 
     h2 {
-        margin-top: 40px;
-        background: #333;
-        color: white;
-        padding: 10px;
-        border-radius: 6px;
+      margin-bottom: 10px;
+      margin-top: 30px;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 5px;
     }
 
     label {
-        font-weight: bold;
-        display: block;
-        margin-top: 10px;
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
     }
 
     input, select {
-        width: 100%;
-        padding: 10px;
-        margin-top: 4px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
     }
 
-    .section {
-        background: white;
-        padding: 20px;
-        margin-top: 20px;
-        border-radius: 6px;
-        box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    .row {
+      display: flex;
+      gap: 20px;
     }
-
-    .guardian-section {
-        margin-top: 15px;
-        padding: 15px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        background: #fafafa;
+    .col {
+      flex: 1;
     }
 
     .discount-row {
-        display: flex;
-        align-items: center;
-        margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
     }
 
     .discount-row input[type="checkbox"] {
-        margin-right: 10px;
-        transform: scale(1.3);
+      transform: scale(1.2);
+      margin-top: 2px;
     }
 
-    .discount-row label {
-        margin: 0;
-        font-weight: normal;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
     }
 
-    .create-button {
-        margin-top: 30px;
-        padding: 18px;
-        width: 100%;
-        font-size: 20px;
-        background: #28a745;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        transition: 0.2s;
+    td {
+      padding: 6px 4px;
+      border-bottom: 1px solid #eee;
     }
 
-    .create-button:hover {
-        background: #218838;
-        transform: scale(1.02);
+    td.text-right {
+      text-align: right;
     }
-</style>
+
+    .red {
+      color: red;
+    }
+
+    .btn-submit {
+      background: #0077ff;
+      padding: 14px 20px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 8px;
+      width: 100%;
+      border: none;
+      margin-top: 25px;
+      cursor: pointer;
+    }
+
+    .btn-submit:hover {
+      background: #005fcc;
+    }
+  </style>
+
 </head>
-
 <body>
 
-<h1>Add New Student</h1>
+<div class="container">
 
-<!-- STUDENT INFO -->
-<div class="section">
-    <h2>Student Information</h2>
+  <h1>Add New Student</h1>
 
-    <label>Full Name</label>
-    <input type="text" placeholder="Enter student full name">
+  <!-- STUDENT INFO -->
+  <h2>Student Information</h2>
+  <div class="row">
+    <div class="col">
+      <label>Full Name</label>
+      <input type="text" />
 
-    <label>Gender</label>
-    <select>
+      <label>Nickname</label>
+      <input type="text" />
+    </div>
+
+    <div class="col">
+      <label>Gender</label>
+      <select>
         <option>Male</option>
         <option>Female</option>
-    </select>
+      </select>
 
-    <label>Nickname</label>
-    <input type="text">
+      <label>Date of Birth</label>
+      <input type="date" />
+    </div>
+  </div>
 
-    <label>Place of Birth</label>
-    <input type="text">
+  <label>Place of Birth</label>
+  <input type="text" />
 
-    <label>Date of Birth</label>
-    <input type="date">
+  <h2>Enrollment</h2>
+  <div class="row">
+    <div class="col">
+      <label>Division</label>
+      <select>
+        <option>Preschool</option>
+        <option>Primary</option>
+      </select>
+    </div>
 
-    <label>Program / Level</label>
-    <select>
-        <option>Preschool — SR</option>
-        <option>Preschool — EY1</option>
-        <option>Preschool — EY2</option>
-        <option>Primary — Year 1</option>
-        <option>Primary — Year 2</option>
-        <option>Primary — Year 3</option>
-    </select>
+    <div class="col">
+      <label>Level</label>
+      <select>
+        <option>SR</option>
+        <option>EY1</option>
+        <option>EY2</option>
+        <option>Y1</option>
+        <option>Y2</option>
+      </select>
+    </div>
 
-    <label>Payment Term</label>
-    <select>
+    <div class="col">
+      <label>Payment Plan</label>
+      <select>
         <option>Monthly</option>
         <option>Termly</option>
         <option>Annual</option>
-    </select>
+      </select>
+    </div>
+  </div>
 
-    <label>Discounts</label>
-    <div class="discount-row">
-        <input type="checkbox" id="eb">
-        <label for="eb">Early Bird 35%</label>
+  <label>Tuition Fee (Auto-filled)</label>
+  <input type="text" value="4,200,000" disabled />
+
+  <h2>Discounts</h2>
+
+  <div class="discount-row">
+    <input type="checkbox" />
+    <span>Early Bird — 35%</span>
+  </div>
+
+  <div class="discount-row">
+    <input type="checkbox" />
+    <span>Play & Learn — 15%</span>
+  </div>
+
+  <div class="discount-row">
+    <input type="checkbox" />
+    <span>Referral — 100,000 MMK</span>
+  </div>
+
+  <div class="discount-row">
+    <input type="checkbox" />
+    <span>Lucky Draw — 20%, 35%, 50%</span>
+  </div>
+
+  <!-- SUMMARY -->
+  <h2>Calculated Tuition Summary</h2>
+
+  <table>
+    <tr>
+      <td>Tuition Before Discount</td>
+      <td class="text-right">4,200,000</td>
+    </tr>
+    <tr>
+      <td>Early Bird 35%</td>
+      <td class="text-right red">-1,470,000</td>
+    </tr>
+    <tr>
+      <td>Play & Learn 15%</td>
+      <td class="text-right red">-630,000</td>
+    </tr>
+    <tr>
+      <td>Referral</td>
+      <td class="text-right red">-100,000</td>
+    </tr>
+    <tr>
+      <td><b>Total Discount</b></td>
+      <td class="text-right red"><b>-2,200,000</b></td>
+    </tr>
+    <tr>
+      <td><b>After Discount</b></td>
+      <td class="text-right"><b>2,000,000</b></td>
+    </tr>
+    <tr>
+      <td>Monthly Fee (10 months)</td>
+      <td class="text-right">200,000</td>
+    </tr>
+  </table>
+
+  <!-- GUARDIAN 1 -->
+  <h2>Guardian 1</h2>
+  <div class="row">
+    <div class="col">
+      <label>Relation</label>
+      <input type="text" />
+
+      <label>Name</label>
+      <input type="text" />
     </div>
-    <div class="discount-row">
-        <input type="checkbox" id="pl">
-        <label for="pl">Play & Learn 15%</label>
+    <div class="col">
+      <label>Phone</label>
+      <input type="text" />
+
+      <label>Email</label>
+      <input type="text" />
     </div>
-    <div class="discount-row">
-        <input type="checkbox" id="ref">
-        <label for="ref">Referral 100,000 MMK</label>
+  </div>
+
+  <label>Address</label>
+  <input type="text" />
+  <label>Township</label>
+  <input type="text" />
+
+  <!-- GUARDIAN 2 -->
+  <h2>Guardian 2</h2>
+  <div class="row">
+    <div class="col">
+      <label>Relation</label>
+      <input type="text" />
+
+      <label>Name</label>
+      <input type="text" />
     </div>
+    <div class="col">
+      <label>Phone</label>
+      <input type="text" />
+
+      <label>Email</label>
+      <input type="text" />
+    </div>
+  </div>
+
+  <label>Address</label>
+  <input type="text" />
+  <label>Township</label>
+  <input type="text" />
+
+  <button class="btn-submit">Create Student & Generate Student Statement</button>
+
 </div>
-
-<!-- GUARDIAN INFO -->
-<div class="section">
-    <h2>Guardian Information</h2>
-
-    <!-- GUARDIAN 1 -->
-    <div class="guardian-section">
-        <h3>Guardian #1</h3>
-
-        <label>Relation</label>
-        <input type="text" placeholder="Mother / Father / Guardian">
-
-        <label>Name</label>
-        <input type="text">
-
-        <label>Address</label>
-        <input type="text">
-
-        <label>Township</label>
-        <input type="text">
-
-        <label>Phone Number</label>
-        <input type="text">
-
-        <label>Email</label>
-        <input type="email">
-    </div>
-
-    <!-- GUARDIAN 2 -->
-    <div class="guardian-section">
-        <h3>Guardian #2</h3>
-
-        <label>Relation</label>
-        <input type="text">
-
-        <label>Name</label>
-        <input type="text">
-
-        <label>Address</label>
-        <input type="text">
-
-        <label>Township</label>
-        <input type="text">
-
-        <label>Phone Number</label>
-        <input type="text">
-
-        <label>Email</label>
-        <input type="email">
-    </div>
-</div>
-
-<!-- CREATE BUTTON -->
-<button class="create-button">CREATE STUDENT</button>
 
 </body>
 </html>
