@@ -153,3 +153,184 @@
   <!-- Table -->
   <table id="assessmentTable">
     <thead id="thead">
+      <tr id="headerRow1">
+        <th rowspan="2">No.</th>
+        <th rowspan="2">Student Name</th>
+        <th colspan="1" id="cwHeader">Coursework (60%)</th>
+        <th rowspan="2">Coursework Total</th>
+        <th rowspan="2">Term Exam (40%)</th>
+        <th rowspan="2">Total (100%)</th>
+      </tr>
+
+      <tr id="headerRow2">
+        <th id="col-ut1">Unit Test 1 <button class="delete-col-btn" onclick="deleteColumn('col-ut1')">x</button></th>
+      </tr>
+    </thead>
+
+    <tbody id="tbody">
+      <tr>
+        <td>1</td>
+        <td class="label-col"><input class="name-box" value="Zin Aung Hlaing"></td>
+        <td data-col="col-ut1"><input class="score-box" value="8" oninput="recalc()"></td>
+        <td>0</td>
+        <td><input class="score-box" value="53" oninput="recalc()"></td>
+        <td>0</td>
+      </tr>
+
+      <tr>
+        <td>2</td>
+        <td class="label-col"><input class="name-box" value="Phoo Pyae Heather"></td>
+        <td data-col="col-ut1"><input class="score-box" value="7" oninput="recalc()"></td>
+        <td>0</td>
+        <td><input class="score-box" value="43" oninput="recalc()"></td>
+        <td>0</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <button class="btn-add-student" onclick="addStudent()">+ Add Student</button>
+
+</div>
+
+
+<script>
+let cwCount = 1;
+
+function addUnitTest() { cwCount++; addCourseworkColumn(`col-ut${cwCount}`, `Unit Test ${cwCount}`); }
+function addProject()  { cwCount++; addCourseworkColumn(`col-proj${cwCount}`, "Project"); }
+function addPresentation() { cwCount++; addCourseworkColumn(`col-pres${cwCount}`, "Presentation"); }
+
+function addCourseworkColumn(colId, label) {
+  document.getElementById("cwHeader").colSpan = cwCount;
+
+  const th = document.createElement("th");
+  th.id = colId;
+  th.innerHTML = `${label} <button class="delete-col-btn" onclick="deleteColumn('${colId}')">x</button>`;
+  document.getElementById("headerRow2").appendChild(th);
+
+  document.querySelectorAll("#tbody tr").forEach(row => {
+    const td = document.createElement("td");
+    td.setAttribute("data-col", colId);
+    td.innerHTML = `<input class="score-box" oninput="recalc()">`;
+    row.insertBefore(td, row.children[row.children.length - 3]);
+  });
+
+  recalc();
+}
+
+function deleteColumn(colId) {
+  document.getElementById(colId).remove();
+  document.querySelectorAll(`[data-col="${colId}"]`).forEach(td => td.remove());
+  cwCount--;
+  document.getElementById("cwHeader").colSpan = cwCount;
+  recalc();
+}
+
+function addStudent() {
+  const tbody = document.getElementById("tbody");
+  const rowNum = tbody.children.length + 1;
+
+  const newRow = document.createElement("tr");
+  let html = `<td>${rowNum}</td><td class="label-col"><input class="name-box" placeholder="Student Name"></td>`;
+
+  document.querySelectorAll("#headerRow2 th").forEach(th => {
+    if (th.id) html += `<td data-col="${th.id}"><input class="score-box" oninput="recalc()"></td>`;
+  });
+
+  html += `
+    <td>0</td>
+    <td><input class="score-box" oninput="recalc()"></td>
+    <td>0</td>
+  `;
+
+  newRow.innerHTML = html;
+  tbody.appendChild(newRow);
+  recalc();
+}
+
+function recalc() {
+  document.querySelectorAll("#tbody tr").forEach(row => {
+    let unitTests = [];
+    let projPres = [];
+
+    row.querySelectorAll("td[data-col]").forEach(td => {
+      const col = td.getAttribute("data-col");
+      const val = parseFloat(td.querySelector("input").value || 0);
+
+      if (col.includes("ut")) unitTests.push(val);
+      else projPres.push(val);
+    });
+
+    const quizAvg = unitTests.length ? unitTests.reduce((a,b)=>a+b,0) / unitTests.length : 0;
+    const projAvg = projPres.length ? projPres.reduce((a,b)=>a+b,0) / projPres.length : 0;
+
+    const coursework =
+      (quizAvg/100)*25 +
+      (projAvg/100)*15;
+
+    const exam = parseFloat(row.children[row.children.length - 2].querySelector("input").value || 0);
+    const examScore = (exam/100)*60;
+
+    const total = coursework + examScore;
+
+    row.children[row.children.length - 3].innerText = coursework.toFixed(2);
+    row.children[row.children.length - 1].innerText = total.toFixed(2);
+  });
+}
+
+/* IMPORT EXCEL */
+function importExcel() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = ".xlsx";
+
+  input.onchange = e => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = event => {
+      const wb = XLSX.read(event.target.result, { type: "binary" });
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+      populateTableFromExcel(json);
+    };
+
+    reader.readAsBinaryString(file);
+  };
+
+  input.click();
+}
+
+function populateTableFromExcel(data) {
+  const tbody = document.getElementById("tbody");
+  tbody.innerHTML = "";
+
+  data.slice(1).forEach((row, i) => {
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td class="label-col"><input class="name-box" value="${row[1] || ""}"></td>
+      <td data-col="col-ut1"><input class="score-box" value="${row[2] || 0}" oninput="recalc()"></td>
+      <td>0</td>
+      <td><input class="score-box" value="${row[4] || 0}" oninput="recalc()"></td>
+      <td>0</td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+
+  recalc();
+}
+
+/* EXPORT EXCEL */
+function exportExcel() {
+  const table = document.getElementById("assessmentTable");
+  const wb = XLSX.utils.table_to_book(table);
+  XLSX.writeFile(wb, "assessment.xlsx");
+}
+</script>
+
+</body>
+</html>
