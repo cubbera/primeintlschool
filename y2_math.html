@@ -45,6 +45,7 @@
     cursor: pointer;
     font-size: 13px;
   }
+
   .btn-top:hover {
     background: #005bbd;
   }
@@ -58,9 +59,15 @@
     display: inline-block;
   }
 
-  .cw-title { font-weight: 600; margin-bottom: 6px; }
+  .cw-title {
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
 
-  .cw-buttons { display: flex; gap: 8px; }
+  .cw-buttons {
+    display: flex;
+    gap: 8px;
+  }
 
   .btn {
     padding: 5px 12px;
@@ -71,7 +78,9 @@
     font-size: 12px;
   }
 
-  .btn:hover { background: #eaeaea; }
+  .btn:hover {
+    background: #eaeaea;
+  }
 
   table {
     width: 100%;
@@ -88,9 +97,16 @@
     text-align: center;
   }
 
-  th { background: #f2f2f7; font-weight: 600; }
+  th {
+    background: #f2f2f7;
+    font-weight: 600;
+  }
 
-  .label-col { text-align: left; padding-left: 8px; font-weight: 600; }
+  .label-col {
+    text-align: left;
+    padding-left: 8px;
+    font-weight: 600;
+  }
 
   input.score-box {
     width: 55px;
@@ -101,7 +117,7 @@
   }
 
   input.name-box {
-    width: 140px;
+    width: 150px;
     padding: 4px;
     border-radius: 6px;
     border: 1px solid #cfcfd4;
@@ -134,13 +150,13 @@
 
 <div class="card">
 
-  <!-- IMPORT / EXPORT BUTTONS -->
+  <!-- Excel Buttons -->
   <div class="top-buttons">
     <button class="btn-top" onclick="importExcel()">Import from Excel</button>
     <button class="btn-top" onclick="exportExcel()">Export to Excel</button>
   </div>
 
-  <!-- Coursework group -->
+  <!-- Coursework Box -->
   <div class="cw-group">
     <div class="cw-title">Coursework Weight: 60%</div>
     <div class="cw-buttons">
@@ -191,7 +207,6 @@
   <button class="btn-add-student" onclick="addStudent()">+ Add Student</button>
 
 </div>
-
 
 <script>
 let cwCount = 1;
