@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Report Card Calculation – Prime International School Yangon</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+    :root {
+      --bg: #f5f5f7;
+      --bg-elevated: #ffffff;
+      --border-subtle: #e5e5ea;
+      --text-primary: #111;
+      --text-secondary: #6e6e73;
+      --accent: #0071e3;
+      --accent-soft: rgba(0,113,227,0.08);
+      --radius-card: 16px;
+      --radius-pill: 999px;
+      --shadow-soft: 0 12px 30px rgba(0,0,0,0.08);
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui;
+      background: var(--bg);
+      padding: 24px;
+      color: var(--text-primary);
+    }
+
+    .page-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .page-subtitle {
+      color: var(--text-secondary);
+      margin-bottom: 22px;
+      font-size: 14px;
+    }
+
+    .card {
+      background: var(--bg-elevated);
+      border-radius: var(--radius-card);
+      padding: 18px;
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 22px;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .card-title {
+      font-weight: 600;
+      font-size: 16px;
+      margin-bottom: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 14px;
+    }
+
+    th {
+      background: #f2f2f7;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    input.score-input {
+      width: 70px;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .final-score {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-top: 10px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      font-size: 14px;
+      border-radius: var(--radius-pill);
+      border: 1px solid transparent;
+      cursor: pointer;
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 6px 16px rgba(0,113,227,0.3);
+    }
+
+</style>
+</head>
+
+<body>
+
+<div class="page-title">Report Card Calculation</div>
+<div class="page-subtitle">Automatic calculation from Coursework (60%) + Exam (40%)</div>
+
+<!-- STUDENT HEADER -->
+<div class="card">
+  <div class="card-title">Student: <strong>Zin Aung Hlaing</strong> • Year 2 • English</div>
+</div>
+
+<!-- COURSEWORK TABLE -->
+<div class="card">
+  <div class="card-title">Coursework (60%)</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 40%">Assessment Item</th>
+        <th>Total Marks</th>
+        <th>Student Score</th>
+        <th>Weight (%)</th>
+        <th>Weighted Score</th>
+      </tr>
+    </thead>
+
+    <tbody>
+
+      <tr>
+        <td>Unit Test 1</td>
+        <td>20</td>
+        <td><input class="score-input cw" type="number" max="20" value="18"></td>
+        <td>20%</td>
+        <td class="cw-weight">—</td>
+      </tr>
+
+      <tr>
+        <td>Unit Test 2</td>
+        <td>20</td>
+        <td><input class="score-input cw" type="number" max="20" value="17"></td>
+        <td>20%</td>
+        <td class="cw-weight">—</td>
+      </tr>
+
+      <tr>
+        <td>Project</td>
+        <td>30</td>
+        <td><input class="score-input cw" type="number" max="30" value="25"></td>
+        <td>20%</td>
+        <td class="cw-weight">—</td>
+      </tr>
+
+      <tr>
+        <td>Presentation</td>
+        <td>30</td>
+        <td><input class="score-input cw" type="number" max="30" value="27"></td>
+        <td>40%</td>
+        <td class="cw-weight">—</td>
+      </tr>
+
+    </tbody>
+  </table>
+
+  <div><strong>Coursework Final (out of 60%):</strong> <span id="cw-final" style="font-size: 18px;">—</span></div>
+</div>
+
+<!-- EXAM -->
+<div class="card">
+  <div class="card-title">Term Exam (40%)</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Exam</th>
+        <th>Total Marks</th>
+        <th>Student Score</th>
+        <th>Weight (40%)</th>
+        <th>Weighted Score</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr>
+        <td>Term Exam</td>
+        <td>100</td>
+        <td><input class="score-input" id="exam-score" type="number" max="100" value="88"></td>
+        <td>40%</td>
+        <td id="exam-weight">—</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div><strong>Exam Final (out of 40%):</strong> <span id="exam-final" style="font-size: 18px;">—</span></div>
+</div>
+
+<!-- FINAL RESULT -->
+<div class="card">
+  <div class="card-title">Final Report Card Score</div>
+  <div class="final-score" id="final-total">—</div>
+
+  <button class="btn" onclick="generateReport()">Generate Report Card</button>
+</div>
+
+<script>
+function calculate() {
+  
+  // COURSEWORK weighting
+  let cwInputs = document.querySelectorAll(".cw");
+  let cwWeights = document.querySelectorAll(".cw-weight");
+
+  let cwPercentages = [20, 20, 20, 40]; // matches table
+  let cwFinal = 0;
+
+  cwInputs.forEach((input, i) => {
+    let score = Number(input.value);
+    let max = Number(input.max);
+    let percent = cwPercentages[i];
+
+    let weighted = (score / max) * percent;
+    cwFinal += weighted;
+
+    cwWeights[i].textContent = weighted.toFixed(2);
+  });
+
+  document.getElementById("cw-final").textContent = cwFinal.toFixed(2);
+
+  // EXAM weighting
+  let examScore = Number(document.getElementById("exam-score").value);
+  let examWeighted = (examScore / 100) * 40;
+
+  document.getElementById("exam-weight").textContent = examWeighted.toFixed(2);
+  document.getElementById("exam-final").textContent = examWeighted.toFixed(2);
+
+  // FINAL TOTAL
+  let final = cwFinal + examWeighted;
+  document.getElementById("final-total").textContent = final.toFixed(2);
+
+}
+
+function generateReport() {
+  alert("Report Card Generated (HTML/PDF version will be implemented).");
+}
+
+// Calculate on load and on change
+document.querySelectorAll("input").forEach(input => {
+  input.addEventListener("input", calculate);
+});
+
+calculate();
+</script>
+
+</body>
+</html>
