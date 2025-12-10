@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Subject Assessment Entry – Prime International School</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --bg-elevated: #ffffff;
+      --border-subtle: #e5e5ea;
+      --border-strong: #d1d1d6;
+      --text-primary: #111111;
+      --text-secondary: #6e6e73;
+      --accent: #0071e3;
+      --accent-soft: rgba(0, 113, 227, 0.08);
+      --danger: #ff3b30;
+      --radius-card: 14px;
+      --radius-pill: 999px;
+      --shadow-soft: 0 14px 34px rgba(0, 0, 0, 0.06);
+      --topbar-height: 60px;
+      --max-width: 1280px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui,
+        sans-serif;
+      background-color: var(--bg);
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top bar */
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      height: var(--topbar-height);
+      background: rgba(245, 245, 247, 0.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .topbar-inner {
+      width: 100%;
+      max-width: var(--max-width);
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-mark {
+      width: 30px;
+      height: 30px;
+      border-radius: 12px;
+      background: radial-gradient(circle at 0 0, #9ce0ff, #0071e3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 16px;
+      box-shadow: 0 8px 18px rgba(0, 113, 227, 0.35);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .brand-text span:first-child {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    .pill {
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-subtle);
+      padding: 5px 10px;
+      background-color: #fff;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-secondary);
+    }
+
+    .btn {
+      border-radius: var(--radius-pill);
+      padding: 6px 14px;
+      border: 1px solid transparent;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: #fff;
+      color: var(--text-primary);
+    }
+
+    .btn-primary {
+      background-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(0, 113, 227, 0.4);
+    }
+
+    .btn-outline {
+      border-color: var(--border-subtle);
+    }
+
+    /* Main */
+
+    .main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 20px 12px 32px;
+    }
+
+    .page {
+      width: 100%;
+      max-width: var(--max-width);
+    }
+
+    .page-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .page-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .page-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .page-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .context-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .context-item {
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+
+    .page-header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* Card */
+
+    .card {
+      background-color: var(--bg-elevated);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(0, 0, 0, 0.03);
+      padding: 14px 16px 16px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .card-subtitle {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .card-footer-note {
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    /* Table */
+
+    .table-wrapper {
+      margin-top: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      overflow: auto;
+      background-color: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      min-width: 920px;
+    }
+
+    thead {
+      background-color: #f2f2f7;
+    }
+
+    th,
+    td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border-subtle);
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    th:first-child,
+    td:first-child {
+      text-align: left;
+      position: sticky;
+      left: 0;
+      background-color: #fff;
+      z-index: 1;
+    }
+
+    thead th:first-child {
+      background-color: #f2f2f7;
+      z-index: 2;
+    }
+
+    th {
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    tbody tr:nth-child(even) td {
+      background-color: #fbfbfd;
+    }
+
+    tbody tr:hover td {
+      background-color: #f5f5f7;
+    }
+
+    .col-meta {
+      min-width: 220px;
+    }
+
+    input.mark-input {
+      width: 60px;
+      max-width: 100%;
+      padding: 4px 6px;
+      font-size: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      text-align: right;
+      background-color: #fff;
+    }
+
+    input.mark-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
+    }
+
+    .cell-readonly {
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .cell-final {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .cell-final.high {
+      color: #1c8c3a;
+    }
+
+    .cell-final.low {
+      color: var(--danger);
+    }
+
+    .small-tag {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: var(--radius-pill);
+      background-color: var(--accent-soft);
+      color: var(--accent);
+      font-size: 10px;
+      font-weight: 500;
+    }
+
+    /* Comment panel */
+
+    .comment-panel {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: 2.3fr 1.5fr;
+      gap: 14px;
+    }
+
+    .comment-group-label {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    select,
+    textarea {
+      width: 100%;
+      font-family: inherit;
+      font-size: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      padding: 6px 8px;
+      background-color: #fff;
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    @media (max-width: 900px) {
+      .comment-panel {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .page-header-actions {
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <div class="brand-mark">P</div>
+          <div class="brand-text">
+            <span>Prime International School Yangon</span>
+            <span>Assessment Entry • Internal Use</span>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <div class="pill">
+            Academic Year:
+            <strong>2025–2026</strong>
+          </div>
+          <button class="btn btn-outline">Auto-Save: On</button>
+          <button class="btn btn-primary">Save Changes</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="main">
+      <div class="page">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="page-title-group">
+            <div class="page-title">Subject Assessment Entry</div>
+            <div class="page-subtitle">
+              Enter exam and coursework marks for this class. Final scores are
+              calculated automatically.
+            </div>
+            <div class="context-line">
+              <span class="context-item">Class: <strong>Year&nbsp;2</strong></span>
+              <span class="context-item">Subject: <strong>Mathematics</strong></span>
+              <span class="context-item">Term: <strong>Term&nbsp;1</strong></span>
+              <span class="context-item">Teacher: <strong>Tr.&nbsp;Nyein Nyein</strong></span>
+            </div>
+          </div>
+          <div class="page-header-actions">
+            <button class="btn btn-outline">Template Settings</button>
+            <button class="btn btn-outline">Import from Excel</button>
+          </div>
+        </div>
+
+        <!-- Main Card -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">
+                Marks by Student
+              </div>
+              <div class="card-subtitle">
+                60% Term Exam • 40% Coursework (Quizzes, Project, Presentation)
+              </div>
+            </div>
+            <span class="small-tag">Auto-calculated totals</span>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th class="col-meta">Student Name</th>
+                  <th>Term Exam<br /><span style="font-weight:400;">(max 60)</span></th>
+                  <th>Quiz 1</th>
+                  <th>Quiz 2</th>
+                  <th>Quiz 3</th>
+                  <th>Quiz 4</th>
+                  <th>Quiz 5</th>
+                  <th>Quiz Avg</th>
+                  <th>Project<br /><span style="font-weight:400;">(max 15)</span></th>
+                  <th>Presentation<br /><span style="font-weight:400;">(max 10)</span></th>
+                  <th>Coursework<br /><span style="font-weight:400;">(40%)</span></th>
+                  <th>Final Score<br /><span style="font-weight:400;">(Exam 60% + Coursework 40%)</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Row 1 -->
+                <tr>
+                  <td class="col-meta">Zin Aung Hlaing</td>
+                  <td>
+                    <input class="mark-input" type="number" min="0" max="60" value="53" />
+                  </td>
+                  <td><input class="mark-input" type="number" min="0" max="10" value="8" /></td>
+                  <td><input class="mark-input" type="number" min="0" max="10" value="9.5" /></td>
+                  <td><input class="mark-input" type="number" min="0" max="10" value="10" /></td>
+                  <td><input class="mark-input" type="number" min="0" max="10" value="8" /></td>
+                  <td><input class="mark-input" type="number" min="0" max="10" value="10" /></td>
+                  <td class="cell-readonly">9.1</td>
+                  <td><input class="mark-input" type="number" min="0" max="15" value="14" /></td>
+                  <td><input class="mark-input" type="number" min="0" max="10" value="9" /></td>
+                  <td class="cell-readonly">36</td>
+                  <td class="cell-final high">91</td>
+                </tr>
+
+                <!-- Row 2 -->
+                <tr>
+                  <td class="col-meta">Phoo Pyae Heather</td>
+                  <td>
+                    <input class="mark-input" type="number" min="0" max="60" value="43" />
+                  </td>
+                  <td><input class="mark-input" type="number" min="0" max="10" value="7" /></td>
+                  <td><input class="mark-input" type="number" min="0" max="10" value="6.5" /></td>
+                  <td><input class="mark-input" type="number" min="0" max="10" value="6.5" /></td>
+                  <td><input class="mark-input" type="number" min="0" max="10" value="7" /></td>
+                  <td><input class="mark-input" type="number" min="0" max="10" value="6.5" /></td>
+                  <td class="cell-readonly">6.7</td>
+                  <td><input class="mark-input" type="number" min="0" max="15" value="12" /></td>
+                  <td><input class="mark-input" type="number" min="0" max="10" value="7" /></td>
+                  <td class="cell-readonly">30</td>
+                  <td class="cell-final">77</td>
+                </tr>
+
+                <!-- Row 3 (example lower score) -->
+                <tr>
+                  <td class="col-meta">Shwe Sin Htet Aung</td>
+                  <td>
+                    <input class="mark-input" type="number" min="0" max="60" value="38" />
+                  </td>
+                  <td><input class="mark-input" type="number" min="0" max="10" value="6" /></td>
+                  <td><input class="mark-input" type="number" min="0" max="10" value="5.5" /></td>
+                  <td><input class="mark-input" type="number" min="0" max="10" value="7" /></td>
+                  <td><input class="mark-input" type="number" min="0" max="10" value="7" /></td>
+                  <td><input class="mark-input" type="number" min="0" max="10" value="6.5" /></td>
+                  <td class="cell-readonly">6.6</td>
+                  <td><input class="mark-input" type="number" min="0" max="15" value="11" /></td>
+                  <td><input class="mark-input" type="number" min="0" max="10" value="7" /></td>
+                  <td class="cell-readonly">29</td>
+                  <td class="cell-final low">72</td>
+                </tr>
+
+                <!-- More rows will be generated dynamically from backend -->
+              </tbody>
+            </table>
+          </div>
+
+          <p class="card-footer-note">
+            Note: grey cells are calculated by the system. “Final Score” applies
+            the configured weighting (e.g. Term Exam 60%, Coursework 40%).
+          </p>
+        </section>
+
+        <!-- Comment & meta panel -->
+        <section class="comment-panel">
+          <div>
+            <div class="comment-group-label">Comment Bank (for this subject, this term)</div>
+            <select>
+              <option value="">Select a common comment…</option>
+              <option>Shows strong understanding of concepts and applies them confidently.</option>
+              <option>Needs further practice with problem-solving and multi-step questions.</option>
+              <option>Consistently completes coursework with care and attention to detail.</option>
+              <option>Should focus on checking work to reduce careless mistakes.</option>
+            </select>
+
+            <div class="comment-group-label" style="margin-top:10px;">
+              Custom Comment (for selected student)
+            </div>
+            <textarea placeholder="Type or refine a comment for the selected student’s Progress Report…"></textarea>
+          </div>
+
+          <div>
+            <div class="comment-group-label">Subject Settings (read-only view)</div>
+            <div class="card-subtitle" style="margin-bottom:8px;">
+              These settings are defined by the academic coordinator.
+            </div>
+            <ul style="font-size:12px; color:var(--text-secondary); line-height:1.6; padding-left:18px;">
+              <li>Max exam score: 60</li>
+              <li>Coursework weight: 40% of final score</li>
+              <li>Quizzes: 5 (equally weighted into Quiz Avg)</li>
+              <li>Project: max 15 marks</li>
+              <li>Presentation: max 10 marks</li>
+              <li>Missing quiz → treated as 0 unless “excused” flag is set</li>
+            </ul>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
