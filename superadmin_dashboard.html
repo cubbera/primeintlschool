@@ -1,4 +1,3 @@
-exact like this, but add the text (dashboard, students, staff, so on) instead of icon:
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,11 +23,7 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
       --topbar-height: 64px;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui,
@@ -141,9 +136,7 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
       outline: none;
     }
 
-    .search input::placeholder {
-      color: var(--text-secondary);
-    }
+    .search input::placeholder { color: var(--text-secondary); }
 
     .search-icon {
       position: absolute;
@@ -164,10 +157,6 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
       align-items: center;
       justify-content: center;
       cursor: pointer;
-    }
-
-    .icon-button:hover {
-      background-color: var(--accent-soft);
     }
 
     .profile-chip {
@@ -194,24 +183,11 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
       font-weight: 600;
     }
 
-    .profile-meta {
-      display: flex;
-      flex-direction: column;
-      line-height: 1.2;
-    }
-
-    .profile-name {
-      font-size: 12px;
-      font-weight: 500;
-    }
-
-    .profile-role {
-      font-size: 11px;
-      color: var(--text-secondary);
-    }
+    .profile-meta { display: flex; flex-direction: column; line-height: 1.2; }
+    .profile-name { font-size: 12px; font-weight: 500; }
+    .profile-role { font-size: 11px; color: var(--text-secondary); }
 
     /* Sidebar */
-
     .sidebar {
       grid-column: 1 / 2;
       grid-row: 2 / 3;
@@ -237,27 +213,21 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
       margin-bottom: 8px;
     }
 
-    .nav-item {
-      margin-bottom: 2px;
-    }
+    .nav-item { margin-bottom: 2px; }
 
     .nav-link {
       display: flex;
       align-items: center;
-      gap: 10px;
       padding: 8px 10px;
       border-radius: 10px;
       font-size: 13px;
       color: var(--text-secondary);
       text-decoration: none;
       cursor: pointer;
+      gap: 10px;
     }
 
-    .nav-link span.icon {
-      width: 20px;
-      text-align: center;
-      opacity: 0.7;
-    }
+    .nav-link .label { color: var(--text-secondary); }
 
     .nav-link.active {
       background-color: #ffffff;
@@ -266,10 +236,14 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
       border: 1px solid rgba(0, 0, 0, 0.03);
     }
 
+    .nav-link.active .label { color: var(--text-primary); }
+
     .nav-link:hover:not(.active) {
       background-color: rgba(255, 255, 255, 0.9);
       color: var(--text-primary);
     }
+
+    .nav-link:hover .label { color: var(--text-primary); }
 
     /* Main content */
     .main {
@@ -286,26 +260,11 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
       margin-bottom: 16px;
     }
 
-    .page-title-group {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
+    .page-title-group { display: flex; flex-direction: column; gap: 4px; }
+    .page-title { font-size: 22px; font-weight: 600; }
+    .page-subtitle { font-size: 13px; color: var(--text-secondary); }
 
-    .page-title {
-      font-size: 22px;
-      font-weight: 600;
-    }
-
-    .page-subtitle {
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
-
-    .page-actions {
-      display: flex;
-      gap: 10px;
-    }
+    .page-actions { display: flex; gap: 10px; }
 
     .btn {
       border-radius: var(--radius-pill);
@@ -326,12 +285,9 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
       box-shadow: 0 8px 18px rgba(0, 113, 227, 0.4);
     }
 
-    .btn-outline {
-      border-color: var(--border-subtle);
-    }
+    .btn-outline { border-color: var(--border-subtle); }
 
     /* KPI cards */
-
     .kpi-row {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -385,18 +341,10 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
       color: var(--text-secondary);
     }
 
-    .trend-up {
-      color: var(--success);
-      font-weight: 500;
-    }
+    .trend-up { color: var(--success); font-weight: 500; }
+    .trend-down { color: var(--danger); font-weight: 500; }
 
-    .trend-down {
-      color: var(--danger);
-      font-weight: 500;
-    }
-
-    /* Layout: middle row */
-
+    /* Charts, lists, cards etc (unchanged) */
     .middle-row {
       display: grid;
       grid-template-columns: 2fr 1.2fr;
@@ -418,29 +366,14 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
       margin-bottom: 8px;
     }
 
-    .card-title {
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .card-subtitle {
-      font-size: 12px;
-      color: var(--text-secondary);
-    }
-
-    .card-body {
-      margin-top: 8px;
-      font-size: 13px;
-    }
+    .card-title { font-size: 14px; font-weight: 600; }
+    .card-subtitle { font-size: 12px; color: var(--text-secondary); }
+    .card-body { margin-top: 8px; font-size: 13px; }
 
     .chart-placeholder {
       height: 200px;
       border-radius: 12px;
-      background: linear-gradient(
-        135deg,
-        rgba(0, 0, 0, 0.03),
-        rgba(0, 0, 0, 0.01)
-      );
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.03), rgba(0, 0, 0, 0.01));
       border: 1px dashed rgba(0, 0, 0, 0.07);
       display: flex;
       align-items: center;
@@ -449,21 +382,19 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
       font-size: 12px;
     }
 
-    .list {
-      margin-top: 8px;
+    .bottom-row {
+      display: grid;
+      grid-template-columns: 1.5fr 1.5fr 1.2fr;
+      gap: 16px;
+      margin-bottom: 24px;
     }
 
+    .list { margin-top: 8px; }
     .list-item {
       display: flex;
       justify-content: space-between;
-      align-items: center;
       padding: 8px 0;
-      font-size: 13px;
       border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-    }
-
-    .list-item:last-child {
-      border-bottom: none;
     }
 
     .badge {
@@ -484,101 +415,19 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
       color: var(--danger);
     }
 
-    /* Bottom row */
-
-    .bottom-row {
-      display: grid;
-      grid-template-columns: 1.5fr 1.5fr 1.2fr;
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .map-placeholder {
-      height: 200px;
-      border-radius: 12px;
-      background: radial-gradient(
-        circle at 10% 20%,
-        rgba(0, 113, 227, 0.25),
-        rgba(0, 0, 0, 0.02)
-      );
-      border: 1px solid rgba(0, 0, 0, 0.04);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      color: var(--text-secondary);
-    }
-
     .footer-note {
       font-size: 11px;
       color: var(--text-secondary);
       opacity: 0.8;
       margin-top: 4px;
     }
-
-    /* Responsive */
-
-    @media (max-width: 1100px) {
-      .app-shell {
-        grid-template-columns: 72px 1fr;
-      }
-
-      .sidebar {
-        padding: 16px 6px;
-      }
-
-      .sidebar-section-title {
-        display: none;
-      }
-
-      .nav-link {
-        justify-content: center;
-        padding: 8px 0;
-      }
-
-      .nav-link span.label {
-        display: none;
-      }
-
-      .kpi-row {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .middle-row {
-        grid-template-columns: 1fr;
-      }
-
-      .bottom-row {
-        grid-template-columns: 1fr;
-      }
-
-      .search {
-        display: none;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .app-shell {
-        grid-template-columns: 1fr;
-        grid-template-rows: var(--topbar-height) auto;
-      }
-
-      .sidebar {
-        display: none; /* for simplicity; replace with drawer in real app */
-      }
-
-      .main {
-        grid-column: 1 / 3;
-      }
-
-      .kpi-row {
-        grid-template-columns: 1fr;
-      }
-    }
   </style>
 </head>
+
 <body>
+
   <div class="app-shell">
+
     <!-- Topbar -->
     <header class="topbar">
       <div class="topbar-left">
@@ -589,6 +438,7 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
         </div>
         <div class="topbar-title">Dashboard</div>
       </div>
+
       <div class="topbar-right">
         <div class="year-selector">
           <span>Academic Year</span>
@@ -597,14 +447,9 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
         </div>
         <div class="search">
           <span class="search-icon">⌕</span>
-          <input
-            type="text"
-            placeholder="Search students, staff, classes, invoices…"
-          />
+          <input type="text" placeholder="Search students, staff, classes, invoices…" />
         </div>
-        <button class="icon-button" aria-label="Notifications">
-          🔔
-        </button>
+        <button class="icon-button">🔔</button>
         <div class="profile-chip">
           <div class="profile-avatar">AW</div>
           <div class="profile-meta">
@@ -615,13 +460,13 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
       </div>
     </header>
 
-    <!-- Sidebar -->
+    <!-- Sidebar (FIXED TEXT MENU) -->
     <aside class="sidebar">
+
       <div class="sidebar-section">
         <ul class="nav-list">
           <li class="nav-item">
             <a class="nav-link active" href="#">
-              <span class="icon">⌂</span>
               <span class="label">Dashboard</span>
             </a>
           </li>
@@ -631,121 +476,50 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
       <div class="sidebar-section">
         <div class="sidebar-section-title">Students</div>
         <ul class="nav-list">
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span class="icon">👨‍🎓</span>
-              <span class="label">Student List</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span class="icon">➕</span>
-              <span class="label">Add Student</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span class="icon">📄</span>
-              <span class="label">Progress & Reports</span>
-            </a>
-          </li>
+          <li class="nav-item"><a class="nav-link"><span class="label">Student List</span></a></li>
+          <li class="nav-item"><a class="nav-link"><span class="label">Add Student</span></a></li>
+          <li class="nav-item"><a class="nav-link"><span class="label">Progress & Reports</span></a></li>
         </ul>
       </div>
 
       <div class="sidebar-section">
         <div class="sidebar-section-title">Academics</div>
         <ul class="nav-list">
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span class="icon">🏫</span>
-              <span class="label">Classes</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span class="icon">📅</span>
-              <span class="label">Timetables</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span class="icon">📚</span>
-              <span class="label">Lesson Plans</span>
-            </a>
-          </li>
+          <li class="nav-item"><a class="nav-link"><span class="label">Classes</span></a></li>
+          <li class="nav-item"><a class="nav-link"><span class="label">Timetables</span></a></li>
+          <li class="nav-item"><a class="nav-link"><span class="label">Lesson Plans</span></a></li>
         </ul>
       </div>
 
       <div class="sidebar-section">
         <div class="sidebar-section-title">Operations</div>
         <ul class="nav-list">
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span class="icon">✅</span>
-              <span class="label">Attendance</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span class="icon">👩‍🏫</span>
-              <span class="label">Teachers & Staff</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span class="icon">🚌</span>
-              <span class="label">Transport</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span class="icon">📖</span>
-              <span class="label">Library</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span class="icon">📦</span>
-              <span class="label">Inventory</span>
-            </a>
-          </li>
+          <li class="nav-item"><a class="nav-link"><span class="label">Attendance</span></a></li>
+          <li class="nav-item"><a class="nav-link"><span class="label">Teachers & Staff</span></a></li>
+          <li class="nav-item"><a class="nav-link"><span class="label">Transport</span></a></li>
+          <li class="nav-item"><a class="nav-link"><span class="label">Library</span></a></li>
+          <li class="nav-item"><a class="nav-link"><span class="label">Inventory</span></a></li>
         </ul>
       </div>
 
       <div class="sidebar-section">
         <div class="sidebar-section-title">Finance & Admin</div>
         <ul class="nav-list">
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span class="icon">💳</span>
-              <span class="label">Finance</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span class="icon">📣</span>
-              <span class="label">Communication</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span class="icon">⚙️</span>
-              <span class="label">Settings</span>
-            </a>
-          </li>
+          <li class="nav-item"><a class="nav-link"><span class="label">Finance</span></a></li>
+          <li class="nav-item"><a class="nav-link"><span class="label">Communication</span></a></li>
+          <li class="nav-item"><a class="nav-link"><span class="label">Settings</span></a></li>
         </ul>
       </div>
+
     </aside>
 
-    <!-- Main content -->
+    <!-- Main content (unchanged) -->
     <main class="main">
-      <!-- Page header -->
+
       <div class="page-header">
         <div class="page-title-group">
           <div class="page-title">Super Admin Dashboard</div>
-          <div class="page-subtitle">
-            Overview of students, staff, attendance, finance and operations.
-          </div>
+          <div class="page-subtitle">Overview of students, staff, attendance, finance and operations.</div>
         </div>
         <div class="page-actions">
           <button class="btn btn-outline">Export Summary</button>
@@ -753,7 +527,7 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
         </div>
       </div>
 
-      <!-- KPI row -->
+      <!-- KPI Cards -->
       <section class="kpi-row">
         <article class="kpi-card">
           <div class="kpi-header">
@@ -761,10 +535,7 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
             <div class="kpi-pill">Enrolled</div>
           </div>
           <div class="kpi-value">728</div>
-          <div class="kpi-footer">
-            <span class="trend-up">▲ 4.1%</span>
-            <span>vs last term</span>
-          </div>
+          <div class="kpi-footer"><span class="trend-up">▲ 4.1%</span><span>vs last term</span></div>
         </article>
 
         <article class="kpi-card">
@@ -773,9 +544,7 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
             <div class="kpi-pill">Teachers & Staff</div>
           </div>
           <div class="kpi-value">86</div>
-          <div class="kpi-footer">
-            <span class="trend-up">▲ Stable</span>
-          </div>
+          <div class="kpi-footer"><span class="trend-up">▲ Stable</span></div>
         </article>
 
         <article class="kpi-card">
@@ -784,10 +553,7 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
             <div class="kpi-pill">Students</div>
           </div>
           <div class="kpi-value">94%</div>
-          <div class="kpi-footer">
-            <span class="trend-down">▼ -1.2%</span>
-            <span>vs last week</span>
-          </div>
+          <div class="kpi-footer"><span class="trend-down">▼ -1.2%</span><span>vs last week</span></div>
         </article>
 
         <article class="kpi-card">
@@ -796,31 +562,22 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
             <div class="kpi-pill">This Month</div>
           </div>
           <div class="kpi-value">MMK 82M</div>
-          <div class="kpi-footer">
-            <span class="trend-up">▲ 7.8%</span>
-            <span>vs previous month</span>
-          </div>
+          <div class="kpi-footer"><span class="trend-up">▲ 7.8%</span><span>vs previous month</span></div>
         </article>
       </section>
 
-      <!-- Middle row: charts & alerts -->
+      <!-- Middle section -->
       <section class="middle-row">
         <article class="card">
           <header class="card-header">
             <div>
               <div class="card-title">Student Attendance (This Week)</div>
-              <div class="card-subtitle">
-                Daily presence across all classes.
-              </div>
+              <div class="card-subtitle">Daily presence across all classes.</div>
             </div>
-            <button class="btn btn-outline" style="font-size: 11px;">
-              View Detail
-            </button>
+            <button class="btn btn-outline" style="font-size: 11px;">View Detail</button>
           </header>
           <div class="card-body">
-            <div class="chart-placeholder">
-              Chart goes here – bar/line attendance visualization
-            </div>
+            <div class="chart-placeholder">Chart goes here – bar/line attendance visualization</div>
           </div>
         </article>
 
@@ -833,28 +590,16 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
           </header>
           <div class="card-body">
             <div class="list">
-              <div class="list-item">
-                <span>5 students with low attendance</span>
-                <span class="badge-danger">Review</span>
-              </div>
-              <div class="list-item">
-                <span>12 invoices overdue</span>
-                <span class="badge-warning">Finance</span>
-              </div>
-              <div class="list-item">
-                <span>2 buses running late</span>
-                <span class="badge-danger">Transport</span>
-              </div>
-              <div class="list-item">
-                <span>3 lesson plans pending approval</span>
-                <span class="badge">Academics</span>
-              </div>
+              <div class="list-item"><span>5 students with low attendance</span><span class="badge-danger">Review</span></div>
+              <div class="list-item"><span>12 invoices overdue</span><span class="badge-warning">Finance</span></div>
+              <div class="list-item"><span>2 buses running late</span><span class="badge-danger">Transport</span></div>
+              <div class="list-item"><span>3 lesson plans pending approval</span><span class="badge">Academics</span></div>
             </div>
           </div>
         </article>
       </section>
 
-      <!-- Bottom row -->
+      <!-- Bottom section -->
       <section class="bottom-row">
         <article class="card">
           <header class="card-header">
@@ -864,9 +609,7 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
             </div>
           </header>
           <div class="card-body">
-            <div class="chart-placeholder">
-              Chart goes here – monthly income line chart
-            </div>
+            <div class="chart-placeholder">Chart goes here – monthly income line chart</div>
           </div>
         </article>
 
@@ -878,9 +621,7 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
             </div>
           </header>
           <div class="card-body">
-            <div class="chart-placeholder">
-              Chart goes here – expense categories (bar/pie)
-            </div>
+            <div class="chart-placeholder">Chart goes here – expense categories (bar/pie)</div>
           </div>
         </article>
 
@@ -893,29 +634,20 @@ exact like this, but add the text (dashboard, students, staff, so on) instead of
           </header>
           <div class="card-body">
             <div class="list">
-              <div class="list-item">
-                <span>Parent–Teacher Meeting</span>
-                <span class="badge">Fri • 9:00 AM</span>
-              </div>
-              <div class="list-item">
-                <span>Cambridge Assessment Week</span>
-                <span class="badge-warning">Next Mon</span>
-              </div>
-              <div class="list-item">
-                <span>Sports Day</span>
-                <span class="badge">2 weeks</span>
-              </div>
+              <div class="list-item"><span>Parent–Teacher Meeting</span><span class="badge">Fri • 9:00 AM</span></div>
+              <div class="list-item"><span>Cambridge Assessment Week</span><span class="badge-warning">Next Mon</span></div>
+              <div class="list-item"><span>Sports Day</span><span class="badge">2 weeks</span></div>
             </div>
             <p class="footer-note">Events are synced with Academic Calendar.</p>
           </div>
         </article>
       </section>
 
-      <p class="footer-note">
-        Super Admin view • Prime International School Yangon · Cambridge
-        Curriculum
-      </p>
+      <p class="footer-note">Super Admin view • Prime International School Yangon · Cambridge Curriculum</p>
+
     </main>
+
   </div>
+
 </body>
 </html>
