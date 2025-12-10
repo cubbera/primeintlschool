@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Assessment Entry – Correct Hybrid Layout</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8">
+<title>Assessment Entry – Coursework & Exam Layout</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
   body {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui;
-    margin: 0;
-    padding: 20px;
     background: #f5f5f7;
+    padding: 20px;
   }
 
   .title {
@@ -19,65 +18,110 @@
     margin-bottom: 10px;
   }
 
-  .subtitle {
-    color: #6e6e73;
-    font-size: 13px;
-    margin-bottom: 20px;
-  }
-
   .card {
     background: #fff;
     border-radius: 14px;
     padding: 20px;
     box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-    border: 1px solid #e2e2e7;
+    border: 1px solid #e3e3e8;
+    position: relative;
   }
 
-  .layout-row {
+  /* TOP RIGHT BUTTONS */
+  .top-right-buttons {
+    position: absolute;
+    right: 20px;
+    top: 20px;
     display: flex;
     gap: 8px;
-    margin-bottom: 10px;
   }
 
-  .btn {
-    padding: 4px 12px;
+  .btn-top {
+    padding: 6px 12px;
     font-size: 12px;
     border-radius: 999px;
-    background: #fff;
     border: 1px solid #ccc;
+    background: white;
     cursor: pointer;
   }
 
-  .btn:hover {
+  .btn-top:hover {
+    background: #f1f1f5;
+  }
+
+  .cw-box {
+    display: inline-block;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 10px 14px;
+    border: 1px solid #cfcfd4;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .cw-controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    margin-left: 4px;
+  }
+
+  .btn-sm {
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 999px;
+    border: 1px solid #ccc;
+    background: white;
+    cursor: pointer;
+  }
+
+  .btn-sm:hover {
     background: #eee;
+  }
+
+  .btn-add-student {
+    margin-top: 14px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: #0071e3;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
   }
 
   table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 12px;
+    margin-top: 16px;
     background: white;
+    font-size: 13px;
     min-width: 900px;
   }
 
   th, td {
-    padding: 8px;
-    border: 1px solid #ddd;
-    font-size: 13px;
+    border: 1px solid #dcdce0;
+    padding: 6px;
     text-align: center;
+    white-space: nowrap;
   }
 
-  th.group {
-    background: #f0f0f5;
+  th {
+    background: #f2f2f7;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  }
+
+  .label-col {
+    text-align: left;
+    padding-left: 8px;
+    font-weight: 600;
   }
 
   input.score-box {
     width: 55px;
     padding: 4px;
-    border: 1px solid #d1d1d6;
+    border: 1px solid #cfcfd4;
     border-radius: 6px;
     text-align: right;
     font-size: 12px;
@@ -88,69 +132,76 @@
 <body>
 
 <div class="title">Assessment Entry – Mathematics (Year 2, Term 1)</div>
-<div class="subtitle">Coursework 60% + Exam 40%. Small input boxes for teacher entry.</div>
 
 <div class="card">
 
-  <!-- Coursework buttons -->
-  <div class="layout-row">
-    <button class="btn">+ Add Unit Test</button>
-    <button class="btn">+ Add Project</button>
-    <button class="btn">+ Add Presentation</button>
+  <!-- NEW BUTTONS (TOP RIGHT OF CARD) -->
+  <div class="top-right-buttons">
+    <button class="btn-top">Import from Excel</button>
+    <button class="btn-top">Export to Excel</button>
+  </div>
+  <!-- END NEW BUTTONS -->
+
+  <!-- Coursework Weight Box -->
+  <div class="cw-box">
+    Coursework Weight: <strong>60%</strong>
   </div>
 
+  <!-- Coursework Controls -->
+  <div class="cw-controls">
+    <button class="btn-sm">+ Add Unit Test</button>
+    <button class="btn-sm">+ Add Project</button>
+    <button class="btn-sm">+ Add Presentation</button>
+  </div>
+
+  <!-- Assessment Table -->
   <table>
     <thead>
       <tr>
-        <th rowspan="2">Student Name</th>
+        <th rowspan="2">No.</th>
+        <th rowspan="2" class="label-col">Student Name</th>
 
-        <!-- Coursework group -->
-        <th class="group" colspan="4">Coursework (60%)</th>
+        <th colspan="1">Coursework (60%)</th>
 
-        <!-- Exam group -->
-        <th class="group" rowspan="2">Term Exam (40%)</th>
+        <th rowspan="2">Coursework Total</th>
 
-        <!-- Final -->
-        <th class="group" rowspan="2">Final Score</th>
+        <th rowspan="2">Term Exam (40%)</th>
+
+        <th rowspan="2">Total (100%)</th>
       </tr>
 
       <tr>
         <th>Unit Test 1</th>
-        <th>Unit Test 2</th>
-        <th>Project</th>
-        <th>Presentation</th>
       </tr>
     </thead>
 
     <tbody>
       <tr>
-        <td style="text-align:left;">Zin Aung Hlaing</td>
+        <td>1</td>
+        <td class="label-col">Zin Aung Hlaing</td>
 
         <td><input class="score-box" value="8"></td>
-        <td><input class="score-box" value="9"></td>
-        <td><input class="score-box" value="14"></td>
-        <td><input class="score-box" value="9"></td>
 
+        <td>36</td>
         <td><input class="score-box" value="53"></td>
-
         <td>91</td>
       </tr>
 
       <tr>
-        <td style="text-align:left;">Phoo Pyae Heather</td>
+        <td>2</td>
+        <td class="label-col">Phoo Pyae Heather</td>
 
         <td><input class="score-box" value="7"></td>
-        <td><input class="score-box" value="6"></td>
-        <td><input class="score-box" value="12"></td>
-        <td><input class="score-box" value="7"></td>
 
+        <td>30</td>
         <td><input class="score-box" value="43"></td>
-
         <td>77</td>
       </tr>
-
     </tbody>
   </table>
+
+  <button class="btn-add-student">+ Add Student</button>
+
 </div>
 
 </body>
