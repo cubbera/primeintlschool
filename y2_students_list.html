@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Students – Prime International School</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --bg-elevated: #ffffff;
+      --border-subtle: #e5e5ea;
+      --text-primary: #111;
+      --text-secondary: #6e6e73;
+      --accent: #0071e3;
+      --accent-soft: rgba(0,113,227,0.08);
+      --radius-card: 16px;
+      --radius-pill: 999px;
+      --shadow-soft: 0 12px 30px rgba(0,0,0,0.06);
+      --sidebar-width: 260px;
+      --topbar-height: 64px;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui;
+      background: var(--bg);
+      color: var(--text-primary);
+      display: flex;
+    }
+
+    /* Reuse sidebar pattern */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: #f9f9fb;
+      border-right: 1px solid var(--border-subtle);
+      padding: 16px 12px;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .nav-list { list-style: none; padding: 0; margin: 0; }
+    .nav-link {
+      display: block;
+      padding: 10px 14px;
+      border-radius: 10px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      margin-bottom: 3px;
+      font-size: 14px;
+    }
+    .nav-link.active {
+      background: white;
+      color: var(--text-primary);
+      border: 1px solid rgba(0,0,0,0.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .nav-link:hover:not(.active) {
+      background: rgba(255,255,255,0.6);
+      color: var(--text-primary);
+    }
+
+    /* MAIN CONTENT */
+    .main {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+    }
+
+    .page-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .page-subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+
+    /* Filters row */
+    .filters {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .input, select {
+      padding: 8px 14px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-subtle);
+      background: white;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .search-box {
+      flex: 1;
+    }
+
+    /* TABLE */
+    .table-wrapper {
+      background: var(--bg-elevated);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(0,0,0,0.04);
+      overflow: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th {
+      text-align: left;
+      background: #f2f2f7;
+      padding: 14px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    td {
+      padding: 14px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+
+    tr:hover td {
+      background: #fafafa;
+    }
+
+    .actions button {
+      padding: 6px 12px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-subtle);
+      background: white;
+      cursor: pointer;
+      font-size: 12px;
+      margin-right: 6px;
+    }
+
+    .actions .primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    .status-pill {
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    /* Pagination */
+    .pagination {
+      margin-top: 18px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .page-btn {
+      padding: 6px 12px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-subtle);
+      background: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .page-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <ul class="nav-list">
+      <li><a class="nav-link" href="#">Dashboard</a></li>
+      <li><a class="nav-link active" href="#">Students</a></li>
+      <li><a class="nav-link" href="#">Staff</a></li>
+      <li><a class="nav-link" href="#">Attendance</a></li>
+      <li><a class="nav-link" href="#">Finance</a></li>
+      <li><a class="nav-link" href="#">Transport</a></li>
+      <li><a class="nav-link" href="#">Library</a></li>
+      <li><a class="nav-link" href="#">Inventory</a></li>
+      <li><a class="nav-link" href="#">Settings</a></li>
+    </ul>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <div class="page-title">Student List</div>
+    <div class="page-subtitle">All enrolled students across every class.</div>
+
+    <!-- FILTERS -->
+    <div class="filters">
+      <input class="input search-box" type="text" placeholder="Search name, ID, parent name…">
+      <select class="input">
+        <option>All Classes</option>
+        <option>Tiny Explorers</option>
+        <option>School Readiness</option>
+        <option>Early Years 1</option>
+        <option>Early Years 2</option>
+        <option>Year 1</option>
+        <option>Year 2</option>
+      </select>
+      <select class="input">
+        <option>Status: All</option>
+        <option>Active</option>
+        <option>Inactive</option>
+        <option>Pending</option>
+      </select>
+      <button class="input">Filter</button>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:180px;">Student Name</th>
+            <th>Student ID</th>
+            <th>Class</th>
+            <th>Parent</th>
+            <th>Status</th>
+            <th style="width: 260px;">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr>
+            <td>Zin Aung Hlaing</td>
+            <td>STU-22101</td>
+            <td>Year 2</td>
+            <td>Mr. Aung Kyaw</td>
+            <td><span class="status-pill">Active</span></td>
+            <td class="actions">
+              <button>View</button>
+              <button>Edit</button>
+              <button>Progress</button>
+              <button class="primary">Statement</button>
+            </td>
+          </tr>
+
+          <tr>
+            <td>Shwe Sin Htet Aung</td>
+            <td>STU-22102</td>
+            <td>Year 2</td>
+            <td>Mrs. Tin Tin</td>
+            <td><span class="status-pill">Active</span></td>
+            <td class="actions">
+              <button>View</button>
+              <button>Edit</button>
+              <button>Progress</button>
+              <button class="primary">Statement</button>
+            </td>
+          </tr>
+
+          <tr>
+            <td>Phoo Pyae Heather</td>
+            <td>STU-22098</td>
+            <td>Year 2</td>
+            <td>Ms. Su Su</td>
+            <td><span class="status-pill" style="background:#fff4e0;color:#d28b00;">Pending</span></td>
+            <td class="actions">
+              <button>View</button>
+              <button>Edit</button>
+              <button>Progress</button>
+              <button class="primary">Statement</button>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination">
+      <button class="page-btn">«</button>
+      <button class="page-btn active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+      <button class="page-btn">»</button>
+    </div>
+
+  </main>
+
+</body>
+</html>
