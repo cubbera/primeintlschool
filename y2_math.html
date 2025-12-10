@@ -5,6 +5,9 @@
 <title>Dynamic Assessment Entry</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+<!-- SheetJS for Excel import/export -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
 <style>
   body {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui;
@@ -27,7 +30,25 @@
     position: relative;
   }
 
-  /* Coursework Box */
+  .top-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+
+  .btn-top {
+    padding: 6px 12px;
+    background: #0071e3;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .btn-top:hover {
+    background: #005bbd;
+  }
+
   .cw-group {
     border: 1px solid #d0d0d5;
     background: #fafafa;
@@ -37,15 +58,9 @@
     display: inline-block;
   }
 
-  .cw-title {
-    font-weight: 600;
-    margin-bottom: 6px;
-  }
+  .cw-title { font-weight: 600; margin-bottom: 6px; }
 
-  .cw-buttons {
-    display: flex;
-    gap: 8px;
-  }
+  .cw-buttons { display: flex; gap: 8px; }
 
   .btn {
     padding: 5px 12px;
@@ -56,9 +71,7 @@
     font-size: 12px;
   }
 
-  .btn:hover {
-    background: #eaeaea;
-  }
+  .btn:hover { background: #eaeaea; }
 
   table {
     width: 100%;
@@ -75,16 +88,9 @@
     text-align: center;
   }
 
-  th {
-    background: #f2f2f7;
-    font-weight: 600;
-  }
+  th { background: #f2f2f7; font-weight: 600; }
 
-  .label-col {
-    text-align: left;
-    padding-left: 8px;
-    font-weight: 600;
-  }
+  .label-col { text-align: left; padding-left: 8px; font-weight: 600; }
 
   input.score-box {
     width: 55px;
@@ -94,13 +100,19 @@
     text-align: right;
   }
 
+  input.name-box {
+    width: 140px;
+    padding: 4px;
+    border-radius: 6px;
+    border: 1px solid #cfcfd4;
+  }
+
   .delete-col-btn {
     font-size: 11px;
     background: none;
     border: none;
     color: red;
     cursor: pointer;
-    margin-left: 3px;
   }
 
   .btn-add-student {
@@ -122,7 +134,13 @@
 
 <div class="card">
 
-  <!-- Coursework Group Box -->
+  <!-- IMPORT / EXPORT BUTTONS -->
+  <div class="top-buttons">
+    <button class="btn-top" onclick="importExcel()">Import from Excel</button>
+    <button class="btn-top" onclick="exportExcel()">Export to Excel</button>
+  </div>
+
+  <!-- Coursework group -->
   <div class="cw-group">
     <div class="cw-title">Coursework Weight: 60%</div>
     <div class="cw-buttons">
@@ -132,134 +150,6 @@
     </div>
   </div>
 
-  <!-- Assessment Table -->
+  <!-- Table -->
   <table id="assessmentTable">
     <thead id="thead">
-      <tr id="headerRow1">
-        <th rowspan="2">No.</th>
-        <th rowspan="2">Student Name</th>
-        <th colspan="1" id="cwHeader">Coursework (60%)</th>
-        <th rowspan="2">Coursework Total</th>
-        <th rowspan="2">Term Exam (40%)</th>
-        <th rowspan="2">Total (100%)</th>
-      </tr>
-
-      <tr id="headerRow2">
-        <th id="col-ut1">Unit Test 1 <button class="delete-col-btn" onclick="deleteColumn('col-ut1')">x</button></th>
-      </tr>
-    </thead>
-
-    <tbody id="tbody">
-      <tr>
-        <td>1</td>
-        <td class="label-col">Zin Aung Hlaing</td>
-        <td data-col="col-ut1"><input class="score-box" value="8"></td>
-        <td>36</td>
-        <td><input class="score-box" value="53"></td>
-        <td>91</td>
-      </tr>
-
-      <tr>
-        <td>2</td>
-        <td class="label-col">Phoo Pyae Heather</td>
-        <td data-col="col-ut1"><input class="score-box" value="7"></td>
-        <td>30</td>
-        <td><input class="score-box" value="43"></td>
-        <td>77</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <button class="btn-add-student" onclick="addStudent()">+ Add Student</button>
-
-</div>
-
-
-<script>
-let cwCount = 1; // current number of coursework columns
-
-function addUnitTest() {
-  cwCount++;
-  const colId = `col-ut${cwCount}`;
-
-  addCourseworkColumn(colId, `Unit Test ${cwCount}`);
-}
-
-function addProject() {
-  cwCount++;
-  const colId = `col-proj${cwCount}`;
-
-  addCourseworkColumn(colId, "Project");
-}
-
-function addPresentation() {
-  cwCount++;
-  const colId = `col-pres${cwCount}`;
-
-  addCourseworkColumn(colId, "Presentation");
-}
-
-function addCourseworkColumn(colId, label) {
-  // Update header row 1 colspan
-  document.getElementById("cwHeader").colSpan = cwCount;
-
-  // Add header cell
-  const headerRow2 = document.getElementById("headerRow2");
-  const th = document.createElement("th");
-  th.id = colId;
-  th.innerHTML = `${label} <button class="delete-col-btn" onclick="deleteColumn('${colId}')">x</button>`;
-  headerRow2.appendChild(th);
-
-  // Add column for each student row
-  document.querySelectorAll("#tbody tr").forEach(row => {
-    const td = document.createElement("td");
-    td.setAttribute("data-col", colId);
-    td.innerHTML = `<input class="score-box">`;
-    row.insertBefore(td, row.children[2 + cwCount - 1]); // before Coursework Total cell
-  });
-}
-
-function deleteColumn(colId) {
-  // Remove header col
-  document.getElementById(colId).remove();
-
-  // Remove each row's corresponding cell
-  document.querySelectorAll(`[data-col="${colId}"]`).forEach(td => td.remove());
-
-  cwCount--;
-  document.getElementById("cwHeader").colSpan = cwCount;
-}
-
-function addStudent() {
-  const tbody = document.getElementById("tbody");
-  const newRow = document.createElement("tr");
-
-  const rowNumber = tbody.children.length + 1;
-
-  let html = `
-    <td>${rowNumber}</td>
-    <td class="label-col">New Student</td>
-  `;
-
-  // Add coursework columns
-  document.querySelectorAll("#headerRow2 th").forEach(th => {
-    const colId = th.id;
-    if (colId !== "") {
-      html += `<td data-col="${colId}"><input class="score-box"></td>`;
-    }
-  });
-
-  // Add coursework total + exam + final
-  html += `
-    <td>0</td>
-    <td><input class="score-box"></td>
-    <td>0</td>
-  `;
-
-  newRow.innerHTML = html;
-  tbody.appendChild(newRow);
-}
-</script>
-
-</body>
-</html>
