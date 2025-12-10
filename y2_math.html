@@ -1,242 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Assessment Entry – Hybrid Layout</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8" />
+<title>Assessment Entry – Correct Hybrid Layout</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
-      background:#f5f5f7;
-      margin:0; padding:20px;
-      color:#111;
-    }
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui;
+    margin: 0;
+    padding: 20px;
+    background: #f5f5f7;
+  }
 
-    .page-title {
-      font-size:22px;
-      font-weight:600;
-      margin-bottom:8px;
-    }
+  .title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
 
-    .page-sub {
-      color:#6e6e73;
-      font-size:13px;
-      margin-bottom:20px;
-    }
+  .subtitle {
+    color: #6e6e73;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
 
-    .card {
-      background:#ffffff;
-      border-radius:14px;
-      padding:20px;
-      box-shadow:0 6px 18px rgba(0,0,0,0.06);
-      border:1px solid #e3e3e8;
-      margin-bottom:24px;
-    }
+  .card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    border: 1px solid #e2e2e7;
+  }
 
-    .section-title {
-      font-size:15px;
-      font-weight:600;
-      margin-bottom:10px;
-    }
+  .layout-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
 
-    .table-wrapper {
-      overflow-x:auto;
-      border-radius:10px;
-      border:1px solid #e3e3e8;
-      background:white;
-    }
+  .btn {
+    padding: 4px 12px;
+    font-size: 12px;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid #ccc;
+    cursor: pointer;
+  }
 
-    table {
-      width:100%;
-      border-collapse:collapse;
-      font-size:13px;
-      min-width:1100px;
-    }
+  .btn:hover {
+    background: #eee;
+  }
 
-    th, td {
-      border-bottom:1px solid #e3e3e8;
-      padding:8px;
-      text-align:center;
-      white-space:nowrap;
-    }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    background: white;
+    min-width: 900px;
+  }
 
-    thead {
-      background:#f2f2f7;
-    }
+  th, td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    font-size: 13px;
+    text-align: center;
+  }
 
-    tbody tr:nth-child(even) {
-      background:#fbfbfd;
-    }
+  th.group {
+    background: #f0f0f5;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
 
-    .label-col {
-      text-align:left;
-      font-weight:600;
-      background:white;
-      position:sticky;
-      left:0;
-      z-index:2;
-    }
-
-    input.score-box {
-      width:60px;
-      padding:4px 6px;
-      font-size:12px;
-      border:1px solid #d1d1d6;
-      border-radius:8px;
-      text-align:right;
-    }
-
-    .readonly {
-      font-weight:600;
-      color:#0071e3;
-    }
-
-    .menu-row {
-      display:flex;
-      align-items:center;
-      gap:10px;
-      margin:12px 0;
-    }
-
-    .btn-small {
-      font-size:12px;
-      padding:4px 10px;
-      border-radius:999px;
-      background:#ffffff;
-      border:1px solid #d1d1d6;
-      cursor:pointer;
-    }
-
-    .btn-small:hover {
-      background:#f0f0f5;
-    }
-
-    .weight-title {
-      font-size:12px;
-      color:#6e6e73;
-      margin-bottom:6px;
-    }
-
-    .section-group {
-      margin-bottom:20px;
-    }
-  </style>
+  input.score-box {
+    width: 55px;
+    padding: 4px;
+    border: 1px solid #d1d1d6;
+    border-radius: 6px;
+    text-align: right;
+    font-size: 12px;
+  }
+</style>
 </head>
 
 <body>
 
-  <div class="page-title">Assessment Entry – Hybrid Layout</div>
-  <div class="page-sub">Clear grouping: Coursework 60% + Exam 40%, small boxes for input, auto-calculated totals.</div>
+<div class="title">Assessment Entry – Mathematics (Year 2, Term 1)</div>
+<div class="subtitle">Coursework 60% + Exam 40%. Small input boxes for teacher entry.</div>
 
-  <!-- === CARD START === -->
-  <div class="card">
-    <div class="section-title">Subject: Mathematics • Class: Year 2 • Term 1</div>
+<div class="card">
 
-    <!-- ===================================================== -->
-    <!-- COURSEWORK 60% SECTION                                -->
-    <!-- ===================================================== -->
-    <div class="section-group">
-      <div class="weight-title">Coursework Weight: 60%</div>
-
-      <div class="menu-row">
-        <button class="btn-small" onclick="addColumn('unit')">+ Add Unit Test</button>
-        <button class="btn-small" onclick="addColumn('project')">+ Add Project</button>
-        <button class="btn-small" onclick="addColumn('presentation')">+ Add Presentation</button>
-      </div>
-    </div>
-
-    <!-- ===================================================== -->
-    <!-- TABLE START                                            -->
-    <!-- ===================================================== -->
-    <div class="table-wrapper">
-      <table id="scoreTable">
-        <thead>
-          <tr>
-            <th class="label-col">Student</th>
-
-            <!-- Coursework Columns -->
-            <th class="cw-col">Unit Test 1</th>
-            <th class="cw-col">Unit Test 2</th>
-            <th class="cw-col">Project</th>
-            <th class="cw-col">Presentation</th>
-
-            <th class="readonly">Coursework Total<br>(60%)</th>
-
-            <!-- Exam -->
-            <th>Term Exam<br>(40%)</th>
-
-            <th class="readonly">Final Score</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr>
-            <td class="label-col">Zin Aung Hlaing</td>
-
-            <td><input class="score-box" value="8"></td>
-            <td><input class="score-box" value="9"></td>
-            <td><input class="score-box" value="14"></td>
-            <td><input class="score-box" value="9"></td>
-
-            <td class="readonly">36</td>
-
-            <td><input class="score-box" value="53"></td>
-
-            <td class="readonly">91</td>
-          </tr>
-
-          <tr>
-            <td class="label-col">Phoo Pyae Heather</td>
-
-            <td><input class="score-box" value="7"></td>
-            <td><input class="score-box" value="6"></td>
-            <td><input class="score-box" value="12"></td>
-            <td><input class="score-box" value="7"></td>
-
-            <td class="readonly">30</td>
-
-            <td><input class="score-box" value="43"></td>
-
-            <td class="readonly">77</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
+  <!-- Coursework buttons -->
+  <div class="layout-row">
+    <button class="btn">+ Add Unit Test</button>
+    <button class="btn">+ Add Project</button>
+    <button class="btn">+ Add Presentation</button>
   </div>
-  <!-- === CARD END === -->
 
-  <script>
-    function addColumn(type) {
-      const table = document.getElementById("scoreTable");
-      const headerRow = table.querySelector("thead tr");
-      const allRows = table.querySelectorAll("tbody tr");
+  <table>
+    <thead>
+      <tr>
+        <th rowspan="2">Student Name</th>
 
-      let label = "";
-      if (type === "unit") label = "Unit Test";
-      if (type === "project") label = "Project";
-      if (type === "presentation") label = "Presentation";
+        <!-- Coursework group -->
+        <th class="group" colspan="4">Coursework (60%)</th>
 
-      // COUNT how many columns of this type exist
-      const count = [...headerRow.children].filter(th =>
-        th.innerText.includes(label)
-      ).length + 1;
+        <!-- Exam group -->
+        <th class="group" rowspan="2">Term Exam (40%)</th>
 
-      // CREATE NEW HEADER
-      const newTH = document.createElement("th");
-      newTH.classList.add("cw-col");
-      newTH.innerHTML = label + " " + count;
-      headerRow.insertBefore(newTH, headerRow.children[headerRow.children.length - 3]);
+        <!-- Final -->
+        <th class="group" rowspan="2">Final Score</th>
+      </tr>
 
-      // ADD new input cell in each row
-      allRows.forEach(row => {
-        const td = document.createElement("td");
-        td.innerHTML = `<input class="score-box" value="0">`;
-        row.insertBefore(td, row.children[row.children.length - 3]);
-      });
-    }
-  </script>
+      <tr>
+        <th>Unit Test 1</th>
+        <th>Unit Test 2</th>
+        <th>Project</th>
+        <th>Presentation</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr>
+        <td style="text-align:left;">Zin Aung Hlaing</td>
+
+        <td><input class="score-box" value="8"></td>
+        <td><input class="score-box" value="9"></td>
+        <td><input class="score-box" value="14"></td>
+        <td><input class="score-box" value="9"></td>
+
+        <td><input class="score-box" value="53"></td>
+
+        <td>91</td>
+      </tr>
+
+      <tr>
+        <td style="text-align:left;">Phoo Pyae Heather</td>
+
+        <td><input class="score-box" value="7"></td>
+        <td><input class="score-box" value="6"></td>
+        <td><input class="score-box" value="12"></td>
+        <td><input class="score-box" value="7"></td>
+
+        <td><input class="score-box" value="43"></td>
+
+        <td>77</td>
+      </tr>
+
+    </tbody>
+  </table>
+</div>
 
 </body>
 </html>
