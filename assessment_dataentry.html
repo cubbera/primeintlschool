@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Assessment Entry – Year 1</title>
+<title>Assessment Entry</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <!-- SheetJS for Excel import/export -->
@@ -922,11 +922,67 @@
     recalc();
   }
 
-  function exportExcel() {
+function exportExcel() {
     const table = document.getElementById("assessmentTable");
-    const wb = XLSX.utils.table_to_book(table);
-    XLSX.writeFile(wb, "year1_assessment.xlsx");
-  }
+
+    // Build an array manually (much cleaner than table_to_book)
+    let sheetData = [];
+
+    // FIRST ROW: metadata
+    sheetData.push([
+        "Grade Level:", document.getElementById("gradeLevel").value,
+        "Subject:", document.getElementById("subjectSelect").value
+    ]);
+
+    sheetData.push([]); // spacer row
+
+    // ---- HEADER ROWS ----
+    const headerRow1 = [];
+    const headerRow2 = [];
+
+    // Read actual <thead> rows
+    const theadRows = table.querySelectorAll("thead tr");
+
+    theadRows.forEach((tr, rowIndex) => {
+        const cells = tr.querySelectorAll("th");
+        cells.forEach(cell => {
+            if (rowIndex === 0) headerRow1.push(cell.innerText.trim());
+            if (rowIndex === 1) headerRow2.push(cell.innerText.trim());
+        });
+    });
+
+    // Add headers to sheet
+    sheetData.push(headerRow1);
+    sheetData.push(headerRow2);
+
+    // ---- BODY ROWS ----
+    const rows = table.querySelectorAll("#tbody tr");
+    rows.forEach(tr => {
+        const rowArr = [];
+        tr.querySelectorAll("td").forEach(td => {
+            const input = td.querySelector("input");
+            if (input) {
+                rowArr.push(input.value);
+            } else {
+                rowArr.push(td.textContent.trim());
+            }
+        });
+        sheetData.push(rowArr);
+    });
+
+    // Create workbook & add sheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(sheetData);
+
+    // Auto-size columns
+    const colWidths = headerRow2.map(() => ({ wch: 18 }));
+    ws['!cols'] = colWidths;
+
+    // Add sheet & export
+    XLSX.utils.book_append_sheet(wb, ws, "Assessment");
+    XLSX.writeFile(wb, "year1_assessment_full.xlsx");
+}
+
 
   function submitScores() {
     alert("Scores submitted! (Placeholder – connect to backend API later.)");
