@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Student Progress Report – Prime International School</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --bg-elevated: #ffffff;
+      --border-subtle: #e5e5ea;
+      --border-strong: #d1d1d6;
+      --text-primary: #111111;
+      --text-secondary: #6e6e73;
+      --accent: #0071e3;
+      --accent-soft: rgba(0, 113, 227, 0.08);
+      --danger: #ff3b30;
+      --radius-card: 16px;
+      --radius-pill: 999px;
+      --shadow-soft: 0 12px 30px rgba(0,0,0,0.06);
+      --max-width: 1000px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 12px 40px;
+    }
+
+    .title {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .card {
+      width: 100%;
+      max-width: var(--max-width);
+      background-color: var(--bg-elevated);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(0,0,0,0.03);
+      padding: 20px 24px 22px;
+    }
+
+    /* Header / logo line */
+    .report-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+
+    .logo-block {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-block img {
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+    }
+
+    .school-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .school-name {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+
+    .school-sub {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .report-title {
+      text-align: right;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .report-title-sub {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* Info grid */
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px 24px;
+      margin-bottom: 16px;
+      font-size: 13px;
+    }
+
+    .info-field {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .info-label {
+      min-width: 110px;
+      font-weight: 600;
+    }
+
+    .info-input,
+    .info-select {
+      flex: 1;
+      padding: 4px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      font-size: 13px;
+      background-color: #fff;
+    }
+
+    .info-input:focus,
+    .info-select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
+    }
+
+    /* Scores table */
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin: 12px 0 6px;
+    }
+
+    .scores-table-wrapper {
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    th, td {
+      padding: 7px 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      text-align: center;
+    }
+
+    thead th {
+      background-color: #f2f2f7;
+      font-weight: 600;
+    }
+
+    .scores-table td:first-child {
+      text-align: left;
+      font-weight: 500;
+    }
+
+    .score-input {
+      width: 70px;
+      padding: 4px 6px;
+      border-radius: 6px;
+      border: 1px solid var(--border-subtle);
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .score-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
+    }
+
+    .total-cell {
+      font-weight: 600;
+    }
+
+    /* Observational assessments */
+
+    .obs-table-wrapper {
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .obs-table th,
+    .obs-table td {
+      padding: 7px 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .obs-table th {
+      background-color: #f2f2f7;
+      font-weight: 600;
+    }
+
+    .obs-table td:first-child {
+      text-align: left;
+      font-weight: 500;
+    }
+
+    .obs-check {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Comment */
+
+    .comment-area {
+      width: 100%;
+      margin-top: 6px;
+      min-height: 90px;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      padding: 8px 10px;
+      font-size: 12px;
+      resize: vertical;
+    }
+
+    .comment-area:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
+    }
+
+    /* Buttons */
+
+    .button-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .btn {
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-subtle);
+      background-color: #fff;
+      padding: 7px 16px;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background-color: var(--accent);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 8px 18px rgba(0, 113, 227, 0.3);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(0.95);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--accent-soft);
+    }
+
+    .footer-note {
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-align: right;
+    }
+
+    /* Print styling */
+
+    @media print {
+      body {
+        background-color: #fff;
+      }
+      .page-shell {
+        padding: 0;
+      }
+      .title,
+      .subtitle {
+        display: none;
+      }
+      .card {
+        box-shadow: none;
+        border-radius: 0;
+        border: none;
+        max-width: 100%;
+      }
+      .button-row {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="page-shell">
+  <div class="title">Student Progress Report Entry</div>
+  <div class="subtitle">
+    Enter scores and observations. The system calculates the final total (Coursework 40% + Exam 60%).
+  </div>
+
+  <div class="card">
+    <!-- Header with logo -->
+    <div class="report-header">
+      <div class="logo-block">
+        <!-- Update src to your real logo path -->
+        <img src="prime-logo-square.png" alt="Prime International School Logo">
+        <div class="school-text">
+          <div class="school-name">PRIME INTERNATIONAL SCHOOL</div>
+          <div class="school-sub">Yangon · Cambridge Curriculum</div>
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div class="report-title">Progress Report</div>
+        <div class="report-title-sub">Formal School Record</div>
+      </div>
+    </div>
+
+    <!-- Student & report info -->
+    <div class="info-grid">
+      <div class="info-field">
+        <span class="info-label">Academic Year</span>
+        <select id="academicYear" class="info-select">
+          <option>2025-2026</option>
+          <option>2026-2027</option>
+          <option>2027-2028</option>
+        </select>
+      </div>
+      <div class="info-field">
+        <span class="info-label">Term</span>
+        <select id="term" class="info-select">
+          <option>Term 1</option>
+          <option>Term 2</option>
+          <option>Term 3</option>
+        </select>
+      </div>
+
+      <div class="info-field">
+        <span class="info-label">Student's Name</span>
+        <input id="studentName" class="info-input" type="text" placeholder="Student full name">
+      </div>
+      <div class="info-field">
+        <span class="info-label">Student ID</span>
+        <input id="studentId" class="info-input" type="text" placeholder="e.g. PR-25014">
+      </div>
+
+      <div class="info-field">
+        <span class="info-label">Class</span>
+        <select id="className" class="info-select">
+          <option>Tiny Explorers</option>
+          <option>School Readiness – Half Day</option>
+          <option>School Readiness – Full Day</option>
+          <option>Early Years 1</option>
+          <option>Early Years 2</option>
+          <option>Year 1</option>
+          <option>Year 2</option>
+          <option>Year 3</option>
+        </select>
+      </div>
+      <div class="info-field">
+        <span class="info-label">Teacher's Name</span>
+        <input id="teacherName" class="info-input" type="text" placeholder="Class teacher">
+      </div>
+
+      <div class="info-field">
+        <span class="info-label">Issue Date</span>
+        <input id="issueDate" class="info-input" type="date">
+      </div>
+      <div class="info-field">
+        <span class="info-label">Subject</span>
+        <select id="subjectName" class="info-select">
+          <option>English</option>
+          <option>Mathematics</option>
+          <option>Science</option>
+          <option>Social Studies</option>
+          <option>Myanmar</option>
+          <option>Myanmar Social Studies</option>
+          <option>Wellbeing</option>
+          <option>ICT</option>
+          <option>Chinese</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Scores section -->
+    <div class="section-title">Paper-based Assessment</div>
+    <div class="scores-table-wrapper">
+      <table class="scores-table">
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Raw Score (0–100)</th>
+            <th>Weight</th>
+            <th>Weighted Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Coursework</td>
+            <td>
+              <input id="cwScore" class="score-input" type="number" min="0" max="100" step="0.1">
+            </td>
+            <td>40%</td>
+            <td id="cwWeighted" class="total-cell">0.00</td>
+          </tr>
+          <tr>
+            <td>Term Exam</td>
+            <td>
+              <input id="examScore" class="score-input" type="number" min="0" max="100" step="0.1">
+            </td>
+            <td>60%</td>
+            <td id="examWeighted" class="total-cell">0.00</td>
+          </tr>
+          <tr>
+            <td style="text-align:right; font-weight:600;">TOTAL</td>
+            <td></td>
+            <td>100%</td>
+            <td id="totalScore" class="total-cell">0.00</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Observational assessments -->
+    <div class="section-title">Observational Assessments</div>
+    <div class="obs-table-wrapper">
+      <table class="obs-table">
+        <thead>
+          <tr>
+            <th>Area</th>
+            <th>Strong Proficiency</th>
+            <th>Proficient</th>
+            <th>Developing</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>PE</td>
+            <td><input class="obs-check" type="checkbox" name="pe-strong"></td>
+            <td><input class="obs-check" type="checkbox" name="pe-prof"></td>
+            <td><input class="obs-check" type="checkbox" name="pe-dev"></td>
+          </tr>
+          <tr>
+            <td>Taekwondo</td>
+            <td><input class="obs-check" type="checkbox" name="tkd-strong"></td>
+            <td><input class="obs-check" type="checkbox" name="tkd-prof"></td>
+            <td><input class="obs-check" type="checkbox" name="tkd-dev"></td>
+          </tr>
+          <tr>
+            <td>Art</td>
+            <td><input class="obs-check" type="checkbox" name="art-strong"></td>
+            <td><input class="obs-check" type="checkbox" name="art-prof"></td>
+            <td><input class="obs-check" type="checkbox" name="art-dev"></td>
+          </tr>
+          <tr>
+            <td>Music</td>
+            <td><input class="obs-check" type="checkbox" name="music-strong"></td>
+            <td><input class="obs-check" type="checkbox" name="music-prof"></td>
+            <td><input class="obs-check" type="checkbox" name="music-dev"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Comment -->
+    <div class="section-title">Teacher Comment</div>
+    <textarea id="comment" class="comment-area"
+      placeholder="Enter a formal comment that will appear on the printed progress report..."></textarea>
+
+    <!-- Buttons -->
+    <div class="button-row">
+      <button type="button" class="btn btn-outline" onclick="alert('Saved locally (placeholder)');">
+        Save Draft
+      </button>
+      <button type="button" class="btn btn-primary" onclick="submitAndPrint()">
+        Submit &amp; Print
+      </button>
+    </div>
+
+    <div class="footer-note">
+      Prime International School Yangon · Progress Report Entry
+    </div>
+  </div>
+</div>
+
+<script>
+  function clampScore(value) {
+    let v = parseFloat(value);
+    if (isNaN(v)) return 0;
+    if (v < 0) v = 0;
+    if (v > 100) v = 100;
+    return v;
+  }
+
+  function recalcTotals() {
+    const cwInput = document.getElementById('cwScore');
+    const examInput = document.getElementById('examScore');
+
+    const cwRaw = clampScore(cwInput.value);
+    const examRaw = clampScore(examInput.value);
+
+    if (cwInput.value !== '') cwInput.value = cwRaw;
+    if (examInput.value !== '') examInput.value = examRaw;
+
+    const cwWeighted = (cwRaw / 100) * 40;
+    const examWeighted = (examRaw / 100) * 60;
+    const total = cwWeighted + examWeighted;
+
+    document.getElementById('cwWeighted').textContent = cwWeighted.toFixed(2);
+    document.getElementById('examWeighted').textContent = examWeighted.toFixed(2);
+    document.getElementById('totalScore').textContent = total.toFixed(2);
+  }
+
+  document.getElementById('cwScore').addEventListener('input', recalcTotals);
+  document.getElementById('examScore').addEventListener('input', recalcTotals);
+
+  function submitAndPrint() {
+    // simple front-end validation (optional / light)
+    const name = document.getElementById('studentName').value.trim();
+    if (!name) {
+      alert('Please enter the student name before submitting.');
+      return;
+    }
+    recalcTotals(); // ensure totals are up to date
+
+    // Placeholder for real submit to backend (API)
+    // e.g. send JSON via fetch(). For now just show a message.
+    console.log('Progress report submitted (placeholder).');
+
+    // Open Print dialog so user can "Save as PDF"
+    window.print();
+  }
+</script>
+</body>
+</html>
