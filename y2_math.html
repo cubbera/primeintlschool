@@ -50,7 +50,6 @@
     background: #005bbd;
   }
 
-  /* Coursework Box */
   .cw-group {
     border: 1px solid #d0d0d5;
     background: #fafafa;
@@ -146,18 +145,17 @@
     font-size: 13px;
   }
 
-  /* pastel backgrounds */
   .cw-cell {
-    background: #eaf4ff;  /* coursework – very light blue */
+    background: #eaf4ff;
   }
 
   .cw-total-cell {
-    background: #eaf4ff;  /* coursework total – same blue */
+    background: #eaf4ff;
     font-weight: 600;
   }
 
   .exam-cell {
-    background: #fff8dc;  /* exam – very light yellow */
+    background: #fff8dc;
   }
 
   .exam-total-cell {
@@ -166,7 +164,7 @@
   }
 
   .total-cell {
-    background: #eaffea;  /* final total – very light green */
+    background: #eaffea;
     font-weight: 600;
   }
 
@@ -177,7 +175,7 @@
     border: none;
     font-size: 14px;
     cursor: pointer;
-    background: #28c76f; /* green */
+    background: #28c76f;
     color: #fff;
     display: inline-block;
   }
@@ -194,13 +192,11 @@
 
 <div class="card">
 
-  <!-- Excel Buttons -->
   <div class="top-buttons">
     <button class="btn-top" onclick="importExcel()">Import from Excel</button>
     <button class="btn-top" onclick="exportExcel()">Export to Excel</button>
   </div>
 
-  <!-- Coursework Group Box -->
   <div class="cw-group">
     <div class="cw-title">Coursework Weight: 40%</div>
     <div class="cw-buttons">
@@ -210,7 +206,6 @@
     </div>
   </div>
 
-  <!-- Assessment Table -->
   <table id="assessmentTable">
     <thead>
       <tr id="headerRow1">
@@ -221,512 +216,225 @@
         <th rowspan="2">Total (100%)</th>
       </tr>
       <tr id="headerRow2">
-        <!-- coursework sub-columns (dynamic) -->
         <th id="cw-ut1" data-role="cw-col">
           Unit Test 1
           <button class="delete-col-btn" onclick="deleteColumn('cw-ut1')">x</button>
         </th>
         <th data-role="cw-total">Coursework Total (40%)</th>
-        <!-- exam sub-columns -->
         <th data-role="exam-score">Exam Score</th>
         <th data-role="exam-total">Exam Total (60%)</th>
       </tr>
     </thead>
 
     <tbody id="tbody">
-      <!-- 17 fixed students, names as plain text, exam scores pre-filled -->
-      <tr>
-        <td>1</td>
-        <td class="label-col">Ye Yint Tayza Hman</td>
-        <td class="cw-cell" data-col="cw-ut1">
-          <input class="score-box" type="number" min="0" max="100" oninput="recalc()">
-        </td>
-        <td class="cw-total-cell">0.00</td>
-        <td class="exam-cell exam-score-cell">
-          <input class="score-box" type="number" min="0" max="100" value="91.5" oninput="recalc()">
-        </td>
-        <td class="exam-cell exam-total-cell">0.00</td>
-        <td class="total-cell final-total-cell">0.00</td>
-      </tr>
 
-      <tr>
-        <td>2</td>
-        <td class="label-col">Shoon La Woon Htet</td>
-        <td class="cw-cell" data-col="cw-ut1">
-          <input class="score-box" type="number" min="0" max="100" oninput="recalc()">
-        </td>
-        <td class="cw-total-cell">0.00</td>
-        <td class="exam-cell exam-score-cell">
-          <input class="score-box" type="number" min="0" max="100" value="82" oninput="recalc()">
-        </td>
-        <td class="exam-cell exam-total-cell">0.00</td>
-        <td class="total-cell final-total-cell">0.00</td>
-      </tr>
+<!-- ALL 17 STUDENTS, EXAM = 0 -->
 
-      <tr>
-        <td>3</td>
-        <td class="label-col">Htun Lae Yi Mon</td>
-        <td class="cw-cell" data-col="cw-ut1">
-          <input class="score-box" type="number" min="0" max="100" oninput="recalc()">
-        </td>
-        <td class="cw-total-cell">0.00</td>
-        <td class="exam-cell exam-score-cell">
-          <input class="score-box" type="number" min="0" max="100" value="86" oninput="recalc()">
-        </td>
-        <td class="exam-cell exam-total-cell">0.00</td>
-        <td class="total-cell final-total-cell">0.00</td>
-      </tr>
+<tr><td>1</td><td class="label-col">Ye Yint Tayza Hman</td><td class="cw-cell" data-col="cw-ut1"><input class="score-box" oninput="recalc()"></td><td class="cw-total-cell">0.00</td><td class="exam-cell exam-score-cell"><input class="score-box" value="0" oninput="recalc()"></td><td class="exam-cell exam-total-cell">0.00</td><td class="total-cell final-total-cell">0.00</td></tr>
 
-      <tr>
-        <td>4</td>
-        <td class="label-col">Lwin Aung Hein</td>
-        <td class="cw-cell" data-col="cw-ut1">
-          <input class="score-box" type="number" min="0" max="100" oninput="recalc()">
-        </td>
-        <td class="cw-total-cell">0.00</td>
-        <td class="exam-cell exam-score-cell">
-          <input class="score-box" type="number" min="0" max="100" value="89" oninput="recalc()">
-        </td>
-        <td class="exam-cell exam-total-cell">0.00</td>
-        <td class="total-cell final-total-cell">0.00</td>
-      </tr>
+<tr><td>2</td><td class="label-col">Shoon La Woon Htet</td><td class="cw-cell" data-col="cw-ut1"><input class="score-box" oninput="recalc()"></td><td class="cw-total-cell">0.00</td><td class="exam-cell exam-score-cell"><input class="score-box" value="0" oninput="recalc()"></td><td class="exam-cell exam-total-cell">0.00</td><td class="total-cell final-total-cell">0.00</td></tr>
 
-      <tr>
-        <td>5</td>
-        <td class="label-col">Aung Bhone San</td>
-        <td class="cw-cell" data-col="cw-ut1">
-          <input class="score-box" type="number" min="0" max="100" oninput="recalc()">
-        </td>
-        <td class="cw-total-cell">0.00</td>
-        <td class="exam-cell exam-score-cell">
-          <input class="score-box" type="number" min="0" max="100" value="92" oninput="recalc()">
-        </td>
-        <td class="exam-cell exam-total-cell">0.00</td>
-        <td class="total-cell final-total-cell">0.00</td>
-      </tr>
+<tr><td>3</td><td class="label-col">Htun Lae Yi Mon</td><td class="cw-cell" data-col="cw-ut1"><input class="score-box" oninput="recalc()"></td><td class="cw-total-cell">0.00</td><td class="exam-cell exam-score-cell"><input class="score-box" value="0" oninput="recalc()"></td><td class="exam-cell exam-total-cell">0.00</td><td class="total-cell final-total-cell">0.00</td></tr>
 
-      <tr>
-        <td>6</td>
-        <td class="label-col">Htet Nay Bhone</td>
-        <td class="cw-cell" data-col="cw-ut1">
-          <input class="score-box" type="number" min="0" max="100" oninput="recalc()">
-        </td>
-        <td class="cw-total-cell">0.00</td>
-        <td class="exam-cell exam-score-cell">
-          <input class="score-box" type="number" min="0" max="100" value="95.5" oninput="recalc()">
-        </td>
-        <td class="exam-cell exam-total-cell">0.00</td>
-        <td class="total-cell final-total-cell">0.00</td>
-      </tr>
+<tr><td>4</td><td class="label-col">Lwin Aung Hein</td><td class="cw-cell" data-col="cw-ut1"><input class="score-box" oninput="recalc()"></td><td class="cw-total-cell">0.00</td><td class="exam-cell exam-score-cell"><input class="score-box" value="0" oninput="recalc()"></td><td class="exam-cell exam-total-cell">0.00</td><td class="total-cell final-total-cell">0.00</td></tr>
 
-      <tr>
-        <td>7</td>
-        <td class="label-col">Sian Vang Huai Kim</td>
-        <td class="cw-cell" data-col="cw-ut1">
-          <input class="score-box" type="number" min="0" max="100" oninput="recalc()">
-        </td>
-        <td class="cw-total-cell">0.00</td>
-        <td class="exam-cell exam-score-cell">
-          <input class="score-box" type="number" min="0" max="100" value="88.5" oninput="recalc()">
-        </td>
-        <td class="exam-cell exam-total-cell">0.00</td>
-        <td class="total-cell final-total-cell">0.00</td>
-      </tr>
+<tr><td>5</td><td class="label-col">Aung Bhone San</td><td class="cw-cell" data-col="cw-ut1"><input class="score-box" oninput="recalc()"></td><td class="cw-total-cell">0.00</td><td class="exam-cell exam-score-cell"><input class="score-box" value="0" oninput="recalc()"></td><td class="exam-cell exam-total-cell">0.00</td><td class="total-cell final-total-cell">0.00</td></tr>
 
-      <tr>
-        <td>8</td>
-        <td class="label-col">Thu Htet Htoo</td>
-        <td class="cw-cell" data-col="cw-ut1">
-          <input class="score-box" type="number" min="0" max="100" oninput="recalc()">
-        </td>
-        <td class="cw-total-cell">0.00</td>
-        <td class="exam-cell exam-score-cell">
-          <input class="score-box" type="number" min="0" max="100" value="92" oninput="recalc()">
-        </td>
-        <td class="exam-cell exam-total-cell">0.00</td>
-        <td class="total-cell final-total-cell">0.00</td>
-      </tr>
+<tr><td>6</td><td class="label-col">Htet Nay Bhone</td><td class="cw-cell" data-col="cw-ut1"><input class="score-box" oninput="recalc()"></td><td class="cw-total-cell">0.00</td><td class="exam-cell exam-score-cell"><input class="score-box" value="0" oninput="recalc()"></td><td class="exam-cell exam-total-cell">0.00</td><td class="total-cell final-total-cell">0.00</td></tr>
 
-      <tr>
-        <td>9</td>
-        <td class="label-col">Khant Su Thar</td>
-        <td class="cw-cell" data-col="cw-ut1">
-          <input class="score-box" type="number" min="0" max="100" oninput="recalc()">
-        </td>
-        <td class="cw-total-cell">0.00</td>
-        <td class="exam-cell exam-score-cell">
-          <input class="score-box" type="number" min="0" max="100" value="84" oninput="recalc()">
-        </td>
-        <td class="exam-cell exam-total-cell">0.00</td>
-        <td class="total-cell final-total-cell">0.00</td>
-      </tr>
+<tr><td>7</td><td class="label-col">Sian Vang Huai Kim</td><td class="cw-cell" data-col="cw-ut1"><input class="score-box" oninput="recalc()"></td><td class="cw-total-cell">0.00</td><td class="exam-cell exam-score-cell"><input class="score-box" value="0" oninput="recalc()"></td><td class="exam-cell exam-total-cell">0.00</td><td class="total-cell final-total-cell">0.00</td></tr>
 
-      <tr>
-        <td>10</td>
-        <td class="label-col">Lwin Khit</td>
-        <td class="cw-cell" data-col="cw-ut1">
-          <input class="score-box" type="number" min="0" max="100" oninput="recalc()">
-        </td>
-        <td class="cw-total-cell">0.00</td>
-        <td class="exam-cell exam-score-cell">
-          <input class="score-box" type="number" min="0" max="100" value="94" oninput="recalc()">
-        </td>
-        <td class="exam-cell exam-total-cell">0.00</td>
-        <td class="total-cell final-total-cell">0.00</td>
-      </tr>
+<tr><td>8</td><td class="label-col">Thu Htet Htoo</td><td class="cw-cell" data-col="cw-ut1"><input class="score-box" oninput="recalc()"></td><td class="cw-total-cell">0.00</td><td class="exam-cell exam-score-cell"><input class="score-box" value="0" oninput="recalc()"></td><td class="exam-cell exam-total-cell">0.00</td><td class="total-cell final-total-cell">0.00</td></tr>
 
-      <tr>
-        <td>11</td>
-        <td class="label-col">Htut Myat Aung</td>
-        <td class="cw-cell" data-col="cw-ut1">
-          <input class="score-box" type="number" min="0" max="100" oninput="recalc()">
-        </td>
-        <td class="cw-total-cell">0.00</td>
-        <td class="exam-cell exam-score-cell">
-          <input class="score-box" type="number" min="0" max="100" value="74" oninput="recalc()">
-        </td>
-        <td class="exam-cell exam-total-cell">0.00</td>
-        <td class="total-cell final-total-cell">0.00</td>
-      </tr>
+<tr><td>9</td><td class="label-col">Khant Su Thar</td><td class="cw-cell" data-col="cw-ut1"><input class="score-box" oninput="recalc()"></td><td class="cw-total-cell">0.00</td><td class="exam-cell exam-score-cell"><input class="score-box" value="0" oninput="recalc()"></td><td class="exam-cell exam-total-cell">0.00</td><td class="total-cell final-total-cell">0.00</td></tr>
 
-      <tr>
-        <td>12</td>
-        <td class="label-col">Myat Shwe Yee Thin</td>
-        <td class="cw-cell" data-col="cw-ut1">
-          <input class="score-box" type="number" min="0" max="100" oninput="recalc()">
-        </td>
-        <td class="cw-total-cell">0.00</td>
-        <td class="exam-cell exam-score-cell">
-          <input class="score-box" type="number" min="0" max="100" value="86.5" oninput="recalc()">
-        </td>
-        <td class="exam-cell exam-total-cell">0.00</td>
-        <td class="total-cell final-total-cell">0.00</td>
-      </tr>
+<tr><td>10</td><td class="label-col">Lwin Khit</td><td class="cw-cell" data-col="cw-ut1"><input class="score-box" oninput="recalc()"></td><td class="cw-total-cell">0.00</td><td class="exam-cell exam-score-cell"><input class="score-box" value="0" oninput="recalc()"></td><td class="exam-cell exam-total-cell">0.00</td><td class="total-cell final-total-cell">0.00</td></tr>
 
-      <tr>
-        <td>13</td>
-        <td class="label-col">Kaung Khit Han</td>
-        <td class="cw-cell" data-col="cw-ut1">
-          <input class="score-box" type="number" min="0" max="100" oninput="recalc()">
-        </td>
-        <td class="cw-total-cell">0.00</td>
-        <td class="exam-cell exam-score-cell">
-          <input class="score-box" type="number" min="0" max="100" value="88" oninput="recalc()">
-        </td>
-        <td class="exam-cell exam-total-cell">0.00</td>
-        <td class="total-cell final-total-cell">0.00</td>
-      </tr>
+<tr><td>11</td><td class="label-col">Htut Myat Aung</td><td class="cw-cell" data-col="cw-ut1"><input class="score-box" oninput="recalc()"></td><td class="cw-total-cell">0.00</td><td class="exam-cell exam-score-cell"><input class="score-box" value="0" oninput="recalc()"></td><td class="exam-cell exam-total-cell">0.00</td><td class="total-cell final-total-cell">0.00</td></tr>
 
-      <tr>
-        <td>14</td>
-        <td class="label-col">Linn Pyae Sone Aung</td>
-        <td class="cw-cell" data-col="cw-ut1">
-          <input class="score-box" type="number" min="0" max="100" oninput="recalc()">
-        </td>
-        <td class="cw-total-cell">0.00</td>
-        <td class="exam-cell exam-score-cell">
-          <input class="score-box" type="number" min="0" max="100" value="94" oninput="recalc()">
-        </td>
-        <td class="exam-cell exam-total-cell">0.00</td>
-        <td class="total-cell final-total-cell">0.00</td>
-      </tr>
+<tr><td>12</td><td class="label-col">Myat Shwe Yee Thin</td><td class="cw-cell" data-col="cw-ut1"><input class="score-box" oninput="recalc()"></td><td class="cw-total-cell">0.00</td><td class="exam-cell exam-score-cell"><input class="score-box" value="0" oninput="recalc()"></td><td class="exam-cell exam-total-cell">0.00</td><td class="total-cell final-total-cell">0.00</td></tr>
 
-      <tr>
-        <td>15</td>
-        <td class="label-col">Sai Noon Wan Han</td>
-        <td class="cw-cell" data-col="cw-ut1">
-          <input class="score-box" type="number" min="0" max="100" oninput="recalc()">
-        </td>
-        <td class="cw-total-cell">0.00</td>
-        <td class="exam-cell exam-score-cell">
-          <input class="score-box" type="number" min="0" max="100" value="91.5" oninput="recalc()">
-        </td>
-        <td class="exam-cell exam-total-cell">0.00</td>
-        <td class="total-cell final-total-cell">0.00</td>
-      </tr>
+<tr><td>13</td><td class="label-col">Kaung Khit Han</td><td class="cw-cell" data-col="cw-ut1"><input class="score-box" oninput="recalc()"></td><td class="cw-total-cell">0.00</td><td class="exam-cell exam-score-cell"><input class="score-box" value="0" oninput="recalc()"></td><td class="exam-cell exam-total-cell">0.00</td><td class="total-cell final-total-cell">0.00</td></tr>
 
-      <tr>
-        <td>16</td>
-        <td class="label-col">Ngwe Yati Moe</td>
-        <td class="cw-cell" data-col="cw-ut1">
-          <input class="score-box" type="number" min="0" max="100" oninput="recalc()">
-        </td>
-        <td class="cw-total-cell">0.00</td>
-        <td class="exam-cell exam-score-cell">
-          <input class="score-box" type="number" min="0" max="100" value="88.5" oninput="recalc()">
-        </td>
-        <td class="exam-cell exam-total-cell">0.00</td>
-        <td class="total-cell final-total-cell">0.00</td>
-      </tr>
+<tr><td>14</td><td class="label-col">Linn Pyae Sone Aung</td><td class="cw-cell" data-col="cw-ut1"><input class="score-box" oninput="recalc()"></td><td class="cw-total-cell">0.00</td><td class="exam-cell exam-score-cell"><input class="score-box" value="0" oninput="recalc()"></td><td class="exam-cell exam-total-cell">0.00</td><td class="total-cell final-total-cell">0.00</td></tr>
 
-      <tr>
-        <td>17</td>
-        <td class="label-col">Khant Htet Zan</td>
-        <td class="cw-cell" data-col="cw-ut1">
-          <input class="score-box" type="number" min="0" max="100" oninput="recalc()">
-        </td>
-        <td class="cw-total-cell">0.00</td>
-        <td class="exam-cell exam-score-cell">
-          <input class="score-box" type="number" min="0" max="100" value="89.5" oninput="recalc()">
-        </td>
-        <td class="exam-cell exam-total-cell">0.00</td>
-        <td class="total-cell final-total-cell">0.00</td>
-      </tr>
+<tr><td>15</td><td class="label-col">Sai Noon Wan Han</td><td class="cw-cell" data-col="cw-ut1"><input class="score-box" oninput="recalc()"></td><td class="cw-total-cell">0.00</td><td class="exam-cell exam-score-cell"><input class="score-box" value="0" oninput="recalc()"></td><td class="exam-cell exam-total-cell">0.00</td><td class="total-cell final-total-cell">0.00</td></tr>
+
+<tr><td>16</td><td class="label-col">Ngwe Yati Moe</td><td class="cw-cell" data-col="cw-ut1"><input class="score-box" oninput="recalc()"></td><td class="cw-total-cell">0.00</td><td class="exam-cell exam-score-cell"><input class="score-box" value="0" oninput="recalc()"></td><td class="exam-cell exam-total-cell">0.00</td><td class="total-cell final-total-cell">0.00</td></tr>
+
+<tr><td>17</td><td class="label-col">Khant Htet Zan</td><td class="cw-cell" data-col="cw-ut1"><input class="score-box" oninput="recalc()"></td><td class="cw-total-cell">0.00</td><td class="exam-cell exam-score-cell"><input class="score-box" value="0" oninput="recalc()"></td><td class="exam-cell exam-total-cell">0.00</td><td class="total-cell final-total-cell">0.00</td></tr>
+
     </tbody>
   </table>
 
   <button class="btn-add-student" onclick="addStudent()">+ Add Student</button>
-
-  <br />
-
+  <br>
   <button class="btn-submit" onclick="submitScores()">Submit Scores</button>
 
 </div>
 
 <script>
-  // Track coursework columns (not including coursework total)
-  let cwColumns = ["cw-ut1"];
+let cwColumns = ["cw-ut1"];
 
-  function updateHeaderSpans() {
-    const cwHeader = document.getElementById("cwHeader");
-    cwHeader.colSpan = cwColumns.length + 1; // coursework columns + coursework total
-    const examHeader = document.getElementById("examHeader");
-    examHeader.colSpan = 2; // exam score + exam total
-  }
+function updateHeaderSpans() {
+  document.getElementById("cwHeader").colSpan = cwColumns.length + 1;
+}
 
-  function addUnitTest() {
-    const index = cwColumns.filter(id => id.startsWith("cw-ut")).length + 1;
-    const colId = "cw-ut" + index;
-    cwColumns.push(colId);
-    addCourseworkColumn(colId, "Unit Test " + index);
-  }
+function addUnitTest() {
+  let i = cwColumns.filter(x=>x.startsWith("cw-ut")).length + 1;
+  let id = "cw-ut" + i;
+  cwColumns.push(id);
+  addCourseworkColumn(id, "Unit Test " + i);
+}
 
-  function addProject() {
-    const index = cwColumns.filter(id => id.startsWith("cw-proj")).length + 1;
-    const colId = "cw-proj" + index;
-    cwColumns.push(colId);
-    addCourseworkColumn(colId, "Project " + index);
-  }
+function addProject() {
+  let i = cwColumns.filter(x=>x.startsWith("cw-proj")).length + 1;
+  let id = "cw-proj" + i;
+  cwColumns.push(id);
+  addCourseworkColumn(id, "Project " + i);
+}
 
-  function addPresentation() {
-    const index = cwColumns.filter(id => id.startsWith("cw-pres")).length + 1;
-    const colId = "cw-pres" + index;
-    cwColumns.push(colId);
-    addCourseworkColumn(colId, "Presentation " + index);
-  }
+function addPresentation() {
+  let i = cwColumns.filter(x=>x.startsWith("cw-pres")).length + 1;
+  let id = "cw-pres" + i;
+  cwColumns.push(id);
+  addCourseworkColumn(id, "Presentation " + i);
+}
 
-  function addCourseworkColumn(colId, label) {
-    const headerRow2 = document.getElementById("headerRow2");
-    const cwTotalTh = headerRow2.querySelector('th[data-role="cw-total"]');
+function addCourseworkColumn(colId, label) {
+  const headerRow2 = document.getElementById("headerRow2");
+  const cwTotalTh = headerRow2.querySelector('th[data-role="cw-total"]');
 
-    const th = document.createElement("th");
-    th.id = colId;
-    th.setAttribute("data-role", "cw-col");
-    th.innerHTML = `${label} <button class="delete-col-btn" onclick="deleteColumn('${colId}')">x</button>`;
-    headerRow2.insertBefore(th, cwTotalTh);
+  const th = document.createElement("th");
+  th.id = colId;
+  th.setAttribute("data-role", "cw-col");
+  th.innerHTML = `${label} <button class="delete-col-btn" onclick="deleteColumn('${colId}')">x</button>`;
+  headerRow2.insertBefore(th, cwTotalTh);
 
-    // Add cell to each row before cw-total cell
-    document.querySelectorAll("#tbody tr").forEach(row => {
-      const cwTotalCell = row.querySelector(".cw-total-cell");
-      const td = document.createElement("td");
-      td.className = "cw-cell";
-      td.setAttribute("data-col", colId);
-      td.innerHTML = `<input class="score-box" type="number" min="0" max="100" oninput="recalc()">`;
-      row.insertBefore(td, cwTotalCell);
-    });
-
-    updateHeaderSpans();
-    recalc();
-  }
-
-  function deleteColumn(colId) {
-    // Remove from tracking array
-    cwColumns = cwColumns.filter(id => id !== colId);
-
-    // Remove header cell
-    const th = document.getElementById(colId);
-    if (th && th.parentNode) th.parentNode.removeChild(th);
-
-    // Remove all td with that data-col
-    document.querySelectorAll(`td[data-col="${colId}"]`).forEach(td => {
-      if (td && td.parentNode) td.parentNode.removeChild(td);
-    });
-
-    if (cwColumns.length === 0) {
-      // At least keep one placeholder column to avoid colSpan issues
-      cwColumns = ["cw-ut1"];
-    }
-
-    updateHeaderSpans();
-    recalc();
-  }
-
-  function addStudent() {
-    const tbody = document.getElementById("tbody");
-    const rowNumber = tbody.children.length + 1;
-
-    const tr = document.createElement("tr");
-
-    let html = `
-      <td>${rowNumber}</td>
-      <td class="label-col"><input class="name-box" placeholder="Student Name"></td>
-    `;
-
-    // Coursework columns
-    cwColumns.forEach(colId => {
-      html += `
-        <td class="cw-cell" data-col="${colId}">
-          <input class="score-box" type="number" min="0" max="100" oninput="recalc()">
-        </td>
-      `;
-    });
-
-    // Coursework total, exam score, exam total, final total
-    html += `
-      <td class="cw-total-cell">0.00</td>
-      <td class="exam-cell exam-score-cell">
-        <input class="score-box" type="number" min="0" max="100" oninput="recalc()">
-      </td>
-      <td class="exam-cell exam-total-cell">0.00</td>
-      <td class="total-cell final-total-cell">0.00</td>
-    `;
-
-    tr.innerHTML = html;
-    tbody.appendChild(tr);
-    recalc();
-  }
-
-  function clamp100(value) {
-    let v = parseFloat(value);
-    if (isNaN(v)) v = 0;
-    if (v < 0) v = 0;
-    if (v > 100) v = 100;
-    return v;
-  }
-
-  // Recalculate all
-  function recalc() {
-    const rows = document.querySelectorAll("#tbody tr");
-
-    rows.forEach(row => {
-      let unitTests = [];
-      let projPres = [];
-
-      row.querySelectorAll("td[data-col]").forEach(td => {
-        const colId = td.getAttribute("data-col");
-        const input = td.querySelector("input");
-        if (!input) return;
-        const val = clamp100(input.value);
-        input.value = val;
-
-        if (colId.startsWith("cw-ut")) {
-          unitTests.push(val);
-        } else {
-          // treat all non-UT as project/presentation
-          projPres.push(val);
-        }
-      });
-
-      const quizAvg = unitTests.length ? unitTests.reduce((a,b) => a + b, 0) / unitTests.length : 0;
-      const projAvg = projPres.length ? projPres.reduce((a,b) => a + b, 0) / projPres.length : 0;
-
-      // Coursework: 25% from quizzes + 15% from project/presentation = 40%
-      const coursework = (quizAvg / 100) * 25 + (projAvg / 100) * 15;
-
-      // Exam score (raw) and 60% total
-      const examInput = row.querySelector(".exam-score-cell input");
-      const examRaw = examInput ? clamp100(examInput.value) : 0;
-      if (examInput) examInput.value = examRaw;
-      const examTotal = (examRaw / 100) * 60;
-
-      const finalTotal = coursework + examTotal;
-
-      const cwTotalCell = row.querySelector(".cw-total-cell");
-      const examTotalCell = row.querySelector(".exam-total-cell");
-      const finalCell = row.querySelector(".final-total-cell");
-
-      if (cwTotalCell) cwTotalCell.textContent = coursework.toFixed(2);
-      if (examTotalCell) examTotalCell.textContent = examTotal.toFixed(2);
-      if (finalCell) finalCell.textContent = finalTotal.toFixed(2);
-    });
-  }
-
-  // Import from Excel (simple structure)
-  function importExcel() {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".xlsx";
-
-    input.onchange = e => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = event => {
-        const wb = XLSX.read(event.target.result, { type: "binary" });
-        const sheet = wb.Sheets[wb.SheetNames[0]];
-        const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-        populateFromExcel(data);
-      };
-      reader.readAsBinaryString(file);
-    };
-
-    input.click();
-  }
-
-  function populateFromExcel(data) {
-    // Expect: row[0] header: Nr, Name, UT1, ExamScore, ...
-    const tbody = document.getElementById("tbody");
-    tbody.innerHTML = "";
-
-    if (!data || data.length < 2) {
-      recalc();
-      return;
-    }
-
-    // Assume first row is header
-    data.slice(1).forEach((row, idx) => {
-      const nr = row[0] || idx + 1;
-      const name = row[1] || "";
-      const ut1 = clamp100(row[2] || 0);
-      const examRaw = clamp100(row[3] || 0);
-
-      const tr = document.createElement("tr");
-      let html = `
-        <td>${nr}</td>
-        <td class="label-col">${name}</td>
-        <td class="cw-cell" data-col="cw-ut1">
-          <input class="score-box" type="number" min="0" max="100" value="${ut1}" oninput="recalc()">
-        </td>
-        <td class="cw-total-cell">0.00</td>
-        <td class="exam-cell exam-score-cell">
-          <input class="score-box" type="number" min="0" max="100" value="${examRaw}" oninput="recalc()">
-        </td>
-        <td class="exam-cell exam-total-cell">0.00</td>
-        <td class="total-cell final-total-cell">0.00</td>
-      `;
-      tr.innerHTML = html;
-      tbody.appendChild(tr);
-    });
-
-    recalc();
-  }
-
-  function exportExcel() {
-    const table = document.getElementById("assessmentTable");
-    const wb = XLSX.utils.table_to_book(table);
-    XLSX.writeFile(wb, "year1_assessment.xlsx");
-  }
-
-  function submitScores() {
-    alert("Scores submitted! (placeholder – connect to backend later)");
-  }
-
-  document.addEventListener("DOMContentLoaded", () => {
-    updateHeaderSpans();
-    recalc();
+  document.querySelectorAll("#tbody tr").forEach(row => {
+    const cwTotalCell = row.querySelector(".cw-total-cell");
+    const td = document.createElement("td");
+    td.className = "cw-cell";
+    td.setAttribute("data-col", colId);
+    td.innerHTML = `<input class="score-box" type="number" oninput="recalc()">`;
+    row.insertBefore(td, cwTotalCell);
   });
+
+  updateHeaderSpans();
+  recalc();
+}
+
+function deleteColumn(colId) {
+  cwColumns = cwColumns.filter(id => id !== colId);
+
+  let th = document.getElementById(colId);
+  if (th) th.remove();
+
+  document.querySelectorAll(`td[data-col="${colId}"]`).forEach(td => td.remove());
+
+  if (cwColumns.length === 0) cwColumns = ["cw-ut1"];
+
+  updateHeaderSpans();
+  recalc();
+}
+
+function addStudent() {
+  const tbody = document.getElementById("tbody");
+  const rowNumber = tbody.children.length + 1;
+  const tr = document.createElement("tr");
+
+  let html = `
+    <td>${rowNumber}</td>
+    <td class="label-col"><input class="name-box" placeholder="Student Name"></td>
+  `;
+
+  cwColumns.forEach(colId => {
+    html += `
+      <td class="cw-cell" data-col="${colId}">
+        <input class="score-box" type="number" oninput="recalc()">
+      </td>
+    `;
+  });
+
+  html += `
+    <td class="cw-total-cell">0.00</td>
+    <td class="exam-cell exam-score-cell">
+      <input class="score-box" type="number" value="0" oninput="recalc()">
+    </td>
+    <td class="exam-cell exam-total-cell">0.00</td>
+    <td class="total-cell final-total-cell">0.00</td>
+  `;
+
+  tr.innerHTML = html;
+  tbody.appendChild(tr);
+  recalc();
+}
+
+function clamp100(v) {
+  v = parseFloat(v);
+  if (isNaN(v)) return 0;
+  return Math.max(0, Math.min(100, v));
+}
+
+function recalc() {
+  document.querySelectorAll("#tbody tr").forEach(row => {
+
+    let uts = [];
+    let nonUTs = [];
+
+    row.querySelectorAll("td[data-col]").forEach(td => {
+      let input = td.querySelector("input");
+      let v = clamp100(input.value);
+      input.value = v;
+
+      if (td.dataset.col.startsWith("cw-ut")) uts.push(v);
+      else nonUTs.push(v);
+    });
+
+    let cw40 = 0;
+
+    if (uts.length > 0 && nonUTs.length === 0) {
+      cw40 = (uts.reduce((a,b)=>a+b,0) / uts.length) / 100 * 40;
+    }
+    else if (nonUTs.length > 0 && uts.length === 0) {
+      cw40 = (nonUTs.reduce((a,b)=>a+b,0) / nonUTs.length) / 100 * 40;
+    }
+    else {
+      let utAvg = uts.length ? uts.reduce((a,b)=>a+b,0) / uts.length : 0;
+      let npAvg = nonUTs.length ? nonUTs.reduce((a,b)=>a+b,0) / nonUTs.length : 0;
+      cw40 = utAvg/100 * 25 + npAvg/100 * 15;
+    }
+
+    row.querySelector(".cw-total-cell").textContent = cw40.toFixed(2);
+
+    let examInput = row.querySelector(".exam-score-cell input");
+    let examRaw = clamp100(examInput.value);
+    let exam60 = examRaw / 100 * 60;
+
+    row.querySelector(".exam-total-cell").textContent = exam60.toFixed(2);
+    row.querySelector(".final-total-cell").textContent = (cw40 + exam60).toFixed(2);
+  });
+}
+
+function importExcel() {
+  alert("Import placeholder – ready to connect backend.");
+}
+
+function exportExcel() {
+  const table = document.getElementById("assessmentTable");
+  const wb = XLSX.utils.table_to_book(table);
+  XLSX.writeFile(wb, "year1_assessment.xlsx");
+}
+
+function submitScores() {
+  alert("Scores submitted! (placeholder)");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  updateHeaderSpans();
+  recalc();
+});
+
 </script>
 
 </body>
