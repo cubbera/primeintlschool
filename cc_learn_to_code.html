@@ -76,6 +76,13 @@
       margin-top: 8px;
     }
 
+    .button-row {
+      margin-top: 12px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
     .feedback {
       margin-top: 16px;
       font-size: 16px;
@@ -89,6 +96,10 @@
 
     .feedback.error {
       color: #e74c3c;
+    }
+
+    .feedback.hint {
+      color: #8e44ad;
     }
   </style>
 </head>
@@ -107,15 +118,17 @@
           autocomplete="off"
         />
       </div>
-      <div style="margin-top: 12px;">
+
+      <div class="button-row">
         <button id="checkBtn" class="btn">Check</button>
+        <button id="hintBtn" class="btn" style="background: #fd9644;">Hint</button>
       </div>
+
       <div id="feedback" class="feedback"></div>
     </div>
   </div>
 
   <script>
-    // List of words to scramble
     const words = [
       "apple",
       "orange",
@@ -133,35 +146,28 @@
     const scrambledWordEl = document.getElementById("scrambledWord");
     const answerInput = document.getElementById("answerInput");
     const checkBtn = document.getElementById("checkBtn");
+    const hintBtn = document.getElementById("hintBtn");
     const feedbackEl = document.getElementById("feedback");
 
     let currentWord = "";
 
     function getRandomWord() {
-      const index = Math.floor(Math.random() * words.length);
-      return words[index];
+      return words[Math.floor(Math.random() * words.length)];
     }
 
     function scrambleWord(word) {
       const arr = word.split("");
-      // Fisher–Yates shuffle
       for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [arr[i], arr[j]] = [arr[j], arr[i]];
       }
-
-      // Ensure scrambled is not accidentally the same as original
       const scrambled = arr.join("");
-      if (scrambled === word) {
-        return scrambleWord(word);
-      }
-      return scrambled;
+      return scrambled === word ? scrambleWord(word) : scrambled;
     }
 
     function startGame() {
       currentWord = getRandomWord();
-      const scrambled = scrambleWord(currentWord);
-      scrambledWordEl.textContent = scrambled.toUpperCase();
+      scrambledWordEl.textContent = scrambleWord(currentWord).toUpperCase();
       gameArea.classList.remove("hidden");
       feedbackEl.textContent = "";
       feedbackEl.className = "feedback";
@@ -171,6 +177,7 @@
 
     function checkAnswer() {
       const userAnswer = answerInput.value.trim().toLowerCase();
+
       if (!userAnswer) {
         feedbackEl.textContent = "Please enter a word.";
         feedbackEl.className = "feedback error";
@@ -186,12 +193,18 @@
       }
     }
 
+    function showHint() {
+      const hint = currentWord.charAt(0).toUpperCase();
+      feedbackEl.textContent = "Hint: starts with " + hint;
+      feedbackEl.className = "feedback hint";
+    }
+
     startBtn.addEventListener("click", startGame);
     checkBtn.addEventListener("click", checkAnswer);
+    hintBtn.addEventListener("click", showHint);
+
     answerInput.addEventListener("keydown", function (e) {
-      if (e.key === "Enter") {
-        checkAnswer();
-      }
+      if (e.key === "Enter") checkAnswer();
     });
   </script>
 </body>
