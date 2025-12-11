@@ -1,25 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Student Progress Report – Prime International School</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <title>Progress Report – Prime International School</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
     :root {
-      --bg: #f5f5f7;
-      --bg-elevated: #ffffff;
-      --border-subtle: #e5e5ea;
-      --border-strong: #d1d1d6;
+      --border: #1f4f8f;
+      --header-blue: #1f4f8f;
+      --header-blue-light: #295fa7;
+      --table-header-bg: #e2ecff;
+      --table-row-alt: #f5f7ff;
       --text-primary: #111111;
-      --text-secondary: #6e6e73;
+      --text-secondary: #444;
       --accent: #0071e3;
-      --accent-soft: rgba(0, 113, 227, 0.08);
-      --danger: #ff3b30;
-      --radius-card: 16px;
-      --radius-pill: 999px;
-      --shadow-soft: 0 12px 30px rgba(0,0,0,0.06);
-      --max-width: 1000px;
+      --accent-soft: rgba(0,113,227,0.08);
+      --page-width: 820px;
     }
 
     * {
@@ -29,183 +26,225 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
-      background-color: var(--bg);
+      font-family: "Times New Roman", -apple-system, BlinkMacSystemFont, system-ui, serif;
+      background: #f5f5f7;
       color: var(--text-primary);
-      -webkit-font-smoothing: antialiased;
-    }
-
-    .page-shell {
-      min-height: 100vh;
+      padding: 20px 8px 40px;
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 24px 12px 40px;
+      justify-content: center;
     }
 
-    .title {
-      font-size: 22px;
-      font-weight: 600;
-      margin-bottom: 14px;
-      text-align: center;
-    }
-
-    .subtitle {
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    .card {
+    #app {
       width: 100%;
-      max-width: var(--max-width);
-      background-color: var(--bg-elevated);
-      border-radius: var(--radius-card);
-      box-shadow: var(--shadow-soft);
-      border: 1px solid rgba(0,0,0,0.03);
-      padding: 20px 24px 22px;
+      max-width: var(--page-width);
     }
 
-    /* Header / logo line */
-    .report-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      border-bottom: 1px solid var(--border-subtle);
-      padding-bottom: 12px;
-      margin-bottom: 16px;
-    }
-
-    .logo-block {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .logo-block img {
-      width: 70px;
-      height: 70px;
-      object-fit: contain;
-    }
-
-    .school-text {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .school-name {
-      font-size: 18px;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-    }
-
-    .school-sub {
-      font-size: 12px;
-      color: var(--text-secondary);
-    }
-
-    .report-title {
+    .screen-controls {
       text-align: right;
-      font-size: 16px;
-      font-weight: 600;
+      margin-bottom: 12px;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
     }
 
-    .report-title-sub {
-      font-size: 12px;
-      color: var(--text-secondary);
-    }
-
-    /* Info grid */
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px 24px;
-      margin-bottom: 16px;
-      font-size: 13px;
-    }
-
-    .info-field {
-      display: flex;
+    .btn-primary {
+      display: inline-flex;
       align-items: center;
       gap: 6px;
-    }
-
-    .info-label {
-      min-width: 110px;
-      font-weight: 600;
-    }
-
-    .info-input,
-    .info-select {
-      flex: 1;
-      padding: 4px 8px;
-      border-radius: 8px;
-      border: 1px solid var(--border-subtle);
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      background: var(--accent);
+      color: #fff;
       font-size: 13px;
-      background-color: #fff;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(0,113,227,0.35);
     }
 
-    .info-input:focus,
-    .info-select:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px var(--accent-soft);
+    .btn-primary:hover {
+      filter: brightness(0.95);
     }
 
-    /* Scores table */
+    /* Report pages */
 
-    .section-title {
-      font-size: 14px;
+    .report-page {
+      background: #ffffff;
+      border: 1px solid #d0d0d5;
+      padding: 26px 32px 28px;
+      margin-bottom: 24px;
+    }
+
+    .report-page:last-of-type {
+      margin-bottom: 0;
+    }
+
+    /* Header with logo and titles */
+
+    .logo-wrapper {
+      text-align: left;
+      margin-bottom: 6px;
+    }
+
+    .logo-wrapper img {
+      width: 120px;
+      height: auto;
+    }
+
+    .top-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-top: 4px;
+    }
+
+    .left-header-block {
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .left-header-block .label {
       font-weight: 600;
-      margin: 12px 0 6px;
+      min-width: 110px;
+      display: inline-block;
     }
 
-    .scores-table-wrapper {
-      border-radius: 10px;
-      border: 1px solid var(--border-subtle);
-      overflow: hidden;
-      margin-bottom: 10px;
+    .right-header-block {
+      text-align: right;
+      font-size: 13px;
+      line-height: 1.4;
     }
 
-    table {
-      width: 100%;
+    .right-header-block .title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .right-header-block .line {
+      font-size: 13px;
+    }
+
+    .input-inline {
+      border: 1px solid #cfd2e0;
+      border-radius: 4px;
+      padding: 2px 4px;
+      min-width: 120px;
+      font-size: 13px;
+    }
+
+    .input-inline.small {
+      min-width: 80px;
+    }
+
+    .select-inline {
+      border: 1px solid #cfd2e0;
+      border-radius: 4px;
+      padding: 2px 4px;
+      font-size: 13px;
+      min-width: 110px;
+      background: #fff;
+    }
+
+    /* Attendance table */
+
+    .attendance-wrapper {
+      margin-top: 14px;
+      margin-bottom: 18px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .attendance-table {
       border-collapse: collapse;
-      font-size: 12px;
+      font-size: 11px;
+      min-width: 280px;
     }
 
-    th, td {
-      padding: 7px 8px;
-      border-bottom: 1px solid var(--border-subtle);
+    .attendance-table th,
+    .attendance-table td {
+      border: 1px solid #9ba7c5;
+      padding: 4px 6px;
       text-align: center;
     }
 
-    thead th {
-      background-color: #f2f2f7;
+    .attendance-table thead th {
+      background: var(--header-blue);
+      color: white;
       font-weight: 600;
     }
 
-    .scores-table td:first-child {
+    .attendance-table tbody th {
+      background: var(--table-header-bg);
+      font-weight: 600;
+    }
+
+    .attendance-input {
+      width: 60px;
+      border: none;
+      text-align: center;
+      font-size: 11px;
+    }
+
+    .attendance-input:focus {
+      outline: none;
+    }
+
+    /* Academic tables */
+
+    .table-title {
+      margin-top: 4px;
+      margin-bottom: 4px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .academic-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      margin-bottom: 12px;
+    }
+
+    .academic-table th,
+    .academic-table td {
+      border: 1px solid #9ba7c5;
+      padding: 4px 6px;
+      text-align: center;
+    }
+
+    .academic-table thead tr:first-child th {
+      background: var(--header-blue);
+      color: white;
+      font-weight: 600;
+    }
+
+    .academic-table thead tr:last-child th {
+      background: var(--header-blue-light);
+      color: white;
+      font-weight: 600;
+    }
+
+    .academic-table tbody tr:nth-child(odd) td {
+      background: #ffffff;
+    }
+
+    .academic-table tbody tr:nth-child(even) td {
+      background: var(--table-row-alt);
+    }
+
+    .academic-table td.subject-cell {
       text-align: left;
       font-weight: 500;
     }
 
     .score-input {
-      width: 70px;
-      padding: 4px 6px;
-      border-radius: 6px;
-      border: 1px solid var(--border-subtle);
-      font-size: 12px;
-      text-align: right;
+      width: 60px;
+      border: none;
+      text-align: center;
+      font-size: 11px;
+      background: transparent;
     }
 
     .score-input:focus {
       outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px var(--accent-soft);
+      background: #fffde8;
     }
 
     .total-cell {
@@ -214,361 +253,513 @@
 
     /* Observational assessments */
 
-    .obs-table-wrapper {
-      border-radius: 10px;
-      border: 1px solid var(--border-subtle);
-      overflow: hidden;
-      margin-top: 6px;
+    .obs-title {
+      margin-top: 14px;
+      margin-bottom: 4px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .obs-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      margin-top: 2px;
     }
 
     .obs-table th,
     .obs-table td {
-      padding: 7px 8px;
-      border-bottom: 1px solid var(--border-subtle);
+      border: 1px solid #9ba7c5;
+      padding: 4px 6px;
       text-align: center;
-      font-size: 12px;
     }
 
-    .obs-table th {
-      background-color: #f2f2f7;
+    .obs-table thead th {
+      background: var(--header-blue);
+      color: white;
       font-weight: 600;
     }
 
-    .obs-table td:first-child {
+    .obs-table tbody td:first-child {
       text-align: left;
       font-weight: 500;
+      background: var(--table-row-alt);
     }
 
     .obs-check {
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
     }
 
-    /* Comment */
+    /* Page 2 – commentary */
 
-    .comment-area {
-      width: 100%;
+    .page-title-small {
       margin-top: 6px;
-      min-height: 90px;
-      border-radius: 10px;
-      border: 1px solid var(--border-subtle);
-      padding: 8px 10px;
-      font-size: 12px;
-      resize: vertical;
-    }
-
-    .comment-area:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px var(--accent-soft);
-    }
-
-    /* Buttons */
-
-    .button-row {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 18px;
-    }
-
-    .btn {
-      border-radius: var(--radius-pill);
-      border: 1px solid var(--border-subtle);
-      background-color: #fff;
-      padding: 7px 16px;
+      margin-bottom: 6px;
       font-size: 13px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+      font-weight: 600;
     }
 
-    .btn-primary {
-      background-color: var(--accent);
-      color: #fff;
-      border-color: transparent;
-      box-shadow: 0 8px 18px rgba(0, 113, 227, 0.3);
-    }
-
-    .btn-primary:hover {
-      filter: brightness(0.95);
-    }
-
-    .btn-outline:hover {
-      background-color: var(--accent-soft);
-    }
-
-    .footer-note {
-      margin-top: 10px;
+    .commentary-table {
+      width: 100%;
+      border-collapse: collapse;
       font-size: 11px;
-      color: var(--text-secondary);
-      text-align: right;
+      margin-bottom: 14px;
     }
 
-    /* Print styling */
+    .commentary-table th,
+    .commentary-table td {
+      border: 1px solid #9ba7c5;
+      padding: 6px 6px;
+      vertical-align: top;
+    }
+
+    .commentary-table thead th {
+      background: var(--header-blue);
+      color: white;
+      font-weight: 600;
+      text-align: left;
+    }
+
+    .commentary-table td.subject {
+      width: 18%;
+      background: var(--table-row-alt);
+      font-weight: 600;
+    }
+
+    .commentary-textarea {
+      width: 100%;
+      min-height: 70px;
+      border: none;
+      resize: vertical;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .commentary-textarea:focus {
+      outline: none;
+    }
+
+    /* Signatures */
+
+    .signature-row {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      text-align: center;
+      font-size: 11px;
+    }
+
+    .signature-label {
+      font-weight: 600;
+      margin-top: 40px;
+      border-top: 1px solid #000;
+      padding-top: 4px;
+    }
+
+    .footer-line {
+      margin-top: 8px;
+      font-size: 10px;
+      text-align: left;
+      color: var(--text-secondary);
+    }
+
+    /* Print */
 
     @media print {
       body {
-        background-color: #fff;
-      }
-      .page-shell {
+        background: #ffffff;
         padding: 0;
       }
-      .title,
-      .subtitle {
+      #app {
+        max-width: none;
+      }
+      .screen-controls {
         display: none;
       }
-      .card {
-        box-shadow: none;
-        border-radius: 0;
+      .report-page {
         border: none;
-        max-width: 100%;
+        margin: 0;
+        page-break-after: always;
       }
-      .button-row {
-        display: none;
+      .report-page:last-of-type {
+        page-break-after: auto;
       }
     }
   </style>
 </head>
 <body>
-<div class="page-shell">
-  <div class="title">Student Progress Report Entry</div>
-  <div class="subtitle">
-    Enter scores and observations. The system calculates the final total (Coursework 40% + Exam 60%).
+<div id="app">
+  <div class="screen-controls">
+    <button class="btn-primary" onclick="handleSubmitAndPrint()">Submit &amp; Print</button>
   </div>
 
-  <div class="card">
-    <!-- Header with logo -->
-    <div class="report-header">
-      <div class="logo-block">
-        <!-- Update src to your real logo path -->
-        <img src="prime-logo-square.png" alt="Prime International School Logo">
-        <div class="school-text">
-          <div class="school-name">PRIME INTERNATIONAL SCHOOL</div>
-          <div class="school-sub">Yangon · Cambridge Curriculum</div>
+  <!-- PAGE 1 -->
+  <section class="report-page" id="page1">
+    <div class="logo-wrapper">
+      <!-- Update src to your own logo path -->
+      <img src="prime-logo-square.png" alt="Prime International School Logo">
+    </div>
+
+    <div class="top-header-row">
+      <!-- Left block: student info -->
+      <div class="left-header-block">
+        <div><span class="label">Student’s Name</span>:
+          <input id="studentName" class="input-inline" type="text"></div>
+        <div><span class="label">Student’s ID</span>:
+          <input id="studentId" class="input-inline small" type="text"></div>
+        <div><span class="label">Class</span>:
+          <select id="classSelect" class="select-inline" onchange="handleClassChange()">
+            <option value="Year 1">Year-1</option>
+            <option value="Year 2" selected>Year-2</option>
+            <option value="Year 3">Year-3</option>
+          </select>
+        </div>
+        <div><span class="label">Teacher’s Name</span>:
+          <input id="teacherName" class="input-inline" type="text"></div>
+        <div><span class="label">Issue Date</span>:
+          <input id="issueDate" class="input-inline small" type="date"></div>
+      </div>
+
+      <!-- Right block: report titles -->
+      <div class="right-header-block">
+        <div class="title">Progress Report</div>
+        <div class="line">
+          Academic Year
+          <select id="academicYear" class="select-inline">
+            <option>2025-2026</option>
+            <option>2026-2027</option>
+            <option>2027-2028</option>
+          </select>
+        </div>
+        <div class="line">
+          Term
+          <select id="termSelect" class="select-inline small">
+            <option>Term-1</option>
+            <option>Term-2</option>
+            <option>Term-3</option>
+          </select>
         </div>
       </div>
-      <div style="text-align:right;">
-        <div class="report-title">Progress Report</div>
-        <div class="report-title-sub">Formal School Record</div>
-      </div>
     </div>
 
-    <!-- Student & report info -->
-    <div class="info-grid">
-      <div class="info-field">
-        <span class="info-label">Academic Year</span>
-        <select id="academicYear" class="info-select">
-          <option>2025-2026</option>
-          <option>2026-2027</option>
-          <option>2027-2028</option>
-        </select>
-      </div>
-      <div class="info-field">
-        <span class="info-label">Term</span>
-        <select id="term" class="info-select">
-          <option>Term 1</option>
-          <option>Term 2</option>
-          <option>Term 3</option>
-        </select>
-      </div>
-
-      <div class="info-field">
-        <span class="info-label">Student's Name</span>
-        <input id="studentName" class="info-input" type="text" placeholder="Student full name">
-      </div>
-      <div class="info-field">
-        <span class="info-label">Student ID</span>
-        <input id="studentId" class="info-input" type="text" placeholder="e.g. PR-25014">
-      </div>
-
-      <div class="info-field">
-        <span class="info-label">Class</span>
-        <select id="className" class="info-select">
-          <option>Tiny Explorers</option>
-          <option>School Readiness – Half Day</option>
-          <option>School Readiness – Full Day</option>
-          <option>Early Years 1</option>
-          <option>Early Years 2</option>
-          <option>Year 1</option>
-          <option>Year 2</option>
-          <option>Year 3</option>
-        </select>
-      </div>
-      <div class="info-field">
-        <span class="info-label">Teacher's Name</span>
-        <input id="teacherName" class="info-input" type="text" placeholder="Class teacher">
-      </div>
-
-      <div class="info-field">
-        <span class="info-label">Issue Date</span>
-        <input id="issueDate" class="info-input" type="date">
-      </div>
-      <div class="info-field">
-        <span class="info-label">Subject</span>
-        <select id="subjectName" class="info-select">
-          <option>English</option>
-          <option>Mathematics</option>
-          <option>Science</option>
-          <option>Social Studies</option>
-          <option>Myanmar</option>
-          <option>Myanmar Social Studies</option>
-          <option>Wellbeing</option>
-          <option>ICT</option>
-          <option>Chinese</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Scores section -->
-    <div class="section-title">Paper-based Assessment</div>
-    <div class="scores-table-wrapper">
-      <table class="scores-table">
+    <!-- Attendance -->
+    <div class="attendance-wrapper">
+      <table class="attendance-table">
         <thead>
-          <tr>
-            <th>Component</th>
-            <th>Raw Score (0–100)</th>
-            <th>Weight</th>
-            <th>Weighted Score</th>
-          </tr>
+        <tr>
+          <th colspan="3">Attendance</th>
+        </tr>
+        <tr>
+          <th>Total School Days</th>
+          <th>Days of Presence</th>
+          <th>Days of Absence</th>
+        </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>Coursework</td>
-            <td>
-              <input id="cwScore" class="score-input" type="number" min="0" max="100" step="0.1">
-            </td>
-            <td>40%</td>
-            <td id="cwWeighted" class="total-cell">0.00</td>
-          </tr>
-          <tr>
-            <td>Term Exam</td>
-            <td>
-              <input id="examScore" class="score-input" type="number" min="0" max="100" step="0.1">
-            </td>
-            <td>60%</td>
-            <td id="examWeighted" class="total-cell">0.00</td>
-          </tr>
-          <tr>
-            <td style="text-align:right; font-weight:600;">TOTAL</td>
-            <td></td>
-            <td>100%</td>
-            <td id="totalScore" class="total-cell">0.00</td>
-          </tr>
+        <tr>
+          <td><input class="attendance-input" id="totalDays" type="number"></td>
+          <td><input class="attendance-input" id="presentDays" type="number"></td>
+          <td><input class="attendance-input" id="absentDays" type="number"></td>
+        </tr>
         </tbody>
       </table>
     </div>
+
+    <!-- Academic table main subjects -->
+    <div class="table-title">Paper-Based Test</div>
+    <table class="academic-table" id="mainSubjectsTable">
+      <thead>
+      <tr>
+        <th>Paper-Based Test</th>
+        <th>Max Marks</th>
+        <th>Term Exam</th>
+        <th>Course Work</th>
+        <th>TOTAL</th>
+      </tr>
+      </thead>
+      <tbody>
+      <!-- English -->
+      <tr class="subject-row" data-subject="English">
+        <td class="subject-cell">English</td>
+        <td>100</td>
+        <td><input class="score-input exam-input" type="number" min="0" max="100" step="0.1"></td>
+        <td><input class="score-input cw-input" type="number" min="0" max="100" step="0.1"></td>
+        <td class="total-cell total-display">0</td>
+      </tr>
+      <!-- Mathematics -->
+      <tr class="subject-row" data-subject="Mathematics">
+        <td class="subject-cell">Mathematics</td>
+        <td>100</td>
+        <td><input class="score-input exam-input" type="number" min="0" max="100" step="0.1"></td>
+        <td><input class="score-input cw-input" type="number" min="0" max="100" step="0.1"></td>
+        <td class="total-cell total-display">0</td>
+      </tr>
+      <!-- Science -->
+      <tr class="subject-row" data-subject="Science">
+        <td class="subject-cell">Science</td>
+        <td>100</td>
+        <td><input class="score-input exam-input" type="number" min="0" max="100" step="0.1"></td>
+        <td><input class="score-input cw-input" type="number" min="0" max="100" step="0.1"></td>
+        <td class="total-cell total-display">0</td>
+      </tr>
+      <!-- Social Studies -->
+      <tr class="subject-row" data-subject="Social Studies">
+        <td class="subject-cell">Social Studies</td>
+        <td>100</td>
+        <td><input class="score-input exam-input" type="number" min="0" max="100" step="0.1"></td>
+        <td><input class="score-input cw-input" type="number" min="0" max="100" step="0.1"></td>
+        <td class="total-cell total-display">0</td>
+      </tr>
+      <!-- Myanmar -->
+      <tr class="subject-row" data-subject="Myanmar">
+        <td class="subject-cell">Myanmar</td>
+        <td>100</td>
+        <td><input class="score-input exam-input" type="number" min="0" max="100" step="0.1"></td>
+        <td><input class="score-input cw-input" type="number" min="0" max="100" step="0.1"></td>
+        <td class="total-cell total-display">0</td>
+      </tr>
+      <!-- Myanmar Social Studies (Year 2+) -->
+      <tr class="subject-row year2plus" data-subject="Myanmar Social Studies">
+        <td class="subject-cell">Myanmar Social Studies</td>
+        <td>100</td>
+        <td><input class="score-input exam-input" type="number" min="0" max="100" step="0.1"></td>
+        <td><input class="score-input cw-input" type="number" min="0" max="100" step="0.1"></td>
+        <td class="total-cell total-display">0</td>
+      </tr>
+      <!-- Wellbeing -->
+      <tr class="subject-row" data-subject="Wellbeing">
+        <td class="subject-cell">Wellbeing</td>
+        <td>100</td>
+        <td><input class="score-input exam-input" type="number" min="0" max="100" step="0.1"></td>
+        <td><input class="score-input cw-input" type="number" min="0" max="100" step="0.1"></td>
+        <td class="total-cell total-display">0</td>
+      </tr>
+      <!-- ICT -->
+      <tr class="subject-row" data-subject="ICT">
+        <td class="subject-cell">ICT</td>
+        <td>100</td>
+        <td><input class="score-input exam-input" type="number" min="0" max="100" step="0.1"></td>
+        <td><input class="score-input cw-input" type="number" min="0" max="100" step="0.1"></td>
+        <td class="total-cell total-display">0</td>
+      </tr>
+      </tbody>
+    </table>
+
+    <!-- Chinese separate table for Year 2+ -->
+    <table class="academic-table year2plus" id="chineseTable">
+      <thead>
+      <tr>
+        <th>Paper-Based Test</th>
+        <th>Max Marks</th>
+        <th>Term Exam</th>
+        <th>Course Work</th>
+        <th>TOTAL</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr class="subject-row" data-subject="Chinese">
+        <td class="subject-cell">Chinese</td>
+        <td>100</td>
+        <td><input class="score-input exam-input" type="number" min="0" max="100" step="0.1"></td>
+        <td><input class="score-input cw-input" type="number" min="0" max="100" step="0.1"></td>
+        <td class="total-cell total-display">0</td>
+      </tr>
+      </tbody>
+    </table>
 
     <!-- Observational assessments -->
-    <div class="section-title">Observational Assessments</div>
-    <div class="obs-table-wrapper">
-      <table class="obs-table">
-        <thead>
-          <tr>
-            <th>Area</th>
-            <th>Strong Proficiency</th>
-            <th>Proficient</th>
-            <th>Developing</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>PE</td>
-            <td><input class="obs-check" type="checkbox" name="pe-strong"></td>
-            <td><input class="obs-check" type="checkbox" name="pe-prof"></td>
-            <td><input class="obs-check" type="checkbox" name="pe-dev"></td>
-          </tr>
-          <tr>
-            <td>Taekwondo</td>
-            <td><input class="obs-check" type="checkbox" name="tkd-strong"></td>
-            <td><input class="obs-check" type="checkbox" name="tkd-prof"></td>
-            <td><input class="obs-check" type="checkbox" name="tkd-dev"></td>
-          </tr>
-          <tr>
-            <td>Art</td>
-            <td><input class="obs-check" type="checkbox" name="art-strong"></td>
-            <td><input class="obs-check" type="checkbox" name="art-prof"></td>
-            <td><input class="obs-check" type="checkbox" name="art-dev"></td>
-          </tr>
-          <tr>
-            <td>Music</td>
-            <td><input class="obs-check" type="checkbox" name="music-strong"></td>
-            <td><input class="obs-check" type="checkbox" name="music-prof"></td>
-            <td><input class="obs-check" type="checkbox" name="music-dev"></td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="obs-title">Observational Assessments</div>
+    <table class="obs-table">
+      <thead>
+      <tr>
+        <th>Observational Assessments</th>
+        <th>Strong Proficiency</th>
+        <th>Proficient</th>
+        <th>Developing</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>PE</td>
+        <td><input class="obs-check" type="checkbox" name="pe-strong"></td>
+        <td><input class="obs-check" type="checkbox" name="pe-prof"></td>
+        <td><input class="obs-check" type="checkbox" name="pe-dev"></td>
+      </tr>
+      <tr>
+        <td>Taekwondo</td>
+        <td><input class="obs-check" type="checkbox" name="tkd-strong"></td>
+        <td><input class="obs-check" type="checkbox" name="tkd-prof"></td>
+        <td><input class="obs-check" type="checkbox" name="tkd-dev"></td>
+      </tr>
+      <tr>
+        <td>Art</td>
+        <td><input class="obs-check" type="checkbox" name="art-strong"></td>
+        <td><input class="obs-check" type="checkbox" name="art-prof"></td>
+        <td><input class="obs-check" type="checkbox" name="art-dev"></td>
+      </tr>
+      <tr>
+        <td>Music</td>
+        <td><input class="obs-check" type="checkbox" name="music-strong"></td>
+        <td><input class="obs-check" type="checkbox" name="music-prof"></td>
+        <td><input class="obs-check" type="checkbox" name="music-dev"></td>
+      </tr>
+      </tbody>
+    </table>
+
+    <div class="footer-line">
+      PRIME International School Progress Report · Term
+      <span id="footerTerm1">1</span>
+    </div>
+  </section>
+
+  <!-- PAGE 2 -->
+  <section class="report-page" id="page2">
+    <div class="logo-wrapper">
+      <img src="prime-logo-square.png" alt="Prime International School Logo">
     </div>
 
-    <!-- Comment -->
-    <div class="section-title">Teacher Comment</div>
-    <textarea id="comment" class="comment-area"
-      placeholder="Enter a formal comment that will appear on the printed progress report..."></textarea>
-
-    <!-- Buttons -->
-    <div class="button-row">
-      <button type="button" class="btn btn-outline" onclick="alert('Saved locally (placeholder)');">
-        Save Draft
-      </button>
-      <button type="button" class="btn btn-primary" onclick="submitAndPrint()">
-        Submit &amp; Print
-      </button>
+    <div class="right-header-block" style="margin-bottom:6px;">
+      <div class="title">Progress Report</div>
+      <div class="line">
+        Academic Year <span id="yearText">2025-2026</span>
+      </div>
+      <div class="line">
+        <span id="termText">Term-1</span>
+      </div>
     </div>
 
-    <div class="footer-note">
-      Prime International School Yangon · Progress Report Entry
+    <div class="page-title-small">Commentary Section <span id="termText2">Term-1</span></div>
+
+    <table class="commentary-table">
+      <thead>
+      <tr>
+        <th style="width:18%;">Subjects</th>
+        <th>Comments</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td class="subject">English</td>
+        <td><textarea class="commentary-textarea" id="commentEnglish"></textarea></td>
+      </tr>
+      <tr>
+        <td class="subject">Mathematics</td>
+        <td><textarea class="commentary-textarea" id="commentMath"></textarea></td>
+      </tr>
+      <tr>
+        <td class="subject">Science</td>
+        <td><textarea class="commentary-textarea" id="commentScience"></textarea></td>
+      </tr>
+      <tr>
+        <td class="subject">Social Studies</td>
+        <td><textarea class="commentary-textarea" id="commentSocial"></textarea></td>
+      </tr>
+      <tr>
+        <td class="subject">Myanmar</td>
+        <td><textarea class="commentary-textarea" id="commentMyanmar"></textarea></td>
+      </tr>
+      <!-- Myanmar Social Studies (Year 2+) -->
+      <tr class="year2plus-comment">
+        <td class="subject">Myanmar Social Studies</td>
+        <td><textarea class="commentary-textarea" id="commentMSS"></textarea></td>
+      </tr>
+      </tbody>
+    </table>
+
+    <!-- Signature row -->
+    <div class="signature-row">
+      <div>
+        <div class="signature-label">Principal’s Signature</div>
+      </div>
+      <div>
+        <div class="signature-label">Class Teacher’s Signature</div>
+      </div>
+      <div>
+        <div class="signature-label">Parent’s Signature</div>
+      </div>
     </div>
-  </div>
+
+    <div class="footer-line">
+      PRIME International School Progress Report · Term
+      <span id="footerTerm2">1</span>
+    </div>
+  </section>
 </div>
 
 <script>
-  function clampScore(value) {
-    let v = parseFloat(value);
+  function clamp100(val) {
+    let v = parseFloat(val);
     if (isNaN(v)) return 0;
     if (v < 0) v = 0;
     if (v > 100) v = 100;
     return v;
   }
 
-  function recalcTotals() {
-    const cwInput = document.getElementById('cwScore');
-    const examInput = document.getElementById('examScore');
+  function recalcAllTotals() {
+    document.querySelectorAll('.subject-row').forEach(row => {
+      const examInput = row.querySelector('.exam-input');
+      const cwInput = row.querySelector('.cw-input');
+      const totalCell = row.querySelector('.total-display');
+      if (!examInput || !cwInput || !totalCell) return;
 
-    const cwRaw = clampScore(cwInput.value);
-    const examRaw = clampScore(examInput.value);
+      const exam = clamp100(examInput.value);
+      const cw = clamp100(cwInput.value);
+      if (examInput.value !== '') examInput.value = exam;
+      if (cwInput.value !== '') cwInput.value = cw;
 
-    if (cwInput.value !== '') cwInput.value = cwRaw;
-    if (examInput.value !== '') examInput.value = examRaw;
-
-    const cwWeighted = (cwRaw / 100) * 40;
-    const examWeighted = (examRaw / 100) * 60;
-    const total = cwWeighted + examWeighted;
-
-    document.getElementById('cwWeighted').textContent = cwWeighted.toFixed(2);
-    document.getElementById('examWeighted').textContent = examWeighted.toFixed(2);
-    document.getElementById('totalScore').textContent = total.toFixed(2);
+      // 60% exam + 40% coursework (both entered as 0–100)
+      const total = exam * 0.6 + cw * 0.4;
+      totalCell.textContent = Math.round(total);
+    });
   }
 
-  document.getElementById('cwScore').addEventListener('input', recalcTotals);
-  document.getElementById('examScore').addEventListener('input', recalcTotals);
-
-  function submitAndPrint() {
-    // simple front-end validation (optional / light)
-    const name = document.getElementById('studentName').value.trim();
-    if (!name) {
-      alert('Please enter the student name before submitting.');
-      return;
+  document.addEventListener('input', function (e) {
+    if (e.target.classList.contains('exam-input') ||
+        e.target.classList.contains('cw-input')) {
+      recalcAllTotals();
     }
-    recalcTotals(); // ensure totals are up to date
+  });
 
-    // Placeholder for real submit to backend (API)
-    // e.g. send JSON via fetch(). For now just show a message.
-    console.log('Progress report submitted (placeholder).');
+  function handleClassChange() {
+    const cls = document.getElementById('classSelect').value;
+    const showYear2Plus = (cls === 'Year 2' || cls === 'Year 3');
 
-    // Open Print dialog so user can "Save as PDF"
+    document.querySelectorAll('.year2plus').forEach(el => {
+      el.style.display = showYear2Plus ? '' : 'none';
+    });
+
+    document.querySelectorAll('.year2plus-comment').forEach(el => {
+      el.style.display = showYear2Plus ? '' : 'none';
+    });
+  }
+
+  function syncHeaderTexts() {
+    const term = document.getElementById('termSelect').value;
+    const year = document.getElementById('academicYear').value;
+
+    document.getElementById('footerTerm1').textContent = term.replace('Term-', '');
+    document.getElementById('footerTerm2').textContent = term.replace('Term-', '');
+    document.getElementById('termText').textContent = term;
+    document.getElementById('termText2').textContent = term;
+    document.getElementById('yearText').textContent = year;
+  }
+
+  document.getElementById('termSelect').addEventListener('change', syncHeaderTexts);
+  document.getElementById('academicYear').addEventListener('change', syncHeaderTexts);
+
+  function handleSubmitAndPrint() {
+    // Simple sanity: recalc totals & sync text before print
+    recalcAllTotals();
+    syncHeaderTexts();
+    handleClassChange();
     window.print();
   }
+
+  // Initial setup
+  handleClassChange();
+  syncHeaderTexts();
 </script>
 </body>
 </html>
