@@ -946,56 +946,51 @@ function exportExcel() {
 
     const table = document.getElementById("assessmentTable");
 
-    let sheetData = [];
+    const sheetData = [];
 
-    // ---- METADATA ----
+    // --------- Metadata ---------
     sheetData.push(["Academic Year", academicYear]);
     sheetData.push(["Term", term]);
     sheetData.push(["Grade Level", grade]);
     sheetData.push(["Subject", subject]);
-    sheetData.push([]); // empty line
+    sheetData.push([]);
 
-    // --------------------------
-    // FIX HEADER ALIGNMENT
-    // --------------------------
-
+    // --------- Build Header ---------
     const header1 = [];
     const header2 = [];
 
-    const headerRow1 = document.querySelectorAll("#headerRow1 th");
-    const headerRow2 = document.querySelectorAll("#headerRow2 th");
+    const headRow1 = document.querySelectorAll("#headerRow1 th");
+    const headRow2 = document.querySelectorAll("#headerRow2 th");
 
-    // Build header1 by expanding colSpan
-    headerRow1.forEach((th) => {
+    // Expand colspan for Row 1
+    headRow1.forEach(th => {
         const text = th.innerText.trim();
-        const colSpan = th.colSpan || 1;
+        const span = th.colSpan || 1;
 
-        for (let i = 0; i < colSpan; i++) {
+        for (let i = 0; i < span; i++) {
             header1.push(text);
         }
     });
 
-    // Build header2 normally (no colSpan)
-    headerRow2.forEach((th) => {
+    // Row 2 always must match header1 length exactly
+    headRow2.forEach(th => {
         header2.push(th.innerText.trim());
     });
 
-    // NOW both header rows must have equal length
-    // If header2 is shorter, pad with empty strings
+    // Fix length mismatch
     while (header2.length < header1.length) {
-        header2.push("");
+        header2.push(""); // fill missing columns
     }
 
     sheetData.push(header1);
     sheetData.push(header2);
 
-    // ---- BODY ROWS ----
+    // --------- Body rows ---------
     const rows = document.querySelectorAll("#tbody tr");
 
-    rows.forEach((tr) => {
+    rows.forEach(tr => {
         const rowArr = [];
-
-        tr.querySelectorAll("td").forEach((td) => {
+        tr.querySelectorAll("td").forEach(td => {
             const input = td.querySelector("input");
             if (input) {
                 rowArr.push(input.value);
@@ -1003,11 +998,10 @@ function exportExcel() {
                 rowArr.push(td.textContent.trim());
             }
         });
-
         sheetData.push(rowArr);
     });
 
-    // ---- BUILD WORKBOOK ----
+    // --------- Build Workbook ---------
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet(sheetData);
 
@@ -1015,13 +1009,14 @@ function exportExcel() {
 
     XLSX.utils.book_append_sheet(wb, ws, "Assessment");
 
-    // ---- FILE NAME ----
+    // File name
     const fileName =
         `${grade}_${subject}_${academicYear}_${term}_assessment.xlsx`
-            .replace(/\s+/g, "");
+        .replace(/\s+/g, "");
 
     XLSX.writeFile(wb, fileName);
 }
+
 
 
 
