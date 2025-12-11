@@ -196,6 +196,22 @@
 
 <!-- Dropdowns -->
 <div style="margin-bottom: 15px;">
+    <div style="margin-bottom: 15px;">
+  <span class="dropdown-label">Academic Year: </span>
+  <select id="academicYear">
+    <option>2025-2026</option>
+  </select>
+
+  &nbsp;&nbsp;&nbsp;
+
+  <span class="dropdown-label">Term: </span>
+  <select id="termSelect">
+    <option>Term 1</option>
+    <option>Term 2</option>
+    <option>Term 3</option>
+  </select>
+</div>
+
   <span class="dropdown-label">Grade Level: </span>
   <select id="gradeLevel">
     <option>Year 1</option>
@@ -923,26 +939,26 @@
   }
 
 function exportExcel() {
-    const table = document.getElementById("assessmentTable");
+    const academicYear = document.getElementById("academicYear").value;
+    const term = document.getElementById("termSelect").value;
+    const grade = document.getElementById("gradeLevel").value;
+    const subject = document.getElementById("subjectSelect").value;
 
-    // Build an array manually (much cleaner than table_to_book)
+    const table = document.getElementById("assessmentTable");
     let sheetData = [];
 
-    // FIRST ROW: metadata
-    sheetData.push([
-        "Grade Level:", document.getElementById("gradeLevel").value,
-        "Subject:", document.getElementById("subjectSelect").value
-    ]);
+    // Metadata rows
+    sheetData.push(["Academic Year:", academicYear]);
+    sheetData.push(["Term:", term]);
+    sheetData.push(["Grade Level:", grade]);
+    sheetData.push(["Subject:", subject]);
+    sheetData.push([]); // spacer
 
-    sheetData.push([]); // spacer row
-
-    // ---- HEADER ROWS ----
+    // Headers
     const headerRow1 = [];
     const headerRow2 = [];
 
-    // Read actual <thead> rows
     const theadRows = table.querySelectorAll("thead tr");
-
     theadRows.forEach((tr, rowIndex) => {
         const cells = tr.querySelectorAll("th");
         cells.forEach(cell => {
@@ -951,11 +967,10 @@ function exportExcel() {
         });
     });
 
-    // Add headers to sheet
     sheetData.push(headerRow1);
     sheetData.push(headerRow2);
 
-    // ---- BODY ROWS ----
+    // Body rows
     const rows = table.querySelectorAll("#tbody tr");
     rows.forEach(tr => {
         const rowArr = [];
@@ -970,18 +985,23 @@ function exportExcel() {
         sheetData.push(rowArr);
     });
 
-    // Create workbook & add sheet
+    // Workbook
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet(sheetData);
 
-    // Auto-size columns
-    const colWidths = headerRow2.map(() => ({ wch: 18 }));
-    ws['!cols'] = colWidths;
+    ws['!cols'] = headerRow2.map(() => ({ wch: 18 }));
 
-    // Add sheet & export
     XLSX.utils.book_append_sheet(wb, ws, "Assessment");
-    XLSX.writeFile(wb, "year1_assessment_full.xlsx");
+
+    // Filename pattern:
+    // Year1_Mathematics_2025-2026_Term1_assessment.xlsx
+    const fileName =
+        `${grade}_${subject}_${academicYear}_${term}_assessment.xlsx`
+            .replace(/\s+/g, '');
+
+    XLSX.writeFile(wb, fileName);
 }
+
 
 
   function submitScores() {
