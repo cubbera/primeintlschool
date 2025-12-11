@@ -387,6 +387,10 @@
     max-width: none;
   }
 
+  table, tr, td, th {
+    page-break-inside: avoid !important;
+  }
+
   .report-page {
     width: 100%;
     min-height: 277mm;
@@ -395,10 +399,6 @@
     border: none;
     page-break-after: always;
     position: relative;
-  }
-
-  table, tr, td, th {
-    page-break-inside: avoid !important;
   }
 
   .academic-table th, .academic-table td,
@@ -410,6 +410,28 @@
 /* Center logo always */
 .logo-wrapper {
   text-align: center !important;
+}
+
+/* PAGE NUMBERS (Web + Print) */
+.report-page {
+  position: relative;
+}
+
+.report-page .page-number {
+  position: absolute;
+  bottom: 6mm;
+  right: 10mm;
+  font-size: 11px;
+  color: #333;
+  font-style: italic;
+}
+
+/* Print adjustments */
+@media print {
+  .page-number {
+    bottom: 10mm;
+    right: 12mm;
+  }
 }
 
     
@@ -624,6 +646,7 @@
       PRIME International School Progress Report · Term
       <span id="footerTerm1">1</span>
     </div>
+    <div class="page-number">Page 1 of 2</div>
   </section>
 
   <!-- PAGE 2 -->
@@ -697,6 +720,7 @@
       PRIME International School Progress Report · Term
       <span id="footerTerm2">1</span>
     </div>
+    <div class="page-number">Page 2 of 2</div>
   </section>
 </div>
 
