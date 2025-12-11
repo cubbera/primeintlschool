@@ -953,42 +953,54 @@ function exportExcel() {
     sheetData.push(["Term", term]);
     sheetData.push(["Grade Level", grade]);
     sheetData.push(["Subject", subject]);
-    sheetData.push([]);
+    sheetData.push([]); // blank row before table
 
-    // --------- Build Header ---------
+    // --------- HEADER ROWS (respect rowspan / colspan) ---------
     const header1 = [];
     const header2 = [];
 
-    const headRow1 = document.querySelectorAll("#headerRow1 th");
-    const headRow2 = document.querySelectorAll("#headerRow2 th");
+    const row1Cells = document.querySelectorAll("#headerRow1 th");
+    const row2Cells = document.querySelectorAll("#headerRow2 th");
 
-    // Expand colspan for Row 1
-    headRow1.forEach(th => {
+    let row2Index = 0;
+
+    row1Cells.forEach(th => {
         const text = th.innerText.trim();
-        const span = th.colSpan || 1;
+        const colSpan = th.colSpan || 1;
+        const rowSpan = th.rowSpan || 1;
 
-        for (let i = 0; i < span; i++) {
+        // Row 1: repeat parent title for each underlying column
+        for (let i = 0; i < colSpan; i++) {
             header1.push(text);
+        }
+
+        if (rowSpan > 1) {
+            // This column spans both rows (Nr., Student Name)
+            // -> second header row gets empty placeholders here
+            for (let i = 0; i < colSpan; i++) {
+                header2.push("");
+            }
+        } else {
+            // This column has children in row 2
+            for (let i = 0; i < colSpan; i++) {
+                if (row2Index < row2Cells.length) {
+                    header2.push(row2Cells[row2Index].innerText.trim());
+                    row2Index++;
+                } else {
+                    header2.push("");
+                }
+            }
         }
     });
 
-    // Row 2 always must match header1 length exactly
-    headRow2.forEach(th => {
-        header2.push(th.innerText.trim());
-    });
-
-    // Fix length mismatch
-    while (header2.length < header1.length) {
-        header2.push(""); // fill missing columns
-    }
-
+    // Now header1.length === header2.length === number of data columns
     sheetData.push(header1);
     sheetData.push(header2);
 
-    // --------- Body rows ---------
-    const rows = document.querySelectorAll("#tbody tr");
+    // --------- BODY ROWS ---------
+    const bodyRows = document.querySelectorAll("#tbody tr");
 
-    rows.forEach(tr => {
+    bodyRows.forEach(tr => {
         const rowArr = [];
         tr.querySelectorAll("td").forEach(td => {
             const input = td.querySelector("input");
@@ -1001,7 +1013,7 @@ function exportExcel() {
         sheetData.push(rowArr);
     });
 
-    // --------- Build Workbook ---------
+    // --------- BUILD WORKBOOK ---------
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet(sheetData);
 
@@ -1009,10 +1021,10 @@ function exportExcel() {
 
     XLSX.utils.book_append_sheet(wb, ws, "Assessment");
 
-    // File name
+    // File name, e.g. Year1_English_2025-2026_Term1_assessment.xlsx
     const fileName =
         `${grade}_${subject}_${academicYear}_${term}_assessment.xlsx`
-        .replace(/\s+/g, "");
+            .replace(/\s+/g, "");
 
     XLSX.writeFile(wb, fileName);
 }
