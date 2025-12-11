@@ -26,7 +26,7 @@
     }
 
     body {
-      font-family: "Times New Roman", -apple-system, BlinkMacSystemFont, system-ui, serif;
+      font-family: "Times New Roman", serif;
       background: #f5f5f7;
       color: var(--text-primary);
       padding: 20px 8px 40px;
@@ -42,7 +42,7 @@
     .screen-controls {
       text-align: right;
       margin-bottom: 12px;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
     .btn-primary {
@@ -59,30 +59,39 @@
       box-shadow: 0 8px 18px rgba(0,113,227,0.35);
     }
 
-    .btn-primary:hover {
-      filter: brightness(0.95);
+    /* Remove arrows on number input */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
     }
 
     /* Report pages */
-
     .report-page {
       background: #ffffff;
       border: 1px solid #d0d0d5;
-      padding: 26px 32px 28px;
+      padding: 26px 32px 48px;
       margin-bottom: 24px;
+      position: relative;
+      min-height: 1100px;
     }
 
-    .report-page:last-of-type {
-      margin-bottom: 0;
+    /* Page number */
+    .page-number {
+      position: absolute;
+      bottom: 12px;
+      right: 20px;
+      font-size: 11px;
+      color: #333;
     }
-
-    /* Header with logo and titles */
 
     .logo-wrapper {
       text-align: left;
       margin-bottom: 6px;
     }
-
     .logo-wrapper img {
       width: 120px;
       height: auto;
@@ -99,8 +108,7 @@
       font-size: 13px;
       line-height: 1.5;
     }
-
-    .left-header-block .label {
+    .label {
       font-weight: 600;
       min-width: 110px;
       display: inline-block;
@@ -111,39 +119,22 @@
       font-size: 13px;
       line-height: 1.4;
     }
-
-    .right-header-block .title {
+    .title {
       font-size: 16px;
       font-weight: 700;
     }
 
-    .right-header-block .line {
-      font-size: 13px;
-    }
-
-    .input-inline {
-      border: 1px solid #cfd2e0;
-      border-radius: 4px;
-      padding: 2px 4px;
-      min-width: 120px;
-      font-size: 13px;
-    }
-
-    .input-inline.small {
-      min-width: 80px;
-    }
-
+    .input-inline,
     .select-inline {
       border: 1px solid #cfd2e0;
       border-radius: 4px;
       padding: 2px 4px;
       font-size: 13px;
-      min-width: 110px;
       background: #fff;
     }
+    .input-inline.small { min-width: 80px; }
 
-    /* Attendance table */
-
+    /* Attendance */
     .attendance-wrapper {
       margin-top: 14px;
       margin-bottom: 18px;
@@ -182,19 +173,7 @@
       font-size: 11px;
     }
 
-    .attendance-input:focus {
-      outline: none;
-    }
-
     /* Academic tables */
-
-    .table-title {
-      margin-top: 4px;
-      margin-bottom: 4px;
-      font-size: 13px;
-      font-weight: 600;
-    }
-
     .academic-table {
       width: 100%;
       border-collapse: collapse;
@@ -214,24 +193,10 @@
       color: white;
       font-weight: 600;
     }
-
     .academic-table thead tr:last-child th {
       background: var(--header-blue-light);
       color: white;
       font-weight: 600;
-    }
-
-    .academic-table tbody tr:nth-child(odd) td {
-      background: #ffffff;
-    }
-
-    .academic-table tbody tr:nth-child(even) td {
-      background: var(--table-row-alt);
-    }
-
-    .academic-table td.subject-cell {
-      text-align: left;
-      font-weight: 500;
     }
 
     .score-input {
@@ -242,23 +207,7 @@
       background: transparent;
     }
 
-    .score-input:focus {
-      outline: none;
-      background: #fffde8;
-    }
-
-    .total-cell {
-      font-weight: 600;
-    }
-
-    /* Observational assessments */
-
-    .obs-title {
-      margin-top: 14px;
-      margin-bottom: 4px;
-      font-size: 13px;
-      font-weight: 600;
-    }
+    .obs-title { margin-top: 14px; margin-bottom: 4px; font-weight: 600; }
 
     .obs-table {
       width: 100%;
@@ -274,32 +223,15 @@
       text-align: center;
     }
 
-    .obs-table thead th {
-      background: var(--header-blue);
-      color: white;
-      font-weight: 600;
-    }
-
     .obs-table tbody td:first-child {
       text-align: left;
-      font-weight: 500;
       background: var(--table-row-alt);
+      font-weight: 500;
     }
 
-    .obs-check {
-      width: 14px;
-      height: 14px;
-    }
+    .obs-check { width: 14px; height: 14px; }
 
-    /* Page 2 – commentary */
-
-    .page-title-small {
-      margin-top: 6px;
-      margin-bottom: 6px;
-      font-size: 13px;
-      font-weight: 600;
-    }
-
+    /* Commentary Page */
     .commentary-table {
       width: 100%;
       border-collapse: collapse;
@@ -310,21 +242,13 @@
     .commentary-table th,
     .commentary-table td {
       border: 1px solid #9ba7c5;
-      padding: 6px 6px;
+      padding: 6px;
       vertical-align: top;
     }
 
     .commentary-table thead th {
       background: var(--header-blue);
       color: white;
-      font-weight: 600;
-      text-align: left;
-    }
-
-    .commentary-table td.subject {
-      width: 18%;
-      background: var(--table-row-alt);
-      font-weight: 600;
     }
 
     .commentary-textarea {
@@ -332,86 +256,36 @@
       min-height: 70px;
       border: none;
       resize: vertical;
-      font-size: 11px;
-      line-height: 1.4;
-    }
-
-    .commentary-textarea:focus {
-      outline: none;
-    }
-
-    /* Signatures */
-
-    .signature-row {
-      margin-top: 24px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      text-align: center;
-      font-size: 11px;
-    }
-
-    .signature-label {
-      font-weight: 600;
-      margin-top: 40px;
-      border-top: 1px solid #000;
-      padding-top: 4px;
-    }
-
-    .footer-line {
-      margin-top: 8px;
-      font-size: 10px;
-      text-align: left;
-      color: var(--text-secondary);
     }
 
     /* Print */
-
     @media print {
-      body {
-        background: #ffffff;
-        padding: 0;
-      }
-      #app {
-        max-width: 210mm;
-        margin: 0 auto;
-      }
-      .screen-controls {
-        display: none;
-      }
-      .report-page {
-        margin: 0 auto;
-        width: 100%;
-        min-height: 297mm;
-        border: 1px solid #000;
-        page-break-after: always;
-      }
-      .report-page:last-of-type {
-        page-break-after: auto;
-      }
+      body { background: #fff; padding: 0; }
+      #app { max-width: 210mm; margin: 0 auto; }
+      .screen-controls { display: none; }
+      .report-page { border: none; padding-top: 20px; page-break-after: always; }
+      .report-page:last-of-type { page-break-after: auto; }
     }
   </style>
 </head>
+
 <body>
 <div id="app">
+
   <div class="screen-controls">
-    <button class="btn-primary" onclick="handleSubmitAndPrint()">Submit &amp; Print</button>
+    <button class="btn-primary" onclick="handleSubmitAndPrint()">Submit & Print</button>
   </div>
 
   <!-- PAGE 1 -->
   <section class="report-page" id="page1">
     <div class="logo-wrapper">
-      <!-- Update src if your file name/path is different -->
-      <img src="prime logo square.png" alt="Prime International School Logo">
+      <img src="prime logo square.png" alt="Logo">
     </div>
 
     <div class="top-header-row">
-      <!-- Left block: student info -->
       <div class="left-header-block">
-        <div><span class="label">Student’s Name</span>:
-          <input id="studentName" class="input-inline" type="text"></div>
-        <div><span class="label">Student’s ID</span>:
-          <input id="studentId" class="input-inline small" type="text"></div>
+        <div><span class="label">Student’s Name</span>: <input id="studentName" class="input-inline" type="text"></div>
+        <div><span class="label">Student’s ID</span>: <input id="studentId" class="input-inline small" type="text"></div>
         <div><span class="label">Class</span>:
           <select id="classSelect" class="select-inline" onchange="handleClassChange()">
             <option value="Year 1">Year-1</option>
@@ -419,29 +293,22 @@
             <option value="Year 3">Year-3</option>
           </select>
         </div>
-        <div><span class="label">Teacher’s Name</span>:
-          <input id="teacherName" class="input-inline" type="text"></div>
-        <div><span class="label">Issue Date</span>:
-          <input id="issueDate" class="input-inline small" type="date"></div>
+        <div><span class="label">Teacher’s Name</span>: <input id="teacherName" class="input-inline" type="text"></div>
+        <div><span class="label">Issue Date</span>: <input id="issueDate" class="input-inline small" type="date"></div>
       </div>
 
-      <!-- Right block: report titles -->
       <div class="right-header-block">
         <div class="title">Progress Report</div>
-        <div class="line">
-          Academic Year
+        <div>Academic Year
           <select id="academicYear" class="select-inline">
             <option>2025-2026</option>
-            <option>2026-2027</option>
-            <option>2027-2028</option>
           </select>
         </div>
-        <div class="line">
-          Term
+        <div>Term
           <select id="termSelect" class="select-inline small">
-            <option>Term-1</option>
-            <option>Term-2</option>
-            <option>Term-3</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
           </select>
         </div>
       </div>
@@ -451,14 +318,8 @@
     <div class="attendance-wrapper">
       <table class="attendance-table">
         <thead>
-        <tr>
-          <th colspan="3">Attendance</th>
-        </tr>
-        <tr>
-          <th>Total School Days</th>
-          <th>Days of Presence</th>
-          <th>Days of Absence</th>
-        </tr>
+        <tr><th colspan="3">Attendance</th></tr>
+        <tr><th>Total School Days</th><th>Days of Presence</th><th>Days of Absence</th></tr>
         </thead>
         <tbody>
         <tr>
@@ -470,8 +331,7 @@
       </table>
     </div>
 
-    <!-- Academic table main subjects (including Chinese) -->
-    <div class="table-title">Paper-Based Test</div>
+    <!-- Main table -->
     <table class="academic-table" id="mainSubjectsTable">
       <thead>
       <tr>
@@ -479,275 +339,123 @@
         <th>Max Marks</th>
         <th>Term Exam 60%</th>
         <th>Course Work 40%</th>
-        <th>TOTAL</th>
+        <th>TOTAL (100%)</th>
       </tr>
       </thead>
       <tbody>
-      <!-- English -->
-      <tr class="subject-row" data-subject="English">
-        <td class="subject-cell">English</td>
-        <td>100</td>
-        <td><input class="score-input exam-input" type="number" min="0" max="100" step="0.1"></td>
-        <td><input class="score-input cw-input" type="number" min="0" max="100" step="0.1"></td>
-        <td class="total-cell total-display">0</td>
-      </tr>
-      <!-- Mathematics -->
-      <tr class="subject-row" data-subject="Mathematics">
-        <td class="subject-cell">Mathematics</td>
-        <td>100</td>
-        <td><input class="score-input exam-input" type="number" min="0" max="100" step="0.1"></td>
-        <td><input class="score-input cw-input" type="number" min="0" max="100" step="0.1"></td>
-        <td class="total-cell total-display">0</td>
-      </tr>
-      <!-- Science -->
-      <tr class="subject-row" data-subject="Science">
-        <td class="subject-cell">Science</td>
-        <td>100</td>
-        <td><input class="score-input exam-input" type="number" min="0" max="100" step="0.1"></td>
-        <td><input class="score-input cw-input" type="number" min="0" max="100" step="0.1"></td>
-        <td class="total-cell total-display">0</td>
-      </tr>
-      <!-- Social Studies -->
-      <tr class="subject-row" data-subject="Social Studies">
-        <td class="subject-cell">Social Studies</td>
-        <td>100</td>
-        <td><input class="score-input exam-input" type="number" min="0" max="100" step="0.1"></td>
-        <td><input class="score-input cw-input" type="number" min="0" max="100" step="0.1"></td>
-        <td class="total-cell total-display">0</td>
-      </tr>
-      <!-- Myanmar -->
-      <tr class="subject-row" data-subject="Myanmar">
-        <td class="subject-cell">Myanmar</td>
-        <td>100</td>
-        <td><input class="score-input exam-input" type="number" min="0" max="100" step="0.1"></td>
-        <td><input class="score-input cw-input" type="number" min="0" max="100" step="0.1"></td>
-        <td class="total-cell total-display">0</td>
-      </tr>
-      <!-- Myanmar Social Studies (Year 2+) -->
-      <tr class="subject-row year2plus" data-subject="Myanmar Social Studies">
-        <td class="subject-cell">Myanmar Social Studies</td>
-        <td>100</td>
-        <td><input class="score-input exam-input" type="number" min="0" max="100" step="0.1"></td>
-        <td><input class="score-input cw-input" type="number" min="0" max="100" step="0.1"></td>
-        <td class="total-cell total-display">0</td>
-      </tr>
-      <!-- Wellbeing -->
-      <tr class="subject-row" data-subject="Wellbeing">
-        <td class="subject-cell">Wellbeing</td>
-        <td>100</td>
-        <td><input class="score-input exam-input" type="number" min="0" max="100" step="0.1"></td>
-        <td><input class="score-input cw-input" type="number" min="0" max="100" step="0.1"></td>
-        <td class="total-cell total-display">0</td>
-      </tr>
-      <!-- ICT -->
-      <tr class="subject-row" data-subject="ICT">
-        <td class="subject-cell">ICT</td>
-        <td>100</td>
-        <td><input class="score-input exam-input" type="number" min="0" max="100" step="0.1"></td>
-        <td><input class="score-input cw-input" type="number" min="0" max="100" step="0.1"></td>
-        <td class="total-cell total-display">0</td>
-      </tr>
-      <!-- Chinese (Year 2+) -->
-      <tr class="subject-row year2plus" data-subject="Chinese">
-        <td class="subject-cell">Chinese</td>
-        <td>100</td>
-        <td><input class="score-input exam-input" type="number" min="0" max="100" step="0.1"></td>
-        <td><input class="score-input cw-input" type="number" min="0" max="100" step="0.1"></td>
-        <td class="total-cell total-display">0</td>
-      </tr>
+      <tr class="subject-row"><td>English</td><td>100</td><td><input class="score-input exam-input"></td><td><input class="score-input cw-input"></td><td class="total-display">0</td></tr>
+      <tr class="subject-row"><td>Mathematics</td><td>100</td><td><input class="score-input exam-input"></td><td><input class="score-input cw-input"></td><td class="total-display">0</td></tr>
+      <tr class="subject-row"><td>Science</td><td>100</td><td><input class="score-input exam-input"></td><td><input class="score-input cw-input"></td><td class="total-display">0</td></tr>
+      <tr class="subject-row"><td>Social Studies</td><td>100</td><td><input class="score-input exam-input"></td><td><input class="score-input cw-input"></td><td class="total-display">0</td></tr>
+      <tr class="subject-row"><td>Myanmar</td><td>100</td><td><input class="score-input exam-input"></td><td><input class="score-input cw-input"></td><td class="total-display">0</td></tr>
+      <tr class="subject-row year2plus"><td>Myanmar Social Studies</td><td>100</td><td><input class="score-input exam-input"></td><td><input class="score-input cw-input"></td><td class="total-display">0</td></tr>
+      <tr class="subject-row"><td>Wellbeing</td><td>100</td><td><input class="score-input exam-input"></td><td><input class="score-input cw-input"></td><td class="total-display">0</td></tr>
+      <tr class="subject-row"><td>ICT</td><td>100</td><td><input class="score-input exam-input"></td><td><input class="score-input cw-input"></td><td class="total-display">0</td></tr>
+      <tr class="subject-row year2plus"><td>Chinese</td><td>100</td><td><input class="score-input exam-input"></td><td><input class="score-input cw-input"></td><td class="total-display">0</td></tr>
       </tbody>
     </table>
 
-    <!-- Observational assessments -->
+    <!-- Observational -->
     <div class="obs-title">Observational Assessments</div>
     <table class="obs-table">
       <thead>
-      <tr>
-        <th>Observational Assessments</th>
-        <th>Strong Proficiency</th>
-        <th>Proficient</th>
-        <th>Developing</th>
-      </tr>
+      <tr><th>Observational Assessments</th><th>Strong</th><th>Proficient</th><th>Developing</th></tr>
       </thead>
       <tbody>
-      <tr>
-        <td>PE</td>
-        <td><input class="obs-check" type="checkbox" name="pe-strong"></td>
-        <td><input class="obs-check" type="checkbox" name="pe-prof"></td>
-        <td><input class="obs-check" type="checkbox" name="pe-dev"></td>
-      </tr>
-      <tr>
-        <td>Taekwondo</td>
-        <td><input class="obs-check" type="checkbox" name="tkd-strong"></td>
-        <td><input class="obs-check" type="checkbox" name="tkd-prof"></td>
-        <td><input class="obs-check" type="checkbox" name="tkd-dev"></td>
-      </tr>
-      <tr>
-        <td>Art</td>
-        <td><input class="obs-check" type="checkbox" name="art-strong"></td>
-        <td><input class="obs-check" type="checkbox" name="art-prof"></td>
-        <td><input class="obs-check" type="checkbox" name="art-dev"></td>
-      </tr>
-      <tr>
-        <td>Music</td>
-        <td><input class="obs-check" type="checkbox" name="music-strong"></td>
-        <td><input class="obs-check" type="checkbox" name="music-prof"></td>
-        <td><input class="obs-check" type="checkbox" name="music-dev"></td>
-      </tr>
+      <tr><td>PE</td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td></tr>
+      <tr><td>Taekwondo</td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td></tr>
+      <tr><td>Art</td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td></tr>
+      <tr><td>Music</td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td></tr>
       </tbody>
     </table>
 
-    <div class="footer-line">
-      PRIME International School Progress Report · Term
-      <span id="footerTerm1">1</span>
-    </div>
+    <div class="footer-line">PRIME International School Progress Report · Term <span id="footerTerm1">1</span></div>
+
+    <div class="page-number">Page 1 of 2</div>
   </section>
 
   <!-- PAGE 2 -->
   <section class="report-page" id="page2">
-    <div class="logo-wrapper">
-      <img src="prime logo square.png" alt="Prime International School Logo">
-    </div>
+    <div class="logo-wrapper"><img src="prime logo square.png"></div>
 
-    <div class="right-header-block" style="margin-bottom:6px;">
+    <div class="right-header-block">
       <div class="title">Progress Report</div>
-      <div class="line">
-        Academic Year <span id="yearText">2025-2026</span>
-      </div>
-      <div class="line">
-        <span id="termText">Term-1</span>
-      </div>
+      <div>Academic Year <span id="yearText">2025-2026</span></div>
+      <div><span id="termText">Term 1</span></div>
     </div>
 
-    <div class="page-title-small">Commentary Section <span id="termText2">Term-1</span></div>
+    <div class="page-title-small">Commentary Section <span id="termText2">Term 1</span></div>
 
     <table class="commentary-table">
-      <thead>
-      <tr>
-        <th style="width:18%;">Subjects</th>
-        <th>Comments</th>
-      </tr>
-      </thead>
+      <thead><tr><th>Subjects</th><th>Comments</th></tr></thead>
       <tbody>
-      <tr>
-        <td class="subject">English</td>
-        <td><textarea class="commentary-textarea" id="commentEnglish"></textarea></td>
-      </tr>
-      <tr>
-        <td class="subject">Mathematics</td>
-        <td><textarea class="commentary-textarea" id="commentMath"></textarea></td>
-      </tr>
-      <tr>
-        <td class="subject">Science</td>
-        <td><textarea class="commentary-textarea" id="commentScience"></textarea></td>
-      </tr>
-      <tr>
-        <td class="subject">Social Studies</td>
-        <td><textarea class="commentary-textarea" id="commentSocial"></textarea></td>
-      </tr>
-      <tr>
-        <td class="subject">Myanmar</td>
-        <td><textarea class="commentary-textarea" id="commentMyanmar"></textarea></td>
-      </tr>
-      <!-- Myanmar Social Studies (Year 2+) -->
-      <tr class="year2plus-comment">
-        <td class="subject">Myanmar Social Studies</td>
-        <td><textarea class="commentary-textarea" id="commentMSS"></textarea></td>
-      </tr>
+      <tr><td>English</td><td><textarea></textarea></td></tr>
+      <tr><td>Mathematics</td><td><textarea></textarea></td></tr>
+      <tr><td>Science</td><td><textarea></textarea></td></tr>
+      <tr><td>Social Studies</td><td><textarea></textarea></td></tr>
+      <tr><td>Myanmar</td><td><textarea></textarea></td></tr>
+      <tr class="year2plus-comment"><td>Myanmar Social Studies</td><td><textarea></textarea></td></tr>
       </tbody>
     </table>
 
-    <!-- Signature row -->
     <div class="signature-row">
-      <div>
-        <div class="signature-label">Principal’s Signature</div>
-      </div>
-      <div>
-        <div class="signature-label">Class Teacher’s Signature</div>
-      </div>
-      <div>
-        <div class="signature-label">Parent’s Signature</div>
-      </div>
+      <div><div class="signature-label">Principal’s Signature</div></div>
+      <div><div class="signature-label">Class Teacher’s Signature</div></div>
+      <div><div class="signature-label">Parent’s Signature</div></div>
     </div>
 
-    <div class="footer-line">
-      PRIME International School Progress Report · Term
-      <span id="footerTerm2">1</span>
-    </div>
+    <div class="footer-line">PRIME International School Progress Report · Term <span id="footerTerm2">1</span></div>
+
+    <div class="page-number">Page 2 of 2</div>
   </section>
+
 </div>
 
 <script>
-  function clamp100(val) {
-    let v = parseFloat(val);
-    if (isNaN(v)) return 0;
-    if (v < 0) v = 0;
-    if (v > 100) v = 100;
-    return v;
-  }
+function clamp100(v){ v=parseFloat(v); if(isNaN(v))return 0; return Math.max(0,Math.min(100,v)); }
 
-  function recalcAllTotals() {
-    document.querySelectorAll('.subject-row').forEach(row => {
-      const examInput = row.querySelector('.exam-input');
-      const cwInput = row.querySelector('.cw-input');
-      const totalCell = row.querySelector('.total-display');
-      if (!examInput || !cwInput || !totalCell) return;
-
-      const exam = clamp100(examInput.value);
-      const cw = clamp100(cwInput.value);
-      if (examInput.value !== '') examInput.value = exam;
-      if (cwInput.value !== '') cwInput.value = cw;
-
-      // 60% exam + 40% coursework (both as 0–100 raw)
-      const total = exam * 0.6 + cw * 0.4;
-      totalCell.textContent = Math.round(total);
-    });
-  }
-
-  document.addEventListener('input', function (e) {
-    if (e.target.classList.contains('exam-input') ||
-        e.target.classList.contains('cw-input')) {
-      recalcAllTotals();
-    }
+function recalcAllTotals(){
+  document.querySelectorAll(".subject-row").forEach(row=>{
+    const exam = clamp100(row.querySelector(".exam-input").value);
+    const cw = clamp100(row.querySelector(".cw-input").value);
+    const total = Math.round(exam*0.6 + cw*0.4);
+    row.querySelector(".total-display").textContent = total;
   });
+}
 
-  function handleClassChange() {
-    const cls = document.getElementById('classSelect').value;
-    const showYear2Plus = (cls === 'Year 2' || cls === 'Year 3');
-
-    document.querySelectorAll('.year2plus').forEach(el => {
-      el.style.display = showYear2Plus ? '' : 'none';
-    });
-
-    document.querySelectorAll('.year2plus-comment').forEach(el => {
-      el.style.display = showYear2Plus ? '' : 'none';
-    });
-  }
-
-  function syncHeaderTexts() {
-    const term = document.getElementById('termSelect').value;
-    const year = document.getElementById('academicYear').value;
-
-    document.getElementById('footerTerm1').textContent = term.replace('Term-', '');
-    document.getElementById('footerTerm2').textContent = term.replace('Term-', '');
-    document.getElementById('termText').textContent = term;
-    document.getElementById('termText2').textContent = term;
-    document.getElementById('yearText').textContent = year;
-  }
-
-  document.getElementById('termSelect').addEventListener('change', syncHeaderTexts);
-  document.getElementById('academicYear').addEventListener('change', syncHeaderTexts);
-
-  function handleSubmitAndPrint() {
+document.addEventListener("input", e=>{
+  if(e.target.classList.contains("exam-input") || e.target.classList.contains("cw-input")){
     recalcAllTotals();
-    syncHeaderTexts();
-    handleClassChange();
-    window.print();
   }
+});
 
-  // Initial setup
-  handleClassChange();
+function handleClassChange(){
+  const cls = document.getElementById("classSelect").value;
+  const show = (cls==="Year 2"||cls==="Year 3");
+  document.querySelectorAll(".year2plus").forEach(el=>el.style.display=show?"":"none");
+  document.querySelectorAll(".year2plus-comment").forEach(el=>el.style.display=show?"":"none");
+}
+
+function syncHeaderTexts(){
+  const term = document.getElementById("termSelect").value;
+  const year = document.getElementById("academicYear").value;
+  document.getElementById("yearText").textContent = year;
+  document.getElementById("termText").textContent = "Term " + term;
+  document.getElementById("termText2").textContent = "Term " + term;
+  document.getElementById("footerTerm1").textContent = term;
+  document.getElementById("footerTerm2").textContent = term;
+}
+
+function handleSubmitAndPrint(){
+  recalcAllTotals();
   syncHeaderTexts();
+  handleClassChange();
+  window.print();
+}
+
+handleClassChange();
+syncHeaderTexts();
 </script>
+
 </body>
 </html>
