@@ -373,14 +373,17 @@
         padding: 0;
       }
       #app {
-        max-width: none;
+        max-width: 210mm;
+        margin: 0 auto;
       }
       .screen-controls {
         display: none;
       }
       .report-page {
-        border: none;
-        margin: 0;
+        margin: 0 auto;
+        width: 100%;
+        min-height: 297mm;
+        border: 1px solid #000;
         page-break-after: always;
       }
       .report-page:last-of-type {
@@ -398,8 +401,8 @@
   <!-- PAGE 1 -->
   <section class="report-page" id="page1">
     <div class="logo-wrapper">
-      <!-- Update src to your own logo path -->
-      <img src="prime-logo-square.png" alt="Prime International School Logo">
+      <!-- Update src if your file name/path is different -->
+      <img src="prime logo square.png" alt="Prime International School Logo">
     </div>
 
     <div class="top-header-row">
@@ -467,15 +470,15 @@
       </table>
     </div>
 
-    <!-- Academic table main subjects -->
+    <!-- Academic table main subjects (including Chinese) -->
     <div class="table-title">Paper-Based Test</div>
     <table class="academic-table" id="mainSubjectsTable">
       <thead>
       <tr>
         <th>Paper-Based Test</th>
         <th>Max Marks</th>
-        <th>Term Exam</th>
-        <th>Course Work</th>
+        <th>Term Exam 60%</th>
+        <th>Course Work 40%</th>
         <th>TOTAL</th>
       </tr>
       </thead>
@@ -544,22 +547,8 @@
         <td><input class="score-input cw-input" type="number" min="0" max="100" step="0.1"></td>
         <td class="total-cell total-display">0</td>
       </tr>
-      </tbody>
-    </table>
-
-    <!-- Chinese separate table for Year 2+ -->
-    <table class="academic-table year2plus" id="chineseTable">
-      <thead>
-      <tr>
-        <th>Paper-Based Test</th>
-        <th>Max Marks</th>
-        <th>Term Exam</th>
-        <th>Course Work</th>
-        <th>TOTAL</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr class="subject-row" data-subject="Chinese">
+      <!-- Chinese (Year 2+) -->
+      <tr class="subject-row year2plus" data-subject="Chinese">
         <td class="subject-cell">Chinese</td>
         <td>100</td>
         <td><input class="score-input exam-input" type="number" min="0" max="100" step="0.1"></td>
@@ -617,7 +606,7 @@
   <!-- PAGE 2 -->
   <section class="report-page" id="page2">
     <div class="logo-wrapper">
-      <img src="prime-logo-square.png" alt="Prime International School Logo">
+      <img src="prime logo square.png" alt="Prime International School Logo">
     </div>
 
     <div class="right-header-block" style="margin-bottom:6px;">
@@ -709,7 +698,7 @@
       if (examInput.value !== '') examInput.value = exam;
       if (cwInput.value !== '') cwInput.value = cw;
 
-      // 60% exam + 40% coursework (both entered as 0–100)
+      // 60% exam + 40% coursework (both as 0–100 raw)
       const total = exam * 0.6 + cw * 0.4;
       totalCell.textContent = Math.round(total);
     });
@@ -750,7 +739,6 @@
   document.getElementById('academicYear').addEventListener('change', syncHeaderTexts);
 
   function handleSubmitAndPrint() {
-    // Simple sanity: recalc totals & sync text before print
     recalcAllTotals();
     syncHeaderTexts();
     handleClassChange();
