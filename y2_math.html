@@ -469,25 +469,73 @@
   }
 
   function addUnitTest() {
-    const index = cwColumns.filter(id => id.startsWith("cw-ut")).length + 1;
-    const colId = "cw-ut" + index;
+  // Find last UT column
+  const utCols = cwColumns.filter(id => id.startsWith("cw-ut"));
+  const index = utCols.length + 1;
+  const colId = "cw-ut" + index;
+
+  // Insert AFTER last UT
+  insertCourseworkColumn(colId, "Unit Test " + index, utCols[utCols.length - 1]);
+}
+
+function addProject() {
+  // Find last Project column
+  const projCols = cwColumns.filter(id => id.startsWith("cw-proj"));
+  const index = projCols.length + 1;
+  const colId = "cw-proj" + index;
+
+  insertCourseworkColumn(colId, "Project " + index, projCols[projCols.length - 1]);
+}
+
+function addPresentation() {
+  const presCols = cwColumns.filter(id => id.startsWith("cw-pres"));
+  const index = presCols.length + 1;
+  const colId = "cw-pres" + index;
+
+  insertCourseworkColumn(colId, "Presentation " + index, presCols[presCols.length - 1]);
+}
+
+function insertCourseworkColumn(colId, label, afterColId) {
+  const headerRow2 = document.getElementById("headerRow2");
+  const cwTotalTh = headerRow2.querySelector('th[data-role="cw-total"]');
+
+  const th = document.createElement("th");
+  th.id = colId;
+  th.setAttribute("data-role", "cw-col");
+  th.innerHTML = `${label} <button class="delete-col-btn" onclick="deleteColumn('${colId}')">x</button>`;
+
+  if (afterColId) {
+    // insert after specified column
+    const afterTh = document.getElementById(afterColId);
+    afterTh.insertAdjacentElement("afterend", th);
+    const insertIndex = cwColumns.indexOf(afterColId) + 1;
+    cwColumns.splice(insertIndex, 0, colId);
+  } else {
+    // if no previous columns, insert before Coursework Total
+    headerRow2.insertBefore(th, cwTotalTh);
     cwColumns.push(colId);
-    addCourseworkColumn(colId, "Unit Test " + index);
   }
 
-  function addProject() {
-    const index = cwColumns.filter(id => id.startsWith("cw-proj")).length + 1;
-    const colId = "cw-proj" + index;
-    cwColumns.push(colId);
-    addCourseworkColumn(colId, "Project " + index);
-  }
+  // Insert cells in rows
+  document.querySelectorAll("#tbody tr").forEach(row => {
+    const cwTotalCell = row.querySelector(".cw-total-cell");
+    const td = document.createElement("td");
+    td.className = "cw-cell";
+    td.setAttribute("data-col", colId);
+    td.innerHTML = `<input class="score-box" type="number" min="0" max="100" oninput="recalc()">`;
 
-  function addPresentation() {
-    const index = cwColumns.filter(id => id.startsWith("cw-pres")).length + 1;
-    const colId = "cw-pres" + index;
-    cwColumns.push(colId);
-    addCourseworkColumn(colId, "Presentation " + index);
-  }
+    if (afterColId) {
+      const afterTd = row.querySelector(`td[data-col="${afterColId}"]`);
+      afterTd.insertAdjacentElement("afterend", td);
+    } else {
+      row.insertBefore(td, cwTotalCell);
+    }
+  });
+
+  updateHeaderSpans();
+  recalc();
+}
+
 
   function addCourseworkColumn(colId, label) {
     const headerRow2 = document.getElementById("headerRow2");
