@@ -368,44 +368,70 @@
     /* Print */
 
     /* FIX PRINT LAYOUT */
+/* PRINT FIX — matches uploaded PDF layout */
 @media print {
 
-  @page {
-    size: A4 portrait;
-    margin: 10mm 12mm;
-  }
-
   body {
-    margin: 0 !important;
+    background: #ffffff !important;
     padding: 0 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+    margin: 0 !important;
   }
 
   #app {
     width: 100%;
-    max-width: none;
+    max-width: 210mm; /* A4 width */
+    margin: 0 auto !important;
+    padding: 0 !important;
   }
 
-  table, tr, td, th {
-    page-break-inside: avoid !important;
+  .screen-controls {
+    display: none !important;
   }
 
   .report-page {
     width: 100%;
-    min-height: 277mm;
-    margin: 0;
-    padding: 10mm;
-    border: none;
+    min-height: 297mm;        /* exact A4 height */
+    padding: 25mm 20mm 20mm;  /* margins that match your PDF */
+    border: none !important;  /* remove border for clean print */
+    box-shadow: none !important;
     page-break-after: always;
     position: relative;
   }
 
-  .academic-table th, .academic-table td,
-  .obs-table th, .obs-table td {
+  .report-page:last-of-type {
+    page-break-after: auto;
+  }
+
+  /* center logo only for print */
+  .logo-wrapper {
+    text-align: center !important;
+    margin-bottom: 10px !important;
+  }
+
+  .logo-wrapper img {
+    width: 140px !important;
+  }
+
+  /* COMPRESS vertical spacing so nothing cuts off */
+  .top-header-row { margin-top: 4mm !important; }
+  .attendance-wrapper { margin-top: 5mm !important; margin-bottom: 6mm !important; }
+  .table-title { margin-top: 4mm !important; margin-bottom: 3mm !important; }
+  .obs-title { margin-top: 4mm !important; margin-bottom: 2mm !important; }
+
+  table th, table td {
     padding: 2px 4px !important;
   }
+
+  /* PAGE NUMBER bottom-right */
+  .page-number {
+    position: absolute;
+    right: 10mm;
+    bottom: 8mm;
+    font-size: 11px;
+    color: #444;
+  }
 }
+
 
 /* Center logo always */
 .logo-wrapper {
@@ -425,15 +451,6 @@
   color: #333;
   font-style: italic;
 }
-
-/* Print adjustments */
-@media print {
-  .page-number {
-    bottom: 10mm;
-    right: 12mm;
-  }
-}
-
     
   </style>
 </head>
