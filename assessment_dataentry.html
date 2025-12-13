@@ -1032,7 +1032,7 @@ function exportExcel() {
 
 
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwZYUQEUohbm-D6NOlO4obwBLSGC_9ZM-WA_f2sP8lyXGxg5HXhGBZ-XiPCxtU5EIoEIQ/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxY9w3bBSuzvlQ4rTaSdRCv_aSYoHQO6AXc_w89RcKatQUe7jKxivSdzP0IaJ0-amTEfw/exec";
 
 function submitScores() {
   const academicYear = document.getElementById("academicYear").value;
@@ -1082,11 +1082,11 @@ function submitScores() {
     return;
   }
 
-  fetch(SCRIPT_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ rows })
-  })
+fetch(SCRIPT_URL, {
+  method: "POST",
+  body: JSON.stringify({ rows })   // NO headers
+})
+
     .then(res => res.json())
     .then(() => {
       alert("Scores successfully saved to Google Sheet.");
