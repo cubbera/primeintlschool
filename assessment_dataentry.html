@@ -1032,7 +1032,7 @@ function exportExcel() {
 
 
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2jxHYrzUgvycQKfThb36J2TvXjgGSFOwsIOZqSxOLZ2eStHR6c3CkiX1UlKirKNe6mg/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwZYUQEUohbm-D6NOlO4obwBLSGC_9ZM-WA_f2sP8lyXGxg5HXhGBZ-XiPCxtU5EIoEIQ/exec";
 
 function submitScores() {
   const academicYear = document.getElementById("academicYear").value;
@@ -1095,7 +1095,8 @@ function submitScores() {
       console.error(err);
       alert("Error saving scores. Please try again.");
     });
-  }
+}
+
 
   // Event delegation: recalc whenever any score-box changes
   document.addEventListener("DOMContentLoaded", () => {
