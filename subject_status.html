@@ -1,27 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
   <title>Subject Status</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+
   <style>
-    body { font-family: system-ui, -apple-system; background:#f5f5f7; padding:20px; }
-    .card { background:#fff; border:1px solid #ddd; border-radius:12px; padding:16px; max-width:1000px; margin:auto; }
-    h1 { margin:0 0 12px; font-size:20px; }
-    table { width:100%; border-collapse:collapse; font-size:13px; }
-    th, td { border:1px solid #e0e0e0; padding:8px; text-align:left; }
-    th { background:#f2f2f7; }
-    .pill { padding:2px 8px; border-radius:999px; font-size:12px; display:inline-block; }
-    .done0 { background:#ffecec; color:#b10000; }
-    .done1 { background:#eaffea; color:#0b6a2b; }
-    .muted { color:#666; font-size:12px; margin-top:10px; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui;
+      background: #f5f5f7;
+      padding: 24px;
+    }
+
+    h1 {
+      margin-bottom: 16px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    label {
+      font-size: 14px;
+    }
+
+    select {
+      margin-left: 6px;
+      padding: 4px 6px;
+      font-size: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      font-size: 14px;
+    }
+
+    th, td {
+      border: 1px solid #d0d0d0;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background: #eaeaf0;
+      font-weight: 600;
+    }
+
+    tr.done {
+      background: #f0f7f0;
+    }
+
+    tr.pending {
+      background: #fff;
+    }
+
+    #error {
+      color: red;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1 style="margin-bottom:16px;">Subject Status</h1>
-    <div id="error" style="color:red;"></div>
-    <div style="margin-bottom:12px; display:flex; gap:12px;">
+
+<h1>Subject Status</h1>
+
+<div class="filters">
   <label>
     Academic Year:
     <select id="yearFilter">
@@ -36,7 +85,7 @@
     </select>
   </label>
 
-   <label>
+  <label>
     Class:
     <select id="classFilter">
       <option value="">All</option>
@@ -44,124 +93,115 @@
   </label>
 </div>
 
-<div id="error" style="color:red;"></div>
-
 <table>
-  <thead>...</thead>
+  <thead>
+    <tr>
+      <th>Academic Year</th>
+      <th>Term</th>
+      <th>Class</th>
+      <th>Subject</th>
+      <th>Status</th>
+    </tr>
+  </thead>
   <tbody id="tbody"></tbody>
-      <thead>
-        <tr>
-          <th>Academic Year</th>
-          <th>Term</th>
-          <th>Class</th>
-          <th>Subject</th>
-          <th>Is Done</th>
-        </tr>
-      </thead>
-      <tbody id="rows"></tbody>
-    </table>
-    <div class="muted" id="status">Loading…</div>
-  </div>
+</table>
 
-  <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7igpCG0pTIfPQpuoZ1BnYAbNDUcvobOtCaaOW7V66pexNCkHiVWUbk9bZAaEjqOqwgQ/exec";
+<div id="error"></div>
+
+<script>
+/* 🔴 REPLACE THIS WITH YOUR DEPLOYED WEB APP URL */
+   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7igpCG0pTIfPQpuoZ1BnYAbNDUcvobOtCaaOW7V66pexNCkHiVWUbk9bZAaEjqOqwgQ/exec";
 
 let ALL_ROWS = [];
 
-
-<script>
-async function loadSubjectStatus() {
+async function loadData() {
   try {
     const res = await fetch(WEB_APP_URL);
     const text = await res.text();
+    const data = JSON.parse(text);
 
-    let data = JSON.parse(text);
     ALL_ROWS = data;
-
     populateFilters(data);
     applyFilters();
 
   } catch (err) {
     console.error(err);
     document.getElementById("error").innerText =
-      "Error: " + err.message;
+      "Error: Unable to load data. Check Apps Script deployment.";
   }
 }
 
 function populateFilters(rows) {
-  const yearSelect = document.getElementById("yearFilter");
-  const termSelect = document.getElementById("termFilter");
-  const classSelect = document.getElementById("classFilter");
+  const yearSet = new Set();
+  const termSet = new Set();
+  const classSet = new Set();
 
-  const years = [...new Set(rows.map(r => r.academic_year))];
-  const terms = [...new Set(rows.map(r => r.term))];
-  const class = [...new Set(rows.map(r => r.class))];
-
-  years.sort().forEach(y => {
-    const opt = document.createElement("option");
-    opt.value = y;
-    opt.textContent = y;
-    yearSelect.appendChild(opt);
+  rows.forEach(r => {
+    yearSet.add(r.academic_year);
+    termSet.add(r.term);
+    classSet.add(r.class_id);
   });
 
-  terms.sort().forEach(t => {
-    const opt = document.createElement("option");
-    opt.value = t;
-    opt.textContent = t;
-    termSelect.appendChild(opt);
-  });
+  fillSelect("yearFilter", [...yearSet].sort());
+  fillSelect("termFilter", [...termSet].sort());
+  fillSelect("classFilter", [...classSet].sort());
 
-  terms.sort().forEach(c => {
-    const opt = document.createElement("option");
-    opt.value = c;
-    opt.textContent = c;
-    classSelect.appendChild(opt);
-  });
+  document.getElementById("yearFilter").onchange = applyFilters;
+  document.getElementById("termFilter").onchange = applyFilters;
+  document.getElementById("classFilter").onchange = applyFilters;
+}
 
-  yearSelect.addEventListener("change", applyFilters);
-  termSelect.addEventListener("change", applyFilters);
-  classSelect.addEventListener("change", applyFilters);
+function fillSelect(id, values) {
+  const sel = document.getElementById(id);
+  values.forEach(v => {
+    const opt = document.createElement("option");
+    opt.value = v;
+    opt.textContent = v;
+    sel.appendChild(opt);
+  });
 }
 
 function applyFilters() {
   const year = document.getElementById("yearFilter").value;
   const term = document.getElementById("termFilter").value;
-  class term = document.getElementById("classFilter").value;
+  const cls  = document.getElementById("classFilter").value;
 
   let rows = ALL_ROWS.filter(r =>
     (year === "" || r.academic_year === year) &&
-    (term === "" || String(r.term) === String(term) &&
-    (class === "" || String(r.class) === String(class))
+    (term === "" || String(r.term) === String(term)) &&
+    (cls === "" || r.class_id === cls)
   );
 
-  // SORT: is_done → class → subject
   rows.sort((a, b) => {
-    if (a.is_done !== b.is_done) return a.is_done - b.is_done;
+    if (a.is_done != b.is_done) return a.is_done - b.is_done;
     if (a.class_id !== b.class_id) return a.class_id.localeCompare(b.class_id);
     return a.subject.localeCompare(b.subject);
   });
 
-  renderTable(rows);
+  render(rows);
 }
 
-function renderTable(rows) {
+function render(rows) {
   const tbody = document.getElementById("tbody");
   tbody.innerHTML = "";
 
   rows.forEach(r => {
     const tr = document.createElement("tr");
+    tr.className = r.is_done == 1 ? "done" : "pending";
+
     tr.innerHTML = `
       <td>${r.academic_year}</td>
       <td>${r.term}</td>
       <td>${r.class_id}</td>
       <td>${r.subject}</td>
-      <td>${r.is_done}</td>
+      <td>${r.is_done == 1 ? "Done" : "Pending"}</td>
     `;
+
     tbody.appendChild(tr);
   });
 }
 
-loadSubjectStatus();
+loadData();
 </script>
 
 </body>
