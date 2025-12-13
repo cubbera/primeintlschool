@@ -19,7 +19,33 @@
 </head>
 <body>
   <div class="card">
-    <h1>Subject Status</h1><div id="error" style="color:red;"></div>
+    <h1 style="margin-bottom:16px;">Subject Status</h1>
+    <div id="error" style="color:red;"></div>
+    <div style="margin-bottom:12px; display:flex; gap:12px;">
+  <label>
+    Academic Year:
+    <select id="yearFilter">
+      <option value="">All</option>
+    </select>
+  </label>
+
+  <label>
+    Term:
+    <select id="termFilter">
+      <option value="">All</option>
+    </select>
+  </label>
+
+   <label>
+    Class:
+    <select id="classFilter">
+      <option value="">All</option>
+    </select>
+  </label>
+</div>
+
+<div id="error" style="color:red;"></div>
+
 <table>
   <thead>...</thead>
   <tbody id="tbody"></tbody>
@@ -40,27 +66,82 @@
   <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7igpCG0pTIfPQpuoZ1BnYAbNDUcvobOtCaaOW7V66pexNCkHiVWUbk9bZAaEjqOqwgQ/exec";
 
-   async function loadSubjectStatus() {
+let ALL_ROWS = [];
+
+
+<script>
+async function loadSubjectStatus() {
   try {
     const res = await fetch(WEB_APP_URL);
     const text = await res.text();
 
-    console.log("RAW RESPONSE:", text);
+    let data = JSON.parse(text);
+    ALL_ROWS = data;
 
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch (e) {
-      throw new Error("Response is not valid JSON");
-    }
-
-    renderTable(data);
+    populateFilters(data);
+    applyFilters();
 
   } catch (err) {
     console.error(err);
     document.getElementById("error").innerText =
       "Error: " + err.message;
   }
+}
+
+function populateFilters(rows) {
+  const yearSelect = document.getElementById("yearFilter");
+  const termSelect = document.getElementById("termFilter");
+  const classSelect = document.getElementById("classFilter");
+
+  const years = [...new Set(rows.map(r => r.academic_year))];
+  const terms = [...new Set(rows.map(r => r.term))];
+  const class = [...new Set(rows.map(r => r.class))];
+
+  years.sort().forEach(y => {
+    const opt = document.createElement("option");
+    opt.value = y;
+    opt.textContent = y;
+    yearSelect.appendChild(opt);
+  });
+
+  terms.sort().forEach(t => {
+    const opt = document.createElement("option");
+    opt.value = t;
+    opt.textContent = t;
+    termSelect.appendChild(opt);
+  });
+
+  terms.sort().forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c;
+    opt.textContent = c;
+    classSelect.appendChild(opt);
+  });
+
+  yearSelect.addEventListener("change", applyFilters);
+  termSelect.addEventListener("change", applyFilters);
+  classSelect.addEventListener("change", applyFilters);
+}
+
+function applyFilters() {
+  const year = document.getElementById("yearFilter").value;
+  const term = document.getElementById("termFilter").value;
+  class term = document.getElementById("classFilter").value;
+
+  let rows = ALL_ROWS.filter(r =>
+    (year === "" || r.academic_year === year) &&
+    (term === "" || String(r.term) === String(term) &&
+    (class === "" || String(r.class) === String(class))
+  );
+
+  // SORT: is_done → class → subject
+  rows.sort((a, b) => {
+    if (a.is_done !== b.is_done) return a.is_done - b.is_done;
+    if (a.class_id !== b.class_id) return a.class_id.localeCompare(b.class_id);
+    return a.subject.localeCompare(b.subject);
+  });
+
+  renderTable(rows);
 }
 
 function renderTable(rows) {
@@ -82,5 +163,6 @@ function renderTable(rows) {
 
 loadSubjectStatus();
 </script>
+
 </body>
 </html>
