@@ -19,8 +19,10 @@
 </head>
 <body>
   <div class="card">
-    <h1>Subject Status</h1>
-    <table>
+    <h1>Subject Status</h1><div id="error" style="color:red;"></div>
+<table>
+  <thead>...</thead>
+  <tbody id="tbody"></tbody>
       <thead>
         <tr>
           <th>Academic Year</th>
@@ -45,35 +47,47 @@
     }
 
     async function loadRows() {
-      const statusEl = document.getElementById("status");
-      const tbody = document.getElementById("rows");
+   async function loadSubjectStatus() {
+  try {
+    const res = await fetch(WEB_APP_URL);
 
-      try {
-        const res = await fetch(WEB_APP_URL);
-        const data = await res.json();
+    const text = await res.text();   // 👈 IMPORTANT
+    console.log("RAW RESPONSE:", text);
 
-        if (!data.ok) throw new Error(data.error || "Unknown error");
-
-        tbody.innerHTML = data.rows.map(r => {
-          const done = String(r.is_done).trim() === "1";
-          return `
-            <tr>
-              <td>${esc(r.academic_year)}</td>
-              <td>${esc(r.term)}</td>
-              <td>${esc(r.class_id)}</td>
-              <td>${esc(r.subject)}</td>
-              <td><span class="pill ${done ? "done1" : "done0"}">${done ? "1" : "0"}</span></td>
-            </tr>
-          `;
-        }).join("");
-
-        statusEl.textContent = `Loaded ${data.rows.length} row(s).`;
-      } catch (err) {
-        statusEl.textContent = `Error: ${err.message}`;
-      }
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new Error("Response is not JSON");
     }
 
-    loadRows();
-  </script>
+    renderTable(data);
+
+  } catch (err) {
+    console.error(err);
+    document.getElementById("error").innerText =
+      "Error: " + err.message;
+  }
+}
+
+function renderTable(rows) {
+  const tbody = document.getElementById("tbody");
+  tbody.innerHTML = "";
+
+  rows.forEach(r => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${r.academic_year}</td>
+      <td>${r.term}</td>
+      <td>${r.class_id}</td>
+      <td>${r.subject}</td>
+      <td>${r.is_done}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+loadSubjectStatus();
+</script>
 </body>
 </html>
