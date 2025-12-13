@@ -40,25 +40,18 @@
   <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7igpCG0pTIfPQpuoZ1BnYAbNDUcvobOtCaaOW7V66pexNCkHiVWUbk9bZAaEjqOqwgQ/exec";
 
-    function esc(s) {
-      return String(s ?? "").replace(/[&<>"']/g, m => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-      }[m]));
-    }
-
-    async function loadRows() {
    async function loadSubjectStatus() {
   try {
     const res = await fetch(WEB_APP_URL);
+    const text = await res.text();
 
-    const text = await res.text();   // 👈 IMPORTANT
     console.log("RAW RESPONSE:", text);
 
     let data;
     try {
       data = JSON.parse(text);
-    } catch {
-      throw new Error("Response is not JSON");
+    } catch (e) {
+      throw new Error("Response is not valid JSON");
     }
 
     renderTable(data);
