@@ -1029,12 +1029,11 @@ function exportExcel() {
     XLSX.writeFile(wb, fileName);
 }
 
-
+<script>
 
 //appscript url paste your url here
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3qXrrwDKJYtFX9yTAFN659_g85QbNtjdd7662G7IvaCMheVWBPEpaUxOiCMf8A_tUrA/exec";
 
-<script>
 function submitScores() {
   const academicYear = document.getElementById("academicYear").value;
   const term = document.getElementById("termSelect").value;
