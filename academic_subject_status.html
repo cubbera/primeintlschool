@@ -13,9 +13,7 @@
       padding: 24px;
     }
 
-    h1 {
-      margin-bottom: 16px;
-    }
+    h1 { margin-bottom: 16px; }
 
     .filters {
       display: flex;
@@ -24,9 +22,7 @@
       flex-wrap: wrap;
     }
 
-    label {
-      font-size: 14px;
-    }
+    label { font-size: 14px; }
 
     select {
       margin-left: 6px;
@@ -52,13 +48,8 @@
       font-weight: 600;
     }
 
-    tr.done {
-      background: #f0f7f0;
-    }
-
-    tr.pending {
-      background: #fff;
-    }
+    tr.done { background: #f0f7f0; }
+    tr.pending { background: #fff; }
 
     #error {
       color: red;
@@ -109,16 +100,15 @@
 <div id="error"></div>
 
 <script>
-/* 🔴 REPLACE THIS WITH YOUR DEPLOYED WEB APP URL */
-   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7igpCG0pTIfPQpuoZ1BnYAbNDUcvobOtCaaOW7V66pexNCkHiVWUbk9bZAaEjqOqwgQ/exec";
+const WEB_APP_URL =
+  "https://script.google.com/macros/s/AKfycbxSMDy62e0Ch8zR8L0fpDaDcVBNTDBfDo7_3hM55RWlWW6QNZ4BdPhluY9vzSvkllwxsA/exec";
 
 let ALL_ROWS = [];
 
 async function loadData() {
   try {
     const res = await fetch(WEB_APP_URL);
-    const text = await res.text();
-    const data = JSON.parse(text);
+    const data = await res.json();   // ✅ FIX HERE
 
     ALL_ROWS = data;
     populateFilters(data);
@@ -146,9 +136,9 @@ function populateFilters(rows) {
   fillSelect("termFilter", [...termSet].sort());
   fillSelect("classFilter", [...classSet].sort());
 
-  document.getElementById("yearFilter").onchange = applyFilters;
-  document.getElementById("termFilter").onchange = applyFilters;
-  document.getElementById("classFilter").onchange = applyFilters;
+  yearFilter.onchange = applyFilters;
+  termFilter.onchange = applyFilters;
+  classFilter.onchange = applyFilters;
 }
 
 function fillSelect(id, values) {
@@ -162,9 +152,9 @@ function fillSelect(id, values) {
 }
 
 function applyFilters() {
-  const year = document.getElementById("yearFilter").value;
-  const term = document.getElementById("termFilter").value;
-  const cls  = document.getElementById("classFilter").value;
+  const year = yearFilter.value;
+  const term = termFilter.value;
+  const cls  = classFilter.value;
 
   let rows = ALL_ROWS.filter(r =>
     (year === "" || r.academic_year === year) &&
