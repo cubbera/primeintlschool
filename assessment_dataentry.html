@@ -1032,59 +1032,76 @@ function exportExcel() {
 
 
 //appscript url paste your url here
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3qXrrwDKJYtFX9yTAFN659_g85QbNtjdd7662G7IvaCMheVWBPEpaUxOiCMf8A_tUrA/exec";
-
+const SCRIPT_URL = "<script>
 function submitScores() {
-  const academicYear = document.getElementById("academicYear").value;
-  const term = document.getElementById("termSelect").value;
-  const classId = document.getElementById("classId").value;
-  const subject = document.getElementById("subjectSelect").value;
+  const academicYear = academicYear.value;
+  const term = termSelect.value;
+  const classId = classSelect.value;
+  const subject = subjectSelect.value;
 
   const rows = [];
 
   document.querySelectorAll("#tbody tr").forEach(tr => {
     const nameCell = tr.querySelector(".label-col");
-    if (!nameCell) return;
-
-    const studentName = nameCell.textContent.trim();
-    if (!studentName) return;
-
-    const cw = Math.round(
-      parseFloat(tr.querySelector(".cw-total-cell")?.textContent || 0)
-    );
-
-    const exam = Math.round(
-      parseFloat(tr.querySelector(".exam-total-cell")?.textContent || 0)
-    );
-
-    const total = Math.round(
-      parseFloat(tr.querySelector(".final-total-cell")?.textContent || 0)
-    );
+    const name = nameCell.textContent.trim();
+    if (!name) return;
 
     rows.push({
       academic_year: academicYear,
-      term,
+      term: term,
       class_id: classId,
-      subject,
-      student_name: studentName,
-      cw_40_rounded: cw,
-      term_60_rounded: exam,
-      total_100_rounded: total
+      subject: subject,
+      student_name: name,
+      cw_40_rounded: Math.round(tr.querySelector(".cw-total-cell").textContent),
+      term_60_rounded: Math.round(tr.querySelector(".exam-total-cell").textContent),
+      total_100_rounded: Math.round(tr.querySelector(".final-total-cell").textContent)
     });
   });
 
-  fetch(SCRIPT_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ rows })
-  })
-    .then(r => r.json())
-    .then(() => alert("Scores saved successfully"))
-    .catch(err => {
-      console.error(err);
-      alert("Error saving scores");
-    });
+  document.getElementById("payloadInput").value =
+    JSON.stringify({ rows });
+
+  document.getElementById("submitForm").submit();
+
+  alert("Scores submitted successfully.");
 }
+</script>
+";
+
+<script>
+function submitScores() {
+  const academicYear = academicYear.value;
+  const term = termSelect.value;
+  const classId = classSelect.value;
+  const subject = subjectSelect.value;
+
+  const rows = [];
+
+  document.querySelectorAll("#tbody tr").forEach(tr => {
+    const nameCell = tr.querySelector(".label-col");
+    const name = nameCell.textContent.trim();
+    if (!name) return;
+
+    rows.push({
+      academic_year: academicYear,
+      term: term,
+      class_id: classId,
+      subject: subject,
+      student_name: name,
+      cw_40_rounded: Math.round(tr.querySelector(".cw-total-cell").textContent),
+      term_60_rounded: Math.round(tr.querySelector(".exam-total-cell").textContent),
+      total_100_rounded: Math.round(tr.querySelector(".final-total-cell").textContent)
+    });
+  });
+
+  document.getElementById("payloadInput").value =
+    JSON.stringify({ rows });
+
+  document.getElementById("submitForm").submit();
+
+  alert("Scores submitted successfully.");
+}
+
 
 
   // Event delegation: recalc whenever any score-box changes
