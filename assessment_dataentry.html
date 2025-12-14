@@ -213,7 +213,7 @@
 </div>
 
 <span class="dropdown-label">Class: </span>
-<select id="classId">
+<select id="classSelect">
   <option value="Y1-A">Y1-A</option>
   <option value="Y2-A">Y2-A</option>
 </select>
@@ -941,7 +941,7 @@
 function exportExcel() {
     const academicYear = document.getElementById("academicYear").value;
     const term = document.getElementById("termSelect").value;
-    const class_id = document.getElementById("classId").value;
+    const class_id = document.getElementById("classSelect").value;
     const subject = document.getElementById("subjectSelect").value;
 
     const table = document.getElementById("assessmentTable");
@@ -1035,37 +1035,57 @@ function exportExcel() {
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3qXrrwDKJYtFX9yTAFN659_g85QbNtjdd7662G7IvaCMheVWBPEpaUxOiCMf8A_tUrA/exec";
 
 <script>
-function submitScores() {
-  const academicYear = academicYear.value;
-  const term = termSelect.value;
-  const classId = classSelect.value;
-  const subject = subjectSelect.value;
+function submitScores() {function submitScores() {
+  const academicYear = document.getElementById("academicYear").value;
+  const term = document.getElementById("termSelect").value;
+  const classId = document.getElementById("classSelect").value;
+  const subject = document.getElementById("subjectSelect").value;
 
   const rows = [];
 
   document.querySelectorAll("#tbody tr").forEach(tr => {
     const nameCell = tr.querySelector(".label-col");
-    const name = nameCell.textContent.trim();
-    if (!name) return;
+    if (!nameCell) return;
+
+    const studentName =
+      nameCell.querySelector("input")
+        ? nameCell.querySelector("input").value.trim()
+        : nameCell.textContent.trim();
+
+    if (!studentName) return;
+
+    const cw = Number(tr.querySelector(".cw-total-cell")?.textContent || 0);
+    const exam = Number(tr.querySelector(".exam-total-cell")?.textContent || 0);
+    const total = Number(tr.querySelector(".rounded-total-cell")?.textContent || 0);
 
     rows.push({
       academic_year: academicYear,
-      term: term,
+      term,
       class_id: classId,
-      subject: subject,
-      student_name: name,
-      cw_40_rounded: Math.round(tr.querySelector(".cw-total-cell").textContent),
-      term_60_rounded: Math.round(tr.querySelector(".exam-total-cell").textContent),
-      total_100_rounded: Math.round(tr.querySelector(".final-total-cell").textContent)
+      subject,
+      student_name: studentName,
+      cw_40: cw,
+      exam_60: exam,
+      total_100: total
     });
   });
 
-  document.getElementById("payloadInput").value =
-    JSON.stringify({ rows });
+  if (!rows.length) {
+    alert("No data to submit.");
+    return;
+  }
 
-  document.getElementById("submitForm").submit();
-
-  alert("Scores submitted successfully.");
+  fetch(SCRIPT_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ rows })
+  })
+  .then(r => r.json())
+  .then(() => alert("Scores saved successfully"))
+  .catch(err => {
+    console.error(err);
+    alert("Save failed");
+  });
 }
 
 
