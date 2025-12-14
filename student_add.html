@@ -2,280 +2,172 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Add Student & Create Tuition Plan</title>
+<title>Create Student Plan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #f3f4f6;
-        padding: 30px;
-    }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui;
+    background: #f5f5f7;
+    padding: 30px;
+  }
 
-    .container {
-        max-width: 860px;
-        margin: auto;
-        background: #fff;
-        padding: 28px;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    }
+  .container {
+    max-width: 700px;
+    margin: 0 auto;
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 12px;
+  }
 
-    h1 {
-        margin-top: 0;
-        margin-bottom: 10px;
-    }
+  h1 {
+    margin-bottom: 20px;
+  }
 
-    h2 {
-        margin-top: 28px;
-        border-bottom: 2px solid #e5e7eb;
-        padding-bottom: 6px;
-        font-size: 18px;
-    }
+  .step {
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
 
-    label {
-        display: block;
-        font-weight: bold;
-        margin-top: 12px;
-        margin-bottom: 4px;
-    }
+  label {
+    display: block;
+    font-weight: 600;
+    margin-top: 12px;
+  }
 
-    input, select {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #d1d5db;
-        border-radius: 6px;
-        margin-bottom: 6px;
-        font-size: 14px;
-        box-sizing: border-box;
-    }
+  input,
+  select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 6px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+  }
 
-    .two-col {
-        display: flex;
-        gap: 16px;
-    }
+  .radio-group {
+    margin-top: 8px;
+  }
 
-    .two-col > div {
-        flex: 1;
-    }
+  .radio-group label {
+    font-weight: normal;
+    display: inline-flex;
+    align-items: center;
+    margin-right: 20px;
+    gap: 6px;
+  }
 
-    .discount-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 8px;
-        padding: 8px 10px;
-        border: 1px solid #e5e7eb;
-        border-radius: 6px;
-        background: #f9fafb;
-    }
+  .hint {
+    margin-top: 10px;
+    font-size: 13px;
+    color: gray;
+  }
 
-    .discount-row select {
-        width: 68%;
-        margin-bottom: 0;
-    }
+  .hint.success {
+    color: green;
+  }
 
-    .discount-amount {
-        font-weight: bold;
-        color: red;
-        text-align: right;
-        width: 30%;
-        font-variant-numeric: tabular-nums;
-    }
-
-    table {
-        width: 100%;
-        margin-top: 16px;
-        border-collapse: collapse;
-    }
-
-    table td {
-        padding: 6px 4px;
-        font-size: 14px;
-    }
-
-    table td:nth-child(2) {
-        text-align: right;
-        font-weight: bold;
-        font-variant-numeric: tabular-nums;
-        white-space: nowrap;
-    }
-
-    .btn-add {
-        margin-top: 10px;
-        background: #1d4ed8;
-        color: #fff;
-        padding: 8px 16px;
-        border-radius: 6px;
-        border: none;
-        cursor: pointer;
-        font-size: 13px;
-        font-weight: 600;
-    }
-
-    .btn-submit {
-        margin-top: 22px;
-        width: 100%;
-        background: #059669;
-        color: #fff;
-        font-size: 18px;
-        padding: 14px;
-        border-radius: 8px;
-        cursor: pointer;
-        border: none;
-        font-weight: bold;
-    }
+  .muted {
+    opacity: 0.4;
+  }
 </style>
-
-<script>
-function autoFillTuition() {
-    const division = document.getElementById("division").value;
-    const level = document.getElementById("level").value;
-    const plan = document.getElementById("paymentPlan").value;
-    const tuitionInput = document.getElementById("tuitionBefore");
-
-    if (!division || !level || !plan) return;
-
-    let amount = 0;
-    if (division === "Preschool") {
-        amount = plan === "Annual" ? 3900000 : 4200000;
-    } else {
-        amount = plan === "Annual" ? 4200000 : 4500000;
-    }
-
-    tuitionInput.value = amount;
-    updateDiscounts();
-}
-
-function addDiscountRow() {
-    const row = document.createElement("div");
-    row.className = "discount-row";
-    row.innerHTML = `
-        <select onchange="updateDiscounts()">
-            <option value="">-- Select Discount --</option>
-            <option value="early35">Early Bird 35%</option>
-            <option value="play15">Play & Learn 15%</option>
-            <option value="ref100">Referral -100,000 MMK</option>
-            <option value="sib5">Sibling 5%</option>
-            <option value="sib10">Sibling 10%</option>
-        </select>
-        <div class="discount-amount">0</div>`;
-    document.getElementById("discountContainer").appendChild(row);
-}
-
-function updateDiscounts() {
-    const tuition = Number(document.getElementById("tuitionBefore").value || 0);
-    let totalDiscount = 0;
-
-    document.querySelectorAll(".discount-row").forEach(row => {
-        const sel = row.querySelector("select").value;
-        let d = 0;
-        if (sel === "early35") d = tuition * 0.35;
-        if (sel === "play15") d = tuition * 0.15;
-        if (sel === "ref100") d = 100000;
-        if (sel === "sib5") d = tuition * 0.05;
-        if (sel === "sib10") d = tuition * 0.10;
-        row.querySelector(".discount-amount").textContent = d ? "-" + Math.round(d).toLocaleString() : "0";
-        totalDiscount += d;
-    });
-
-    document.getElementById("totalDiscount").textContent = "-" + Math.round(totalDiscount).toLocaleString();
-    const net = tuition - totalDiscount;
-    document.getElementById("afterDiscount").textContent = net.toLocaleString();
-    document.getElementById("monthlyFee").textContent = Math.round(net / 10).toLocaleString();
-
-    updatePaymentPlanAuto();
-}
-
-function updatePaymentPlanAuto() {
-    const plan = document.getElementById("paymentPlan").value;
-    const net = Number(document.getElementById("afterDiscount").textContent.replace(/,/g,'') || 0);
-    const rows = document.querySelectorAll(".pp-amount");
-
-    let count = 0;
-    if (plan === "Monthly") count = 10;
-    if (plan === "Termly") count = 3;
-    if (plan === "Annual") count = 1;
-
-    const per = count ? Math.round(net / count) : 0;
-
-    rows.forEach((r,i)=> r.textContent = i < count ? per.toLocaleString() : "");
-}
-
-function updateLevels() {
-    const level = document.getElementById("level");
-    level.innerHTML = "";
-    if (division.value === "Preschool") level.innerHTML += `<option>SR</option><option>EY1</option><option>EY2</option>`;
-    if (division.value === "Primary") level.innerHTML += `<option>Y1</option><option>Y2</option><option>Y3</option>`;
-}
-</script>
 </head>
 
 <body>
+
 <div class="container">
-<h1>Add New Student</h1>
+  <h1>Create Student Plan</h1>
 
-<h2>1. Student Information</h2>
-<label>Full Name</label><input>
-<label>Father's Name</label><input>
+  <!-- STEP 1 -->
+  <div class="step">
+    <h3>Step 1 — Enrollment</h3>
 
-<div class="two-col">
-<div><label>Gender</label><select><option>Male</option><option>Female</option></select></div>
-<div><label>Date of Birth</label><input type="date"></div>
+    <!-- ENROLL FOR -->
+    <label>Select Enrollment Option:</label>
+    <select id="enrollFor">
+      <option value="">Select…</option>
+      <option value="AY25">Academic Year 2025–2026</option>
+      <option value="SUM2026">Summer 2026</option>
+      <option value="AY26">Academic Year 2026–2027</option>
+      <option value="TE">Tiny Explorer (10-weeks)</option>
+    </select>
+
+    <!-- ENROLL TYPE -->
+    <label style="margin-top:20px;">Enroll Type:</label>
+    <div class="radio-group">
+      <label>
+        <input type="radio" name="enrollType" value="new" checked>
+        New Student
+      </label>
+
+      <label>
+        <input type="radio" name="enrollType" value="current">
+        Current Student
+      </label>
+    </div>
+
+    <!-- STUDENT FIELDS -->
+    <div id="studentFields" style="margin-top:20px;">
+      <!-- Dynamic content goes here -->
+    </div>
+  </div>
+
+  <p class="muted">More steps will be added after cleanup.</p>
 </div>
 
-<h2>2. Enrollment</h2>
-<label>Academic Year</label><select><option>2025–2026</option></select>
+<script>
+  const enrollForEl = document.getElementById("enrollFor");
+  const studentFieldsEl = document.getElementById("studentFields");
+  const enrollTypeEls = document.querySelectorAll("input[name='enrollType']");
 
-<div class="two-col">
-<div>
-<label>Division</label>
-<select id="division" onchange="updateLevels(); autoFillTuition();">
-<option value="">Select</option><option>Preschool</option><option>Primary</option>
-</select>
-</div>
-<div>
-<label>Level</label>
-<select id="level" onchange="autoFillTuition()"></select>
-</div>
-</div>
+  function getEnrollType() {
+    return document.querySelector("input[name='enrollType']:checked").value;
+  }
 
-<label>Payment Plan</label>
-<select id="paymentPlan" onchange="autoFillTuition(); updatePaymentPlanAuto();">
-<option value="">Select</option><option>Monthly</option><option>Termly</option><option>Annual</option>
-</select>
+  function renderStudentFields() {
+    const enrollType = getEnrollType();
+    const enrollFor = enrollForEl.value;
 
-<h2>3. Calculated Tuition Summary</h2>
-<label>Tuition Before Discount</label>
-<input id="tuitionBefore" onkeyup="updateDiscounts()">
+    studentFieldsEl.innerHTML = "";
 
-<h3>Add Discounts</h3>
-<div id="discountContainer"></div>
-<button class="btn-add" onclick="addDiscountRow()">+ Add Discount</button>
+    if (enrollType === "new") {
+      studentFieldsEl.innerHTML = `
+        <label>Student Full Name:</label>
+        <input type="text" id="studentName">
 
-<table>
-<tr><td>Total Discount</td><td id="totalDiscount">0</td></tr>
-<tr><td>After Discount</td><td id="afterDiscount">0</td></tr>
-<tr><td>Monthly Fee (10 installments)</td><td id="monthlyFee">0</td></tr>
-</table>
+        <label>Father’s Name:</label>
+        <input type="text" id="fatherName">
 
-<h3>Payment Plan</h3>
-<table>
-<tbody id="paymentPlanBody">
+        ${enrollFor ? `
+          <p class="hint success">
+            Student ID will be auto-generated (prefix based on ${enrollFor})
+          </p>
+        ` : ""}
+      `;
+    } else {
+      studentFieldsEl.innerHTML = `
+        <label>Enter Student ID:</label>
+        <input type="text" id="studentId">
 
-<tr><td style="text-align:center;"><b>Payment No</b></td><td style="text-align:center;">Due Date</td><td style="text-align:center;"><b>Amount</b></td></tr>
-<tr><td style="text-align:center;">1</td><td style="text-align:center;">Registration Date</td><td class="pp-amount">0</td></tr>
-<tr><td style="text-align:center;">2</td><td style="text-align:center;">1 July</td><td class="pp-amount">0</td></tr>
-<tr><td style="text-align:center;">3</td><td style="text-align:center;">1 Aug</td><td class="pp-amount">0</td></tr>
-<tr><td style="text-align:center;">4</td><td style="text-align:center;">1 Sep</td><td class="pp-amount">0</td></tr>
-<tr><td style="text-align:center;">5</td><td style="text-align:center;">1 Oct</td><td class="pp-amount">0</td></tr>
-<tr><td style="text-align:center;">6</td><td style="text-align:center;">1 Nov</td><td class="pp-amount">0</td></tr>
-<tr><td style="text-align:center;">7</td><td style="text-align:center;">1 Dec</td><td class="pp-amount">0</td></tr>
-<tr><td style="text-align:center;">8</td><td style="text-align:center;">1 Jan</td><td class="pp-amount">0</td></tr>
-<tr><td style="text-align:center;">9</td><td style="text-align:center;">1 Feb</td><td class="pp-amount">0</td></tr>
-<tr><td style="text-align:center;">10</td><td style="text-align:center;">1 Mar</td><td class="pp-amount">0</td></tr>
-</tbody>
-</table>
+        <p class="hint">
+          System will auto-fetch student details.
+        </p>
+      `;
+    }
+  }
 
-<button class="btn-submit">Add Student & Create Tuition Plan</button>
-</div>
+  // Event listeners
+  enrollForEl.addEventListener("change", renderStudentFields);
+  enrollTypeEls.forEach(radio =>
+    radio.addEventListener("change", renderStudentFields)
+  );
+
+  // Initial render
+  renderStudentFields();
+</script>
+
 </body>
 </html>
