@@ -1032,39 +1032,7 @@ function exportExcel() {
 
 
 //appscript url paste your url here
-const SCRIPT_URL = "<script>
-function submitScores() {
-  const academicYear = academicYear.value;
-  const term = termSelect.value;
-  const classId = classSelect.value;
-  const subject = subjectSelect.value;
-
-  const rows = [];
-
-  document.querySelectorAll("#tbody tr").forEach(tr => {
-    const nameCell = tr.querySelector(".label-col");
-    const name = nameCell.textContent.trim();
-    if (!name) return;
-
-    rows.push({
-      academic_year: academicYear,
-      term: term,
-      class_id: classId,
-      subject: subject,
-      student_name: name,
-      cw_40_rounded: Math.round(tr.querySelector(".cw-total-cell").textContent),
-      term_60_rounded: Math.round(tr.querySelector(".exam-total-cell").textContent),
-      total_100_rounded: Math.round(tr.querySelector(".final-total-cell").textContent)
-    });
-  });
-
-  document.getElementById("payloadInput").value =
-    JSON.stringify({ rows });
-
-  document.getElementById("submitForm").submit();
-
-  alert("Scores submitted successfully.");
-}
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3qXrrwDKJYtFX9yTAFN659_g85QbNtjdd7662G7IvaCMheVWBPEpaUxOiCMf8A_tUrA/exec";
 
 <script>
 function submitScores() {
