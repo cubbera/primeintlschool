@@ -212,12 +212,14 @@
   </select>
 </div>
 
-  <span class="dropdown-label">Grade Level: </span>
-  <select id="gradeLevel">
-    <option>Year 1</option>
-    <option>Year 2</option>
-    <option>Year 3</option>
-  </select>
+<span class="dropdown-label">Class: </span>
+<select id="classId">
+  <option value="Y1-A">Y1-A</option>
+  <option value="Y1-B">Y1-B</option>
+  <option value="Y2-A">Y2-A</option>
+  <option value="Y2-B">Y2-B</option>
+</select>
+
 
   &nbsp;&nbsp;&nbsp;
 
@@ -941,7 +943,7 @@
 function exportExcel() {
     const academicYear = document.getElementById("academicYear").value;
     const term = document.getElementById("termSelect").value;
-    const grade = document.getElementById("gradeLevel").value;
+    const class_id = document.getElementById("classId").value;
     const subject = document.getElementById("subjectSelect").value;
 
     const table = document.getElementById("assessmentTable");
@@ -951,7 +953,7 @@ function exportExcel() {
     // --------- Metadata ---------
     sheetData.push(["Academic Year", academicYear]);
     sheetData.push(["Term", term]);
-    sheetData.push(["Grade Level", grade]);
+    sheetData.push(["Class", class_id]);
     sheetData.push(["Subject", subject]);
     sheetData.push([]); // blank row before table
 
@@ -1023,7 +1025,7 @@ function exportExcel() {
 
     // File name, e.g. Year1_English_2025-2026_Term1_assessment.xlsx
     const fileName =
-        `${grade}_${subject}_${academicYear}_${term}_assessment.xlsx`
+        `${class_id}_${subject}_${academicYear}_${term}_assessment.xlsx`
             .replace(/\s+/g, "");
 
     XLSX.writeFile(wb, fileName);
@@ -1031,26 +1033,22 @@ function exportExcel() {
 
 
 
-
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyOePKxdr-7nT4D-G4bNT9Tm_O2T1eQec8mpvZQqCEoyUuVqjaCnVVT-Q40tcp7N0RNYA/exec";
+//appscript url paste your url here
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw609PLiUsaieq3N6pLBb0MRgGIC8_y9Z4MoyP3DEeaU7IR5yrBhaX8y8ij6RAC9m8eMA/exec";
 
 function submitScores() {
   const academicYear = document.getElementById("academicYear").value;
   const term = document.getElementById("termSelect").value;
-  const classId = document.getElementById("gradeLevel").value;
+  const classId = document.getElementById("classId").value;
   const subject = document.getElementById("subjectSelect").value;
 
   const rows = [];
 
   document.querySelectorAll("#tbody tr").forEach(tr => {
-    const studentNameCell = tr.querySelector(".label-col");
-    if (!studentNameCell) return;
+    const nameCell = tr.querySelector(".label-col");
+    if (!nameCell) return;
 
-    const studentName =
-      studentNameCell.querySelector("input")
-        ? studentNameCell.querySelector("input").value.trim()
-        : studentNameCell.textContent.trim();
-
+    const studentName = nameCell.textContent.trim();
     if (!studentName) return;
 
     const cw = Math.round(
@@ -1067,9 +1065,9 @@ function submitScores() {
 
     rows.push({
       academic_year: academicYear,
-      term: term,
+      term,
       class_id: classId,
-      subject: subject,
+      subject,
       student_name: studentName,
       cw_40_rounded: cw,
       term_60_rounded: exam,
@@ -1077,23 +1075,16 @@ function submitScores() {
     });
   });
 
-  if (rows.length === 0) {
-    alert("No data to submit.");
-    return;
-  }
-
-fetch(SCRIPT_URL, {
-  method: "POST",
-  body: JSON.stringify({ rows })   // NO headers
-})
-
-    .then(res => res.json())
-    .then(() => {
-      alert("Scores successfully saved to Google Sheet.");
-    })
+  fetch(SCRIPT_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ rows })
+  })
+    .then(r => r.json())
+    .then(() => alert("Scores saved successfully"))
     .catch(err => {
       console.error(err);
-      alert("Error saving scores. Please try again.");
+      alert("Error saving scores");
     });
 }
 
