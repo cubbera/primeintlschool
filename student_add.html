@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Add Student & Create Tuition Plan</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f3f4f6;
+  padding: 30px;
+}
+.container {
+  max-width: 860px;
+  margin: auto;
+  background: #fff;
+  padding: 28px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+h1 { margin-top: 0; }
+h2 {
+  margin-top: 28px;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 6px;
+  font-size: 18px;
+}
+label {
+  display: block;
+  font-weight: bold;
+  margin-top: 12px;
+}
+input, select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+.two-col {
+  display: flex;
+  gap: 16px;
+}
+.two-col > div { flex: 1; }
+
+.discount-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: #f9fafb;
+  border-radius: 6px;
+}
+.discount-row select { width: 70%; }
+.discount-amount {
+  font-weight: bold;
+  color: red;
+  text-align: right;
+  width: 30%;
+}
+
+table {
+  width: 100%;
+  margin-top: 16px;
+  border-collapse: collapse;
+}
+table td {
+  padding: 6px 4px;
+}
+table td:nth-child(2) {
+  text-align: right;
+  font-weight: bold;
+}
+
+.btn-add {
+  margin-top: 10px;
+  background: #1d4ed8;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+.btn-submit {
+  margin-top: 22px;
+  width: 100%;
+  background: #059669;
+  color: #fff;
+  font-size: 18px;
+  padding: 14px;
+  border-radius: 8px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+</style>
+
+<script>
+function autoFillTuition() {
+  const division = document.getElementById("division").value;
+  const plan = document.getElementById("paymentPlan").value;
+  const tuitionInput = document.getElementById("tuitionBefore");
+
+  if (!division || !plan) return;
+
+  let amount = 0;
+  if (division === "Preschool") {
+    amount = plan === "Annual" ? 3900000 : 4200000;
+  } else {
+    amount = plan === "Annual" ? 4200000 : 4500000;
+  }
+
+  tuitionInput.value = amount;
+  updateDiscounts();
+}
+
+function addDiscountRow() {
+  const row = document.createElement("div");
+  row.className = "discount-row";
+  row.innerHTML = `
+    <select onchange="updateDiscounts()">
+      <option value="">-- Select Discount --</option>
+      <option value="early35">Early Bird 35%</option>
+      <option value="play15">Play & Learn 15%</option>
+      <option value="ref100">Referral -100,000</option>
+      <option value="sib5">Sibling 5%</option>
+      <option value="sib10">Sibling 10%</option>
+    </select>
+    <div class="discount-amount">0</div>
+  `;
+  document.getElementById("discountContainer").appendChild(row);
+}
+
+function updateDiscounts() {
+  const tuition = Number(document.getElementById("tuitionBefore").value || 0);
+  let totalDiscount = 0;
+
+  document.querySelectorAll(".discount-row").forEach(row => {
+    const type = row.querySelector("select").value;
+    let d = 0;
+    if (type === "early35") d = tuition * 0.35;
+    if (type === "play15") d = tuition * 0.15;
+    if (type === "ref100") d = 100000;
+    if (type === "sib5") d = tuition * 0.05;
+    if (type === "sib10") d = tuition * 0.10;
+    d = Math.round(d);
+    row.querySelector(".discount-amount").textContent = d ? "-" + d.toLocaleString() : "0";
+    totalDiscount += d;
+  });
+
+  const net = tuition - totalDiscount;
+  document.getElementById("totalDiscount").textContent = "-" + totalDiscount.toLocaleString();
+  document.getElementById("afterDiscount").textContent = net.toLocaleString();
+
+  updatePaymentPlan(net);
+}
+
+function updatePaymentPlan(net) {
+  const plan = document.getElementById("paymentPlan").value;
+  const tbody = document.getElementById("paymentPlanBody");
+  tbody.innerHTML = "";
+
+  let count = plan === "Monthly" ? 10 : plan === "Termly" ? 3 : 1;
+  let amount = Math.round(net / count);
+
+  const labels = [
+    "Registration Date",
+    "1 July", "1 August", "1 September", "1 October",
+    "1 November", "1 December", "1 January", "1 February", "1 March"
+  ];
+
+  for (let i = 0; i < count; i++) {
+    tbody.innerHTML += `
+      <tr>
+        <td style="text-align:center;">${i + 1}</td>
+        <td style="text-align:center;">${labels[i]}</td>
+        <td style="text-align:right;">${amount.toLocaleString()}</td>
+      </tr>
+    `;
+  }
+}
+</script>
+</head>
+
+<body>
+<div class="container">
+<h1>Add New Student</h1>
+
+<h2>Enrollment</h2>
+<label>Division</label>
+<select id="division" onchange="autoFillTuition()">
+  <option value="">Select</option>
+  <option value="Preschool">Preschool</option>
+  <option value="Primary">Primary</option>
+</select>
+
+<label>Payment Plan</label>
+<select id="paymentPlan" onchange="autoFillTuition()">
+  <option value="">Select</option>
+  <option value="Monthly">Monthly</option>
+  <option value="Termly">Termly</option>
+  <option value="Annual">Annual</option>
+</select>
+
+<h2>Tuition</h2>
+<label>Tuition Before Discount</label>
+<input id="tuitionBefore" type="number" oninput="updateDiscounts()">
+
+<h3>Discounts</h3>
+<div id="discountContainer"></div>
+<button class="btn-add" onclick="addDiscountRow()">+ Add Discount</button>
+
+<table>
+<tr><td>Total Discount</td><td id="totalDiscount">0</td></tr>
+<tr><td>After Discount</td><td id="afterDiscount">0</td></tr>
+</table>
+
+<h2>Payment Plan</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:center;">Month #</th>
+<th style="text-align:center;">Due Date</th>
+<th style="text-align:right;">Amount</th>
+</tr>
+</thead>
+<tbody id="paymentPlanBody"></tbody>
+</table>
+
+<button class="btn-submit">Add Student & Create Tuition Plan</button>
+</div>
+</body>
+</html>
