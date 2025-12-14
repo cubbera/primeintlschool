@@ -320,94 +320,45 @@ function updateLevels() {
         <tr><td>Monthly Fee (10 installments)</td><td id="monthlyFee">420,000</td></tr>
     </table>
 
-    <button class="btn-submit">Add Student & Create Tuition Plan</button>
-
-    <!-- Payment Plan -->
+<!-- Payment Plan -->
 <div style="margin-top:30px;">
   <h3 style="margin-bottom:10px;">Payment Plan (Monthly)</h3>
+
+  <!-- Monthly Amount Input -->
+  <div style="margin-bottom:10px;">
+    Monthly Amount:
+    <input id="monthlyAmount" type="number" style="width:120px;" oninput="updateMonthlyAmounts()">
+  </div>
 
   <table style="width:100%; border-collapse:collapse; font-size:13px;">
     <thead>
       <tr>
-        <th style="border:1px solid #ccc; padding:6px;">Month #</th>
-        <th style="border:1px solid #ccc; padding:6px;">Due Date</th>
-        <th style="border:1px solid #ccc; padding:6px;">Amount</th>
+        <th style="padding:6px; text-align:center;">Month #</th>
+        <th style="padding:6px; text-align:center;">Due Date</th>
+        <th style="padding:6px; text-align:right;">Amount</th>
       </tr>
     </thead>
-    <tbody>
-      <tr>
-        <td style="border:1px solid #ccc; padding:6px;">1</td>
-        <td style="border:1px solid #ccc; padding:6px;">Registration Date</td>
-        <td style="border:1px solid #ccc; padding:6px;">
-          <input type="number" style="width:100px;">
-        </td>
-      </tr>
-      <tr>
-        <td style="border:1px solid #ccc; padding:6px;">2</td>
-        <td style="border:1px solid #ccc; padding:6px;">1 July</td>
-        <td style="border:1px solid #ccc; padding:6px;">
-          <input type="number" style="width:100px;">
-        </td>
-      </tr>
-      <tr>
-        <td style="border:1px solid #ccc; padding:6px;">3</td>
-        <td style="border:1px solid #ccc; padding:6px;">1 August</td>
-        <td style="border:1px solid #ccc; padding:6px;">
-          <input type="number" style="width:100px;">
-        </td>
-      </tr>
-      <tr>
-        <td style="border:1px solid #ccc; padding:6px;">4</td>
-        <td style="border:1px solid #ccc; padding:6px;">1 September</td>
-        <td style="border:1px solid #ccc; padding:6px;">
-          <input type="number" style="width:100px;">
-        </td>
-      </tr>
-      <tr>
-        <td style="border:1px solid #ccc; padding:6px;">5</td>
-        <td style="border:1px solid #ccc; padding:6px;">1 October</td>
-        <td style="border:1px solid #ccc; padding:6px;">
-          <input type="number" style="width:100px;">
-        </td>
-      </tr>
-      <tr>
-        <td style="border:1px solid #ccc; padding:6px;">6</td>
-        <td style="border:1px solid #ccc; padding:6px;">1 November</td>
-        <td style="border:1px solid #ccc; padding:6px;">
-          <input type="number" style="width:100px;">
-        </td>
-      </tr>
-      <tr>
-        <td style="border:1px solid #ccc; padding:6px;">7</td>
-        <td style="border:1px solid #ccc; padding:6px;">1 December</td>
-        <td style="border:1px solid #ccc; padding:6px;">
-          <input type="number" style="width:100px;">
-        </td>
-      </tr>
-      <tr>
-        <td style="border:1px solid #ccc; padding:6px;">8</td>
-        <td style="border:1px solid #ccc; padding:6px;">1 January</td>
-        <td style="border:1px solid #ccc; padding:6px;">
-          <input type="number" style="width:100px;">
-        </td>
-      </tr>
-      <tr>
-        <td style="border:1px solid #ccc; padding:6px;">9</td>
-        <td style="border:1px solid #ccc; padding:6px;">1 February</td>
-        <td style="border:1px solid #ccc; padding:6px;">
-          <input type="number" style="width:100px;">
-        </td>
-      </tr>
-      <tr>
-        <td style="border:1px solid #ccc; padding:6px;">10</td>
-        <td style="border:1px solid #ccc; padding:6px;">1 March</td>
-        <td style="border:1px solid #ccc; padding:6px;">
-          <input type="number" style="width:100px;">
-        </td>
-      </tr>
+    <tbody id="paymentPlanBody">
+      <tr><td style="text-align:center;">1</td><td style="text-align:center;">Registration Date</td><td class="pp-amount" style="text-align:right;">0</td></tr>
+      <tr><td style="text-align:center;">2</td><td style="text-align:center;">1 July</td><td class="pp-amount" style="text-align:right;">0</td></tr>
+      <tr><td style="text-align:center;">3</td><td style="text-align:center;">1 August</td><td class="pp-amount" style="text-align:right;">0</td></tr>
+      <tr><td style="text-align:center;">4</td><td style="text-align:center;">1 September</td><td class="pp-amount" style="text-align:right;">0</td></tr>
+      <tr><td style="text-align:center;">5</td><td style="text-align:center;">1 October</td><td class="pp-amount" style="text-align:right;">0</td></tr>
+      <tr><td style="text-align:center;">6</td><td style="text-align:center;">1 November</td><td class="pp-amount" style="text-align:right;">0</td></tr>
+      <tr><td style="text-align:center;">7</td><td style="text-align:center;">1 December</td><td class="pp-amount" style="text-align:right;">0</td></tr>
+      <tr><td style="text-align:center;">8</td><td style="text-align:center;">1 January</td><td class="pp-amount" style="text-align:right;">0</td></tr>
+      <tr><td style="text-align:center;">9</td><td style="text-align:center;">1 February</td><td class="pp-amount" style="text-align:right;">0</td></tr>
+      <tr><td style="text-align:center;">10</td><td style="text-align:center;">1 March</td><td class="pp-amount" style="text-align:right;">0</td></tr>
     </tbody>
   </table>
 </div>
+
+
+
+
+
+
+    <button class="btn-submit">Add Student & Create Tuition Plan</button>
 
 </div>
 
