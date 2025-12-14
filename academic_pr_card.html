@@ -365,46 +365,75 @@
       color: var(--text-secondary);
     }
 
-    /* ===============================
-       🔽 ADDITIONS — NO BORDER / NO ARROW
-       =============================== */
+    /* EVERYTHING */
+* {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
 
-    /* Remove borders from ALL inputs */
-    input,
-    textarea {
-      border: none !important;
-      outline: none !important;
-      background: transparent !important;
-      box-shadow: none !important;
-    }
+/* INPUTS / TEXTAREAS */
+input,
+textarea {
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+}
 
-    /* Remove borders + arrows from ALL selects */
-    select {
-      border: none !important;
-      outline: none !important;
-      background: transparent !important;
-      box-shadow: none !important;
-      appearance: none !important;
-      -webkit-appearance: none !important;
-      -moz-appearance: none !important;
-      padding-right: 0 !important;
-    }
+/* SELECTS — REMOVE ARROWS */
+select {
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-image: none !important;
+  padding-right: 0 !important;
+}
 
-    /* Remove table borders */
-    table,
-    th,
-    td {
-      border: none !important;
-    }
+/* REMOVE ARROWS (EDGE / IE) */
+select::-ms-expand {
+  display: none;
+}
 
-    /* Prevent yellow focus highlight */
-    input:focus,
-    textarea:focus,
-    select:focus {
-      outline: none !important;
-      background: transparent !important;
-    }
+/* TABLES */
+table,
+thead,
+tbody,
+tr,
+th,
+td {
+  border: none !important;
+}
 
+/* CHECKBOXES KEEP SHAPE BUT NO OUTLINE */
+input[type="checkbox"] {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* REMOVE FOCUS COLOR */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* REMOVE PRINT BORDERS */
+@media print {
+  * {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+}
     /* Print */
 
     /* FIX PRINT LAYOUT */
