@@ -9,164 +9,247 @@
   body {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui;
     background: #f5f5f7;
-    padding: 30px;
+    padding: 24px;
   }
 
-  .container {
-    max-width: 700px;
-    margin: 0 auto;
-    background: #ffffff;
+  .page {
+    max-width: 720px;
+    margin: auto;
+    background: #fff;
     padding: 24px;
     border-radius: 12px;
   }
 
-  h1 {
+  .title {
     margin-bottom: 20px;
   }
 
-  .step {
-    padding: 20px;
+  .section {
     border: 1px solid #ddd;
-    border-radius: 8px;
+    border-radius: 10px;
+    padding: 20px;
     margin-bottom: 20px;
+  }
+
+  .sectionTitle {
+    margin-bottom: 12px;
   }
 
   label {
     display: block;
-    font-weight: 600;
-    margin-top: 12px;
+    margin-bottom: 6px;
+    font-size: 14px;
   }
 
-  input,
-  select {
+  input[type="radio"] {
+    margin-right: 6px;
+  }
+
+  .input {
     width: 100%;
     padding: 8px;
     margin-top: 6px;
-    font-size: 14px;
+    margin-bottom: 10px;
     border-radius: 6px;
     border: 1px solid #ccc;
-    box-sizing: border-box;
+    font-size: 14px;
   }
 
-  .radio-group {
-    margin-top: 8px;
+  .discountLine {
+    padding: 6px 0;
+    font-size: 14px;
   }
 
-  .radio-group label {
-    font-weight: normal;
-    display: inline-flex;
-    align-items: center;
-    margin-right: 20px;
-    gap: 6px;
-  }
-
-  .hint {
+  .finalBox {
     margin-top: 10px;
-    font-size: 13px;
-    color: gray;
-  }
-
-  .hint.success {
-    color: green;
-  }
-
-  .muted {
-    opacity: 0.4;
+    padding: 14px;
+    background: #f2f2f7;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 600;
   }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-  <h1>Create Student Plan</h1>
+<div class="page">
+  <h1 class="title">Create Student Plan</h1>
 
   <!-- STEP 1 -->
-  <div class="step">
-    <h3>Step 1 — Enrollment</h3>
+  <div class="section">
+    <h2 class="sectionTitle">Step 1 — Enrollment</h2>
 
-    <!-- ENROLL FOR -->
-    <label>Select Enrollment Option:</label>
-    <select id="enrollFor">
-      <option value="">Select…</option>
-      <option value="AY25">Academic Year 2025–2026</option>
-      <option value="SUM2026">Summer 2026</option>
-      <option value="AY26">Academic Year 2026–2027</option>
-      <option value="TE">Tiny Explorer (10-weeks)</option>
-    </select>
+    <label><input type="radio" name="enrollFor" value="AY25" checked> AY 2025–2026</label>
+    <label><input type="radio" name="enrollFor" value="SUM2026"> Summer 2026</label>
+    <label><input type="radio" name="enrollFor" value="AY26"> AY 2026–2027</label>
+    <label><input type="radio" name="enrollFor" value="TE"> Tiny Explorer</label>
 
-    <!-- ENROLL TYPE -->
-    <label style="margin-top:20px;">Enroll Type:</label>
-    <div class="radio-group">
-      <label>
-        <input type="radio" name="enrollType" value="new" checked>
-        New Student
-      </label>
+    <br>
 
-      <label>
-        <input type="radio" name="enrollType" value="current">
-        Current Student
-      </label>
-    </div>
+    <label><input type="radio" name="studentType" value="new" checked> New Student</label>
+    <label><input type="radio" name="studentType" value="current"> Current Student</label>
 
-    <!-- STUDENT FIELDS -->
-    <div id="studentFields" style="margin-top:20px;">
-      <!-- Dynamic content goes here -->
-    </div>
+    <div id="studentFields"></div>
   </div>
 
-  <p class="muted">More steps will be added after cleanup.</p>
+  <!-- STEP 2 -->
+  <div class="section">
+    <h2 class="sectionTitle">Step 2 — First Attendance Date</h2>
+    <input type="date" class="input" id="firstAttendance">
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="section">
+    <h2 class="sectionTitle">Step 3 — Tuition & Discounts</h2>
+
+    <h3>Add Discount</h3>
+    <select class="input" id="discountSelect">
+      <option value="">Select…</option>
+    </select>
+
+    <h3>Selected Discounts</h3>
+    <div id="selectedDiscounts"></div>
+
+    <h3>Final Tuition</h3>
+    <div class="finalBox" id="finalTuition">0 Ks</div>
+  </div>
 </div>
 
 <script>
-  const enrollForEl = document.getElementById("enrollFor");
-  const studentFieldsEl = document.getElementById("studentFields");
-  const enrollTypeEls = document.querySelectorAll("input[name='enrollType']");
+/* ---------------- MOCK DATA (replaces Supabase) ---------------- */
 
-  function getEnrollType() {
-    return document.querySelector("input[name='enrollType']:checked").value;
+const availableDiscounts = [
+  { discount_type_id: "FREE_SUMMER", discount_name_type: "Free Summer", discount_description: "100% summer waiver", discount_kind: "FIXED", value_fixed: 850000, value_percent: null, priority_group: 1 },
+  { discount_type_id: "DISC50", discount_name_type: "50% Discount", discount_description: "Half tuition", discount_kind: "PERCENT", value_fixed: null, value_percent: 50, priority_group: 2 },
+];
+
+const pricingData = {
+  AY: { annual_tuition_amount: 4200000 },
+  SUM: { annual_tuition_amount: 850000 },
+  TE: { annual_tuition_amount: 450000 }
+};
+
+/* ---------------- STATE ---------------- */
+
+let enrollmentFor = "AY25";
+let isNewStudent = true;
+let discounts = [];
+let tuitionFinal = 0;
+
+/* ---------------- HELPERS ---------------- */
+
+function getPricingSource() {
+  if (enrollmentFor === "SUM2026") return "SUM";
+  if (enrollmentFor === "TE") return "TE";
+  return "AY";
+}
+
+function getAllowedDiscounts() {
+  if (enrollmentFor === "SUM2026")
+    return availableDiscounts.filter(d => d.discount_type_id === "FREE_SUMMER" || d.discount_type_id === "DISC50");
+
+  if (enrollmentFor === "TE")
+    return availableDiscounts.filter(d => d.discount_type_id === "DISC50");
+
+  return availableDiscounts.filter(d => d.discount_type_id !== "FREE_SUMMER");
+}
+
+function recalcTuition() {
+  let base;
+  if (enrollmentFor === "SUM2026") base = 850000;
+  else if (enrollmentFor === "TE") base = 450000;
+  else base = pricingData.AY.annual_tuition_amount;
+
+  let total = base;
+
+  [...discounts].sort((a,b)=>a.priority_group-b.priority_group)
+    .forEach(d => {
+      if (d.discount_kind === "FIXED") total -= d.value_fixed || 0;
+      if (d.discount_kind === "PERCENT") total -= Math.floor(total * (d.value_percent / 100));
+    });
+
+  tuitionFinal = Math.max(0, total);
+  document.getElementById("finalTuition").textContent =
+    tuitionFinal.toLocaleString() + " Ks";
+}
+
+/* ---------------- UI RENDER ---------------- */
+
+function renderStudentFields() {
+  const box = document.getElementById("studentFields");
+  box.innerHTML = "";
+
+  if (isNewStudent) {
+    const idPreview = enrollmentFor === "AY26" ? "PR2026xxx" : "PR2025xxx";
+    box.innerHTML = `
+      <div>Student ID Preview: <b>${idPreview}</b></div>
+      <input class="input" placeholder="Student Name">
+      <input class="input" placeholder="Father's Name">
+    `;
+  } else {
+    box.innerHTML = `<input class="input" placeholder="Search Student ID or Name">`;
   }
+}
 
-  function renderStudentFields() {
-    const enrollType = getEnrollType();
-    const enrollFor = enrollForEl.value;
+function renderDiscountOptions() {
+  const sel = document.getElementById("discountSelect");
+  sel.innerHTML = `<option value="">Select…</option>`;
+  getAllowedDiscounts().forEach(d => {
+    const opt = document.createElement("option");
+    opt.value = d.discount_type_id;
+    opt.textContent = `${d.discount_name_type} — ${d.discount_description}`;
+    sel.appendChild(opt);
+  });
+}
 
-    studentFieldsEl.innerHTML = "";
+function renderSelectedDiscounts() {
+  const box = document.getElementById("selectedDiscounts");
+  box.innerHTML = "";
+  discounts.forEach(d => {
+    const div = document.createElement("div");
+    div.className = "discountLine";
+    div.textContent = `${d.discount_name_type} — ${d.discount_description}`;
+    box.appendChild(div);
+  });
+}
 
-    if (enrollType === "new") {
-      studentFieldsEl.innerHTML = `
-        <label>Student Full Name:</label>
-        <input type="text" id="studentName">
+/* ---------------- EVENTS ---------------- */
 
-        <label>Father’s Name:</label>
-        <input type="text" id="fatherName">
+document.querySelectorAll("input[name='enrollFor']").forEach(r =>
+  r.addEventListener("change", e => {
+    enrollmentFor = e.target.value;
+    discounts = [];
+    renderDiscountOptions();
+    renderSelectedDiscounts();
+    renderStudentFields();
+    recalcTuition();
+  })
+);
 
-        ${enrollFor ? `
-          <p class="hint success">
-            Student ID will be auto-generated (prefix based on ${enrollFor})
-          </p>
-        ` : ""}
-      `;
-    } else {
-      studentFieldsEl.innerHTML = `
-        <label>Enter Student ID:</label>
-        <input type="text" id="studentId">
+document.querySelectorAll("input[name='studentType']").forEach(r =>
+  r.addEventListener("change", e => {
+    isNewStudent = e.target.value === "new";
+    renderStudentFields();
+  })
+);
 
-        <p class="hint">
-          System will auto-fetch student details.
-        </p>
-      `;
-    }
-  }
+document.getElementById("discountSelect").addEventListener("change", e => {
+  const d = availableDiscounts.find(x => x.discount_type_id === e.target.value);
+  if (!d) return;
+  discounts.push(d);
+  renderSelectedDiscounts();
+  recalcTuition();
+});
 
-  // Event listeners
-  enrollForEl.addEventListener("change", renderStudentFields);
-  enrollTypeEls.forEach(radio =>
-    radio.addEventListener("change", renderStudentFields)
-  );
+/* ---------------- INIT ---------------- */
 
-  // Initial render
-  renderStudentFields();
+document.getElementById("firstAttendance").value =
+  new Date().toISOString().slice(0,10);
+
+renderStudentFields();
+renderDiscountOptions();
+recalcTuition();
 </script>
 
 </body>
