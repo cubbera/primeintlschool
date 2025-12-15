@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Student Enrollment & Tuition Plan</title>
+<title>Student Tuition Plan</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -13,7 +13,7 @@ body {
 }
 
 .container {
-  max-width:900px;
+  max-width:1000px;
   margin:auto;
   background:#fff;
   padding:30px;
@@ -29,59 +29,88 @@ h2 {
 .row {
   display:flex;
   align-items:center;
+  gap:16px;
   margin-top:14px;
-  gap:14px;
 }
 
 .label {
-  width:220px;
+  width:260px;
   font-weight:600;
 }
 
 input, select {
   padding:8px 10px;
   font-size:14px;
-  width:260px;
+  width:220px;
 }
 
 .radio-row {
   display:flex;
   gap:40px;
-  margin-top:10px;
+  margin-top:12px;
+}
+
+.discount-table {
+  margin-top:16px;
+}
+
+.discount-header,
+.discount-row {
+  display:grid;
+  grid-template-columns: 90px 200px 220px 180px 200px 40px;
+  gap:10px;
+  align-items:center;
+}
+
+.discount-header {
+  font-weight:700;
+  margin-bottom:8px;
 }
 
 .discount-row {
-  display:flex;
-  align-items:center;
-  gap:14px;
-  margin-top:10px;
+  margin-top:8px;
+  color:#b91c1c;
 }
 
-.discount-row select,
-.discount-row input {
-  width:180px;
-}
-
-.amount {
-  width:160px;
+.discount-amount {
   text-align:right;
   font-weight:600;
 }
 
-.total {
-  font-weight:700;
-  margin-top:12px;
+.remove-btn {
+  cursor:pointer;
+  font-size:18px;
+  color:#b91c1c;
+  text-align:center;
 }
 
-button {
-  margin-top:20px;
-  padding:14px;
-  font-size:16px;
+.add-discount-btn {
+  margin-top:14px;
+  padding:10px 14px;
+  background:#e5e7eb;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.final-btn {
+  margin-top:28px;
+  padding:16px;
   width:100%;
+  font-size:16px;
   background:#059669;
   color:white;
   border:none;
   border-radius:8px;
+}
+
+.total {
+  margin-top:12px;
+  font-weight:700;
+}
+
+.total.red {
+  color:#b91c1c;
 }
 </style>
 </head>
@@ -102,139 +131,106 @@ button {
 </div>
 
 <div class="radio-row">
-  <label><input type="radio" name="studentType" value="new" checked onchange="renderStudentFields()"> New Student</label>
-  <label><input type="radio" name="studentType" value="current" onchange="renderStudentFields()"> Current Student</label>
-</div>
-
-<div id="studentFields"></div>
-
-<div class="row">
-  <div class="label">First Attendance Date:</div>
-  <input type="date">
+  <label><input type="radio" checked> New Student</label>
+  <label><input type="radio"> Current Student</label>
 </div>
 
 <div class="row">
-  <div class="label">Grade Level:</div>
-  <select>
-    <option>SR</option><option>EY1</option><option>EY2</option>
-    <option>Y1</option><option>Y2</option><option>Y3</option>
-  </select>
-</div>
-
-<div class="row">
-  <div class="label">Payment Plan:</div>
-  <select id="paymentPlan" onchange="recalc()">
-    <option>Annual</option>
-    <option>Termly</option>
-    <option selected>Monthly</option>
-  </select>
+  <div class="label">Student ID:</div>
+  <input id="studentId" readonly>
 </div>
 
 <h2>2. Calculating Payment</h2>
 
 <div class="row">
   <div class="label">Tuition Before Discount:</div>
-  <input id="tuition" type="number" value="5000000" oninput="recalc()">
+  <div><b id="baseAmount">10,000,000</b></div>
 </div>
 
-<div id="discounts"></div>
+<div class="discount-table">
+  <div class="discount-header">
+    <div>Disc #</div>
+    <div>Type</div>
+    <div>Amount</div>
+    <div>Discount</div>
+    <div>After Discount</div>
+    <div></div>
+  </div>
 
-<button type="button" onclick="addDiscount()">+ Add Discount</button>
+  <div id="discountBody"></div>
+</div>
 
-<div class="total">Total Discount: <span id="totalDiscount">0</span></div>
-<div class="total">Amount After Discount: <span id="afterDiscount">0</span></div>
-<div class="b></b>
+<button class="add-discount-btn" onclick="addDiscount()">+ Add Discount</button>
 
-<div class="total">Monthly Fee (10x): <span id="monthlyFee">0</span></div>
+<div class="total red">Total Discount: <span id="totalDiscount">0</span></div>
+<div class="total">Amount After Discount: <span id="afterDiscount">10,000,000</span></div>
+<div class="total">Monthly Fee (10x): <span id="monthlyFee">1,000,000</span></div>
 
-<h2>3. Tuition Payment Plan</h2>
-
-<table width="100%" cellpadding="6">
-<tr><th>Payment No</th><th>Due Date</th><th>Amount</th></tr>
-<tbody id="planBody"></tbody>
-</table>
-
-<button>Add Student & Create Payment Plan</button>
-
-<p style="margin-top:10px;font-size:13px;color:#555">
-By clicking, we will create new student, payment plan, and then go to payment (creating payment receipt) page.
-</p>
+<button class="final-btn">Add Student & Create Payment Plan</button>
 
 </div>
 
 <script>
-function renderStudentFields() {
-  const type = document.querySelector('input[name="studentType"]:checked').value;
-  const year = document.getElementById("academicYear").value;
-  const box = document.getElementById("studentFields");
-  box.innerHTML = "";
-
-  if (type === "new") {
-    if (!year) return;
-    const id = year === "AY25" ? "PR25142" : "PR26012";
-    box.innerHTML = `
-      <div class="row">
-        <div class="label">Student ID:</div>
-        <input value="${id}" readonly>
-      </div>`;
-  } else {
-    box.innerHTML = `
-      <div class="row">
-        <div class="label">Student Name:</div>
-        <input>
-      </div>
-      <div class="row">
-        <div class="label">Student ID:</div>
-        <input>
-      </div>`;
-  }
-}
+const BASE = 10000000;
+let discounts = [];
 
 function updateStudentId() {
-  renderStudentFields();
+  const y = academicYear.value;
+  studentId.value = y === "AY25" ? "PR25142" :
+                    (y === "SUM26" || y === "AY26") ? "PR26012" : "";
 }
 
 function addDiscount() {
-  const d = document.createElement("div");
-  d.className = "discount-row";
-  d.innerHTML = `
-    <select onchange="recalc()">
-      <option value="">Select</option>
-      <option value="fixed">Fixed Amount</option>
-      <option value="percent">Percentage</option>
-    </select>
-    <input type="number" placeholder="Value" oninput="recalc()">
-    <div class="amount">0</div>`;
-  document.getElementById("discounts").appendChild(d);
+  discounts.push({ type:"fixed", value:0 });
+  render();
 }
 
-function recalc() {
-  const tuition = Number(document.getElementById("tuition").value || 0);
-  let totalDiscount = 0;
+function removeDiscount(i) {
+  discounts.splice(i,1);
+  render();
+}
 
-  document.querySelectorAll(".discount-row").forEach(r => {
-    const type = r.children[0].value;
-    const val = Number(r.children[1].value || 0);
-    let d = 0;
-    if (type === "fixed") d = val;
-    if (type === "percent") d = tuition * val / 100;
-    r.children[2].textContent = "-" + d.toLocaleString();
-    totalDiscount += d;
+function render() {
+  const body = document.getElementById("discountBody");
+  body.innerHTML = "";
+
+  // FIXED FIRST
+  const fixed = discounts.filter(d=>d.type==="fixed");
+  const percent = discounts.filter(d=>d.type==="percent");
+  const ordered = [...fixed, ...percent];
+
+  let running = BASE;
+  let totalDisc = 0;
+
+  ordered.forEach((d,i)=>{
+    let disc = d.type==="fixed" ? d.value : Math.round(running * d.value/100);
+    running -= disc;
+    totalDisc += disc;
+
+    body.innerHTML += `
+      <div class="discount-row">
+        <div>Disc #${i+1}</div>
+        <select onchange="updateType(${i},this.value)">
+          <option value="fixed" ${d.type==="fixed"?"selected":""}>Fixed Amount</option>
+          <option value="percent" ${d.type==="percent"?"selected":""}>Percentage</option>
+        </select>
+        <input type="number" value="${d.value}" oninput="updateValue(${i},this.value)">
+        <div class="discount-amount">-${disc.toLocaleString()}</div>
+        <div>${running.toLocaleString()}</div>
+        <div class="remove-btn" onclick="removeDiscount(${i})">−</div>
+      </div>
+    `;
   });
 
-  const net = tuition - totalDiscount;
-  document.getElementById("totalDiscount").textContent = "-" + totalDiscount.toLocaleString();
-  document.getElementById("afterDiscount").textContent = net.toLocaleString();
-  document.getElementById("monthlyFee").textContent = Math.round(net / 10).toLocaleString();
-
-  const body = document.getElementById("planBody");
-  body.innerHTML = "";
-  for (let i = 1; i <= 10; i++) {
-    body.innerHTML += `<tr><td>${i}</td><td>${i === 1 ? "Registration" : "Month " + i}</td><td>${Math.round(net/10).toLocaleString()}</td></tr>`;
-  }
+  totalDiscount.textContent = "-" + totalDisc.toLocaleString();
+  afterDiscount.textContent = running.toLocaleString();
+  monthlyFee.textContent = Math.round(running/10).toLocaleString();
 }
 
-recalc();
+function updateType(i,v){ discounts[i].type=v; render(); }
+function updateValue(i,v){ discounts[i].value=Number(v||0); render(); }
+
+render();
 </script>
 </body>
 </html>
