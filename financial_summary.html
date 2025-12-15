@@ -1,277 +1,361 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Financial Summary Report — International School</title>
 
 <style>
-@page { size: A4; margin: 12mm; }
+  @page { size: A4; margin: 12mm; }
 
-:root{
-  --text:#0b0f14;
-  --muted:#6b7280;
-  --line:#e5e7eb;
-  --bg:#ffffff;
-  --card:#f6f7f9;
-  --neg:#b42318;
-}
+  :root{
+    --bg:#ffffff;
+    --text:#0b0f14;
+    --muted:#6b7280;
+    --line:#e5e7eb;
+    --card:#f6f7f9;
+    --card2:#fbfbfc;
+    --neg:#b42318;
+    --pos:#0a7a3d;
+  }
 
-*{box-sizing:border-box}
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; background:var(--bg); color:var(--text); }
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
 
-body{
-  margin:0;
-  background:#fff;
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  color:var(--text);
-}
+  .page{ width:210mm; min-height:297mm; margin:0 auto; }
+  .wrap{ padding:0; }
 
-.page{
-  width:210mm;
-  min-height:297mm;
-  margin:0 auto;
-}
+  header{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:14px;
+    padding: 2mm 0 4mm 0;
+    border-bottom:1px solid var(--line);
+    margin-bottom:4mm;
+  }
+  .title h1{
+    margin:0;
+    font-size:18px;
+    letter-spacing:-0.3px;
+  }
+  .title .sub{
+    margin-top:2px;
+    font-size:12px;
+    color:var(--muted);
+    line-height:1.35;
+  }
+  .meta{
+    text-align:right;
+    font-size:11px;
+    color:var(--muted);
+    line-height:1.35;
+    white-space:nowrap;
+  }
+  .pill{
+    display:inline-block;
+    padding:4px 8px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    font-size:11px;
+    color:#111827;
+    background:var(--card2);
+    margin-top:6px;
+  }
 
-header{
-  border-bottom:1px solid var(--line);
-  padding-bottom:10px;
-  margin-bottom:14px;
-}
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:12px;
+  }
+  .card h2{
+    margin:0 0 8px 0;
+    font-size:12px;
+    letter-spacing:0.2px;
+    text-transform:uppercase;
+    color:#111827;
+  }
 
-h1{
-  margin:0;
-  font-size:18px;
-  letter-spacing:-0.3px;
-}
+  .kpis{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:10px;
+  }
+  .kpi{
+    background:var(--card2);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:10px;
+    min-height:64px;
+  }
+  .kpi .label{ font-size:11px; color:var(--muted); }
+  .kpi .value{ margin-top:4px; font-size:15px; font-weight:700; letter-spacing:-0.2px; }
+  .kpi .delta{ margin-top:4px; font-size:11px; color:var(--muted); }
+  .pos{ color:var(--pos); font-weight:700; }
+  .neg{ color:var(--neg); font-weight:700; }
 
-.sub{
-  margin-top:4px;
-  font-size:12px;
-  color:var(--muted);
-  line-height:1.4;
-}
+  .grid{
+    display:grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap:4mm;
+    margin-top:4mm;
+  }
 
-.card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:10px;
-  margin-bottom:12px;
-}
+  table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0;
+    font-size:10.6px;
+    background:var(--card2);
+    border:1px solid var(--line);
+    border-radius:12px;
+    overflow:hidden;
+  }
+  thead th{
+    text-align:left;
+    font-weight:700;
+    color:#111827;
+    padding:8px 8px;
+    border-bottom:1px solid var(--line);
+    background:#ffffff;
+    vertical-align:bottom;
+  }
+  tbody td{
+    padding:6px 8px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  tbody tr:last-child td{ border-bottom:none; }
 
-h2{
-  margin:0 0 8px 0;
-  font-size:12px;
-  letter-spacing:.3px;
-  text-transform:uppercase;
-}
+  .num{ text-align:right; font-variant-numeric: tabular-nums; }
+  .muted{ color:var(--muted); }
 
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
+  .section-row td{
+    background:#ffffff;
+    font-weight:900;
+    color:#111827;
+  }
+  .subtotal-row td{
+    background:#ffffff;
+    font-weight:900;
+  }
+  .students-row td{
+    background:#ffffff;
+    font-weight:800;
+  }
+  .students-row td:first-child{
+    color:var(--muted);
+    font-weight:700;
+  }
 
-table{
-  width:100%;
-  border-collapse:collapse;
-  font-size:11px;
-  background:#fff;
-  border-radius:10px;
-  overflow:hidden;
-}
+  footer{
+    margin-top:4mm;
+    padding-top:3mm;
+    border-top:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    font-size:11px;
+    color:var(--muted);
+  }
 
-th,td{
-  padding:6px 8px;
-  border-bottom:1px solid var(--line);
-}
-
-th{
-  text-align:left;
-  background:#fafafa;
-  font-weight:700;
-}
-
-.num{
-  text-align:right;
-  font-variant-numeric:tabular-nums;
-}
-
-.neg{ color:var(--neg); font-weight:600; }
-
-.section-row td{
-  background:#fafafa;
-  font-weight:800;
-}
-
-.total-row td{
-  background:#fafafa;
-  font-weight:900;
-}
-
-.students-row td{
-  background:#f9fafb;
-  font-weight:700;
-}
-
-footer{
-  margin-top:10px;
-  border-top:1px solid var(--line);
-  padding-top:6px;
-  display:flex;
-  justify-content:space-between;
-  font-size:11px;
-  color:var(--muted);
-}
+  @media print{
+    body{ background:#fff; }
+    .page{ box-shadow:none; }
+  }
 </style>
 </head>
 
 <body>
-<div class="page">
+  <div class="page">
+    <div class="wrap">
 
-<header>
-  <h1>Financial Summary Report — International School</h1>
-  <div class="sub">
-    Category: Jan’23–Mar’24 · AY2024–2025 (Apr’24–Mar’25) · AY2025–2026 (Apr’24–Nov’25)<br>
-    Reporting scope: Profit &amp; Loss, Assets (CapEx), Investments
+      <header>
+        <div class="title">
+          <h1>Financial Summary Report — International School</h1>
+          <div class="sub">
+            Comparison focus: <strong>AY2024–2025 (Apr’24–Mar’25)</strong> versus Jan’23–Mar’24.<br/>
+            Columns included: Jan’23–Mar’24 · AY2024–2025 · AY2025–2026 (Mar’25–Nov’25, Ongoing) · Total.
+          </div>
+        </div>
+        <div class="meta">
+          <div><strong>Reporting scope:</strong> P&amp;L, Assets (CapEx), Investments</div>
+          <div><strong>Period label:</strong> Apr 2024 – Mar 2025</div>
+          <div class="pill">One-page A4 • Print-ready</div>
+        </div>
+      </header>
+
+      <!-- Executive KPIs (AY2024–2025) -->
+      <section class="card">
+        <h2>Executive KPIs (AY2024–2025)</h2>
+        <div class="kpis">
+          <div class="kpi">
+            <div class="label">Income Subtotal</div>
+            <div class="value">89,439,200</div>
+            <div class="delta">Vs Jan’23–Mar’24: <span class="pos">+61,012,200</span></div>
+          </div>
+          <div class="kpi">
+            <div class="label">Total Expense</div>
+            <div class="value"><span class="neg">-218,622,390</span></div>
+            <div class="delta">Vs Jan’23–Mar’24: <span class="neg">-40,171,871</span> (higher cost)</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Profit / Loss</div>
+            <div class="value"><span class="neg">-129,183,190</span></div>
+            <div class="delta">Vs Jan’23–Mar’24: <span class="pos">+20,840,329</span> (loss reduced)</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="grid">
+
+        <!-- Left: P&L detail -->
+        <section class="card">
+          <h2>Profit &amp; Loss</h2>
+
+          <table aria-label="Profit and Loss">
+            <thead>
+              <tr>
+                <th style="width:46%">Line item</th>
+                <th class="num" style="width:14%">Jan’23–Mar’24</th>
+                <th class="num" style="width:14%">AY2024–2025<br><span class="muted">Apr’24–Mar’25</span></th>
+                <th class="num" style="width:14%">AY2025–2026<br><span class="muted">Mar’25–Nov’25 (Ongoing)</span></th>
+                <th class="num" style="width:12%">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <!-- Students row: amounts only (no title duplication) -->
+              <tr class="students-row">
+                <td></td>
+                <td class="num">18</td>
+                <td class="num">41</td>
+                <td class="num">103</td>
+                <td class="num"></td>
+              </tr>
+
+              <tr class="section-row"><td colspan="5">Income</td></tr>
+
+              <tr><td>Tuition Fees</td><td class="num">15,467,500</td><td class="num">63,409,800</td><td class="num">112,235,749</td><td class="num">191,113,049</td></tr>
+              <tr><td>Material Fees</td><td class="num">7,100,000</td><td class="num">17,624,400</td><td class="num">37,860,000</td><td class="num">62,584,400</td></tr>
+              <tr><td>Registration fees</td><td class="num">5,000,000</td><td class="num">6,200,000</td><td class="num">12,873,000</td><td class="num">24,073,000</td></tr>
+              <tr><td>Uniform Fees</td><td class="num">855,000</td><td class="num">2,355,000</td><td class="num">4,985,000</td><td class="num">8,195,000</td></tr>
+              <tr><td>Ferry Fees</td><td class="num">0</td><td class="num neg">-200,000</td><td class="num">3,272,000</td><td class="num">3,072,000</td></tr>
+              <tr><td>Other Income</td><td class="num">0</td><td class="num"></td><td class="num">1,177,495</td><td class="num">1,177,495</td></tr>
+              <tr><td>Sales of Merchandise</td><td class="num">4,500</td><td class="num">50,000</td><td class="num">7,500</td><td class="num">62,000</td></tr>
+
+              <tr class="subtotal-row">
+                <td>Income</td>
+                <td class="num">28,427,000</td>
+                <td class="num">89,439,200</td>
+                <td class="num">172,410,744</td>
+                <td class="num">290,276,944</td>
+              </tr>
+
+              <tr class="section-row"><td colspan="5">Expense</td></tr>
+
+              <tr><td>Staff Costs</td><td class="num neg">-51,463,946</td><td class="num neg">-83,394,582</td><td class="num neg">-87,923,133</td><td class="num neg">-222,781,661</td></tr>
+              <tr><td>Rent</td><td class="num neg">-66,599,999</td><td class="num neg">-66,600,000</td><td class="num"></td><td class="num neg">-133,199,999</td></tr>
+              <tr><td>Advertising &amp; Marketing</td><td class="num neg">-25,262,434</td><td class="num neg">-16,873,766</td><td class="num neg">-31,546,963</td><td class="num neg">-73,683,163</td></tr>
+              <tr><td>School Events Expenses</td><td class="num neg">-1,319,650</td><td class="num neg">-17,629,800</td><td class="num neg">-15,330,050</td><td class="num neg">-34,279,500</td></tr>
+              <tr><td>Maintenance &amp; Repairs</td><td class="num neg">-4,537,280</td><td class="num neg">-4,208,100</td><td class="num neg">-8,913,650</td><td class="num neg">-17,659,030</td></tr>
+              <tr><td>Supplies, Materials, &amp; Stationaries</td><td class="num neg">-3,239,600</td><td class="num neg">-5,864,367</td><td class="num neg">-6,115,485</td><td class="num neg">-15,219,452</td></tr>
+              <tr><td>General &amp; Administrative Expenses</td><td class="num neg">-6,691,900</td><td class="num neg">-3,438,860</td><td class="num neg">-3,278,971</td><td class="num neg">-13,409,730</td></tr>
+              <tr><td>Legal &amp; Professional Expenses</td><td class="num neg">-8,035,000</td><td class="num neg">-977,000</td><td class="num neg">-250,000</td><td class="num neg">-9,262,000</td></tr>
+              <tr><td>IT &amp; Internet Expenses</td><td class="num neg">-4,553,455</td><td class="num neg">-3,442,200</td><td class="num neg">-300,000</td><td class="num neg">-8,295,655</td></tr>
+              <tr><td>Office Expenses</td><td class="num neg">-2,231,750</td><td class="num neg">-2,476,900</td><td class="num neg">-2,471,350</td><td class="num neg">-7,180,000</td></tr>
+              <tr><td>Donation &amp; Gifts</td><td class="num neg">-400,500</td><td class="num neg">-1,248,400</td><td class="num neg">-2,165,100</td><td class="num neg">-3,814,000</td></tr>
+              <tr><td>Solar System</td><td class="num">0</td><td class="num neg">-70,000</td><td class="num neg">-3,682,100</td><td class="num neg">-3,752,100</td></tr>
+              <tr><td>Tax</td><td class="num neg">-444,950</td><td class="num neg">-1,437,400</td><td class="num neg">-1,021,400</td><td class="num neg">-2,903,750</td></tr>
+              <tr><td>Inventory-Books</td><td class="num neg">-2,398,055</td><td class="num neg">-6,502,765</td><td class="num neg">-20,209,233</td><td class="num neg">-29,110,053</td></tr>
+              <tr><td>Inventory-Uniform</td><td class="num neg">-1,272,000</td><td class="num neg">-4,458,250</td><td class="num neg">-4,701,500</td><td class="num neg">-10,431,750</td></tr>
+
+              <tr class="subtotal-row">
+                <td>Total Expense</td>
+                <td class="num neg">-178,450,519</td>
+                <td class="num neg">-218,622,390</td>
+                <td class="num neg">-187,908,935</td>
+                <td class="num neg">-584,981,843</td>
+              </tr>
+
+              <tr class="subtotal-row">
+                <td>Profit / Loss</td>
+                <td class="num neg">-150,023,519</td>
+                <td class="num neg">-129,183,190</td>
+                <td class="num neg">-15,498,190</td>
+                <td class="num neg">-294,704,899</td>
+              </tr>
+
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Right: Assets & Investments -->
+        <section class="card">
+          <h2>Assets (Capital Expenditure) &amp; Investments</h2>
+
+          <table aria-label="Assets and Investments">
+            <thead>
+              <tr>
+                <th style="width:46%">Line item</th>
+                <th class="num" style="width:14%">Jan’23–Mar’24</th>
+                <th class="num" style="width:14%">AY2024–2025</th>
+                <th class="num" style="width:14%">AY2025–2026</th>
+                <th class="num" style="width:12%">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <tr class="section-row"><td colspan="5">Asset</td></tr>
+
+              <tr><td>FA-Construction</td><td class="num neg">-148,825,224</td><td class="num neg">-20,710,000</td><td class="num neg">-7,094,600</td><td class="num neg">-176,629,824</td></tr>
+              <tr><td>FA-Electrical</td><td class="num neg">-68,541,440</td><td class="num neg">-21,792,950</td><td class="num neg">-14,496,100</td><td class="num neg">-104,830,490</td></tr>
+              <tr><td>FA-Furniture &amp; Fixtures</td><td class="num neg">-31,067,085</td><td class="num neg">-23,155,940</td><td class="num neg">-11,873,575</td><td class="num neg">-66,096,600</td></tr>
+              <tr><td>Solar System</td><td class="num neg">-31,905,400</td><td class="num neg">-400,000</td><td class="num"></td><td class="num neg">-32,305,400</td></tr>
+              <tr><td>Class Expenditure</td><td class="num neg">-7,751,963</td><td class="num neg">-13,964,092</td><td class="num neg">-3,211,162</td><td class="num neg">-24,927,217</td></tr>
+              <tr><td>FA-Equipment</td><td class="num neg">-3,483,500</td><td class="num neg">-870,250</td><td class="num neg">-479,100</td><td class="num neg">-4,832,850</td></tr>
+
+              <tr class="subtotal-row">
+                <td>Asset</td>
+                <td class="num neg">-291,574,612</td>
+                <td class="num neg">-80,893,232</td>
+                <td class="num neg">-37,154,537</td>
+                <td class="num neg">-409,622,381</td>
+              </tr>
+
+              <tr class="section-row"><td colspan="5">Investment</td></tr>
+
+              <tr><td>Ko Andy to PRIME</td><td class="num">162,864,100</td><td class="num">84,875,650</td><td class="num">16,120,000</td><td class="num">263,859,750</td></tr>
+              <tr><td>Ko Jon to PRIME</td><td class="num">150,964,333</td><td class="num">94,035,667</td><td class="num">10,000,000</td><td class="num">255,000,000</td></tr>
+              <tr><td>Ko Patrick to PRIME</td><td class="num">148,230,529</td><td class="num">90,879,351</td><td class="num">15,000,000</td><td class="num">254,109,880</td></tr>
+
+              <tr class="subtotal-row">
+                <td>Total Investment</td>
+                <td class="num">462,058,962</td>
+                <td class="num">269,790,668</td>
+                <td class="num">41,120,000</td>
+                <td class="num">772,969,630</td>
+              </tr>
+
+            </tbody>
+          </table>
+        </section>
+
+      </div>
+
+      <footer>
+        <div>One-page A4 • Professional management format</div>
+        <div>All totals recalculated and matched to provided sheet</div>
+      </footer>
+
+    </div>
   </div>
-</header>
-
-<div class="card">
-<h2>Profit &amp; Loss (Chart of Accounts)</h2>
-
-<table>
-<thead>
-<tr>
-  <th>Line Item</th>
-  <th class="num">Jan’23–Mar’24</th>
-  <th class="num">AY2024–2025</th>
-  <th class="num">AY2025–2026</th>
-  <th class="num">TOTAL</th>
-</tr>
-</thead>
-<tbody>
-
-<tr class="students-row">
-  <td colspan="5">
-    Total Students
-    <span style="float:right">
-      Jan’23–Mar’24: 18 &nbsp;&nbsp;|&nbsp;&nbsp;
-      AY2024–2025: 41 &nbsp;&nbsp;|&nbsp;&nbsp;
-      AY2025–2026: 103
-    </span>
-  </td>
-</tr>
-
-<tr class="section-row"><td colspan="5">Income</td></tr>
-
-<tr><td>Ferry Fees</td><td class="num">0</td><td class="num neg">-200,000</td><td class="num">3,272,000</td><td class="num">3,072,000</td></tr>
-<tr><td>Material Fees</td><td class="num">7,100,000</td><td class="num">17,624,400</td><td class="num">37,860,000</td><td class="num">62,584,400</td></tr>
-<tr><td>Other Income</td><td class="num">0</td><td class="num"></td><td class="num">1,177,495</td><td class="num">1,177,495</td></tr>
-<tr><td>Registration Fees</td><td class="num">5,000,000</td><td class="num">6,200,000</td><td class="num">12,873,000</td><td class="num">24,073,000</td></tr>
-<tr><td>Sales of Merchandise</td><td class="num">4,500</td><td class="num">50,000</td><td class="num">7,500</td><td class="num">62,000</td></tr>
-<tr><td>Tuition Fees</td><td class="num">15,467,500</td><td class="num">63,409,800</td><td class="num">112,235,749</td><td class="num">191,113,049</td></tr>
-<tr><td>Uniform Fees</td><td class="num">855,000</td><td class="num">2,355,000</td><td class="num">4,985,000</td><td class="num">8,195,000</td></tr>
-
-<tr class="total-row">
-  <td>Income Subtotal</td>
-  <td class="num">28,427,000</td>
-  <td class="num">89,439,600</td>
-  <td class="num">172,410,744</td>
-  <td class="num">290,277,344</td>
-</tr>
-
-<tr class="section-row"><td colspan="5">Expense</td></tr>
-
-<tr><td>Advertising &amp; Marketing</td><td class="num neg">-25,262,434</td><td class="num neg">-16,873,766</td><td class="num neg">-31,546,963</td><td class="num neg">-73,683,163</td></tr>
-<tr><td>Donation &amp; Gifts</td><td class="num neg">-400,500</td><td class="num neg">-1,248,400</td><td class="num neg">-2,165,100</td><td class="num neg">-3,814,000</td></tr>
-<tr><td>Staff Costs</td><td class="num neg">-51,463,946</td><td class="num neg">-83,394,582</td><td class="num neg">-87,923,133</td><td class="num neg">-222,781,661</td></tr>
-<tr><td>Utilities</td><td class="num neg">-2,040,880</td><td class="num neg">-4,498,890</td><td class="num neg">-2,127,550</td><td class="num neg">-8,667,320</td></tr>
-
-<tr class="total-row">
-  <td>Expense Subtotal</td>
-  <td class="num neg">-79,167,760</td>
-  <td class="num neg">-105, , ,</td>
-  <td class="num neg">-123, , ,</td>
-  <td class="num neg">-308, , ,</td>
-</tr>
-
-</tbody>
-</table>
-</div>
-
-<div class="grid">
-
-<div class="card">
-<h2>Assets (Capital Expenditure)</h2>
-<table>
-<thead>
-<tr>
-  <th>Line Item</th>
-  <th class="num">Jan’23–Mar’24</th>
-  <th class="num">AY2024–2025</th>
-  <th class="num">AY2025–2026</th>
-  <th class="num">TOTAL</th>
-</tr>
-</thead>
-<tbody>
-
-<tr class="section-row"><td colspan="5">Asset</td></tr>
-
-<tr><td>Class Expenditure</td><td class="num neg">-7,751,963</td><td class="num neg">-13,964,092</td><td class="num neg">-3,211,162</td><td class="num neg">-24,927,217</td></tr>
-<tr><td>FA-Construction</td><td class="num neg">-148,825,224</td><td class="num neg">-20,710,000</td><td class="num neg">-7,094,600</td><td class="num neg">-176,629,824</td></tr>
-<tr><td>FA-Electrical</td><td class="num neg">-68,541,440</td><td class="num neg">-21,792,950</td><td class="num neg">-14,496,100</td><td class="num neg">-104,830,490</td></tr>
-
-<tr class="total-row">
-  <td>Asset Subtotal</td>
-  <td class="num neg">-225,118,627</td>
-  <td class="num neg">-56,467,042</td>
-  <td class="num neg">-24,801,862</td>
-  <td class="num neg">-306,387,531</td>
-</tr>
-
-</tbody>
-</table>
-</div>
-
-<div class="card">
-<h2>Investments</h2>
-<table>
-<thead>
-<tr>
-  <th>Line Item</th>
-  <th class="num">Jan’23–Mar’24</th>
-  <th class="num">AY2024–2025</th>
-  <th class="num">AY2025–2026</th>
-  <th class="num">TOTAL</th>
-</tr>
-</thead>
-<tbody>
-
-<tr class="section-row"><td colspan="5">Investment</td></tr>
-
-<tr><td>Ko Andy to PRIME</td><td class="num">162,864,100</td><td class="num">84,875,650</td><td class="num">16,120,000</td><td class="num">263,859,750</td></tr>
-<tr><td>Ko Jon to PRIME</td><td class="num">150,964,333</td><td class="num">94,035,667</td><td class="num">10,000,000</td><td class="num">255,000,000</td></tr>
-<tr><td>Ko Patrick to PRIME</td><td class="num">148,230,529</td><td class="num">90,879,351</td><td class="num">15,000,000</td><td class="num">254,109,880</td></tr>
-
-<tr class="total-row">
-  <td>Investment Subtotal</td>
-  <td class="num">462,058,962</td>
-  <td class="num">269,790,668</td>
-  <td class="num">41,120,000</td>
-  <td class="num">772,969,630</td>
-</tr>
-
-</tbody>
-</table>
-</div>
-
-</div>
-
-<footer>
-  <div>One-page A4 · Print-ready</div>
-  <div>Prepared for management review</div>
-</footer>
-
-</div>
 </body>
 </html>
