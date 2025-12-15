@@ -97,19 +97,23 @@ select{
 }
 table{
   width:100%;border-collapse:collapse;
-  min-width:900px;font-size:13px;
+  min-width:1000px;font-size:13px;
 }
 th{
   background:#f2f2f7;
   color:var(--text-secondary);
   font-weight:600;
   padding:10px;border-bottom:1px solid var(--border);
+  cursor:pointer;
+  user-select:none;
 }
+th.sort-active{color:var(--accent)}
 td{
   padding:10px;border-bottom:1px solid var(--border);
   text-align:center;
 }
 td.name{text-align:left;font-weight:500}
+td.id{text-align:left;font-family:monospace}
 .score-high{color:var(--success);font-weight:600}
 .score-mid{color:var(--warning);font-weight:600}
 .score-low{color:var(--danger);font-weight:600}
@@ -140,99 +144,125 @@ tbody tr:hover td{background:#f5f5f7}
   <div class="page-title">Class Score Summary</div>
   <div class="page-subtitle">Final subject marks for selected academic period.</div>
 
-  <!-- FILTERS -->
   <div class="filters">
     <select>
       <option>AY2023–2024</option>
       <option>AY2024–2025</option>
       <option selected>AY2025–2026</option>
     </select>
-
     <select>
       <option>Term 1</option>
       <option selected>Term 2</option>
       <option>Term 3</option>
     </select>
-
     <select>
       <option>Y1-A</option>
       <option selected>Y2-A</option>
-      <option>Y3-A</option>
     </select>
   </div>
 
-  <!-- SUMMARY -->
   <section class="summary-cards">
-    <div class="card">
-      <div class="card-title">Class Average</div>
-      <div class="card-value" id="avg">–</div>
-    </div>
-    <div class="card">
-      <div class="card-title">Highest Mark</div>
-      <div class="card-value" id="high">–</div>
-    </div>
-    <div class="card">
-      <div class="card-title">Lowest Mark</div>
-      <div class="card-value" id="low">–</div>
-    </div>
-    <div class="card">
-      <div class="card-title">Students</div>
-      <div class="card-value">10</div>
-    </div>
+    <div class="card"><div class="card-title">Class Average</div><div class="card-value" id="avg">–</div></div>
+    <div class="card"><div class="card-title">Highest Mark</div><div class="card-value" id="high">–</div></div>
+    <div class="card"><div class="card-title">Lowest Mark</div><div class="card-value" id="low">–</div></div>
+    <div class="card"><div class="card-title">Students</div><div class="card-value">10</div></div>
   </section>
 
-  <!-- TABLE -->
   <div class="table-wrapper">
-    <table>
+    <table id="scoreTable">
       <thead>
         <tr>
-          <th>Student</th>
-          <th>English</th>
-          <th>Math</th>
-          <th>Science</th>
-          <th>ICT</th>
-          <th>Global</th>
-          <th>Myanmar</th>
-          <th>Chinese</th>
-          <th>Average</th>
+          <th data-key="id">Student ID</th>
+          <th data-key="name">Student</th>
+          <th data-key="English">English</th>
+          <th data-key="Math">Math</th>
+          <th data-key="Science">Science</th>
+          <th data-key="ICT">ICT</th>
+          <th data-key="Global">Global</th>
+          <th data-key="Myanmar">Myanmar</th>
+          <th data-key="Chinese">Chinese</th>
+          <th data-key="avg">Average</th>
         </tr>
       </thead>
-      <tbody id="rows"></tbody>
+      <tbody></tbody>
     </table>
   </div>
 </main>
 
 <script>
 const students=[
-  "Aye Chan","Hnin Pwint","Min Khant","Thiri Tun","Zin Myo",
-  "Pyae Phyo","Su Mon","Khine Thazin","Ye Lin","Moe Set"
+  {id:"PR23004",name:"Aye Chan"},
+  {id:"PR23005",name:"Hnin Pwint"},
+  {id:"PR23006",name:"Min Khant"},
+  {id:"PR23009",name:"Thiri Tun"},
+  {id:"PR23010",name:"Zin Myo"},
+  {id:"PR24046",name:"Pyae Phyo"},
+  {id:"PR24050",name:"Su Mon"},
+  {id:"PR24051",name:"Khine Thazin"},
+  {id:"PR25010",name:"Ye Lin"},
+  {id:"PR2523", name:"Moe Set"}
 ];
 
 function rand(min,max){return Math.floor(Math.random()*(max-min+1))+min}
 
-let allAverages=[],tbody=document.getElementById("rows");
-
-students.forEach(name=>{
-  let scores=[
-    rand(65,98),rand(65,98),rand(65,98),rand(65,98),
-    rand(65,98),rand(65,98),rand(65,98)
-  ];
-  let avg=Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
-  allAverages.push(avg);
-
-  let tr=document.createElement("tr");
-  tr.innerHTML=`
-    <td class="name">${name}</td>
-    ${scores.map(s=>`<td class="${s>=85?'score-high':s>=70?'score-mid':'score-low'}">${s}</td>`).join("")}
-    <td class="${avg>=85?'score-high':avg>=70?'score-mid':'score-low'}">${avg}</td>
-  `;
-  tbody.appendChild(tr);
+students.forEach(s=>{
+  s.English=rand(65,98);
+  s.Math=rand(65,98);
+  s.Science=rand(65,98);
+  s.ICT=rand(65,98);
+  s.Global=rand(65,98);
+  s.Myanmar=rand(65,98);
+  s.Chinese=rand(65,98);
+  s.avg=Math.round(
+    (s.English+s.Math+s.Science+s.ICT+s.Global+s.Myanmar+s.Chinese)/7
+  );
 });
 
-document.getElementById("avg").textContent=
-  Math.round(allAverages.reduce((a,b)=>a+b,0)/allAverages.length);
-document.getElementById("high").textContent=Math.max(...allAverages);
-document.getElementById("low").textContent=Math.min(...allAverages);
+let sortKey="id",sortAsc=true;
+
+const tbody=document.querySelector("tbody");
+const headers=document.querySelectorAll("th");
+
+function render(){
+  tbody.innerHTML="";
+  let avgs=[];
+  students.forEach(s=>{
+    avgs.push(s.avg);
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td class="id">${s.id}</td>
+      <td class="name">${s.name}</td>
+      ${["English","Math","Science","ICT","Global","Myanmar","Chinese"].map(k=>{
+        const v=s[k];
+        return `<td class="${v>=85?'score-high':v>=70?'score-mid':'score-low'}">${v}</td>`;
+      }).join("")}
+      <td class="${s.avg>=85?'score-high':s.avg>=70?'score-mid':'score-low'}">${s.avg}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+  document.getElementById("avg").textContent=Math.round(avgs.reduce((a,b)=>a+b,0)/avgs.length);
+  document.getElementById("high").textContent=Math.max(...avgs);
+  document.getElementById("low").textContent=Math.min(...avgs);
+}
+
+function sortData(key){
+  sortAsc = sortKey===key ? !sortAsc : true;
+  sortKey = key;
+  students.sort((a,b)=>{
+    let x=a[key], y=b[key];
+    if(typeof x==="string") return sortAsc ? x.localeCompare(y) : y.localeCompare(x);
+    return sortAsc ? x-y : y-x;
+  });
+  headers.forEach(h=>h.classList.remove("sort-active"));
+  document.querySelector(`th[data-key="${key}"]`).classList.add("sort-active");
+  render();
+}
+
+headers.forEach(h=>{
+  h.addEventListener("click",()=>sortData(h.dataset.key));
+});
+
+sortData("id"); // default sort
 </script>
 
 </body>
