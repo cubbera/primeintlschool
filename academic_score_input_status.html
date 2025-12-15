@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Subject Status</title>
+  <title>Class Status</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="data:,">
 
@@ -59,7 +59,7 @@
 </head>
 <body>
 
-<h1>Subject Status</h1>
+<h1>Score Input Status</h1>
 
 <div class="filters">
   <label>
@@ -90,14 +90,19 @@
       <th>Academic Year</th>
       <th>Term</th>
       <th>Class</th>
-      <th>Subject</th>
-      <th>Status</th>
+      <th>Quantitative Status</th>
+      <th>Qualitative Status</th>
+      <th>Comment Status</th>
     </tr>
   </thead>
   <tbody id="tbody"></tbody>
 </table>
 
 <div id="error"></div>
+
+
+</br></br><button>Generate Student Progress Card</button>
+
 
 <script>
 const WEB_APP_URL =
@@ -165,7 +170,6 @@ function applyFilters() {
   rows.sort((a, b) => {
     if (a.is_done != b.is_done) return a.is_done - b.is_done;
     if (a.class_id !== b.class_id) return a.class_id.localeCompare(b.class_id);
-    return a.subject.localeCompare(b.subject);
   });
 
   render(rows);
@@ -183,7 +187,8 @@ function render(rows) {
       <td>${r.academic_year}</td>
       <td>${r.term}</td>
       <td>${r.class_id}</td>
-      <td>${r.subject}</td>
+      <td>${r.is_done == 1 ? "Done" : "Pending"}</td>
+      <td>${r.is_done == 1 ? "Done" : "Pending"}</td>
       <td>${r.is_done == 1 ? "Done" : "Pending"}</td>
     `;
 
@@ -193,6 +198,5 @@ function render(rows) {
 
 loadData();
 </script>
-
 </body>
 </html>
