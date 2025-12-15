@@ -1,222 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Class Score Summary – Prime International School</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<title>Class Score Summary – Prime International School</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <style>
-    :root {
-      --bg: #f5f5f7;
-      --bg-elevated: #ffffff;
-      --border: #e5e5ea;
-      --text-primary: #111;
-      --text-secondary: #6e6e73;
-      --accent: #0071e3;
-      --success: #1c8c3a;
-      --warning: #f2c94c;
-      --danger: #eb5757;
-      --radius-card: 14px;
-      --shadow: 0 14px 34px rgba(0,0,0,0.06);
-      --max-width: 1280px;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui;
-      background: var(--bg); color: var(--text-primary);
-    }
+<style>
+:root {
+  --bg:#f5f5f7;
+  --bg-elevated:#ffffff;
+  --border:#e5e5ea;
+  --text-primary:#111;
+  --text-secondary:#6e6e73;
+  --accent:#0071e3;
+  --success:#1c8c3a;
+  --warning:#c58b00;
+  --danger:#eb5757;
+  --radius-card:14px;
+  --shadow:0 14px 34px rgba(0,0,0,0.06);
+  --max-width:1280px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui;
+  background:var(--bg);
+  color:var(--text-primary);
+}
 
-    .topbar {
-      position: sticky; top: 0;
-      height: 60px; background: rgba(245,245,247,0.8);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-      display: flex; justify-content: center; align-items: center;
-    }
-    .topbar-inner {
-      width: 100%; max-width: var(--max-width);
-      display: flex; justify-content: space-between; padding: 0 20px;
-    }
+.topbar{
+  position:sticky;top:0;height:60px;
+  background:rgba(245,245,247,.85);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  display:flex;justify-content:center;
+}
+.topbar-inner{
+  max-width:var(--max-width);
+  width:100%;
+  display:flex;justify-content:space-between;
+  align-items:center;padding:0 20px;
+}
 
-    .brand { display: flex; align-items: center; gap: 10px; }
-    .brand-mark {
-      width: 30px; height: 30px; border-radius: 10px;
-      background: linear-gradient(135deg, #9ce0ff, #0071e3);
-      display: flex; align-items: center; justify-content: center;
-      color: white; font-weight: 700;
-      box-shadow: 0 6px 18px rgba(0,113,227,0.36);
-    }
-    .brand-text span:first-child { font-weight: 600; }
-    .brand-text span { display: block; font-size: 12px; color: var(--text-secondary); }
+.brand{display:flex;gap:10px;align-items:center}
+.brand-mark{
+  width:30px;height:30px;border-radius:10px;
+  background:linear-gradient(135deg,#9ce0ff,#0071e3);
+  color:#fff;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+.brand-text span:first-child{font-weight:600}
+.brand-text span{display:block;font-size:12px;color:var(--text-secondary)}
 
-    .btn {
-      padding: 6px 14px; border-radius: 50px;
-      border: 1px solid var(--border);
-      background: white; cursor: pointer; font-size: 13px;
-    }
-    .btn-primary {
-      background: var(--accent); color: white;
-      border-color: var(--accent);
-    }
+.btn{
+  padding:6px 14px;border-radius:50px;
+  border:1px solid var(--border);
+  background:white;font-size:13px;cursor:pointer;
+}
+.btn-primary{background:var(--accent);color:white;border-color:var(--accent)}
 
-    .page {
-      max-width: var(--max-width); margin: 30px auto; padding: 0 20px;
-    }
-    .page-title { font-size: 26px; font-weight: 600; margin-bottom: 8px; }
-    .page-subtitle { color: var(--text-secondary); font-size: 14px; margin-bottom: 18px; }
+.page{
+  max-width:var(--max-width);
+  margin:28px auto;padding:0 20px;
+}
 
-    .summary-cards {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px; margin-bottom: 30px;
-    }
-    .card {
-      background: var(--bg-elevated); padding: 16px;
-      border-radius: var(--radius-card); box-shadow: var(--shadow);
-      border: 1px solid rgba(0,0,0,0.05);
-    }
-    .card-title { font-size: 13px; color: var(--text-secondary); }
-    .card-value { font-size: 24px; margin-top: 6px; font-weight: 600; }
+.page-title{font-size:26px;font-weight:600;margin-bottom:6px}
+.page-subtitle{font-size:14px;color:var(--text-secondary);margin-bottom:18px}
 
-    .table-wrapper {
-      margin-top: 20px; border-radius: 14px;
-      overflow: auto; border: 1px solid var(--border);
-      background: white;
-    }
-    table {
-      width: 100%; border-collapse: collapse; min-width: 900px;
-      font-size: 13px;
-    }
-    th {
-      background: #f2f2f7; text-align: center;
-      padding: 10px; font-weight: 600; color: var(--text-secondary);
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
-    }
-    td {
-      padding: 10px; text-align: center; border-bottom: 1px solid var(--border);
-    }
-    td.name-col { text-align: left; font-weight: 500; }
+.filters{
+  display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;
+}
+select{
+  padding:8px 14px;border-radius:999px;
+  border:1px solid var(--border);
+  background:white;font-size:13px;
+}
 
-    .score-high { color: var(--success); font-weight: 600; }
-    .score-mid { color: #c58b00; font-weight: 600; }
-    .score-low { color: var(--danger); font-weight: 600; }
+.summary-cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:16px;margin-bottom:26px;
+}
+.card{
+  background:var(--bg-elevated);
+  border-radius:var(--radius-card);
+  box-shadow:var(--shadow);
+  padding:16px;border:1px solid rgba(0,0,0,.05);
+}
+.card-title{font-size:13px;color:var(--text-secondary)}
+.card-value{font-size:24px;font-weight:600;margin-top:6px}
 
-    tbody tr:nth-child(even) td { background: #fbfbfd; }
-    tbody tr:hover td { background: #f5f5f7; }
-  </style>
+.table-wrapper{
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:white;
+  overflow:auto;
+}
+table{
+  width:100%;border-collapse:collapse;
+  min-width:900px;font-size:13px;
+}
+th{
+  background:#f2f2f7;
+  color:var(--text-secondary);
+  font-weight:600;
+  padding:10px;border-bottom:1px solid var(--border);
+}
+td{
+  padding:10px;border-bottom:1px solid var(--border);
+  text-align:center;
+}
+td.name{text-align:left;font-weight:500}
+.score-high{color:var(--success);font-weight:600}
+.score-mid{color:var(--warning);font-weight:600}
+.score-low{color:var(--danger);font-weight:600}
+tbody tr:nth-child(even) td{background:#fbfbfd}
+tbody tr:hover td{background:#f5f5f7}
+</style>
 </head>
 
 <body>
 
-  <!-- TOPBAR -->
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="brand">
-        <div class="brand-mark">P</div>
-        <div class="brand-text">
-          <span>Prime International School Yangon</span>
-          <span>Class Score Summary</span>
-        </div>
-      </div>
-      <div>
-        <button class="btn">Export Excel</button>
-        <button class="btn btn-primary">Export Progress Reports</button>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-mark">P</div>
+      <div class="brand-text">
+        <span>Prime International School Yangon</span>
+        <span>Class Score Summary</span>
       </div>
     </div>
-  </header>
-
-  <!-- PAGE -->
-  <main class="page">
-    <div class="page-title">Year 2 – Term 1 Score Summary</div>
-    <div class="page-subtitle">All subjects final marks for the entire class.</div>
-
-    <!-- SUMMARY CARDS -->
-    <section class="summary-cards">
-      <div class="card">
-        <div class="card-title">Class Average</div>
-        <div class="card-value">87.4</div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Highest Mark</div>
-        <div class="card-value">97</div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Lowest Mark</div>
-        <div class="card-value">72</div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Students</div>
-        <div class="card-value">13</div>
-      </div>
-    </section>
-
-    <!-- TABLE -->
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>Student</th>
-            <th>English</th>
-            <th>Math</th>
-            <th>Science</th>
-            <th>ICT</th>
-            <th>Global</th>
-            <th>Myanmar</th>
-            <th>Wellbeing</th>
-            <th>Chinese</th>
-            <th>Average</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr>
-            <td class="name-col">Zin Aung Hlaing</td>
-            <td class="score-high">90</td>
-            <td class="score-high">91</td>
-            <td class="score-high">96</td>
-            <td>88</td>
-            <td>90</td>
-            <td>87</td>
-            <td>Strong</td>
-            <td>92</td>
-            <td class="score-high">91</td>
-          </tr>
-
-          <tr>
-            <td class="name-col">Phoo Pyae Heather</td>
-            <td>82</td>
-            <td>77</td>
-            <td>89</td>
-            <td>83</td>
-            <td>82</td>
-            <td>80</td>
-            <td>Proficient</td>
-            <td>88</td>
-            <td>83</td>
-          </tr>
-
-          <tr>
-            <td class="name-col">Shwe Sin Htet Aung</td>
-            <td class="score-mid">74</td>
-            <td class="score-mid">72</td>
-            <td class="score-high">86</td>
-            <td>78</td>
-            <td>76</td>
-            <td>70</td>
-            <td>Developing</td>
-            <td>72</td>
-            <td class="score-mid">76</td>
-          </tr>
-
-          <!-- More rows dynamically generated -->
-        </tbody>
-      </table>
+    <div>
+      <button class="btn">Export Excel</button>
+      <button class="btn btn-primary">Export Reports</button>
     </div>
+  </div>
+</header>
 
-  </main>
+<main class="page">
+  <div class="page-title">Class Score Summary</div>
+  <div class="page-subtitle">Final subject marks for selected academic period.</div>
+
+  <!-- FILTERS -->
+  <div class="filters">
+    <select>
+      <option>AY2023–2024</option>
+      <option>AY2024–2025</option>
+      <option selected>AY2025–2026</option>
+    </select>
+
+    <select>
+      <option>Term 1</option>
+      <option selected>Term 2</option>
+      <option>Term 3</option>
+    </select>
+
+    <select>
+      <option>Y1-A</option>
+      <option selected>Y2-A</option>
+      <option>Y3-A</option>
+    </select>
+  </div>
+
+  <!-- SUMMARY -->
+  <section class="summary-cards">
+    <div class="card">
+      <div class="card-title">Class Average</div>
+      <div class="card-value" id="avg">–</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Highest Mark</div>
+      <div class="card-value" id="high">–</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Lowest Mark</div>
+      <div class="card-value" id="low">–</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Students</div>
+      <div class="card-value">10</div>
+    </div>
+  </section>
+
+  <!-- TABLE -->
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>English</th>
+          <th>Math</th>
+          <th>Science</th>
+          <th>ICT</th>
+          <th>Global</th>
+          <th>Myanmar</th>
+          <th>Chinese</th>
+          <th>Average</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+</main>
+
+<script>
+const students=[
+  "Aye Chan","Hnin Pwint","Min Khant","Thiri Tun","Zin Myo",
+  "Pyae Phyo","Su Mon","Khine Thazin","Ye Lin","Moe Set"
+];
+
+function rand(min,max){return Math.floor(Math.random()*(max-min+1))+min}
+
+let allAverages=[],tbody=document.getElementById("rows");
+
+students.forEach(name=>{
+  let scores=[
+    rand(65,98),rand(65,98),rand(65,98),rand(65,98),
+    rand(65,98),rand(65,98),rand(65,98)
+  ];
+  let avg=Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
+  allAverages.push(avg);
+
+  let tr=document.createElement("tr");
+  tr.innerHTML=`
+    <td class="name">${name}</td>
+    ${scores.map(s=>`<td class="${s>=85?'score-high':s>=70?'score-mid':'score-low'}">${s}</td>`).join("")}
+    <td class="${avg>=85?'score-high':avg>=70?'score-mid':'score-low'}">${avg}</td>
+  `;
+  tbody.appendChild(tr);
+});
+
+document.getElementById("avg").textContent=
+  Math.round(allAverages.reduce((a,b)=>a+b,0)/allAverages.length);
+document.getElementById("high").textContent=Math.max(...allAverages);
+document.getElementById("low").textContent=Math.min(...allAverages);
+</script>
 
 </body>
 </html>
