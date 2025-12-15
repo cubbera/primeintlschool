@@ -20,10 +20,7 @@
     border-radius: 14px;
   }
 
-  h1 {
-    margin-bottom: 24px;
-  }
-
+  h1 { margin-bottom: 24px; }
   h2 {
     margin-top: 28px;
     margin-bottom: 12px;
@@ -32,12 +29,7 @@
     padding-bottom: 6px;
   }
 
-  label {
-    display: block;
-    font-weight: 600;
-    margin-top: 12px;
-  }
-
+  label { display: block; font-weight: 600; margin-top: 12px; }
   input, select {
     width: 100%;
     padding: 10px;
@@ -45,50 +37,15 @@
     font-size: 14px;
     border-radius: 8px;
     border: 1px solid #d1d5db;
-    box-sizing: border-box;
   }
 
-  .row {
-    display: flex;
-    gap: 16px;
-  }
-
-  .row > div {
-    flex: 1;
-  }
-
-  .radio-group {
-    display: flex;
-    gap: 20px;
-    margin-top: 8px;
-  }
-
-  .radio-group label {
-    font-weight: normal;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .hint {
-    font-size: 13px;
-    margin-top: 8px;
-    color: #555;
-  }
-
-  .hint.success {
-    color: #047857;
-  }
+  .radio-group { display: flex; gap: 20px; margin-top: 8px; }
+  .radio-group label { font-weight: normal; }
 
   .discount-row {
     display: flex;
     gap: 10px;
     margin-top: 8px;
-  }
-
-  .discount-row input,
-  .discount-row select {
-    flex: 1;
   }
 
   table {
@@ -98,27 +55,18 @@
     font-size: 14px;
   }
 
-  table th, table td {
+  th, td {
     border: 1px solid #e5e7eb;
     padding: 8px;
     text-align: center;
   }
 
-  table th {
-    background: #f9fafb;
-  }
+  th { background: #f9fafb; }
 
-  .summary {
-    margin-top: 16px;
-    font-size: 15px;
-  }
-
-  .summary div {
-    margin-top: 6px;
-  }
+  .summary div { margin-top: 6px; }
 
   .btn {
-    margin-top: 28px;
+    margin-top: 20px;
     width: 100%;
     background: #059669;
     color: #fff;
@@ -146,7 +94,7 @@
 <h2>1. Enrollment</h2>
 
 <label>Academic Year</label>
-<select id="academicYear">
+<select id="academicYear" onchange="renderStudent(); recalc();">
   <option value="">Select…</option>
   <option value="AY25">AY 2025–2026</option>
   <option value="SUM26">Summer 2026</option>
@@ -155,8 +103,8 @@
 
 <label>Student Type</label>
 <div class="radio-group">
-  <label><input type="radio" name="studentType" value="new" checked> New Student</label>
-  <label><input type="radio" name="studentType" value="current"> Current Student</label>
+  <label><input type="radio" name="studentType" value="new" checked onchange="renderStudent()"> New Student</label>
+  <label><input type="radio" name="studentType" value="current" onchange="renderStudent()"> Current Student</label>
 </div>
 
 <div id="studentSection"></div>
@@ -165,7 +113,7 @@
 <input type="date">
 
 <label>Grade Level</label>
-<select>
+<select id="grade" onchange="recalc()">
   <option>SR</option>
   <option>EY1</option>
   <option>EY2</option>
@@ -175,109 +123,120 @@
 </select>
 
 <label>Payment Plan</label>
-<select id="paymentPlan" onchange="updateTuition()">
+<select id="paymentPlan" onchange="recalc()">
   <option value="">Select…</option>
   <option value="Annual">Annual</option>
   <option value="Termly">Termly</option>
   <option value="Monthly">Monthly</option>
 </select>
 
-<label>Tuition Before Discount</label>
-<input id="tuitionBefore" readonly>
-
 <!-- ================= 2. CALCULATION ================= -->
 <h2>2. Calculating Payment Plan</h2>
 
-<button type="button" onclick="addDiscount()">Add Discount</button>
+<label>Tuition Before Discount</label>
+<input id="tuitionBefore" readonly>
+
 <div id="discountList"></div>
+
+<button type="button" onclick="addDiscount()">Add Discount</button>
 
 <div class="summary">
   <div>Total Discount: <b id="totalDiscount">0</b></div>
   <div>Amount After Discount: <b id="afterDiscount">0</b></div>
-  <div id="monthlyRow">Monthly Fee (10×): <b id="monthlyFee">0</b></div>
+  <div>Monthly Fee (10x): <b id="monthlyFee">0</b></div>
 </div>
 
 <!-- ================= 3. PAYMENT PLAN ================= -->
 <h2>3. Tuition Payment Plan</h2>
 
 <table>
-  <thead>
-    <tr>
-      <th>Payment No</th>
-      <th>Due Date</th>
-      <th>Due Amount</th>
-    </tr>
-  </thead>
-  <tbody id="paymentTable">
-    <tr><td>1</td><td>Registration Date</td><td class="pay">0</td></tr>
-    <tr><td>2</td><td>1 July</td><td class="pay">0</td></tr>
-    <tr><td>3</td><td>1 Aug</td><td class="pay">0</td></tr>
-    <tr><td>4</td><td>1 Sep</td><td class="pay">0</td></tr>
-    <tr><td>5</td><td>1 Oct</td><td class="pay">0</td></tr>
-    <tr><td>6</td><td>1 Nov</td><td class="pay">0</td></tr>
-    <tr><td>7</td><td>1 Dec</td><td class="pay">0</td></tr>
-    <tr><td>8</td><td>1 Jan</td><td class="pay">0</td></tr>
-    <tr><td>9</td><td>1 Feb</td><td class="pay">0</td></tr>
-    <tr><td>10</td><td>1 Mar</td><td class="pay">0</td></tr>
-  </tbody>
+<thead>
+<tr><th>No</th><th>Due Date</th><th>Amount</th></tr>
+</thead>
+<tbody id="paymentTable">
+<tr><td>1</td><td>Registration</td><td class="pay">0</td></tr>
+<tr><td>2</td><td>1 July</td><td class="pay">0</td></tr>
+<tr><td>3</td><td>1 Aug</td><td class="pay">0</td></tr>
+<tr><td>4</td><td>1 Sep</td><td class="pay">0</td></tr>
+<tr><td>5</td><td>1 Oct</td><td class="pay">0</td></tr>
+<tr><td>6</td><td>1 Nov</td><td class="pay">0</td></tr>
+<tr><td>7</td><td>1 Dec</td><td class="pay">0</td></tr>
+<tr><td>8</td><td>1 Jan</td><td class="pay">0</td></tr>
+<tr><td>9</td><td>1 Feb</td><td class="pay">0</td></tr>
+<tr><td>10</td><td>1 Mar</td><td class="pay">0</td></tr>
+</tbody>
 </table>
 
 <button class="btn">Add Student and Create Payment Plan</button>
 
 <div class="note">
-  By clicking, we will create new student, payment plan, and then go to payment (creating payment receipt) page.
+By clicking, we will create new student, payment plan, and then go to payment (creating payment receipt) page.
 </div>
 
 </div>
 
 <script>
-const studentSection = document.getElementById("studentSection");
-const academicYear = document.getElementById("academicYear");
-const tuitionBefore = document.getElementById("tuitionBefore");
-
-function renderStudentSection() {
+function renderStudent() {
   const type = document.querySelector("input[name='studentType']:checked").value;
   const ay = academicYear.value;
+  const sec = document.getElementById("studentSection");
 
   if (type === "new") {
-    let prefix = ay === "AY25" ? "PR25" : ay ? "PR26" : "";
-    studentSection.innerHTML = `
-      <label>Student ID</label>
-      <input value="${prefix ? prefix + 'XXX' : ''}" readonly>
-    `;
+    let prefix = ay === "AY25" ? "PR25" : ay ? "PR26" : "PR";
+    let id = prefix + Math.floor(1000 + Math.random() * 9000);
+    sec.innerHTML = `<label>Student ID</label><input value="${id}" readonly>`;
   } else {
-    studentSection.innerHTML = `
-      <label>Search Student</label>
-      <input placeholder="Student Name">
-      <input placeholder="Student ID">
+    sec.innerHTML = `
+      <label>Student Name</label><input>
+      <label>Student ID</label><input>
     `;
   }
-}
-
-document.querySelectorAll("input[name='studentType']").forEach(r => r.onchange = renderStudentSection);
-academicYear.onchange = renderStudentSection;
-
-function updateTuition() {
-  if (!academicYear.value || !paymentPlan.value) return;
-  let base = academicYear.value === "SUM26" ? 850000 : 4200000;
-  tuitionBefore.value = base.toLocaleString();
 }
 
 function addDiscount() {
   const row = document.createElement("div");
   row.className = "discount-row";
   row.innerHTML = `
-    <select>
-      <option>Fixed Amount</option>
-      <option>Percentage</option>
-      <option>Term Free</option>
+    <select onchange="recalc()">
+      <option value="">Type</option>
+      <option value="fixed">Fixed Amount</option>
+      <option value="percent">Percentage</option>
     </select>
-    <input placeholder="Enter value">
+    <input type="number" placeholder="Value" oninput="recalc()">
   `;
   document.getElementById("discountList").appendChild(row);
 }
 
-renderStudentSection();
+function recalc() {
+  let base = academicYear.value === "SUM26" ? 850000 : academicYear.value ? 4200000 : 0;
+  tuitionBefore.value = base.toLocaleString();
+
+  let totalDiscount = 0;
+  document.querySelectorAll(".discount-row").forEach(r => {
+    const t = r.children[0].value;
+    const v = Number(r.children[1].value || 0);
+    if (t === "fixed") totalDiscount += v;
+    if (t === "percent") totalDiscount += base * v / 100;
+  });
+
+  const after = Math.max(base - totalDiscount, 0);
+  totalDiscountSpan = document.getElementById("totalDiscount");
+  afterDiscountSpan = document.getElementById("afterDiscount");
+
+  totalDiscountSpan.textContent = totalDiscount.toLocaleString();
+  afterDiscountSpan.textContent = after.toLocaleString();
+
+  let monthly = Math.round(after / 10);
+  document.getElementById("monthlyFee").textContent = monthly.toLocaleString();
+
+  document.querySelectorAll(".pay").forEach((c,i)=>{
+    c.textContent = paymentPlan.value === "Monthly" && i < 10 ? monthly.toLocaleString() :
+                    paymentPlan.value === "Annual" && i === 0 ? after.toLocaleString() :
+                    paymentPlan.value === "Termly" && i < 3 ? Math.round(after/3).toLocaleString() : "";
+  });
+}
+
+renderStudent();
 </script>
 
 </body>
