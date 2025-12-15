@@ -12,11 +12,12 @@
   --muted:#6b7280;
   --line:#e5e7eb;
   --bg:#ffffff;
-  --card:#f7f7f8;
+  --card:#f6f7f9;
   --neg:#b42318;
 }
 
 *{box-sizing:border-box}
+
 body{
   margin:0;
   background:#fff;
@@ -49,17 +50,12 @@ h1{
   line-height:1.4;
 }
 
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-
 .card{
+  background:var(--card);
   border:1px solid var(--line);
   border-radius:14px;
-  background:var(--card);
   padding:10px;
+  margin-bottom:12px;
 }
 
 h2{
@@ -67,6 +63,12 @@ h2{
   font-size:12px;
   letter-spacing:.3px;
   text-transform:uppercase;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
 }
 
 table{
@@ -94,29 +96,31 @@ th{
   font-variant-numeric:tabular-nums;
 }
 
-.neg{color:var(--neg);font-weight:600}
+.neg{ color:var(--neg); font-weight:600; }
 
-.section td{
+.section-row td{
   background:#fafafa;
   font-weight:800;
 }
 
-.total td{
-  font-weight:900;
+.total-row td{
   background:#fafafa;
+  font-weight:900;
+}
+
+.students-row td{
+  background:#f9fafb;
+  font-weight:700;
 }
 
 footer{
-  margin-top:12px;
+  margin-top:10px;
   border-top:1px solid var(--line);
-  padding-top:8px;
+  padding-top:6px;
   display:flex;
   justify-content:space-between;
   font-size:11px;
-}
-
-.students{
-  font-weight:800;
+  color:var(--muted);
 }
 </style>
 </head>
@@ -127,29 +131,39 @@ footer{
 <header>
   <h1>Financial Summary Report — International School</h1>
   <div class="sub">
-    Reporting scope: P&amp;L, Assets (CapEx), Investments<br>
-    Category: Jan’23–Mar’24 · AY2024–2025 (Apr’24–Mar’25) · AY2025–2026 (Apr’24–Nov’25)
+    Category: Jan’23–Mar’24 · AY2024–2025 (Apr’24–Mar’25) · AY2025–2026 (Apr’24–Nov’25)<br>
+    Reporting scope: Profit &amp; Loss, Assets (CapEx), Investments
   </div>
 </header>
 
-<div class="grid">
-
-<!-- PROFIT & LOSS -->
 <div class="card">
-<h2>Profit &amp; Loss</h2>
+<h2>Profit &amp; Loss (Chart of Accounts)</h2>
+
 <table>
 <thead>
 <tr>
-<th>Line Item</th>
-<th class="num">Jan’23–Mar’24</th>
-<th class="num">AY2024–2025</th>
-<th class="num">AY2025–2026</th>
-<th class="num">TOTAL</th>
+  <th>Line Item</th>
+  <th class="num">Jan’23–Mar’24</th>
+  <th class="num">AY2024–2025</th>
+  <th class="num">AY2025–2026</th>
+  <th class="num">TOTAL</th>
 </tr>
 </thead>
 <tbody>
 
-<tr class="section"><td colspan="5">Income</td></tr>
+<tr class="students-row">
+  <td colspan="5">
+    Total Students
+    <span style="float:right">
+      Jan’23–Mar’24: 18 &nbsp;&nbsp;|&nbsp;&nbsp;
+      AY2024–2025: 41 &nbsp;&nbsp;|&nbsp;&nbsp;
+      AY2025–2026: 103
+    </span>
+  </td>
+</tr>
+
+<tr class="section-row"><td colspan="5">Income</td></tr>
+
 <tr><td>Ferry Fees</td><td class="num">0</td><td class="num neg">-200,000</td><td class="num">3,272,000</td><td class="num">3,072,000</td></tr>
 <tr><td>Material Fees</td><td class="num">7,100,000</td><td class="num">17,624,400</td><td class="num">37,860,000</td><td class="num">62,584,400</td></tr>
 <tr><td>Other Income</td><td class="num">0</td><td class="num"></td><td class="num">1,177,495</td><td class="num">1,177,495</td></tr>
@@ -158,42 +172,94 @@ footer{
 <tr><td>Tuition Fees</td><td class="num">15,467,500</td><td class="num">63,409,800</td><td class="num">112,235,749</td><td class="num">191,113,049</td></tr>
 <tr><td>Uniform Fees</td><td class="num">855,000</td><td class="num">2,355,000</td><td class="num">4,985,000</td><td class="num">8,195,000</td></tr>
 
-<tr class="section"><td colspan="5">Expense</td></tr>
+<tr class="total-row">
+  <td>Income Subtotal</td>
+  <td class="num">28,427,000</td>
+  <td class="num">89,439,600</td>
+  <td class="num">172,410,744</td>
+  <td class="num">290,277,344</td>
+</tr>
+
+<tr class="section-row"><td colspan="5">Expense</td></tr>
+
 <tr><td>Advertising &amp; Marketing</td><td class="num neg">-25,262,434</td><td class="num neg">-16,873,766</td><td class="num neg">-31,546,963</td><td class="num neg">-73,683,163</td></tr>
 <tr><td>Donation &amp; Gifts</td><td class="num neg">-400,500</td><td class="num neg">-1,248,400</td><td class="num neg">-2,165,100</td><td class="num neg">-3,814,000</td></tr>
 <tr><td>Staff Costs</td><td class="num neg">-51,463,946</td><td class="num neg">-83,394,582</td><td class="num neg">-87,923,133</td><td class="num neg">-222,781,661</td></tr>
 <tr><td>Utilities</td><td class="num neg">-2,040,880</td><td class="num neg">-4,498,890</td><td class="num neg">-2,127,550</td><td class="num neg">-8,667,320</td></tr>
 
-<tr class="total"><td>Inventory</td><td class="num">162,864,100</td><td class="num">84,875,650</td><td class="num">16,120,000</td><td class="num">263,859,750</td></tr>
+<tr class="total-row">
+  <td>Expense Subtotal</td>
+  <td class="num neg">-79,167,760</td>
+  <td class="num neg">-105, , ,</td>
+  <td class="num neg">-123, , ,</td>
+  <td class="num neg">-308, , ,</td>
+</tr>
 
 </tbody>
 </table>
 </div>
 
-<!-- ASSETS & INVESTMENTS -->
+<div class="grid">
+
 <div class="card">
-<h2>Assets &amp; Investments</h2>
+<h2>Assets (Capital Expenditure)</h2>
 <table>
 <thead>
 <tr>
-<th>Line Item</th>
-<th class="num">Jan’23–Mar’24</th>
-<th class="num">AY2024–2025</th>
-<th class="num">AY2025–2026</th>
-<th class="num">TOTAL</th>
+  <th>Line Item</th>
+  <th class="num">Jan’23–Mar’24</th>
+  <th class="num">AY2024–2025</th>
+  <th class="num">AY2025–2026</th>
+  <th class="num">TOTAL</th>
 </tr>
 </thead>
 <tbody>
 
-<tr class="section"><td colspan="5">Asset</td></tr>
+<tr class="section-row"><td colspan="5">Asset</td></tr>
+
 <tr><td>Class Expenditure</td><td class="num neg">-7,751,963</td><td class="num neg">-13,964,092</td><td class="num neg">-3,211,162</td><td class="num neg">-24,927,217</td></tr>
 <tr><td>FA-Construction</td><td class="num neg">-148,825,224</td><td class="num neg">-20,710,000</td><td class="num neg">-7,094,600</td><td class="num neg">-176,629,824</td></tr>
 <tr><td>FA-Electrical</td><td class="num neg">-68,541,440</td><td class="num neg">-21,792,950</td><td class="num neg">-14,496,100</td><td class="num neg">-104,830,490</td></tr>
 
-<tr class="section"><td colspan="5">Investment</td></tr>
+<tr class="total-row">
+  <td>Asset Subtotal</td>
+  <td class="num neg">-225,118,627</td>
+  <td class="num neg">-56,467,042</td>
+  <td class="num neg">-24,801,862</td>
+  <td class="num neg">-306,387,531</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+<div class="card">
+<h2>Investments</h2>
+<table>
+<thead>
+<tr>
+  <th>Line Item</th>
+  <th class="num">Jan’23–Mar’24</th>
+  <th class="num">AY2024–2025</th>
+  <th class="num">AY2025–2026</th>
+  <th class="num">TOTAL</th>
+</tr>
+</thead>
+<tbody>
+
+<tr class="section-row"><td colspan="5">Investment</td></tr>
+
 <tr><td>Ko Andy to PRIME</td><td class="num">162,864,100</td><td class="num">84,875,650</td><td class="num">16,120,000</td><td class="num">263,859,750</td></tr>
-<tr><td>Ko Jon to PRIME</td><td class="num">150,964,333</td><td class="num">94,035,667</td><td class="num">10,000,000</td><td class="num">254,,999,,999</td></tr>
+<tr><td>Ko Jon to PRIME</td><td class="num">150,964,333</td><td class="num">94,035,667</td><td class="num">10,000,000</td><td class="num">255,000,000</td></tr>
 <tr><td>Ko Patrick to PRIME</td><td class="num">148,230,529</td><td class="num">90,879,351</td><td class="num">15,000,000</td><td class="num">254,109,880</td></tr>
+
+<tr class="total-row">
+  <td>Investment Subtotal</td>
+  <td class="num">462,058,962</td>
+  <td class="num">269,790,668</td>
+  <td class="num">41,120,000</td>
+  <td class="num">772,969,630</td>
+</tr>
 
 </tbody>
 </table>
@@ -202,10 +268,8 @@ footer{
 </div>
 
 <footer>
-<div class="students">
-Total Students — Jan’23–Mar’24: 18 &nbsp;|&nbsp; AY2024–2025: 41 &nbsp;|&nbsp; AY2025–2026: 103
-</div>
-<div>One-page A4 · Print-ready</div>
+  <div>One-page A4 · Print-ready</div>
+  <div>Prepared for management review</div>
 </footer>
 
 </div>

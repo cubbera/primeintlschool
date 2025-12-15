@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Product Requirements — School Finance System</title>
+
+<style>
+@page { size: A4; margin: 16mm; }
+
+:root{
+  --text:#0b0f14;
+  --muted:#6b7280;
+  --line:#e5e7eb;
+  --bg:#ffffff;
+  --card:#f6f7f9;
+  --accent:#111827;
+  --hover:#f0f2f5;
+}
+
+*{ box-sizing:border-box }
+
+body{
+  margin:0;
+  background:#fff;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color:var(--text);
+}
+
+.page{
+  max-width:1100px;
+  margin:40px auto;
+  padding:0 20px;
+}
+
+header{
+  margin-bottom:28px;
+}
+
+h1{
+  margin:0;
+  font-size:24px;
+  letter-spacing:-0.4px;
+}
+
+.subtitle{
+  margin-top:6px;
+  font-size:14px;
+  color:var(--muted);
+  max-width:820px;
+}
+
+.section{
+  margin-bottom:32px;
+}
+
+.section h2{
+  font-size:13px;
+  letter-spacing:.3px;
+  text-transform:uppercase;
+  margin-bottom:12px;
+  color:var(--accent);
+}
+
+.list{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:16px;
+}
+
+.card{
+  display:block;
+  text-decoration:none;
+  color:inherit;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--card);
+  padding:16px;
+  transition:all .15s ease;
+}
+
+.card:hover{
+  background:var(--hover);
+  transform:translateY(-2px);
+}
+
+.card h3{
+  margin:0 0 6px 0;
+  font-size:16px;
+  letter-spacing:-0.2px;
+}
+
+.card p{
+  margin:0;
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.4;
+}
+
+.meta{
+  margin-top:10px;
+  font-size:11px;
+  color:var(--muted);
+  display:flex;
+  justify-content:space-between;
+}
+
+.badge{
+  padding:2px 8px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  font-size:11px;
+  background:#fff;
+}
+
+footer{
+  margin-top:48px;
+  padding-top:16px;
+  border-top:1px solid var(--line);
+  font-size:12px;
+  color:var(--muted);
+}
+</style>
+</head>
+
+<body>
+<div class="page">
+
+<header>
+  <h1>Product Requirements — School Finance & Operations</h1>
+  <div class="subtitle">
+    This document outlines the pages and components to be developed for the
+    International School finance and operations system.  
+    Each card links to the expected page or module.
+  </div>
+</header>
+
+<!-- CORE FINANCIAL PAGES -->
+<section class="section">
+  <h2>Core Financial Pages</h2>
+
+  <div class="list">
+
+    <a class="card" href="financial-summary.html">
+      <h3>Financial Summary Report</h3>
+      <p>
+        One-page A4, Apple-style financial report including Income, Expenses,
+        Assets (CapEx), Investments, subtotals, and student counts.
+      </p>
+      <div class="meta">
+        <span class="badge">High Priority</span>
+        <span>HTML • Print-ready</span>
+      </div>
+    </a>
+
+    <a class="card" href="profit-loss-detail.html">
+      <h3>Detailed Profit &amp; Loss</h3>
+      <p>
+        Expandable, multi-period P&amp;L with drill-down by category,
+        exportable to PDF and Excel.
+      </p>
+      <div class="meta">
+        <span class="badge">High Priority</span>
+        <span>Web • Data-driven</span>
+      </div>
+    </a>
+
+    <a class="card" href="capex-assets.html">
+      <h3>Assets &amp; Capital Expenditure</h3>
+      <p>
+        Fixed assets register, construction costs, equipment, depreciation
+        readiness, and summaries by year.
+      </p>
+      <div class="meta">
+        <span class="badge">Medium Priority</span>
+        <span>Web • Tables</span>
+      </div>
+    </a>
+
+    <a class="card" href="investments.html">
+      <h3>Investments &amp; Funding</h3>
+      <p>
+        Investment inflows by partner, period comparisons, totals,
+        and reconciliation against cash usage.
+      </p>
+      <div class="meta">
+        <span class="badge">Medium Priority</span>
+        <span>Web • Finance</span>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<!-- ANALYTICS & INSIGHTS -->
+<section class="section">
+  <h2>Analytics &amp; Insights</h2>
+
+  <div class="list">
+
+    <a class="card" href="student-metrics.html">
+      <h3>Student Metrics Dashboard</h3>
+      <p>
+        Student counts by academic year, intake vs growth,
+        revenue per student, and trends.
+      </p>
+      <div class="meta">
+        <span class="badge">Medium Priority</span>
+        <span>Dashboard</span>
+      </div>
+    </a>
+
+    <a class="card" href="financial-kpis.html">
+      <h3>Executive KPIs</h3>
+      <p>
+        Key metrics such as margins, cost ratios,
+        YoY growth, and financial health indicators.
+      </p>
+      <div class="meta">
+        <span class="badge">Medium Priority</span>
+        <span>Charts • Summary</span>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<!-- EXPORTS & UTILITIES -->
+<section class="section">
+  <h2>Exports &amp; Utilities</h2>
+
+  <div class="list">
+
+    <a class="card" href="pdf-export.html">
+      <h3>PDF Export Engine</h3>
+      <p>
+        Consistent A4 PDF generation for all financial reports,
+        matching on-screen layout exactly.
+      </p>
+      <div class="meta">
+        <span class="badge">High Priority</span>
+        <span>Print • Compliance</span>
+      </div>
+    </a>
+
+    <a class="card" href="excel-export.html">
+      <h3>Excel / CSV Export</h3>
+      <p>
+        Structured exports for accounting, audit, and external reporting.
+      </p>
+      <div class="meta">
+        <span class="badge">Low Priority</span>
+        <span>Data</span>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<footer>
+  This page is a functional requirements index.
+  Styling is indicative; developer is free to implement with React, Vue,
+  server-rendered HTML, or static pages as appropriate.
+</footer>
+
+</div>
+</body>
+</html>
