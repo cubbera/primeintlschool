@@ -2,237 +2,161 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Financial Summary Report | AY 2024–2025</title>
+<title>Financial Summary Comparison | AY 2023–2026</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-    :root {
-        --bg: #f5f5f7;
-        --card: #ffffff;
-        --text-primary: #1d1d1f;
-        --text-secondary: #6e6e73;
-        --accent: #0071e3;
-        --positive: #2ecc71;
-        --negative: #e74c3c;
-        --border: #e5e5ea;
-    }
+@page {
+    size: A4;
+    margin: 20mm;
+}
 
-    * {
-        box-sizing: border-box;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: #1d1d1f;
+}
 
-    body {
-        margin: 0;
-        background: var(--bg);
-        color: var(--text-primary);
-        padding: 40px;
-    }
+.container {
+    width: 100%;
+}
 
-    .container {
-        max-width: 1100px;
-        margin: auto;
-    }
+h1 {
+    font-size: 20px;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
 
-    header {
-        margin-bottom: 40px;
-    }
+.subtitle {
+    font-size: 12px;
+    color: #6e6e73;
+    margin-bottom: 16px;
+}
 
-    header h1 {
-        font-size: 36px;
-        font-weight: 600;
-        margin: 0;
-    }
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
 
-    header p {
-        color: var(--text-secondary);
-        margin-top: 8px;
-        font-size: 16px;
-    }
+th, td {
+    padding: 6px 6px;
+    border-bottom: 1px solid #e5e5ea;
+}
 
-    .card {
-        background: var(--card);
-        border-radius: 18px;
-        padding: 28px;
-        margin-bottom: 28px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    }
+th {
+    text-align: right;
+    color: #6e6e73;
+    font-weight: 500;
+}
 
-    .card h2 {
-        font-size: 22px;
-        margin-bottom: 20px;
-        font-weight: 600;
-    }
+th:first-child,
+td:first-child {
+    text-align: left;
+}
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
+.section {
+    background: #f5f5f7;
+    font-weight: 600;
+}
 
-    th, td {
-        padding: 14px 10px;
-        border-bottom: 1px solid var(--border);
-        text-align: right;
-        font-size: 15px;
-    }
+.total {
+    font-weight: 600;
+    border-top: 2px solid #1d1d1f;
+}
 
-    th {
-        text-align: left;
-        color: var(--text-secondary);
-        font-weight: 500;
-    }
+.positive {
+    color: #1d7f3f;
+}
 
-    td.label {
-        text-align: left;
-        font-weight: 500;
-    }
+.negative {
+    color: #b3261e;
+}
 
-    tr.total-row td {
-        font-weight: 600;
-        border-top: 2px solid var(--border);
-        background: #fafafa;
-    }
-
-    .positive {
-        color: var(--positive);
-    }
-
-    .negative {
-        color: var(--negative);
-    }
-
-    .summary-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 20px;
-    }
-
-    .summary-box {
-        padding: 22px;
-        border-radius: 16px;
-        background: linear-gradient(135deg, #ffffff, #f9f9fb);
-        border: 1px solid var(--border);
-    }
-
-    .summary-box h3 {
-        font-size: 14px;
-        color: var(--text-secondary);
-        margin-bottom: 6px;
-        font-weight: 500;
-    }
-
-    .summary-box p {
-        font-size: 26px;
-        font-weight: 600;
-        margin: 0;
-    }
-
-    footer {
-        text-align: center;
-        margin-top: 40px;
-        color: var(--text-secondary);
-        font-size: 14px;
-    }
+.footer {
+    margin-top: 14px;
+    font-size: 10px;
+    color: #6e6e73;
+    text-align: center;
+}
 </style>
 </head>
 
 <body>
 <div class="container">
 
-    <header>
-        <h1>Financial Summary Report</h1>
-        <p>International School • Academic Year: April 2024 – March 2025</p>
-    </header>
+<h1>Financial Summary Comparison</h1>
+<div class="subtitle">
+International School • Academic Years AY 2023–2024 to AY 2025–2026 (Ongoing)
+</div>
 
-    <!-- Executive Summary -->
-    <div class="card">
-        <h2>Executive Financial Overview</h2>
-        <div class="summary-grid">
-            <div class="summary-box">
-                <h3>Total Income</h3>
-                <p class="positive">138,920,248</p>
-            </div>
-            <div class="summary-box">
-                <h3>Total Expenses</h3>
-                <p class="negative">123,380,518</p>
-            </div>
-            <div class="summary-box">
-                <h3>Net Operating Result</h3>
-                <p class="positive">15,539,730</p>
-            </div>
-        </div>
-    </div>
+<table>
+    <tr>
+        <th>Category</th>
+        <th>AY 2023–2024</th>
+        <th>AY 2024–2025</th>
+        <th>AY 2025–2026<br>(Ongoing)</th>
+    </tr>
 
-    <!-- Income -->
-    <div class="card">
-        <h2>Income Statement</h2>
-        <table>
-            <tr>
-                <th>Income Category</th>
-                <th>Amount</th>
-            </tr>
-            <tr><td class="label">Tuition Fees</td><td>84,177,848</td></tr>
-            <tr><td class="label">Material Fees</td><td>43,657,400</td></tr>
-            <tr><td class="label">Registration Fees</td><td>7,600,000</td></tr>
-            <tr><td class="label">Uniform Fees</td><td>3,575,000</td></tr>
-            <tr><td class="label">Other Income</td><td>1,137,495</td></tr>
-            <tr><td class="label">Sales of Merchandise</td><td>50,000</td></tr>
-            <tr class="total-row">
-                <td class="label">Total Income</td>
-                <td>138,920,248</td>
-            </tr>
-        </table>
-    </div>
+    <!-- INCOME -->
+    <tr class="section"><td colspan="4">Income</td></tr>
+    <tr>
+        <td>Total Income</td>
+        <td class="positive">30,587,000</td>
+        <td class="positive">138,920,248</td>
+        <td class="positive">122,923,446</td>
+    </tr>
 
-    <!-- Expenses -->
-    <div class="card">
-        <h2>Expense Breakdown</h2>
-        <table>
-            <tr>
-                <th>Expense Category</th>
-                <th>Amount</th>
-            </tr>
-            <tr><td class="label">Staff Costs</td><td class="negative">60,343,379</td></tr>
-            <tr><td class="label">Advertising & Marketing</td><td class="negative">26,859,884</td></tr>
-            <tr><td class="label">School Events</td><td class="negative">15,980,350</td></tr>
-            <tr><td class="label">Maintenance & Repairs</td><td class="negative">3,698,430</td></tr>
-            <tr><td class="label">Office Expenses</td><td class="negative">2,854,400</td></tr>
-            <tr><td class="label">Utilities</td><td class="negative">1,951,055</td></tr>
-            <tr><td class="label">Other Expenses</td><td class="negative">11,692,020</td></tr>
-            <tr class="total-row">
-                <td class="label">Total Expenses</td>
-                <td class="negative">123,380,518</td>
-            </tr>
-        </table>
-    </div>
+    <!-- EXPENSE -->
+    <tr class="section"><td colspan="4">Expenses</td></tr>
+    <tr>
+        <td>Total Expenses</td>
+        <td class="negative">88,947,025</td>
+        <td class="negative">123,380,518</td>
+        <td class="negative">233,795,255</td>
+    </tr>
 
-    <!-- Assets & Investment -->
-    <div class="card">
-        <h2>Capital Assets & Investment Activity</h2>
-        <table>
-            <tr>
-                <th>Category</th>
-                <th>Amount</th>
-            </tr>
-            <tr><td class="label">Fixed Assets Acquired</td><td class="negative">18,814,920</td></tr>
-            <tr><td class="label">Investment Inflows</td><td class="positive">119,238,189</td></tr>
-        </table>
-    </div>
+    <!-- NET RESULT -->
+    <tr class="section"><td colspan="4">Net Operating Result</td></tr>
+    <tr class="total">
+        <td>Profit / (Loss)</td>
+        <td class="negative">-58,360,025</td>
+        <td class="positive">15,539,730</td>
+        <td class="negative">-110,871,809</td>
+    </tr>
 
-    <!-- Students -->
-    <div class="card">
-        <h2>Student Enrollment</h2>
-        <table>
-            <tr class="total-row">
-                <td class="label">Total Students (AY 2024–2025)</td>
-                <td><!-- INSERT NUMBER HERE --> ___</td>
-            </tr>
-        </table>
-    </div>
+    <!-- ASSETS -->
+    <tr class="section"><td colspan="4">Capital Expenditure & Assets</td></tr>
+    <tr>
+        <td>Total Assets Acquired</td>
+        <td class="negative">272,910,392</td>
+        <td class="negative">18,814,920</td>
+        <td class="negative">99,366,132</td>
+    </tr>
 
-    <footer>
-        © International School • Financial Year April 2024 – March 2025
-    </footer>
+    <!-- INVESTMENT -->
+    <tr class="section"><td colspan="4">Investment Inflows</td></tr>
+    <tr>
+        <td>Total Investment In</td>
+        <td class="positive">365,505,773</td>
+        <td class="positive">119,238,189</td>
+        <td class="positive">258,225,668</td>
+    </tr>
+
+    <!-- STUDENTS -->
+    <tr class="section"><td colspan="4">Student Enrollment</td></tr>
+    <tr class="total">
+        <td>Total Students</td>
+        <td>___</td>
+        <td>___</td>
+        <td>___</td>
+    </tr>
+</table>
+
+<div class="footer">
+All figures in local currency • Unaudited • For management and board use
+</div>
 
 </div>
 </body>
