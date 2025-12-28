@@ -41,7 +41,7 @@
     min-width:240px;
   }
 
-  /* radio: left aligned + spacing */
+  /* radio */
   .radio-row{
     display:flex;
     align-items:center;
@@ -74,10 +74,6 @@
     background:#fff1f2;
     color:#9f1239;
   }
-  .money-badge.blue{
-    background:#e0f2fe;
-    color:#0369a1;
-  }
 
   /* student id badge */
   .student-id-badge{
@@ -91,45 +87,92 @@
     font-weight:800;
   }
 
-  /* discounts */
-  .discount-header,
-  .discount-row{
-    display:grid;
-    grid-template-columns:80px 240px 200px 180px 200px 44px;
-    gap:10px;
-    align-items:center;
+  /* discounts: table box (smaller font) */
+  .discount-box{
+    margin-top:16px;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    padding:12px;
+    background:#fafafa;
   }
-  .discount-header{
+  .discount-box h3{
+    margin:0 0 10px 0;
+    font-size:14px;
     font-weight:800;
-    margin-top:18px;
     color:#111;
   }
-  .discount-row{
-    margin-top:10px;
+  .disc-table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0;
+    font-size:12px; /* smaller */
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:10px;
+    overflow:hidden;
   }
-  .discount-row select,
-  .discount-row input{
+  .disc-table th,
+  .disc-table td{
+    padding:10px 8px;
+    border-bottom:1px solid #eef2f7;
+    text-align:left;
+    vertical-align:middle;
+  }
+  .disc-table th{
+    font-weight:800;
+    color:#111;
+    background:#f8fafc;
+  }
+  .disc-table td:last-child,
+  .disc-table th:last-child{
+    text-align:right;
+  }
+  .disc-table tr:last-child td{
+    border-bottom:none;
+  }
+  .disc-table select,
+  .disc-table input{
     min-width:unset;
     width:100%;
+    padding:7px 8px;
+    font-size:12px;
   }
+
+  .disc-pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:3px 8px;
+    border-radius:999px;
+    background:#f1f5f9;
+    font-weight:800;
+    color:#0f172a;
+  }
+  .disc-calc{
+    color:#b91c1c;
+    font-weight:800;
+    font-variant-numeric:tabular-nums;
+  }
+
   .remove{
     cursor:pointer;
-    font-size:20px;
+    font-size:18px;
     color:#991b1b;
     line-height:1;
     user-select:none;
-    display:flex;
+    display:inline-flex;
     align-items:center;
     justify-content:center;
-    width:34px;
-    height:34px;
+    width:30px;
+    height:30px;
     border-radius:10px;
     background:#fff1f2;
+    margin-left:8px;
   }
   .remove:hover{ filter:brightness(0.95); }
 
   .add-discount{
-    margin-top:14px;
+    margin-top:10px;
     padding:10px 14px;
     background:#e5e7eb;
     border:none;
@@ -145,25 +188,22 @@
     display:flex;
     align-items:center;
     gap:10px;
+    flex-wrap:wrap;
   }
 
-  /* payment plan */
-  table{
+  table.plan{
     width:100%;
     margin-top:14px;
     border-collapse:collapse;
   }
-  th,td{
+  .plan th,.plan td{
     padding:10px 8px;
     border-bottom:1px solid #eee;
     text-align:center;
     font-size:14px;
   }
-  td.amount-cell{
-    text-align:right;
-  }
+  .plan td.amount-cell{ text-align:right; }
 
-  /* primary button */
   .primary-btn{
     margin-top:32px;
     padding:18px;
@@ -180,11 +220,8 @@
   @media(max-width:980px){
     .label{ min-width:160px; }
     input,select{ min-width:220px; }
-    .discount-header,
-    .discount-row{
-      grid-template-columns:1fr;
-    }
     .money-badge{ min-width:unset; justify-content:flex-start; }
+    .disc-table{ font-size:12px; }
   }
 </style>
 </head>
@@ -239,18 +276,23 @@
     <span class="money-badge" id="tuition">0</span>
   </div>
 
-  <div class="discount-header">
-    <div>DISC#</div>
-    <div>FIXED / PERCENTAGE</div>
-    <div>[BOX: AMOUNT OF DISC]</div>
-    <div>CALCULATED</div>
-    <div>AFTER DISCOUNT</div>
-    <div></div>
+  <div class="discount-box">
+    <h3>discount</h3>
+
+    <table class="disc-table" aria-label="discounts table">
+      <thead>
+        <tr>
+          <th style="width:110px;">disc nr</th>
+          <th style="width:260px;">type (free | fixed amount | percentage)</th>
+          <th style="width:200px;">amount</th>
+          <th style="width:220px; text-align:right;">calculated</th>
+        </tr>
+      </thead>
+      <tbody id="discounts"></tbody>
+    </table>
+
+    <button type="button" class="add-discount" id="addDiscountBtn">+ add discount</button>
   </div>
-
-  <div id="discounts"></div>
-
-  <button type="button" class="add-discount" id="addDiscountBtn">+ Add Discount</button>
 
   <div class="total">
     <span style="min-width:220px;">Total Discount:</span>
@@ -267,7 +309,7 @@
 
   <h2>3. Tuition Payment Plan</h2>
 
-  <table>
+  <table class="plan">
     <thead>
       <tr><th>No</th><th>Due Date</th><th style="text-align:right;">Amount</th></tr>
     </thead>
@@ -310,7 +352,8 @@ const elGrade = document.getElementById("grade");
 const elPlan = document.getElementById("plan");
 const elAttendance = document.getElementById("attendance");
 const elStudentFields = document.getElementById("studentFields");
-const elDiscounts = document.getElementById("discounts");
+
+const elDiscountsTbody = document.getElementById("discounts");
 
 const elTuition = document.getElementById("tuition");
 const elTotalDiscount = document.getElementById("totalDiscount");
@@ -357,38 +400,39 @@ let discCounter = 0;
 
 function addDiscount() {
   discCounter += 1;
-  const id = "d_" + discCounter;
 
-  const row = document.createElement("div");
-  row.className = "discount-row";
-  row.dataset.id = id;
+  const tr = document.createElement("tr");
+  tr.className = "disc-tr";
+  tr.innerHTML = `
+    <td><span class="disc-pill">disc ${discCounter}</span></td>
 
-  row.innerHTML = `
-    <div class="value">DISC#${discCounter}</div>
+    <td>
+      <select class="disc-type">
+        <option value="fixed" selected>fixed amount</option>
+        <option value="percent">percentage</option>
+        <option value="free">free</option>
+      </select>
+    </td>
 
-    <select class="disc-type">
-      <option value="fixed" selected>Fixed Amount</option>
-      <option value="percent">Percentage</option>
-    </select>
+    <td>
+      <input class="disc-value" type="number" min="0" placeholder="enter value">
+    </td>
 
-    <input class="disc-value" type="number" min="0" placeholder="Enter value">
-
-    <span class="money-badge red disc-calc">0</span>
-
-    <span class="money-badge disc-after">0</span>
-
-    <div class="remove" title="Remove" aria-label="Remove">−</div>
+    <td style="text-align:right;">
+      <span class="disc-calc">0</span>
+      <span class="remove" title="Remove" aria-label="Remove">−</span>
+    </td>
   `;
 
-  row.querySelector(".remove").addEventListener("click", () => {
-    row.remove();
+  tr.querySelector(".remove").addEventListener("click", () => {
+    tr.remove();
     recalc();
   });
 
-  row.querySelector(".disc-type").addEventListener("change", recalc);
-  row.querySelector(".disc-value").addEventListener("input", recalc);
+  tr.querySelector(".disc-type").addEventListener("change", recalc);
+  tr.querySelector(".disc-value").addEventListener("input", recalc);
 
-  elDiscounts.appendChild(row);
+  elDiscountsTbody.appendChild(tr);
   recalc();
 }
 
@@ -401,77 +445,59 @@ function getBaseTuition() {
   if (year === "SUM26") return PRICING.SUM26.ALL[plan] || 0;
   return (PRICING[year] && PRICING[year][grade] && PRICING[year][grade][plan]) ? PRICING[year][grade][plan] : 0;
 }
-
-function fmt(n) {
-  return Math.round(n).toLocaleString();
-}
+function fmt(n){ return Math.round(n).toLocaleString(); }
 
 function recalc() {
   const base = getBaseTuition();
   elTuition.textContent = fmt(base);
 
-  // Collect discount rows
-  const rows = Array.from(document.querySelectorAll(".discount-row")).map((row) => {
-    const type = row.querySelector(".disc-type").value;
-    const val = Number(row.querySelector(".disc-value").value || 0);
-    return { row, type, val };
+  // read rows
+  const rows = Array.from(elDiscountsTbody.querySelectorAll("tr")).map(tr => {
+    const type = tr.querySelector(".disc-type").value;
+    const val = Number(tr.querySelector(".disc-value").value || 0);
+    return { tr, type, val };
   });
 
-  // Priority rule: apply FIXED first, then PERCENT (regardless of UI order)
-  const fixedRows = rows.filter(r => r.type === "fixed");
+  // rule: fixed first, then percent (free treated as fixed in this UI, value = fixed discount)
+  const fixedRows = rows.filter(r => r.type === "fixed" || r.type === "free");
   const percentRows = rows.filter(r => r.type === "percent");
 
   let running = base;
 
-  // fixed first
+  // fixed total
   let totalFixed = 0;
   fixedRows.forEach(r => totalFixed += Math.max(0, r.val));
   running = Math.max(0, running - totalFixed);
 
-  // percent on remaining
+  // percent computed on remaining
   let totalPercent = 0;
   percentRows.forEach(r => {
     const pct = Math.max(0, r.val);
     totalPercent += (running * pct / 100);
   });
 
-  let totalDiscount = totalFixed + totalPercent;
-  let after = Math.max(0, base - totalDiscount);
+  const totalDiscount = totalFixed + totalPercent;
+  const after = Math.max(0, base - totalDiscount);
 
-  // Now fill each row display (show per-row calc and running after, using the same rule)
-  let stepAfter = base;
-
-  // fixed display
+  // display per-row calculated
   fixedRows.forEach(r => {
     const d = Math.max(0, r.val);
-    const newAfter = Math.max(0, stepAfter - d);
-
-    r.row.querySelector(".disc-calc").textContent = "-" + fmt(d);
-    r.row.querySelector(".disc-after").textContent = fmt(newAfter);
-
-    stepAfter = newAfter;
+    r.tr.querySelector(".disc-calc").textContent = "-" + fmt(d);
   });
 
-  // percent display (percent applies after all fixed have been applied)
-  const percentBase = stepAfter;
+  const percentBase = Math.max(0, base - totalFixed);
   percentRows.forEach(r => {
     const pct = Math.max(0, r.val);
     const d = percentBase * pct / 100;
-
-    const newAfter = Math.max(0, stepAfter - d);
-
-    r.row.querySelector(".disc-calc").textContent = (pct ? (pct + "%") : "0") + "  ( -" + fmt(d) + " )";
-    r.row.querySelector(".disc-after").textContent = fmt(newAfter);
-
-    stepAfter = newAfter;
+    r.tr.querySelector(".disc-calc").textContent = (pct ? (pct + "%") : "0") + "  ( -" + fmt(d) + " )";
   });
 
-  // Totals
+  // totals
   elTotalDiscount.textContent = "-" + fmt(totalDiscount);
   elAfterDiscount.textContent = fmt(after);
   elMonthlyFee.textContent = fmt(after / 10);
 
-  // Payment plan (always 10 rows; amount uses monthly fee)
+  // plan
   const per = Math.round(after / 10);
   elPlanBody.innerHTML = "";
   for (let i = 1; i <= 10; i++) {
@@ -488,7 +514,7 @@ function recalc() {
 
 /* ---------- EVENTS ---------- */
 document.querySelectorAll('input[name="studentType"]').forEach(r =>
-  r.addEventListener("change", () => { renderStudent(); })
+  r.addEventListener("change", renderStudent)
 );
 
 elYear.addEventListener("change", () => { renderStudent(); recalc(); });
