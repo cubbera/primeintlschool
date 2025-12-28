@@ -50,6 +50,7 @@
     display: flex;
     gap: 48px;
     margin-top: 14px;
+    justify-content: flex-start;
   }
 
   .money {
@@ -58,7 +59,7 @@
     background: #f1f5f9;
     font-weight: 800;
     display: inline-block;
-    min-width: 140px;
+    min-width: 160px;
     text-align: right;
   }
 
@@ -150,14 +151,15 @@
     cursor: pointer;
   }
 
+  .small {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 8px;
+  }
+
   @media (max-width: 900px) {
-    .label {
-      min-width: 160px;
-    }
-    input,
-    select {
-      min-width: 220px;
-    }
+    .label { min-width: 160px; }
+    input, select { min-width: 220px; }
   }
 </style>
 </head>
@@ -170,9 +172,9 @@
   <div class="row">
     <div class="label">Academic Year</div>
     <select id="year">
-      <option value="AY25">AY 2025–2026</option>
-      <option value="SUM26">Summer 2026</option>
-      <option value="AY26">AY 2026–2027</option>
+      <option value="AY2025-2026">AY 2025–2026</option>
+      <option value="SUMMER2026">Summer 2026</option>
+      <option value="AY2026-2027">AY 2026–2027</option>
     </select>
   </div>
 
@@ -191,13 +193,13 @@
   <div class="row">
     <div class="label">Grade</div>
     <select id="grade">
-      <option>SR Half-day</option>
-      <option>SR Full-day</option>
-      <option>EY1</option>
-      <option>EY2</option>
-      <option>Y1</option>
-      <option>Y2</option>
-      <option>Y3</option>
+      <option value="SR_HALF">SR Half-day</option>
+      <option value="SR_FULL">SR Full-day</option>
+      <option value="EY1">EY1</option>
+      <option value="EY2">EY2</option>
+      <option value="Y1">Y1</option>
+      <option value="Y2">Y2</option>
+      <option value="Y3">Y3</option>
     </select>
   </div>
 
@@ -223,10 +225,10 @@
     <table>
       <thead>
         <tr>
-          <th style="width:60px;">Disc</th>
-          <th style="width:160px;">Type</th>
-          <th>Description</th>
-          <th style="width:160px;">Amount</th>
+          <th style="width:70px;">Disc</th>
+          <th style="width:170px;">Type</th>
+          <th>Desc</th>
+          <th style="width:170px;">Disc Amount</th>
           <th style="width:170px;">Calc Amount</th>
         </tr>
       </thead>
@@ -234,6 +236,7 @@
     </table>
 
     <button class="add-disc" type="button" onclick="addDiscount()">+ Add Discount</button>
+    <div class="small">Rule: all fixed amounts apply first, then percentage discounts apply on the remaining amount.</div>
   </div>
 
   <div class="row">
@@ -273,37 +276,123 @@
 </div>
 
 <script>
-  // Pricing base (as previously used)
-  const pricing = {
-    AY25: { base: 4500000 },
-    AY26: { base: 4890000 },
-    SUM26: { base: 850000 }
+  // Default attendance date = today
+  document.getElementById("attDate").value = new Date().toISOString().slice(0, 10);
+
+  // Student IDs per your rule (not random)
+  function getStudentIdByYear(year) {
+    if (year === "AY2025-2026") return "PR25142";
+    return "PR26012"; // Summer 2026 and AY 2026–2027
+  }
+
+  // Pricing from your provided INSERT data
+  // AY: annual/termly/monthly by grade + session type for SR
+  const AY_PRICING = {
+    "AY2025-2026": {
+      SR: {
+        HALF_DAY: { annual: 2700000, termly: 3000000, monthly: 3000000 },
+        FULL_DAY: { annual: 3900000, termly: 4200000, monthly: 4200000 }
+      },
+      EY1: { annual: 3900000, termly: 4200000, monthly: 4200000 },
+      EY2: { annual: 3900000, termly: 4200000, monthly: 4200000 },
+      Y1:  { annual: 4200000, termly: 4500000, monthly: 4500000 },
+      Y2:  { annual: 4200000, termly: 4500000, monthly: 4500000 },
+      Y3:  { annual: 4200000, termly: 4500000, monthly: 4500000 }
+    },
+    "AY2026-2027": {
+      SR: {
+        HALF_DAY: { annual: 2890000, termly: 3090000, monthly: 3290000 },
+        FULL_DAY: { annual: 4290000, termly: 4490000, monthly: 4890000 }
+      },
+      EY1: { annual: 4290000, termly: 4490000, monthly: 4890000 },
+      EY2: { annual: 4290000, termly: 4490000, monthly: 4890000 },
+      Y1:  { annual: 4690000, termly: 4890000, monthly: 5290000 },
+      Y2:  { annual: 4690000, termly: 4890000, monthly: 5290000 },
+      Y3:  { annual: 4690000, termly: 4890000, monthly: 5290000 }
+    }
   };
 
-  const yearEl = document.getElementById("year");
-  const planEl = document.getElementById("plan");
-  const attDateEl = document.getElementById("attDate");
+  // Program tuition pricing
+  const PROGRAM_TUITION = {
+    "SUMMER2026": 850000
+    // (You also provided SUMMER2025=800000 but not in your UI year list)
+  };
 
-  const tuitionEl = document.getElementById("tuition");
-  const totalDiscEl = document.getElementById("totalDisc");
-  const afterDiscEl = document.getElementById("afterDisc");
-  const monthlyFeeEl = document.getElementById("monthlyFee");
+  // Helpers
+  function money(n) {
+    return Math.round(n).toLocaleString();
+  }
 
-  const discBodyEl = document.getElementById("discBody");
-  const planBodyEl = document.getElementById("planBody");
+  function getPlanKey() {
+    const p = document.getElementById("plan").value;
+    if (p === "Annual") return "annual";
+    if (p === "Termly") return "termly";
+    return "monthly";
+  }
+
+  function getSelectedTuition() {
+    const year = document.getElementById("year").value;
+    const grade = document.getElementById("grade").value;
+    const planKey = getPlanKey();
+
+    // Summer program: program tuition
+    if (year === "SUMMER2026") {
+      return PROGRAM_TUITION["SUMMER2026"] || 0;
+    }
+
+    // Academic year pricing
+    const yearPricing = AY_PRICING[year];
+    if (!yearPricing) return 0;
+
+    if (grade === "SR_HALF") return yearPricing.SR.HALF_DAY[planKey] || 0;
+    if (grade === "SR_FULL") return yearPricing.SR.FULL_DAY[planKey] || 0;
+
+    const g = yearPricing[grade];
+    if (!g) return 0;
+
+    return g[planKey] || 0;
+  }
+
+  // For "Free X Terms", compute using TERMly price of the same AY+grade (regardless of current plan),
+  // and for Free Summer Program, use SUMMER2026 program tuition (850,000).
+  function getTermlyTuitionForFreeTerms() {
+    const year = document.getElementById("year").value;
+    const grade = document.getElementById("grade").value;
+
+    // If currently Summer, "Free Terms" doesn't really apply; return 0
+    if (year === "SUMMER2026") return 0;
+
+    const yearPricing = AY_PRICING[year];
+    if (!yearPricing) return 0;
+
+    if (grade === "SR_HALF") return yearPricing.SR.HALF_DAY.termly || 0;
+    if (grade === "SR_FULL") return yearPricing.SR.FULL_DAY.termly || 0;
+
+    const g = yearPricing[grade];
+    return g ? (g.termly || 0) : 0;
+  }
+
+  function computeFreeDiscount(desc) {
+    const termly = getTermlyTuitionForFreeTerms();
+
+    if (desc === "Free 3 Terms") return termly * 3;
+    if (desc === "Free 2 Terms") return termly * 2;
+    if (desc === "Free 1 Term")  return termly * 1;
+    if (desc === "Free Summer Program") return PROGRAM_TUITION["SUMMER2026"] || 0;
+
+    return 0;
+  }
+
+  // Student section
   const studentBoxEl = document.getElementById("studentBox");
-
-  // Default attendance date = today
-  attDateEl.value = new Date().toISOString().slice(0, 10);
-
   function renderStudent() {
     const type = document.querySelector('input[name="stype"]:checked').value;
-    const year = yearEl.value;
+    const year = document.getElementById("year").value;
 
     studentBoxEl.innerHTML = "";
 
     if (type === "new") {
-      const id = (year === "AY25") ? "PR25142" : "PR26012";
+      const id = getStudentIdByYear(year);
       studentBoxEl.innerHTML = `
         <div class="row">
           <div class="label">Student ID</div>
@@ -314,27 +403,24 @@
       studentBoxEl.innerHTML = `
         <div class="row">
           <div class="label">Student Name</div>
-          <input type="text" />
+          <input type="text" id="curName" oninput="syncCurrentStudentFields('name')" />
         </div>
         <div class="row">
           <div class="label">Student ID</div>
-          <input type="text" />
+          <input type="text" id="curId" oninput="syncCurrentStudentFields('id')" />
         </div>
       `;
     }
   }
 
-  document.querySelectorAll('input[name="stype"]').forEach(r => {
-    r.addEventListener("change", renderStudent);
-  });
+  function syncCurrentStudentFields(changed) {
+    // "typed any, the other one will appear" — simple behavior:
+    // if one has value, leave other visible (already visible); no auto-fill.
+    // This function exists mainly to ensure "current student" feels active.
+  }
 
-  yearEl.addEventListener("change", () => {
-    renderStudent();
-    calc();
-  });
-
-  planEl.addEventListener("change", calc);
-
+  // Discounts
+  const discBodyEl = document.getElementById("discBody");
   let discNo = 0;
 
   function addDiscount() {
@@ -351,26 +437,18 @@
         </select>
       </td>
       <td>
-        <select onchange="calc()">
-          <option value="Referral">Referral</option>
-          <option value="Sibling Discount">Sibling Discount</option>
-          <option value="Early Bird">Early Bird</option>
-          <option value="Free 3 Terms">Free 3 Terms</option>
-          <option value="Free 2 Terms">Free 2 Terms</option>
-          <option value="Free 1 Term">Free 1 Term</option>
-          <option value="Free Summer Program">Free Summer Program</option>
-        </select>
+        <input type="text" placeholder="Type description..." oninput="calc()" />
       </td>
       <td>
         <input type="number" oninput="calc()" />
       </td>
       <td class="disc-calc">
-        0
-        <span class="remove" onclick="removeDiscount(this)">−</span>
+        0 <span class="remove" onclick="removeDiscount(this)">−</span>
       </td>
     `;
 
     discBodyEl.appendChild(tr);
+    sortDiscountRows(); // priority order
     calc();
   }
 
@@ -380,83 +458,173 @@
     calc();
   }
 
-  function formatMoney(n) {
-    return Math.round(n).toLocaleString();
+  // Priority: fixed > referral > others (and free is treated like fixed for priority)
+  function getRowPriority(tr) {
+    const type = tr.children[1].querySelector("select").value;
+    const desc = (tr.children[2].querySelector("input").value || "").toLowerCase();
+
+    if (type === "fixed" || type === "free") return 1;
+    if (desc.includes("referral")) return 2;
+    return 3;
   }
 
+  function renumberRows() {
+    const rows = Array.from(discBodyEl.querySelectorAll("tr"));
+    rows.forEach((tr, idx) => {
+      tr.children[0].textContent = (idx + 1);
+    });
+  }
+
+  function sortDiscountRows() {
+    const rows = Array.from(discBodyEl.querySelectorAll("tr"));
+    rows.sort((a, b) => getRowPriority(a) - getRowPriority(b));
+    discBodyEl.innerHTML = "";
+    rows.forEach(r => discBodyEl.appendChild(r));
+    renumberRows();
+  }
+
+  // Calculation + payment plan
+  const tuitionEl = document.getElementById("tuition");
+  const totalDiscEl = document.getElementById("totalDisc");
+  const afterDiscEl = document.getElementById("afterDisc");
+  const monthlyFeeEl = document.getElementById("monthlyFee");
+  const planBodyEl = document.getElementById("planBody");
+
   function calc() {
-    const yearKey = yearEl.value;
-    const base = (pricing[yearKey] ? pricing[yearKey].base : 0);
+    // keep student ID updated
+    renderStudent();
 
-    tuitionEl.textContent = formatMoney(base);
+    const base = getSelectedTuition();
+    tuitionEl.textContent = money(base);
 
-    // Apply rule: sum all fixed/free first, then percent based on (base - fixedTotal)
+    // Sort discounts by priority whenever content changes
+    sortDiscountRows();
+
+    // Apply: all fixed/free first, then percent on remaining
     let fixedTotal = 0;
-    let percentList = [];
+    let percentRows = [];
 
-    // First pass: compute fixed/free, gather percents
-    Array.from(discBodyEl.querySelectorAll("tr")).forEach(tr => {
-      const typeSel = tr.children[1].querySelector("select").value;
-      const inputVal = Number(tr.children[3].querySelector("input").value || 0);
+    const rows = Array.from(discBodyEl.querySelectorAll("tr"));
+    rows.forEach(tr => {
+      const type = tr.children[1].querySelector("select").value;
+      const desc = tr.children[2].querySelector("input").value || "";
+      const amountInput = tr.children[3].querySelector("input");
+      const val = Number(amountInput.value || 0);
 
-      if (typeSel === "fixed" || typeSel === "free") {
-        fixedTotal += inputVal;
-      } else if (typeSel === "percent") {
-        percentList.push({ tr, pct: inputVal });
+      // Free: no amount nor calc shown; compute from dropdown-like desc
+      if (type === "free") {
+        fixedTotal += computeFreeDiscount(desc);
+      } else if (type === "fixed") {
+        fixedTotal += val;
+      } else if (type === "percent") {
+        percentRows.push(tr);
       }
     });
 
     const percentBase = Math.max(0, base - fixedTotal);
 
-    // Second pass: set calc amounts per row (using rule above)
     let totalDiscount = 0;
 
-    Array.from(discBodyEl.querySelectorAll("tr")).forEach(tr => {
-      const typeSel = tr.children[1].querySelector("select").value;
-      const inputEl = tr.children[3].querySelector("input");
-      const val = Number(inputEl.value || 0);
+    rows.forEach(tr => {
+      const type = tr.children[1].querySelector("select").value;
+      const desc = tr.children[2].querySelector("input").value || "";
+      const amountInput = tr.children[3].querySelector("input");
+      const val = Number(amountInput.value || 0);
+
+      const calcCell = tr.children[4];
+      const removeBtn = calcCell.querySelector(".remove");
+
+      // Free behavior: no amount input and no calc amount shown (but discount still applies to totals)
+      if (type === "free") {
+        amountInput.value = "";
+        amountInput.disabled = true;
+
+        // also enforce "Free ..." choices by simple placeholder guidance
+        amountInput.placeholder = "";
+
+        const freeDiscount = computeFreeDiscount(desc);
+        totalDiscount += freeDiscount;
+
+        calcCell.textContent = ""; // show nothing for free calc
+        calcCell.appendChild(removeBtn);
+        return;
+      } else {
+        amountInput.disabled = false;
+        amountInput.placeholder = "";
+      }
 
       let d = 0;
-      if (typeSel === "fixed" || typeSel === "free") {
-        d = val;
-      } else if (typeSel === "percent") {
-        d = percentBase * val / 100;
-      }
+      if (type === "fixed") d = val;
+      if (type === "percent") d = percentBase * (val / 100);
 
       totalDiscount += d;
 
-      const calcCell = tr.children[4];
-      // Keep remove button
-      const removeBtn = calcCell.querySelector(".remove");
-      calcCell.textContent = "-" + formatMoney(d) + " ";
+      calcCell.textContent = "-" + money(d) + " ";
       calcCell.appendChild(removeBtn);
     });
 
     const net = Math.max(0, base - totalDiscount);
 
-    totalDiscEl.textContent = "-" + formatMoney(totalDiscount);
-    afterDiscEl.textContent = formatMoney(net);
+    totalDiscEl.textContent = "-" + money(totalDiscount);
+    afterDiscEl.textContent = money(net);
 
+    // Monthly Fee display always net/10 as requested previously
     const monthly = Math.round(net / 10);
-    monthlyFeeEl.textContent = formatMoney(monthly);
+    monthlyFeeEl.textContent = money(monthly);
 
-    // Payment plan table (10 rows as your existing structure implied)
+    renderPaymentPlan(net);
+  }
+
+  function renderPaymentPlan(net) {
+    const plan = document.getElementById("plan").value;
+
+    let count = 10;
+    if (plan === "Annual") count = 1;
+    if (plan === "Termly") count = 3;
+    if (plan === "Monthly") count = 10;
+
+    const per = count ? Math.round(net / count) : 0;
+
+    const dueDates = [
+      "Registration Date",
+      "1 July",
+      "1 Aug",
+      "1 Sep",
+      "1 Oct",
+      "1 Nov",
+      "1 Dec",
+      "1 Jan",
+      "1 Feb",
+      "1 Mar"
+    ];
+
     planBodyEl.innerHTML = "";
+
     for (let i = 1; i <= 10; i++) {
-      const due = (i === 1) ? "Registration" : ("Month " + i);
+      const show = i <= count;
       planBodyEl.innerHTML += `
         <tr>
           <td>${i}</td>
-          <td>${due}</td>
-          <td style="text-align:right;">${formatMoney(monthly)}</td>
+          <td>${dueDates[i - 1] || ("Payment " + i)}</td>
+          <td style="text-align:right;">${show ? money(per) : ""}</td>
         </tr>
       `;
     }
   }
 
-  // Initial render
+  // Events
+  document.getElementById("year").addEventListener("change", calc);
+  document.getElementById("grade").addEventListener("change", calc);
+  document.getElementById("plan").addEventListener("change", calc);
+  document.querySelectorAll('input[name="stype"]').forEach(r => r.addEventListener("change", calc));
+
+  // Initialize: one default discount row optional? (leave empty)
   renderStudent();
   calc();
+
+  // Guidance for "Free" entries: user wants dropdown for Free options.
+  // To keep your structure intact, accountants type one of:
+  // "Free 3 Terms", "Free 2 Terms", "Free 1 Term", "Free Summer Program"
 </script>
 
 </body>
