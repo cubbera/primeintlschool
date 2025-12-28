@@ -1,227 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>Student Enrollment & Tuition Plan</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <style>
-  body{
-    font-family:-apple-system,BlinkMacSystemFont,system-ui;
-    background:#f5f5f7;
-    padding:24px;
-  }
-  .container{
-    max-width:1100px;
-    margin:auto;
-    background:#fff;
-    padding:32px;
-    border-radius:14px;
-  }
-  h2{
-    margin-top:32px;
-    border-bottom:1px solid #ddd;
-    padding-bottom:6px;
-  }
-  .row{
-    display:flex;
-    align-items:center;
-    gap:16px;
-    margin-top:14px;
-    flex-wrap:wrap;
-  }
-  .label{
-    min-width:220px;
-    font-weight:600;
-    color:#111;
-  }
-  input,select{
-    padding:8px 10px;
-    font-size:14px;
-    min-width:240px;
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui;
+    background: #f5f5f7;
+    padding: 24px;
   }
 
-  /* radio */
-  .radio-row{
-    display:flex;
-    align-items:center;
-    gap:44px;
-    margin-top:16px;
-    justify-content:flex-start;
-  }
-  .radio-row label{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    font-weight:600;
-    color:#111;
+  .container {
+    max-width: 1100px;
+    margin: auto;
+    background: #fff;
+    padding: 32px;
+    border-radius: 14px;
   }
 
-  /* highlighted amounts */
-  .money-badge{
-    display:inline-flex;
-    align-items:center;
-    justify-content:flex-end;
-    min-width:160px;
-    padding:6px 12px;
-    border-radius:10px;
-    background:#f1f5f9;
-    color:#0f172a;
-    font-weight:800;
-    letter-spacing:0.2px;
-  }
-  .money-badge.red{
-    background:#fff1f2;
-    color:#9f1239;
+  h2 {
+    margin-top: 32px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 6px;
   }
 
-  /* student id badge */
-  .student-id-badge{
-    display:inline-flex;
-    align-items:center;
-    gap:10px;
-    padding:8px 14px;
-    border-radius:999px;
-    background:#e0f2fe;
-    color:#0369a1;
-    font-weight:800;
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 14px;
+    flex-wrap: wrap;
   }
 
-  /* discounts: table box (smaller font) */
-  .discount-box{
-    margin-top:16px;
-    border:1px solid #e5e7eb;
-    border-radius:12px;
-    padding:12px;
-    background:#fafafa;
-  }
-  .discount-box h3{
-    margin:0 0 10px 0;
-    font-size:14px;
-    font-weight:800;
-    color:#111;
-  }
-  .disc-table{
-    width:100%;
-    border-collapse:separate;
-    border-spacing:0;
-    font-size:12px; /* smaller */
-    background:#fff;
-    border:1px solid #e5e7eb;
-    border-radius:10px;
-    overflow:hidden;
-  }
-  .disc-table th,
-  .disc-table td{
-    padding:10px 8px;
-    border-bottom:1px solid #eef2f7;
-    text-align:left;
-    vertical-align:middle;
-  }
-  .disc-table th{
-    font-weight:800;
-    color:#111;
-    background:#f8fafc;
-  }
-  .disc-table td:last-child,
-  .disc-table th:last-child{
-    text-align:right;
-  }
-  .disc-table tr:last-child td{
-    border-bottom:none;
-  }
-  .disc-table select,
-  .disc-table input{
-    min-width:unset;
-    width:100%;
-    padding:7px 8px;
-    font-size:12px;
+  .label {
+    min-width: 220px;
+    font-weight: 600;
   }
 
-  .disc-pill{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    padding:3px 8px;
-    border-radius:999px;
-    background:#f1f5f9;
-    font-weight:800;
-    color:#0f172a;
-  }
-  .disc-calc{
-    color:#b91c1c;
-    font-weight:800;
-    font-variant-numeric:tabular-nums;
+  input,
+  select {
+    padding: 8px 10px;
+    font-size: 14px;
+    min-width: 260px;
   }
 
-  .remove{
-    cursor:pointer;
-    font-size:18px;
-    color:#991b1b;
-    line-height:1;
-    user-select:none;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    width:30px;
-    height:30px;
-    border-radius:10px;
-    background:#fff1f2;
-    margin-left:8px;
-  }
-  .remove:hover{ filter:brightness(0.95); }
-
-  .add-discount{
-    margin-top:10px;
-    padding:10px 14px;
-    background:#e5e7eb;
-    border:none;
-    border-radius:10px;
-    cursor:pointer;
-    font-weight:700;
-  }
-  .add-discount:hover{ filter:brightness(0.98); }
-
-  .total{
-    margin-top:12px;
-    font-weight:800;
-    display:flex;
-    align-items:center;
-    gap:10px;
-    flex-wrap:wrap;
+  .radio-row {
+    display: flex;
+    gap: 48px;
+    margin-top: 14px;
   }
 
-  table.plan{
-    width:100%;
-    margin-top:14px;
-    border-collapse:collapse;
-  }
-  .plan th,.plan td{
-    padding:10px 8px;
-    border-bottom:1px solid #eee;
-    text-align:center;
-    font-size:14px;
-  }
-  .plan td.amount-cell{ text-align:right; }
-
-  .primary-btn{
-    margin-top:32px;
-    padding:18px;
-    width:100%;
-    font-size:16px;
-    background:#2563eb;
-    color:white;
-    border:none;
-    border-radius:12px;
-    font-weight:800;
+  .money {
+    padding: 6px 14px;
+    border-radius: 10px;
+    background: #f1f5f9;
+    font-weight: 800;
+    display: inline-block;
+    min-width: 140px;
+    text-align: right;
   }
 
-  /* fluid */
-  @media(max-width:980px){
-    .label{ min-width:160px; }
-    input,select{ min-width:220px; }
-    .money-badge{ min-width:unset; justify-content:flex-start; }
-    .disc-table{ font-size:12px; }
+  .money.red {
+    background: #fff1f2;
+    color: #9f1239;
+  }
+
+  .student-id {
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: #e0f2fe;
+    color: #0369a1;
+    font-weight: 800;
+    display: inline-block;
+  }
+
+  .discount-box {
+    margin-top: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 14px;
+    background: #fafafa;
+  }
+
+  .discount-box h3 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    background: #fff;
+  }
+
+  th,
+  td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+  }
+
+  th {
+    background: #f8fafc;
+    text-align: left;
+  }
+
+  td:last-child,
+  th:last-child {
+    text-align: right;
+  }
+
+  .disc-calc {
+    color: #b91c1c;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .remove {
+    cursor: pointer;
+    color: #991b1b;
+    font-size: 18px;
+    margin-left: 8px;
+    user-select: none;
+  }
+
+  .add-disc {
+    margin-top: 10px;
+    padding: 8px 14px;
+    background: #e5e7eb;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .primary-btn {
+    margin-top: 30px;
+    width: 100%;
+    padding: 18px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  @media (max-width: 900px) {
+    .label {
+      min-width: 160px;
+    }
+    input,
+    select {
+      min-width: 220px;
+    }
   }
 </style>
 </head>
@@ -232,36 +168,41 @@
   <h2>1. Enrollment</h2>
 
   <div class="row">
-    <div class="label">Academic Year:</div>
-    <select id="academicYear">
-      <option value="AY25">AY2025–2026</option>
+    <div class="label">Academic Year</div>
+    <select id="year">
+      <option value="AY25">AY 2025–2026</option>
       <option value="SUM26">Summer 2026</option>
-      <option value="AY26">AY2026–2027</option>
+      <option value="AY26">AY 2026–2027</option>
     </select>
   </div>
 
   <div class="radio-row">
-    <label><input type="radio" name="studentType" value="new" checked> New Student</label>
-    <label><input type="radio" name="studentType" value="current"> Current Student</label>
+    <label><input type="radio" name="stype" value="new" checked /> New Student</label>
+    <label><input type="radio" name="stype" value="current" /> Current Student</label>
   </div>
 
-  <div id="studentFields"></div>
+  <div id="studentBox"></div>
 
   <div class="row">
-    <div class="label">First Attendance Date:</div>
-    <input type="date" id="attendance">
+    <div class="label">First Attendance Date</div>
+    <input type="date" id="attDate" />
   </div>
 
   <div class="row">
-    <div class="label">Grade Level:</div>
+    <div class="label">Grade</div>
     <select id="grade">
-      <option>SR</option><option>EY1</option><option>EY2</option>
-      <option>Y1</option><option>Y2</option><option>Y3</option>
+      <option>SR Half-day</option>
+      <option>SR Full-day</option>
+      <option>EY1</option>
+      <option>EY2</option>
+      <option>Y1</option>
+      <option>Y2</option>
+      <option>Y3</option>
     </select>
   </div>
 
   <div class="row">
-    <div class="label">Payment Plan:</div>
+    <div class="label">Payment Plan</div>
     <select id="plan">
       <option>Annual</option>
       <option>Termly</option>
@@ -272,258 +213,251 @@
   <h2>2. Calculating Payment</h2>
 
   <div class="row">
-    <div class="label">Tuition Before Discount:</div>
-    <span class="money-badge" id="tuition">0</span>
+    <div class="label">Tuition Before Discount</div>
+    <span class="money" id="tuition">0</span>
   </div>
 
   <div class="discount-box">
-    <h3>discount</h3>
+    <h3>Discounts</h3>
 
-    <table class="disc-table" aria-label="discounts table">
+    <table>
       <thead>
         <tr>
-          <th style="width:110px;">disc nr</th>
-          <th style="width:260px;">type (free | fixed amount | percentage)</th>
-          <th style="width:200px;">amount</th>
-          <th style="width:220px; text-align:right;">calculated</th>
+          <th style="width:60px;">Disc</th>
+          <th style="width:160px;">Type</th>
+          <th>Description</th>
+          <th style="width:160px;">Amount</th>
+          <th style="width:170px;">Calc Amount</th>
         </tr>
       </thead>
-      <tbody id="discounts"></tbody>
+      <tbody id="discBody"></tbody>
     </table>
 
-    <button type="button" class="add-discount" id="addDiscountBtn">+ add discount</button>
+    <button class="add-disc" type="button" onclick="addDiscount()">+ Add Discount</button>
   </div>
 
-  <div class="total">
-    <span style="min-width:220px;">Total Discount:</span>
-    <span class="money-badge red" id="totalDiscount">0</span>
+  <div class="row">
+    <div class="label">Total Discount</div>
+    <span class="money red" id="totalDisc">0</span>
   </div>
-  <div class="total">
-    <span style="min-width:220px;">Amount After Discount:</span>
-    <span class="money-badge" id="afterDiscount">0</span>
+
+  <div class="row">
+    <div class="label">Amount After Discount</div>
+    <span class="money" id="afterDisc">0</span>
   </div>
-  <div class="total">
-    <span style="min-width:220px;">Monthly Fee (10x):</span>
-    <span class="money-badge" id="monthlyFee">0</span>
+
+  <div class="row">
+    <div class="label">Monthly Fee (10 installments)</div>
+    <span class="money" id="monthlyFee">0</span>
   </div>
 
   <h2>3. Tuition Payment Plan</h2>
 
-  <table class="plan">
+  <table>
     <thead>
-      <tr><th>No</th><th>Due Date</th><th style="text-align:right;">Amount</th></tr>
+      <tr>
+        <th style="width:90px;">No</th>
+        <th>Due Date</th>
+        <th style="width:200px; text-align:right;">Amount</th>
+      </tr>
     </thead>
     <tbody id="planBody"></tbody>
   </table>
 
-  <button class="primary-btn">Add Student & Create Payment Plan</button>
+  <button class="primary-btn" type="button">Add Student & Create Payment Plan</button>
 
   <p style="margin-top:12px;font-size:13px;color:#555">
-    By clicking, we will create new student, payment plan, and then go to payment (creating payment receipt) page.
+    By clicking, we will create new student, payment plan, and then proceed to payment receipt creation.
   </p>
 
 </div>
 
 <script>
-/* ---------- PRICING (from your inserts) ---------- */
-const PRICING = {
-  AY25: {
-    SR: { Annual: 2700000, Termly: 3000000, Monthly: 3000000 },
-    EY1:{ Annual: 3900000, Termly: 4200000, Monthly: 4200000 },
-    EY2:{ Annual: 3900000, Termly: 4200000, Monthly: 4200000 },
-    Y1: { Annual: 4200000, Termly: 4500000, Monthly: 4500000 },
-    Y2: { Annual: 4200000, Termly: 4500000, Monthly: 4500000 },
-    Y3: { Annual: 4200000, Termly: 4500000, Monthly: 4500000 }
-  },
-  AY26: {
-    SR: { Annual: 2890000, Termly: 3090000, Monthly: 3290000 },
-    EY1:{ Annual: 4290000, Termly: 4490000, Monthly: 4890000 },
-    EY2:{ Annual: 4290000, Termly: 4490000, Monthly: 4890000 },
-    Y1: { Annual: 4690000, Termly: 4890000, Monthly: 5290000 },
-    Y2: { Annual: 4690000, Termly: 4890000, Monthly: 5290000 },
-    Y3: { Annual: 4690000, Termly: 4890000, Monthly: 5290000 }
-  },
-  SUM26: { ALL: { Annual: 850000, Termly: 850000, Monthly: 850000 } }
-};
+  // Pricing base (as previously used)
+  const pricing = {
+    AY25: { base: 4500000 },
+    AY26: { base: 4890000 },
+    SUM26: { base: 850000 }
+  };
 
-/* ---------- ELEMENTS ---------- */
-const elYear = document.getElementById("academicYear");
-const elGrade = document.getElementById("grade");
-const elPlan = document.getElementById("plan");
-const elAttendance = document.getElementById("attendance");
-const elStudentFields = document.getElementById("studentFields");
+  const yearEl = document.getElementById("year");
+  const planEl = document.getElementById("plan");
+  const attDateEl = document.getElementById("attDate");
 
-const elDiscountsTbody = document.getElementById("discounts");
+  const tuitionEl = document.getElementById("tuition");
+  const totalDiscEl = document.getElementById("totalDisc");
+  const afterDiscEl = document.getElementById("afterDisc");
+  const monthlyFeeEl = document.getElementById("monthlyFee");
 
-const elTuition = document.getElementById("tuition");
-const elTotalDiscount = document.getElementById("totalDiscount");
-const elAfterDiscount = document.getElementById("afterDiscount");
-const elMonthlyFee = document.getElementById("monthlyFee");
-const elPlanBody = document.getElementById("planBody");
+  const discBodyEl = document.getElementById("discBody");
+  const planBodyEl = document.getElementById("planBody");
+  const studentBoxEl = document.getElementById("studentBox");
 
-document.getElementById("addDiscountBtn").addEventListener("click", addDiscount);
+  // Default attendance date = today
+  attDateEl.value = new Date().toISOString().slice(0, 10);
 
-/* default attendance = today */
-elAttendance.value = new Date().toISOString().slice(0, 10);
+  function renderStudent() {
+    const type = document.querySelector('input[name="stype"]:checked').value;
+    const year = yearEl.value;
 
-/* ---------- STUDENT UI ---------- */
-function renderStudent() {
-  const type = document.querySelector('input[name="studentType"]:checked').value;
-  const year = elYear.value;
+    studentBoxEl.innerHTML = "";
 
-  elStudentFields.innerHTML = "";
-
-  if (type === "new") {
-    const id = (year === "AY25") ? "PR25142" : "PR26012";
-    elStudentFields.innerHTML = `
-      <div class="row">
-        <div class="label">Student ID:</div>
-        <span class="student-id-badge">${id}</span>
-      </div>
-    `;
-  } else {
-    elStudentFields.innerHTML = `
-      <div class="row">
-        <div class="label">Student Name:</div>
-        <input type="text" id="curStudentName" placeholder="Student Name">
-      </div>
-      <div class="row">
-        <div class="label">Student ID:</div>
-        <input type="text" id="curStudentId" placeholder="Student ID">
-      </div>
-    `;
+    if (type === "new") {
+      const id = (year === "AY25") ? "PR25142" : "PR26012";
+      studentBoxEl.innerHTML = `
+        <div class="row">
+          <div class="label">Student ID</div>
+          <span class="student-id">${id}</span>
+        </div>
+      `;
+    } else {
+      studentBoxEl.innerHTML = `
+        <div class="row">
+          <div class="label">Student Name</div>
+          <input type="text" />
+        </div>
+        <div class="row">
+          <div class="label">Student ID</div>
+          <input type="text" />
+        </div>
+      `;
+    }
   }
-}
 
-/* ---------- DISCOUNTS UI ---------- */
-let discCounter = 0;
-
-function addDiscount() {
-  discCounter += 1;
-
-  const tr = document.createElement("tr");
-  tr.className = "disc-tr";
-  tr.innerHTML = `
-    <td><span class="disc-pill">disc ${discCounter}</span></td>
-
-    <td>
-      <select class="disc-type">
-        <option value="fixed" selected>fixed amount</option>
-        <option value="percent">percentage</option>
-        <option value="free">free</option>
-      </select>
-    </td>
-
-    <td>
-      <input class="disc-value" type="number" min="0" placeholder="enter value">
-    </td>
-
-    <td style="text-align:right;">
-      <span class="disc-calc">0</span>
-      <span class="remove" title="Remove" aria-label="Remove">−</span>
-    </td>
-  `;
-
-  tr.querySelector(".remove").addEventListener("click", () => {
-    tr.remove();
-    recalc();
+  document.querySelectorAll('input[name="stype"]').forEach(r => {
+    r.addEventListener("change", renderStudent);
   });
 
-  tr.querySelector(".disc-type").addEventListener("change", recalc);
-  tr.querySelector(".disc-value").addEventListener("input", recalc);
-
-  elDiscountsTbody.appendChild(tr);
-  recalc();
-}
-
-/* ---------- CALC ---------- */
-function getBaseTuition() {
-  const year = elYear.value;
-  const grade = elGrade.value;
-  const plan = elPlan.value;
-
-  if (year === "SUM26") return PRICING.SUM26.ALL[plan] || 0;
-  return (PRICING[year] && PRICING[year][grade] && PRICING[year][grade][plan]) ? PRICING[year][grade][plan] : 0;
-}
-function fmt(n){ return Math.round(n).toLocaleString(); }
-
-function recalc() {
-  const base = getBaseTuition();
-  elTuition.textContent = fmt(base);
-
-  // read rows
-  const rows = Array.from(elDiscountsTbody.querySelectorAll("tr")).map(tr => {
-    const type = tr.querySelector(".disc-type").value;
-    const val = Number(tr.querySelector(".disc-value").value || 0);
-    return { tr, type, val };
+  yearEl.addEventListener("change", () => {
+    renderStudent();
+    calc();
   });
 
-  // rule: fixed first, then percent (free treated as fixed in this UI, value = fixed discount)
-  const fixedRows = rows.filter(r => r.type === "fixed" || r.type === "free");
-  const percentRows = rows.filter(r => r.type === "percent");
+  planEl.addEventListener("change", calc);
 
-  let running = base;
+  let discNo = 0;
 
-  // fixed total
-  let totalFixed = 0;
-  fixedRows.forEach(r => totalFixed += Math.max(0, r.val));
-  running = Math.max(0, running - totalFixed);
+  function addDiscount() {
+    discNo++;
 
-  // percent computed on remaining
-  let totalPercent = 0;
-  percentRows.forEach(r => {
-    const pct = Math.max(0, r.val);
-    totalPercent += (running * pct / 100);
-  });
-
-  const totalDiscount = totalFixed + totalPercent;
-  const after = Math.max(0, base - totalDiscount);
-
-  // display per-row calculated
-  fixedRows.forEach(r => {
-    const d = Math.max(0, r.val);
-    r.tr.querySelector(".disc-calc").textContent = "-" + fmt(d);
-  });
-
-  const percentBase = Math.max(0, base - totalFixed);
-  percentRows.forEach(r => {
-    const pct = Math.max(0, r.val);
-    const d = percentBase * pct / 100;
-    r.tr.querySelector(".disc-calc").textContent = (pct ? (pct + "%") : "0") + "  ( -" + fmt(d) + " )";
-  });
-
-  // totals
-  elTotalDiscount.textContent = "-" + fmt(totalDiscount);
-  elAfterDiscount.textContent = fmt(after);
-  elMonthlyFee.textContent = fmt(after / 10);
-
-  // plan
-  const per = Math.round(after / 10);
-  elPlanBody.innerHTML = "";
-  for (let i = 1; i <= 10; i++) {
-    const due = (i === 1) ? "Registration Date" : ("Month " + i);
-    elPlanBody.innerHTML += `
-      <tr>
-        <td>${i}</td>
-        <td>${due}</td>
-        <td class="amount-cell"><span class="money-badge">${fmt(per)}</span></td>
-      </tr>
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${discNo}</td>
+      <td>
+        <select onchange="calc()">
+          <option value="fixed">Fixed Amount</option>
+          <option value="percent">Percentage</option>
+          <option value="free">Free</option>
+        </select>
+      </td>
+      <td>
+        <select onchange="calc()">
+          <option value="Referral">Referral</option>
+          <option value="Sibling Discount">Sibling Discount</option>
+          <option value="Early Bird">Early Bird</option>
+          <option value="Free 3 Terms">Free 3 Terms</option>
+          <option value="Free 2 Terms">Free 2 Terms</option>
+          <option value="Free 1 Term">Free 1 Term</option>
+          <option value="Free Summer Program">Free Summer Program</option>
+        </select>
+      </td>
+      <td>
+        <input type="number" oninput="calc()" />
+      </td>
+      <td class="disc-calc">
+        0
+        <span class="remove" onclick="removeDiscount(this)">−</span>
+      </td>
     `;
+
+    discBodyEl.appendChild(tr);
+    calc();
   }
-}
 
-/* ---------- EVENTS ---------- */
-document.querySelectorAll('input[name="studentType"]').forEach(r =>
-  r.addEventListener("change", renderStudent)
-);
+  function removeDiscount(btn) {
+    const tr = btn.closest("tr");
+    if (tr) tr.remove();
+    calc();
+  }
 
-elYear.addEventListener("change", () => { renderStudent(); recalc(); });
-elGrade.addEventListener("change", recalc);
-elPlan.addEventListener("change", recalc);
+  function formatMoney(n) {
+    return Math.round(n).toLocaleString();
+  }
 
-/* init */
-renderStudent();
-recalc();
+  function calc() {
+    const yearKey = yearEl.value;
+    const base = (pricing[yearKey] ? pricing[yearKey].base : 0);
+
+    tuitionEl.textContent = formatMoney(base);
+
+    // Apply rule: sum all fixed/free first, then percent based on (base - fixedTotal)
+    let fixedTotal = 0;
+    let percentList = [];
+
+    // First pass: compute fixed/free, gather percents
+    Array.from(discBodyEl.querySelectorAll("tr")).forEach(tr => {
+      const typeSel = tr.children[1].querySelector("select").value;
+      const inputVal = Number(tr.children[3].querySelector("input").value || 0);
+
+      if (typeSel === "fixed" || typeSel === "free") {
+        fixedTotal += inputVal;
+      } else if (typeSel === "percent") {
+        percentList.push({ tr, pct: inputVal });
+      }
+    });
+
+    const percentBase = Math.max(0, base - fixedTotal);
+
+    // Second pass: set calc amounts per row (using rule above)
+    let totalDiscount = 0;
+
+    Array.from(discBodyEl.querySelectorAll("tr")).forEach(tr => {
+      const typeSel = tr.children[1].querySelector("select").value;
+      const inputEl = tr.children[3].querySelector("input");
+      const val = Number(inputEl.value || 0);
+
+      let d = 0;
+      if (typeSel === "fixed" || typeSel === "free") {
+        d = val;
+      } else if (typeSel === "percent") {
+        d = percentBase * val / 100;
+      }
+
+      totalDiscount += d;
+
+      const calcCell = tr.children[4];
+      // Keep remove button
+      const removeBtn = calcCell.querySelector(".remove");
+      calcCell.textContent = "-" + formatMoney(d) + " ";
+      calcCell.appendChild(removeBtn);
+    });
+
+    const net = Math.max(0, base - totalDiscount);
+
+    totalDiscEl.textContent = "-" + formatMoney(totalDiscount);
+    afterDiscEl.textContent = formatMoney(net);
+
+    const monthly = Math.round(net / 10);
+    monthlyFeeEl.textContent = formatMoney(monthly);
+
+    // Payment plan table (10 rows as your existing structure implied)
+    planBodyEl.innerHTML = "";
+    for (let i = 1; i <= 10; i++) {
+      const due = (i === 1) ? "Registration" : ("Month " + i);
+      planBodyEl.innerHTML += `
+        <tr>
+          <td>${i}</td>
+          <td>${due}</td>
+          <td style="text-align:right;">${formatMoney(monthly)}</td>
+        </tr>
+      `;
+    }
+  }
+
+  // Initial render
+  renderStudent();
+  calc();
 </script>
+
 </body>
 </html>
