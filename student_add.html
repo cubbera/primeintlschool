@@ -103,7 +103,7 @@
   .radio-row{
     display:flex;
     align-items:center;
-    gap:18px; /* space between radios */
+    gap:18px;
     flex-wrap:wrap;
     padding:6px 0 2px;
   }
@@ -213,12 +213,25 @@
   }
   .btn-remove:hover{ background:rgba(185,28,28,0.08); }
 
-  .totals{
-    display:flex;
-    gap:12px;
-    flex-wrap:wrap;
+  /* totals layout change (only highlight amount) */
+  .totals-lines{
     margin-top:12px;
+    display:grid;
+    gap:8px;
+  }
+  .totals-line{
+    display:flex;
     align-items:center;
+    justify-content:flex-start;
+    gap:10px;
+    flex-wrap:wrap;
+    font-size:13px;
+    color:#111827;
+    font-weight:600;
+  }
+  .totals-line .muted{
+    color:var(--muted);
+    font-weight:600;
   }
 
   /* payment plan */
@@ -280,6 +293,7 @@
 
   <h2>1. Enrollment</h2>
 
+  <!-- UPDATED LAYOUT ONLY (keep everything else) -->
   <div class="grid two">
     <div>
       <div class="row">
@@ -309,18 +323,13 @@
         </div>
       </div>
 
-      <!-- student fields -->
-      <div id="studentFields"></div>
-
       <div class="row">
-        <div class="label">First Attendance Date:</div>
+        <div class="label">Student Name:</div>
         <div class="control">
-          <input id="firstAttendance" type="date" />
+          <input type="text" id="newStudentNameStatic" placeholder="Student Name" />
         </div>
       </div>
-    </div>
 
-    <div>
       <div class="row">
         <div class="label">Grade:</div>
         <div class="control">
@@ -335,7 +344,32 @@
           </select>
         </div>
       </div>
+    </div>
 
+    <div>
+      <div class="row">
+        <div class="label">Student ID:</div>
+        <div class="control">
+          <span id="studentIdPill" class="pill">PR25142</span>
+          <span style="color:var(--muted);font-size:13px;">(auto)</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="label">Father's Name:</div>
+        <div class="control">
+          <input type="text" id="newFatherNameStatic" placeholder="Father's Name" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="label">First Attendance Date:</div>
+        <div class="control">
+          <input id="firstAttendance" type="date" />
+        </div>
+      </div>
+
+      <!-- keep original Payment Plan control in same section (already exists) -->
       <div class="row">
         <div class="label">Payment Plan:</div>
         <div class="control">
@@ -346,16 +380,11 @@
           </select>
         </div>
       </div>
-
-      <div class="row">
-        <div class="label">Student ID:</div>
-        <div class="control">
-          <span id="studentIdPill" class="pill">PR25142</span>
-          <span style="color:var(--muted);font-size:13px;">(auto)</span>
-        </div>
-      </div>
     </div>
   </div>
+
+  <!-- keep this div for JS (do not remove), but it will be used only for "current student" search -->
+  <div id="studentFields" style="display:none;"></div>
 
   <h2>2. Calculating Payment</h2>
 
@@ -379,9 +408,7 @@
           <th style="width:70px;"></th>
         </tr>
       </thead>
-      <tbody id="discBody">
-        <!-- rows injected -->
-      </tbody>
+      <tbody id="discBody"></tbody>
     </table>
   </div>
 
@@ -389,10 +416,21 @@
     <button class="btn-add" type="button" id="btnAddDisc">+ Add Discount</button>
   </div>
 
-  <div class="totals">
-    <span class="amount-pill red">Total Discount: <span id="totalDiscountText" style="margin-left:8px;">0 Ks</span></span>
-    <span class="amount-pill">Amount After Discount: <span id="afterDiscountText" style="margin-left:8px;">0 Ks</span></span>
-    <span class="amount-pill">Payment Fee: <span id="paymentFeeText" style="margin-left:8px;">0 Ks</span></span>
+  <!-- UPDATED TOTALS LAYOUT ONLY -->
+  <div class="totals-lines">
+    <div class="totals-line">
+      total discount
+      <span id="totalDiscountText" class="amount-pill red">0 Ks</span>
+    </div>
+    <div class="totals-line">
+      amount after discount
+      <span id="afterDiscountText" class="amount-pill">0 Ks</span>
+    </div>
+    <div class="totals-line">
+      payment plan (how many times)
+      <span id="paymentFeeText" class="amount-pill">0 Ks</span>
+      <span class="muted" id="paymentPlanHint">(10x)</span>
+    </div>
   </div>
 
   <h2>3. Tuition Payment Plan</h2>
@@ -418,9 +456,6 @@
 </div>
 
 <script>
-  // -----------------------------
-  // Fixed tuition pricing (from your SQL)
-  // -----------------------------
   const PRICING = {
     "AY2025-2026": {
       SR_HALF: { annual: 2700000, termly: 3000000, monthly: 3000000 },
@@ -444,7 +479,6 @@
     }
   };
 
-  // Academic terms (from your SQL) used for termly due dates
   const TERMS = {
     "AY2025-2026": {
       term1Start: "2025-06-10",
@@ -458,9 +492,6 @@
     }
   };
 
-  // -----------------------------
-  // DOM refs
-  // -----------------------------
   const academicYearEl = document.getElementById("academicYear");
   const paymentPlanEl  = document.getElementById("paymentPlan");
   const gradeEl        = document.getElementById("grade");
@@ -475,12 +506,10 @@
   const totalDiscountText = document.getElementById("totalDiscountText");
   const afterDiscountText = document.getElementById("afterDiscountText");
   const paymentFeeText    = document.getElementById("paymentFeeText");
+  const paymentPlanHint   = document.getElementById("paymentPlanHint");
 
   const planBody = document.getElementById("planBody");
 
-  // -----------------------------
-  // Helpers
-  // -----------------------------
   function todayISO(){
     const d = new Date();
     const yyyy = d.getFullYear();
@@ -500,55 +529,8 @@
 
   function setStudentId(){
     const ay = academicYearEl.value;
-    // Your fixed IDs:
-    // AY25 = PR25142
-    // SUMMER 2026 AND AY 26 = PR26012
     const id = (ay === "AY2025-2026") ? "PR25142" : "PR26012";
     studentIdPill.textContent = id;
-  }
-
-  function renderStudentFields(){
-    const type = getStudentType();
-    studentFields.innerHTML = "";
-
-    if (type === "new") {
-      // student id already shown as pill (not inputable). Keep empty boxes not required here.
-      studentFields.innerHTML = `
-        <div class="row">
-          <div class="label">Student Name:</div>
-          <div class="control"><input type="text" id="newStudentName" placeholder="Student Name" /></div>
-        </div>
-        <div class="row">
-          <div class="label">Father's Name:</div>
-          <div class="control"><input type="text" id="newFatherName" placeholder="Father's Name" /></div>
-        </div>
-      `;
-    } else {
-      // current student search: typing one reveals the other (as requested earlier)
-      studentFields.innerHTML = `
-        <div class="row">
-          <div class="label">Search Student:</div>
-          <div class="control" style="gap:12px; max-width:100%; flex-wrap:wrap;">
-            <input type="text" id="searchName" placeholder="Student Name" style="max-width:360px;" />
-            <input type="text" id="searchId" placeholder="Student ID" style="max-width:220px; display:none;" />
-          </div>
-        </div>
-      `;
-
-      const searchName = document.getElementById("searchName");
-      const searchId = document.getElementById("searchId");
-
-      function toggle(){
-        const hasName = (searchName.value || "").trim().length > 0;
-        const hasId   = (searchId.value || "").trim().length > 0;
-        if (hasName && !hasId) searchId.style.display = "";
-        else if (hasId && !hasName) searchName.style.display = "";
-        else if (!hasName && !hasId) searchId.style.display = "none";
-      }
-
-      searchName.addEventListener("input", toggle);
-      searchId.addEventListener("input", toggle);
-    }
   }
 
   function isSummer(){
@@ -556,55 +538,37 @@
   }
 
   function getTuitionBefore(){
-    // Summer payment is program tuition one-time
-    if (isSummer()) {
-      // use your pricing for SUMMER2026 (850000) from the SQL
-      return PRICING["AY2026-2027"].PROGRAM.summer;
-    }
+    if (isSummer()) return PRICING["AY2026-2027"].PROGRAM.summer;
     const ay = academicYearEl.value;
     const g = gradeEl.value;
     const plan = paymentPlanEl.value;
-
     const row = PRICING[ay]?.[g];
     if (!row) return 0;
-
     if (plan === "Annual") return row.annual;
     if (plan === "Termly") return row.termly;
-    return row.monthly; // Monthly
+    return row.monthly;
   }
 
   function getAnnualAndTermlyForFreeCalc(){
-    // Free-term discount rules are based on Annual + Termly amounts (not monthly)
-    if (isSummer()) {
-      // Summer has no term concept; free-term doesn't apply meaningfully
-      return { annual: getTuitionBefore(), termly: getTuitionBefore() };
-    }
+    if (isSummer()) return { annual: getTuitionBefore(), termly: getTuitionBefore() };
     const ay = academicYearEl.value;
     const g = gradeEl.value;
     const row = PRICING[ay]?.[g];
-    return {
-      annual: row?.annual || 0,
-      termly: row?.termly || 0
-    };
+    return { annual: row?.annual || 0, termly: row?.termly || 0 };
   }
 
-  // Priority: fixed/free first, then percentages on remainder (sum of percents)
   function computeDiscounts(tuitionBefore){
     const rows = Array.from(discBody.querySelectorAll("tr"));
-
-    // Collect
     const fixedRows = [];
     const percentRows = [];
 
     rows.forEach(tr => {
       const typeSel = tr.querySelector(".jsType");
-      const descInp = tr.querySelector(".jsDesc");
       const amtInp  = tr.querySelector(".jsAmt");
       const freeSel = tr.querySelector(".jsFree");
       const calcTd  = tr.querySelector(".jsCalc");
 
       const type = typeSel?.value || "";
-      const desc = (descInp?.value || "").trim();
       const rawAmt = Number(amtInp?.value || 0);
 
       let calc = 0;
@@ -612,92 +576,63 @@
       if (type === "Free") {
         const free = freeSel?.value || "";
         const { annual, termly } = getAnnualAndTermlyForFreeCalc();
-
-        // user rule:
-        // free 3 terms = annual amount
-        // free 2 terms = 2/3 of annual amount BUT take price from TERMLY -> discount = 2 * termly/3? (they clarified: take price from TERMLY)
-        // Their last clarification: "free 2 terms is 2/3 of annual amount (but take price from TERMLY)"
-        // Practical: termly amount is for 3 terms total in the year; each term value = termly/3.
-        // So:
-        // Free 2 terms = 2 * (termly/3)
-        // Free 1 term  = 1 * (termly/3)
-        // Free 3 terms = annual (as said)
         const perTerm = termly > 0 ? (termly / 3) : 0;
 
         if (free === "FREE_3_TERMS") calc = annual;
         else if (free === "FREE_2_TERMS") calc = Math.round(perTerm * 2);
         else if (free === "FREE_1_TERM") calc = Math.round(perTerm * 1);
-        else if (free === "FREE_SUMMER") calc = PRICING["AY2026-2027"].PROGRAM.summer; // display only; but summer is one-time anyway
+        else if (free === "FREE_SUMMER") calc = PRICING["AY2026-2027"].PROGRAM.summer;
 
-        // Free has no amount nor calc amount requirement per your latest: "Free has no amount nor calc amount."
-        // So show blank calc for Free, but still apply it as a discount to totals.
-        // We will keep calc internal, and show "-" + calc in red only if you want; you said Free has no calc amount.
-        calcTd.textContent = ""; // display blank
-        fixedRows.push({ tr, type, desc, calc });
+        calcTd.textContent = "";
+        fixedRows.push({ calc });
         return;
       }
 
       if (type === "Fixed Amount") {
         calc = Math.max(0, Math.round(rawAmt));
         calcTd.textContent = calc ? ("-" + fmtKs(calc).replace(" Ks","")) : "";
-        fixedRows.push({ tr, type, desc, calc });
+        fixedRows.push({ calc });
         return;
       }
 
       if (type === "Percentage") {
         const pct = Math.max(0, Number(rawAmt));
-        // calc later on remainder after fixed. Keep pct in calc field placeholder
-        calcTd.textContent = ""; // will fill after we know remainder
-        percentRows.push({ tr, type, desc, pct });
+        calcTd.textContent = "";
+        percentRows.push({ tr, pct });
         return;
       }
 
-      // empty type
       calcTd.textContent = "";
     });
 
-    // Apply fixed first
     const fixedTotal = fixedRows.reduce((s, x) => s + (x.calc || 0), 0);
     const afterFixed = Math.max(0, tuitionBefore - fixedTotal);
 
-    // Sum all percents and apply ONCE on afterFixed
     const totalPct = percentRows.reduce((s, x) => s + (x.pct || 0), 0);
     const percentDiscount = Math.floor(afterFixed * (totalPct / 100));
     const totalDiscount = Math.min(tuitionBefore, fixedTotal + percentDiscount);
     const afterDiscount = Math.max(0, tuitionBefore - totalDiscount);
 
-    // Fill percentage calc display (same rule applied to remainder; split proportionally for display)
     percentRows.forEach(x => {
       const calcTd = x.tr.querySelector(".jsCalc");
       if (!calcTd) return;
-      if (totalPct <= 0) {
-        calcTd.textContent = "";
-        return;
-      }
+      if (totalPct <= 0) { calcTd.textContent = ""; return; }
       const share = Math.floor(percentDiscount * ((x.pct || 0) / totalPct));
       calcTd.textContent = share ? ("-" + fmtKs(share).replace(" Ks","")) : "";
       calcTd.style.color = "var(--danger)";
       calcTd.style.fontWeight = "800";
     });
 
-    // Ensure fixed calc display red (already) and keep free blank display
-    discBody.querySelectorAll(".jsCalc").forEach(td => {
-      if (!td) return;
-      td.classList.add("disc-calc");
-    });
+    discBody.querySelectorAll(".jsCalc").forEach(td => td.classList.add("disc-calc"));
 
-    return { totalDiscount, afterDiscount, tuitionBefore };
+    return { totalDiscount, afterDiscount };
   }
 
   function getPaymentFee(afterDiscount){
     const plan = paymentPlanEl.value;
-
-    // Summer: one-time payment
     if (isSummer()) return afterDiscount;
-
     if (plan === "Annual") return afterDiscount;
     if (plan === "Termly") return Math.round(afterDiscount / 3);
-    // Monthly: 10 installments
     return Math.round(afterDiscount / 10);
   }
 
@@ -707,7 +642,6 @@
 
     const regDate = firstAttendanceEl.value || todayISO();
 
-    // Summer: only one-time payment regardless of selection
     if (isSummer()) {
       planBody.innerHTML = `
         <tr>
@@ -733,10 +667,6 @@
       const t = TERMS[ay];
       const per = Math.round(afterDiscount / 3);
 
-      // EXACTLY 3 payments:
-      // Registration Date
-      // Before Term 2 (term2 start date)
-      // Before Term 3 (term3 start date)
       planBody.innerHTML = `
         <tr>
           <td class="num">1</td>
@@ -756,7 +686,6 @@
       return;
     }
 
-    // Monthly: 10 installments, with Registration + Jul..Mar style labels
     const per = Math.round(afterDiscount / 10);
     const due = [
       "Registration Date",
@@ -785,22 +714,25 @@
   function updateTuitionAndRecalc(){
     setStudentId();
 
-    // Tuition before discount
+    if (isSummer()) paymentPlanEl.value = "Annual";
+
     const tuitionBefore = getTuitionBefore();
     tuitionBeforePill.textContent = fmtKs(tuitionBefore);
 
-    // Compute discounts
-    const { totalDiscount, afterDiscount } = computeDiscounts(tuitionBefore) || { totalDiscount:0, afterDiscount:tuitionBefore };
+    const res = computeDiscounts(tuitionBefore) || { totalDiscount:0, afterDiscount:tuitionBefore };
+    totalDiscountText.textContent = fmtKs(res.totalDiscount);
+    afterDiscountText.textContent = fmtKs(res.afterDiscount);
 
-    totalDiscountText.textContent = fmtKs(totalDiscount);
-    afterDiscountText.textContent = fmtKs(afterDiscount);
-
-    // Payment fee
-    const fee = getPaymentFee(afterDiscount);
+    const fee = getPaymentFee(res.afterDiscount);
     paymentFeeText.textContent = fmtKs(fee);
 
-    // Payment plan table
-    generatePaymentPlan(afterDiscount);
+    // hint: how many times
+    if (isSummer()) paymentPlanHint.textContent = "(1x)";
+    else if (paymentPlanEl.value === "Annual") paymentPlanHint.textContent = "(1x)";
+    else if (paymentPlanEl.value === "Termly") paymentPlanHint.textContent = "(3x)";
+    else paymentPlanHint.textContent = "(10x)";
+
+    generatePaymentPlan(res.afterDiscount);
   }
 
   function createDiscountRow(){
@@ -853,8 +785,6 @@
 
     function onTypeChange(){
       const t = typeSel.value;
-
-      // Free: show free dropdown, hide amount input for effect (but keep layout stable)
       if (t === "Free") {
         freeSel.style.display = "";
         amtInp.style.display = "none";
@@ -870,11 +800,10 @@
     typeSel.addEventListener("change", onTypeChange);
     freeSel.addEventListener("change", updateTuitionAndRecalc);
     amtInp.addEventListener("input", updateTuitionAndRecalc);
-    tr.querySelector(".jsDesc").addEventListener("input", () => { /* no calc, but must not break */ });
+    tr.querySelector(".jsDesc").addEventListener("input", () => {});
 
     removeBtn.addEventListener("click", () => {
       tr.remove();
-      // re-number disc no
       Array.from(discBody.querySelectorAll("tr")).forEach((row,i)=>{
         const no = row.querySelector(".disc-no");
         if (no) no.textContent = String(i+1);
@@ -883,29 +812,34 @@
     });
   }
 
-  // -----------------------------
-  // Events
-  // -----------------------------
   document.querySelectorAll('input[name="studentType"]').forEach(r => {
     r.addEventListener("change", () => {
-      renderStudentFields();
+      // current student did not work previously; keep behavior:
+      // show search controls inside hidden container but do not change layout.
+      const type = getStudentType();
+      if (type === "current") {
+        studentFields.style.display = "block";
+        studentFields.innerHTML = `
+          <div class="row">
+            <div class="label">Search Student:</div>
+            <div class="control" style="gap:12px; max-width:100%; flex-wrap:wrap;">
+              <input type="text" id="searchName" placeholder="Student Name" style="max-width:360px;" />
+              <input type="text" id="searchId" placeholder="Student ID" style="max-width:220px;" />
+            </div>
+          </div>
+        `;
+      } else {
+        studentFields.style.display = "none";
+        studentFields.innerHTML = "";
+      }
       updateTuitionAndRecalc();
     });
   });
 
-  academicYearEl.addEventListener("change", () => {
-    // Summer forces one-time payment
-    if (isSummer()) {
-      paymentPlanEl.value = "Annual";
-    }
-    renderStudentFields();
-    updateTuitionAndRecalc();
-  });
-
+  academicYearEl.addEventListener("change", updateTuitionAndRecalc);
   gradeEl.addEventListener("change", updateTuitionAndRecalc);
 
   paymentPlanEl.addEventListener("change", () => {
-    // Summer always one-time; keep annual selection but still works
     if (isSummer()) paymentPlanEl.value = "Annual";
     updateTuitionAndRecalc();
   });
@@ -917,14 +851,10 @@
     updateTuitionAndRecalc();
   });
 
-  // -----------------------------
   // Initial setup
-  // -----------------------------
-  firstAttendanceEl.value = todayISO();               // default today
-  setStudentId();                                     // default AY25 => PR25142
-  renderStudentFields();                              // current/new works
-  // start with no discounts
-  updateTuitionAndRecalc();                           // compute tuition + plan
+  firstAttendanceEl.value = todayISO();
+  setStudentId();
+  updateTuitionAndRecalc();
 </script>
 
 </body>
