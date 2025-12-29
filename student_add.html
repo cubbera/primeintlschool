@@ -105,7 +105,8 @@
     align-items:center;
     gap:18px;
     flex-wrap:wrap;
-    padding:6px 0 2px;
+    padding:0;
+    margin:0;
   }
   .radio-row label{
     display:inline-flex;
@@ -213,7 +214,7 @@
   }
   .btn-remove:hover{ background:rgba(185,28,28,0.08); }
 
-  /* totals layout change (only highlight amount) */
+  /* totals layout */
   .totals-lines{
     margin-top:12px;
     display:grid;
@@ -284,6 +285,67 @@
     color:#4b5563;
     line-height:1.35;
   }
+
+  /* Enrollment layout change only */
+  .enroll-table{
+    margin-top:8px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+    background:#fff;
+  }
+  .enroll-table table{ width:100%; border-collapse:collapse; }
+  .enroll-table td{
+    padding:10px 12px;
+    font-size:13px; /* same as table body */
+    border-bottom:1px solid var(--line);
+    vertical-align:middle;
+  }
+  .enroll-table tr:last-child td{ border-bottom:none; }
+  .enroll-table .cell{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .enroll-table .cell .t{
+    font-weight:700;
+    color:#111827;
+    white-space:nowrap;
+  }
+  .enroll-table .cell .v{
+    flex:1;
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .enroll-table select,
+  .enroll-table input[type="text"],
+  .enroll-table input[type="date"]{
+    max-width:340px;
+    width:100%;
+  }
+  @media (max-width:720px){
+    .enroll-table .cell{ align-items:flex-start; }
+    .enroll-table .cell .v{ justify-content:flex-start; width:100%; }
+    .enroll-table select,
+    .enroll-table input[type="text"],
+    .enroll-table input[type="date"]{ max-width:100%; }
+  }
+
+  .btn-search{
+    padding:10px 12px;
+    font-size:13px;
+    font-weight:700;
+    border-radius:10px;
+    border:1px solid #d1d5db;
+    background:#ffffff;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .btn-search:hover{ background:#f9fafb; }
 </style>
 </head>
 
@@ -293,97 +355,111 @@
 
   <h2>1. Enrollment</h2>
 
-  <!-- UPDATED LAYOUT ONLY (keep everything else) -->
-  <div class="grid two">
-    <div>
-      <div class="row">
-        <div class="label">Academic Year:</div>
-        <div class="control">
-          <select id="academicYear">
-            <option value="AY2025-2026" selected>AY2025–2026</option>
-            <option value="SUMMER2026">Summer 2026</option>
-            <option value="AY2026-2027">AY2026–2027</option>
-          </select>
-        </div>
-      </div>
+  <!-- CHANGED LAYOUT ONLY HERE -->
+  <div class="enroll-table">
+    <table>
+      <tbody>
+        <tr>
+          <td style="width:50%;">
+            <div class="cell">
+              <div class="t">Academic Year</div>
+              <div class="v">
+                <select id="academicYear">
+                  <option value="AY2025-2026" selected>AY2025–2026</option>
+                  <option value="SUMMER2026">Summer 2026</option>
+                  <option value="AY2026-2027">AY2026–2027</option>
+                </select>
+              </div>
+            </div>
+          </td>
+          <td style="width:50%;">
+            <div class="cell">
+              <div class="t">Grade</div>
+              <div class="v">
+                <select id="grade">
+                  <option value="SR_HALF">SR Half-day</option>
+                  <option value="SR_FULL">SR Full-day</option>
+                  <option value="EY1">EY1</option>
+                  <option value="EY2">EY2</option>
+                  <option value="Y1">Y1</option>
+                  <option value="Y2">Y2</option>
+                  <option value="Y3">Y3</option>
+                </select>
+              </div>
+            </div>
+          </td>
+        </tr>
 
-      <div class="row">
-        <div class="label">Student Type:</div>
-        <div class="control" style="justify-content:flex-start;">
-          <div class="radio-row" style="margin:0;">
-            <label style="justify-content:flex-start;">
-              <input type="radio" name="studentType" value="new" checked />
-              New Student
-            </label>
-            <label>
-              <input type="radio" name="studentType" value="current" />
-              Current Student
-            </label>
-          </div>
-        </div>
-      </div>
+        <tr>
+          <td style="width:50%;">
+            <div class="cell">
+              <div class="t">Student Type</div>
+              <div class="v">
+                <div class="radio-row">
+                  <label><input type="radio" name="studentType" value="new" checked /> New</label>
+                  <label><input type="radio" name="studentType" value="current" /> Current</label>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td style="width:50%;">
+            <div class="cell">
+              <div class="t">Father's Name</div>
+              <div class="v">
+                <input type="text" id="fatherName" placeholder="Father's Name" />
+              </div>
+            </div>
+          </td>
+        </tr>
 
-      <div class="row">
-        <div class="label">Student Name:</div>
-        <div class="control">
-          <input type="text" id="newStudentNameStatic" placeholder="Student Name" />
-        </div>
-      </div>
+        <tr>
+          <td style="width:50%;">
+            <div class="cell">
+              <div class="t">Student ID</div>
+              <div class="v">
+                <span id="studentIdPill" class="pill">PR25142</span>
+                <span style="color:var(--muted);font-size:13px;">(auto)</span>
+              </div>
+            </div>
+          </td>
+          <td style="width:50%;">
+            <div class="cell">
+              <div class="t">Student Name</div>
+              <div class="v" id="studentNameCell">
+                <input type="text" id="studentName" placeholder="Student Name" />
+              </div>
+            </div>
+          </td>
+        </tr>
 
-      <div class="row">
-        <div class="label">Grade:</div>
-        <div class="control">
-          <select id="grade">
-            <option value="SR_HALF">SR Half-day</option>
-            <option value="SR_FULL">SR Full-day</option>
-            <option value="EY1">EY1</option>
-            <option value="EY2">EY2</option>
-            <option value="Y1">Y1</option>
-            <option value="Y2">Y2</option>
-            <option value="Y3">Y3</option>
-          </select>
-        </div>
-      </div>
-    </div>
+        <tr>
+          <td style="width:50%;">
+            <div class="cell">
+              <div class="t">Payment Plan</div>
+              <div class="v">
+                <select id="paymentPlan">
+                  <option value="Annual">Annual</option>
+                  <option value="Termly">Termly</option>
+                  <option value="Monthly" selected>Monthly</option>
+                </select>
+              </div>
+            </div>
+          </td>
+          <td style="width:50%;">
+            <div class="cell">
+              <div class="t">First Attendance Date</div>
+              <div class="v">
+                <input id="firstAttendance" type="date" />
+              </div>
+            </div>
+          </td>
+        </tr>
 
-    <div>
-      <div class="row">
-        <div class="label">Student ID:</div>
-        <div class="control">
-          <span id="studentIdPill" class="pill">PR25142</span>
-          <span style="color:var(--muted);font-size:13px;">(auto)</span>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="label">Father's Name:</div>
-        <div class="control">
-          <input type="text" id="newFatherNameStatic" placeholder="Father's Name" />
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="label">First Attendance Date:</div>
-        <div class="control">
-          <input id="firstAttendance" type="date" />
-        </div>
-      </div>
-
-      <!-- keep original Payment Plan control in same section (already exists) -->
-      <div class="row">
-        <div class="label">Payment Plan:</div>
-        <div class="control">
-          <select id="paymentPlan">
-            <option value="Annual">Annual</option>
-            <option value="Termly">Termly</option>
-            <option value="Monthly" selected>Monthly</option>
-          </select>
-        </div>
-      </div>
-    </div>
+      </tbody>
+    </table>
   </div>
 
-  <!-- keep this div for JS (do not remove), but it will be used only for "current student" search -->
+  <!-- keep this div for JS (do not remove) -->
   <div id="studentFields" style="display:none;"></div>
 
   <h2>2. Calculating Payment</h2>
@@ -416,7 +492,6 @@
     <button class="btn-add" type="button" id="btnAddDisc">+ Add Discount</button>
   </div>
 
-  <!-- UPDATED TOTALS LAYOUT ONLY -->
   <div class="totals-lines">
     <div class="totals-line">
       total discount
@@ -480,23 +555,14 @@
   };
 
   const TERMS = {
-    "AY2025-2026": {
-      term1Start: "2025-06-10",
-      term2Start: "2025-09-01",
-      term3Start: "2025-12-01"
-    },
-    "AY2026-2027": {
-      term1Start: "2026-06-16",
-      term2Start: "2026-09-01",
-      term3Start: "2026-12-01"
-    }
+    "AY2025-2026": { term2Start: "2025-09-01", term3Start: "2025-12-01" },
+    "AY2026-2027": { term2Start: "2026-09-01", term3Start: "2026-12-01" }
   };
 
   const academicYearEl = document.getElementById("academicYear");
   const paymentPlanEl  = document.getElementById("paymentPlan");
   const gradeEl        = document.getElementById("grade");
   const studentIdPill  = document.getElementById("studentIdPill");
-  const studentFields  = document.getElementById("studentFields");
   const firstAttendanceEl = document.getElementById("firstAttendance");
 
   const tuitionBeforePill = document.getElementById("tuitionBeforePill");
@@ -509,6 +575,10 @@
   const paymentPlanHint   = document.getElementById("paymentPlanHint");
 
   const planBody = document.getElementById("planBody");
+
+  const studentNameCell = document.getElementById("studentNameCell");
+  const fatherNameEl = document.getElementById("fatherName");
+  const studentNameEl = document.getElementById("studentName");
 
   function todayISO(){
     const d = new Date();
@@ -687,18 +757,7 @@
     }
 
     const per = Math.round(afterDiscount / 10);
-    const due = [
-      "Registration Date",
-      "1 July",
-      "1 Aug",
-      "1 Sep",
-      "1 Oct",
-      "1 Nov",
-      "1 Dec",
-      "1 Jan",
-      "1 Feb",
-      "1 Mar"
-    ];
+    const due = ["Registration Date","1 July","1 Aug","1 Sep","1 Oct","1 Nov","1 Dec","1 Jan","1 Feb","1 Mar"];
 
     for (let i=1; i<=10; i++){
       const label = due[i-1] + (i===1 ? ` (${regDate})` : "");
@@ -708,6 +767,30 @@
           <td>${label}</td>
           <td class="amt">${fmtKs(per)}</td>
         </tr>`;
+    }
+  }
+
+  function renderStudentNameCell(){
+    const type = getStudentType();
+    if (type === "new") {
+      studentNameCell.innerHTML = `<input type="text" id="studentName" placeholder="Student Name" />`;
+      // keep father's name editable
+      fatherNameEl.disabled = false;
+    } else {
+      studentNameCell.innerHTML = `
+        <input type="text" id="studentName" placeholder="Student Name" style="max-width:260px;" />
+        <button type="button" class="btn-search" id="btnSearchStudent">Search</button>
+      `;
+      // "current = just show" father's name
+      fatherNameEl.value = fatherNameEl.value || "";
+      fatherNameEl.disabled = true;
+
+      // demo handler (no API call requested)
+      document.getElementById("btnSearchStudent").addEventListener("click", () => {
+        // placeholder: keep UI responsive without changing other logic
+        // In production, call your search endpoint here.
+        alert("Search action placeholder (connect to your backend).");
+      });
     }
   }
 
@@ -726,7 +809,6 @@
     const fee = getPaymentFee(res.afterDiscount);
     paymentFeeText.textContent = fmtKs(fee);
 
-    // hint: how many times
     if (isSummer()) paymentPlanHint.textContent = "(1x)";
     else if (paymentPlanEl.value === "Annual") paymentPlanHint.textContent = "(1x)";
     else if (paymentPlanEl.value === "Termly") paymentPlanHint.textContent = "(3x)";
@@ -800,7 +882,6 @@
     typeSel.addEventListener("change", onTypeChange);
     freeSel.addEventListener("change", updateTuitionAndRecalc);
     amtInp.addEventListener("input", updateTuitionAndRecalc);
-    tr.querySelector(".jsDesc").addEventListener("input", () => {});
 
     removeBtn.addEventListener("click", () => {
       tr.remove();
@@ -814,29 +895,12 @@
 
   document.querySelectorAll('input[name="studentType"]').forEach(r => {
     r.addEventListener("change", () => {
-      // current student did not work previously; keep behavior:
-      // show search controls inside hidden container but do not change layout.
-      const type = getStudentType();
-      if (type === "current") {
-        studentFields.style.display = "block";
-        studentFields.innerHTML = `
-          <div class="row">
-            <div class="label">Search Student:</div>
-            <div class="control" style="gap:12px; max-width:100%; flex-wrap:wrap;">
-              <input type="text" id="searchName" placeholder="Student Name" style="max-width:360px;" />
-              <input type="text" id="searchId" placeholder="Student ID" style="max-width:220px;" />
-            </div>
-          </div>
-        `;
-      } else {
-        studentFields.style.display = "none";
-        studentFields.innerHTML = "";
-      }
+      renderStudentNameCell();
       updateTuitionAndRecalc();
     });
   });
 
-  academicYearEl.addEventListener("change", updateTuitionAndRecalc);
+  academicYearEl.addEventListener("change", () => { updateTuitionAndRecalc(); });
   gradeEl.addEventListener("change", updateTuitionAndRecalc);
 
   paymentPlanEl.addEventListener("change", () => {
@@ -853,6 +917,7 @@
 
   // Initial setup
   firstAttendanceEl.value = todayISO();
+  renderStudentNameCell();
   setStudentId();
   updateTuitionAndRecalc();
 </script>
