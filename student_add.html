@@ -133,6 +133,24 @@
     flex-wrap:wrap;
   }
 
+  /* keep input + button on SAME LINE for current student search */
+  .inline-search{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    width:100%;
+    flex-wrap:nowrap;
+  }
+  .inline-search input{
+    flex:1;
+    min-width:220px;
+    max-width:none;
+  }
+  .inline-search button{
+    flex:0 0 auto;
+    white-space:nowrap;
+  }
+
   .btn-search{
     padding:10px 12px;
     font-size:13px;
@@ -348,7 +366,7 @@
   <div class="cell">
     <div class="t">Tuition Before Discount</div>
     <div class="v">
-      <span class="amount-pill" id="tuitionBefore">4,200,000 Ks</span>
+      <span class="amount-pill" id="tuitionBefore">0 Ks</span>
     </div>
   </div>
 
@@ -387,7 +405,7 @@
     </table>
   </div>
 
-  <button class="btn-final" type="button">Add Student & Create Payment Plan</button>
+  <button class="btn-final" type="button">Add Student &amp; Create Payment Plan</button>
 </div>
 
 <script>
@@ -419,16 +437,19 @@
     const type = document.querySelector('input[name="studentType"]:checked').value;
 
     if (type === "current") {
-      // Student ID becomes editable to search
+      // Student ID becomes editable (search)
       studentIdCell.innerHTML = '<input type="text" id="studentIdSearch" placeholder="Student ID">';
-      // Student Name shows input + search button on same line
-      studentNameCell.innerHTML = '<input type="text" id="studentNameSearch" placeholder="Student Name"><button class="btn-search" type="button">Search</button>';
+      // Student Name input + Search button SAME LINE
+      studentNameCell.innerHTML = `
+        <div class="inline-search">
+          <input type="text" id="studentNameSearch" placeholder="Student Name">
+          <button class="btn-search" type="button">Search</button>
+        </div>
+      `;
       // Father name just show (not editable)
-      const fatherVal = (document.getElementById("fatherName") ? document.getElementById("fatherName").value : "");
       fatherCell.innerHTML = '<span class="pill" id="fatherDisplay">—</span>';
-      if (fatherVal && document.getElementById("fatherDisplay")) document.getElementById("fatherDisplay").textContent = fatherVal;
     } else {
-      // New student: Student ID pill auto; student name editable; father name editable
+      // New student
       studentIdCell.innerHTML = '<span class="pill" id="studentId"></span>';
       document.getElementById("studentId").textContent = newStudentIdForYear();
       studentNameCell.innerHTML = '<input type="text" id="studentName" placeholder="Student Name">';
@@ -438,14 +459,13 @@
 
   studentTypeRadios.forEach(r => r.addEventListener("change", renderStudentType));
   academicYearEl.addEventListener("change", () => {
-    // update student id only if New
     if (document.querySelector('input[name="studentType"]:checked').value === "new") {
       const pill = document.getElementById("studentId");
       if (pill) pill.textContent = newStudentIdForYear();
     }
+    recalc();
   });
 
-  // discount rows
   function renumberDiscounts(){
     [...discBody.querySelectorAll("tr")].forEach((tr, i) => {
       tr.querySelector("[data-discno]").textContent = (i + 1);
@@ -479,27 +499,24 @@
     recalc();
   }
 
-  // expose to inline handlers
   window.addDiscount = addDiscount;
   window.removeDiscount = removeDiscount;
 
-  // pricing (simplified consistent with your earlier examples)
+  // pricing (based on your inserts)
   function getTuitionBefore(){
-    // Keep as-is from your previous accepted version; update here only if you already wired full pricing.
-    // For now, show a stable default (AY25 Y1..Y3 annual = 4,200,000 etc.).
     const year = academicYearEl.value;
     const grade = document.getElementById("grade").value;
     const plan = paymentPlanEl.value;
 
     // AY2025–2026
     if (year === "AY2025-2026") {
-      if (grade === "SR Half-day") return plan === "Annual" ? 2700000 : 3000000; // termly/monthly shown same in your insert
+      if (grade === "SR Half-day") return plan === "Annual" ? 2700000 : 3000000;
       if (grade === "SR Full-day") return plan === "Annual" ? 3900000 : 4200000;
       if (grade === "EY1" || grade === "EY2") return plan === "Annual" ? 3900000 : 4200000;
       if (grade === "Y1" || grade === "Y2" || grade === "Y3") return plan === "Annual" ? 4200000 : 4500000;
     }
 
-    // SUMMER2026 program tuition: one time
+    // SUMMER2026: one time
     if (year === "SUMMER2026") return 850000;
 
     // AY2026–2027
@@ -513,76 +530,148 @@
     return 0;
   }
 
+  // annual reference for "free terms" math (use annual amount / 10 months)
+  function getAnnualReferenceAmount(){
+    const year = academicYearEl.value;
+    const grade = document.getElementById("grade").value;
+
+    if (year === "SUMMER2026") return 0;
+
+    // use annual value regardless of selected plan
+    if (year === "AY2025-2026") {
+      if (grade === "SR Half-day") return 2700000;
+      if (grade === "SR Full-day") return 3900000;
+      if (grade === "EY1" || grade === "EY2") return 3900000;
+      if (grade === "Y1" || grade === "Y2" || grade === "Y3") return 4200000;
+    }
+
+    if (year === "AY2026-2027") {
+      if (grade === "SR Half-day") return 2890000;
+      if (grade === "SR Full-day") return 4290000;
+      if (grade === "EY1" || grade === "EY2") return 4290000;
+      if (grade === "Y1" || grade === "Y2" || grade === "Y3") return 4690000;
+    }
+
+    return 0;
+  }
+
   function fmtKs(n){
     const v = Math.max(0, Math.round(n));
     return v.toLocaleString() + " Ks";
+  }
+
+  function ensureFreeDescControl(tr){
+    const descCell = tr.children[2];
+    const existing = descCell.querySelector(".free-desc");
+    const type = tr.querySelector(".disc-type").value;
+
+    if (type !== "free") {
+      // if it was free before, restore input
+      if (existing) {
+        descCell.innerHTML = `<input class="disc-desc" type="text" placeholder="Description" oninput="recalc()">`;
+      }
+      return;
+    }
+
+    if (!existing) {
+      descCell.innerHTML = `
+        <select class="free-desc" onchange="recalc()">
+          <option value="FREE_3">Free 3 Terms</option>
+          <option value="FREE_2">Free 2 Terms</option>
+          <option value="FREE_1">Free 1 Term</option>
+        </select>
+      `;
+    }
+  }
+
+  function computeFreeDiscount(tr){
+    const year = academicYearEl.value;
+    if (year === "SUMMER2026") return 0;
+
+    const annual = getAnnualReferenceAmount();
+    if (!annual) return 0;
+
+    // AY2026-2027 rough: term1=3 months, term2=3 months, term3=4 months => 10 months total
+    // Free 3 terms => annual (10/10)
+    // Free 2 terms => 6 months => annual/10 * 6
+    // Free 1 term  => 3 months => annual/10 * 3
+    const sel = tr.querySelector(".free-desc") ? tr.querySelector(".free-desc").value : "FREE_1";
+    const perMonth = annual / 10;
+
+    if (sel === "FREE_3") return Math.round(perMonth * 10);
+    if (sel === "FREE_2") return Math.round(perMonth * 6);
+    return Math.round(perMonth * 3);
   }
 
   function recalc(){
     const tuitionBefore = getTuitionBefore();
     tuitionBeforeEl.textContent = fmtKs(tuitionBefore);
 
-    // discount rules: sum fixed first then percent, free ignored here (no amount)
     const rows = [...discBody.querySelectorAll("tr")];
 
-    let fixedTotal = 0;
-    let percentTotal = 0;
-
+    // normalize UI (free desc dropdown, amount disabled, etc.)
     rows.forEach(tr => {
+      ensureFreeDescControl(tr);
+
       const type = tr.querySelector(".disc-type").value;
       const amtEl = tr.querySelector(".disc-amt");
       const calcEl = tr.querySelector(".disc-calc");
 
-      // Free: no amount/calc
       if (type === "free") {
         amtEl.value = "";
         amtEl.disabled = true;
-        calcEl.textContent = "—";
-        return;
+        const freeDisc = computeFreeDiscount(tr);
+        calcEl.textContent = freeDisc > 0 ? ("-" + fmtKs(freeDisc)) : "0";
+      } else {
+        amtEl.disabled = false;
+        // calc filled below
+        if (calcEl.textContent === "—") calcEl.textContent = "0";
       }
-
-      amtEl.disabled = false;
-
-      const amt = Number(amtEl.value || 0);
-      if (type === "fixed") fixedTotal += amt;
-      if (type === "percent") percentTotal += amt; // will apply later
     });
 
-    // Apply fixed first
+    // discount rules: sum fixed (including free) first, then percent on remaining
+    let fixedTotal = 0;
+    let percentSum = 0;
+
+    rows.forEach(tr => {
+      const type = tr.querySelector(".disc-type").value;
+      if (type === "free") {
+        fixedTotal += computeFreeDiscount(tr);
+        return;
+      }
+      const amt = Number(tr.querySelector(".disc-amt").value || 0);
+      if (type === "fixed") fixedTotal += amt;
+      if (type === "percent") percentSum += amt;
+    });
+
     let subtotal = tuitionBefore - fixedTotal;
     if (subtotal < 0) subtotal = 0;
 
-    // Apply percent on remaining subtotal
-    let percentDiscount = 0;
-    if (percentTotal > 0) {
-      percentDiscount = Math.floor(subtotal * (percentTotal / 100));
-    }
+    const percentDiscount = percentSum > 0 ? Math.floor(subtotal * (percentSum / 100)) : 0;
 
     const totalDiscount = fixedTotal + percentDiscount;
     const afterDiscount = Math.max(0, tuitionBefore - totalDiscount);
 
-    // Update calc display per row
+    // Update calc per row
     rows.forEach(tr => {
       const type = tr.querySelector(".disc-type").value;
-      const amtEl = tr.querySelector(".disc-amt");
       const calcEl = tr.querySelector(".disc-calc");
 
       if (type === "free") return;
 
-      const amt = Number(amtEl.value || 0);
+      const amt = Number(tr.querySelector(".disc-amt").value || 0);
       let calc = 0;
 
       if (type === "fixed") {
         calc = amt;
       } else if (type === "percent") {
-        // percent rows collectively apply as a combined percent; show row calc as proportional share
-        // If multiple percent rows exist, distribute by their percentage weight.
+        // distribute percentDiscount proportional to percentages if multiple rows
         const pctSum = rows
           .filter(r => r.querySelector(".disc-type").value === "percent")
           .reduce((s, r) => s + Number(r.querySelector(".disc-amt").value || 0), 0);
 
         if (pctSum > 0) {
-          const pct = Number(amtEl.value || 0);
+          const pct = Number(tr.querySelector(".disc-amt").value || 0);
           calc = Math.floor(percentDiscount * (pct / pctSum));
         } else {
           calc = 0;
@@ -608,18 +697,14 @@
     if (year === "SUMMER2026") {
       const amt = afterDiscount;
       paymentFeeEl.textContent = fmtKs(amt);
-      planBody.innerHTML = `
-        <tr><td>1</td><td>Registration Date</td><td>${fmtKs(amt)}</td></tr>
-      `;
+      planBody.innerHTML = `<tr><td>1</td><td>Registration Date</td><td>${fmtKs(amt)}</td></tr>`;
       return;
     }
 
     if (plan === "Annual") {
       const amt = afterDiscount;
       paymentFeeEl.textContent = fmtKs(amt);
-      planBody.innerHTML = `
-        <tr><td>1</td><td>Registration Date</td><td>${fmtKs(amt)}</td></tr>
-      `;
+      planBody.innerHTML = `<tr><td>1</td><td>Registration Date</td><td>${fmtKs(amt)}</td></tr>`;
       return;
     }
 
@@ -646,17 +731,11 @@
       return;
     }
 
-    // Termly: only 3 payments (Registration, before term 2, before term 3)
+    // Termly: Registration, before term 2, before term 3
     if (plan === "Termly") {
-      // Use termly tuition price as the basis for "termly amount" expectation:
-      // termly payment should be afterDiscount / 3 if discounts applied on annual base;
-      // but you requested only schedule rows change; keep fee derived from afterDiscount/3.
       const per = Math.round(afterDiscount / 3);
       paymentFeeEl.textContent = fmtKs(per);
 
-      // Dates from your academic_terms inserts:
-      // "before term 2" => day before Term 2 start
-      // "before term 3" => day before Term 3 start
       const termStart = {
         "AY2025-2026": { t2:"2025-09-01", t3:"2025-12-01" },
         "AY2026-2027": { t2:"2026-09-01", t3:"2026-12-01" }
@@ -686,12 +765,10 @@
     paymentFeeEl.textContent = "0 Ks";
   }
 
-  // wiring
   document.getElementById("grade").addEventListener("change", recalc);
-  academicYearEl.addEventListener("change", () => { renderStudentType(); recalc(); });
   paymentPlanEl.addEventListener("change", recalc);
 
-  // initial render
+  // init
   renderStudentType();
   recalc();
 </script>
