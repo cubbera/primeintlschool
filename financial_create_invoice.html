@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Create Invoice</title>
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --text:#111827;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --accent:#111827;
+      --danger:#b91c1c;
+      --ok:#065f46;
+      --shadow: 0 8px 24px rgba(17,24,39,.08);
+      --radius:14px;
+      --pad:16px;
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--font);
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.35;
+    }
+    .page{
+      max-width:1080px;
+      margin:24px auto;
+      padding:0 16px 48px;
+    }
+    .header{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:16px;
+    }
+    .header h1{
+      margin:0;
+      font-size:20px;
+      letter-spacing:.2px;
+    }
+    .header .hint{
+      margin:0;
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:16px;
+    }
+    @media (max-width: 920px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .card-header{
+      padding:14px var(--pad);
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .card-header h2{
+      margin:0;
+      font-size:15px;
+      letter-spacing:.2px;
+    }
+    .card-body{padding:var(--pad)}
+    .section-note{color:var(--muted); font-size:12px}
+
+    .form-grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap:12px;
+    }
+    .field{
+      grid-column: span 6;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .field.sm{grid-column: span 3;}
+    .field.lg{grid-column: span 12;}
+    @media (max-width: 720px){
+      .field, .field.sm{grid-column: span 12;}
+    }
+    label{
+      font-size:12px;
+      color:var(--muted);
+    }
+    input, select, textarea{
+      width:100%;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+      outline:none;
+      font-size:14px;
+    }
+    textarea{min-height:92px; resize:vertical}
+    input[readonly]{
+      background:#f9fafb;
+      color:#374151;
+    }
+
+    .table-wrap{
+      overflow:auto;
+      border:1px solid var(--line);
+      border-radius:12px;
+    }
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      min-width:760px;
+    }
+    thead th{
+      text-align:left;
+      font-size:12px;
+      color:var(--muted);
+      font-weight:600;
+      padding:10px 12px;
+      border-bottom:1px solid var(--line);
+      background:#fafafa;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+    tbody td{
+      padding:10px 12px;
+      border-bottom:1px solid var(--line);
+      vertical-align:middle;
+    }
+    tbody tr:last-child td{border-bottom:none}
+
+    .td-num{width:56px; color:var(--muted)}
+    .td-actions{width:92px; text-align:right}
+    .money{
+      text-align:right;
+      white-space:nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+    .row-input{
+      padding:8px 10px;
+      border-radius:10px;
+      font-size:13px;
+    }
+
+    .btn{
+      appearance:none;
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      font-size:14px;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      user-select:none;
+    }
+    .btn.primary{
+      background:var(--accent);
+      color:#fff;
+      border-color:var(--accent);
+    }
+    .btn.danger{
+      color:#fff;
+      background:var(--danger);
+      border-color:var(--danger);
+    }
+    .btn:disabled{
+      opacity:.5; cursor:not-allowed;
+    }
+    .btn.small{
+      padding:7px 10px;
+      font-size:12px;
+      border-radius:10px;
+    }
+    .btn-row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .totals{
+      display:grid;
+      gap:10px;
+      margin-top:12px;
+    }
+    .total-line{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      font-size:13px;
+      color:var(--muted);
+    }
+    .total-line strong{
+      color:var(--text);
+      font-size:14px;
+    }
+    .total-line .money{min-width:140px}
+    .divider{height:1px; background:var(--line); margin:10px 0}
+
+    .pill{
+      font-size:12px;
+      padding:5px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      color:var(--muted);
+      background:#fff;
+    }
+
+    .file-box{
+      border:1px dashed var(--line);
+      border-radius:12px;
+      padding:12px;
+      background:#fafafa;
+    }
+    .file-preview{
+      margin-top:10px;
+      display:none;
+      gap:10px;
+      align-items:center;
+    }
+    .thumb{
+      width:64px; height:64px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      object-fit:cover;
+      background:#fff;
+    }
+
+    .footer-actions{
+      margin-top:14px;
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .muted{color:var(--muted)}
+    .right{margin-left:auto}
+
+    /* Compact “dropdown feel” */
+    .inline-controls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-top:10px;
+    }
+    .inline-controls .btn{white-space:nowrap}
+
+    /* Hide/show */
+    .hidden{display:none !important;}
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <div class="header">
+      <div>
+        <h1>Create Invoice</h1>
+        <p class="hint">Enter basic info, add invoice items, then record payment details.</p>
+      </div>
+      <span class="pill" id="invoiceStatusPill">Draft</span>
+    </div>
+
+    <div class="grid">
+      <!-- LEFT: Basic Info + Items -->
+      <div class="card">
+        <div class="card-header">
+          <h2>1. Basic Info</h2>
+          <span class="section-note">Invoice number auto-generated</span>
+        </div>
+
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="field">
+              <label for="academic_year">Academic Year</label>
+              <select id="academic_year">
+                <option value="AY2025-2026">AY2025-2026</option>
+                <option value="AY2026-2027">AY2026-2027</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="invoice_number">Invoice Nr</label>
+              <input id="invoice_number" type="text" readonly value="INV202601043" />
+            </div>
+
+            <div class="field">
+              <label for="student_id">Student ID</label>
+              <input id="student_id" type="text" placeholder="e.g. PR2025003" />
+            </div>
+
+            <div class="field">
+              <label for="student_name">Student Name</label>
+              <input id="student_name" type="text" placeholder="Student full name" />
+            </div>
+
+            <div class="field">
+              <label for="grade_level">Grade Level</label>
+              <select id="grade_level">
+                <option value="">Select level</option>
+                <option value="TE">Tiny Explorers (TE)</option>
+                <option value="SR">School Readiness (SR)</option>
+                <option value="EY1">Early Years 1 (EY1)</option>
+                <option value="EY2">Early Years 2 (EY2)</option>
+                <option value="Y1">Year 1 (Y1)</option>
+                <option value="Y2">Year 2 (Y2)</option>
+                <option value="Y3">Year 3 (Y3)</option>
+                <option value="Y4">Year 4 (Y4)</option>
+                <option value="Y5">Year 5 (Y5)</option>
+                <option value="Y6">Year 6 (Y6)</option>
+                <option value="Y7">Year 7 (Y7)</option>
+                <option value="Y8">Year 8 (Y8)</option>
+                <option value="Y9">Year 9 (Y9)</option>
+                <option value="Y10">Year 10 (Y10)</option>
+                <option value="Y11">Year 11 (Y11)</option>
+                <option value="Y12">Year 12 (Y12)</option>
+                <option value="Y13">Year 13 (Y13)</option>
+              </select>
+            </div>
+
+            <div class="field sm">
+              <label for="issue_date">Issue Date</label>
+              <input id="issue_date" type="date" />
+            </div>
+
+            <div class="field sm">
+              <label for="due_date">Due Date</label>
+              <input id="due_date" type="date" />
+            </div>
+
+            <div class="field sm">
+              <label for="tax_rate">Tax (%)</label>
+              <input id="tax_rate" type="number" min="0" step="0.01" value="0" />
+            </div>
+          </div>
+
+          <div style="height:14px"></div>
+
+          <div class="card-header" style="border:0; padding:0; margin-bottom:10px;">
+            <h2 style="font-size:15px;margin:0;">2. Invoice Items</h2>
+            <div class="btn-row">
+              <button class="btn small" type="button" id="addItemBtn">+ Add Item</button>
+              <button class="btn small" type="button" id="addDiscountBtn">+ Add Discount</button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table id="itemsTable">
+              <thead>
+                <tr>
+                  <th class="td-num">No</th>
+                  <th>Invoice Item</th>
+                  <th style="width:120px;">Quantity</th>
+                  <th style="width:160px;" class="money">Unit Price</th>
+                  <th style="width:160px;" class="money">Subtotal</th>
+                  <th class="td-actions"></th>
+                </tr>
+              </thead>
+              <tbody id="itemsBody">
+                <!-- Sample starter rows -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="totals">
+            <div class="total-line">
+              <span>Subtotal</span>
+              <span class="money" id="subtotalDisplay">0</span>
+            </div>
+            <div class="total-line">
+              <span>Tax</span>
+              <span class="money" id="taxDisplay">0</span>
+            </div>
+            <div class="divider"></div>
+            <div class="total-line">
+              <strong>Total</strong>
+              <strong class="money" id="totalDisplay">0</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Payment + Remark + Actions -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Payment</h2>
+          <span class="section-note">Attach proof if needed</span>
+        </div>
+
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="field lg">
+              <label for="payment_method">Payment Method</label>
+              <select id="payment_method">
+                <option value="CASH">Cash</option>
+                <option value="KBZ_TRANSFER">KBZ Transfer</option>
+                <option value="CB_TRANSFER">CB Transfer</option>
+                <option value="KPAY">KPay</option>
+                <option value="OTHER">Others</option>
+              </select>
+            </div>
+
+            <div class="field lg hidden" id="payment_other_wrapper">
+              <label for="payment_other">Other Method (specify)</label>
+              <input id="payment_other" type="text" placeholder="e.g. AYA Transfer" />
+            </div>
+
+            <div class="field lg">
+              <label for="paid_amount">Paid Amount</label>
+              <input id="paid_amount" type="number" min="0" step="1" placeholder="0" />
+            </div>
+
+            <div class="field lg">
+              <label>Payment Proof</label>
+              <div class="file-box">
+                <input id="payment_proof" type="file" accept="image/*" />
+                <div class="file-preview" id="proofPreview">
+                  <img class="thumb" id="proofThumb" alt="Proof preview" />
+                  <div>
+                    <div id="proofName" style="font-size:13px;"></div>
+                    <div class="muted" style="font-size:12px;">Image preview only (front-end)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="field lg">
+              <label for="remark">Remark</label>
+              <textarea id="remark" placeholder="Any note for this invoice..."></textarea>
+            </div>
+          </div>
+
+          <div class="footer-actions">
+            <button class="btn" type="button" id="cancelBtn">Cancel</button>
+            <button class="btn primary" type="button" id="addBtn">ADD</button>
+          </div>
+
+          <p class="muted" id="msg" style="margin:12px 0 0; font-size:13px;"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Discount Modal -->
+  <dialog id="discountDialog" style="border:none; border-radius:16px; padding:0; width:min(560px, 92vw);">
+    <div style="background:#fff; border:1px solid var(--line); border-radius:16px; overflow:hidden;">
+      <div style="padding:14px 16px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between;">
+        <strong>Select Discount</strong>
+        <button class="btn small" type="button" id="closeDiscountBtn">✕</button>
+      </div>
+      <div style="padding:16px;">
+        <div class="form-grid">
+          <div class="field lg">
+            <label for="discount_desc">Discount Description</label>
+            <input id="discount_desc" type="text" placeholder="e.g. Early Bird 35%" />
+          </div>
+          <div class="field lg">
+            <label for="discount_amount">Amount (use negative for discount)</label>
+            <input id="discount_amount" type="number" step="1" placeholder="-2250000" />
+          </div>
+        </div>
+
+        <div class="footer-actions" style="justify-content:flex-end; padding-top:12px;">
+          <button class="btn" type="button" id="discountCancel">Cancel</button>
+          <button class="btn primary" type="button" id="applyDiscount">Apply Discount</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    // ------- Helpers -------
+    const fmt = (n) => {
+      const v = Number(n || 0);
+      return v.toLocaleString("en-US");
+    };
+
+    const el = (id) => document.getElementById(id);
+
+    // ------- Table state -------
+    const items = [];
+
+    function computeRowSubtotal(qty, unit) {
+      const q = Number(qty || 0);
+      const u = Number(unit || 0);
+      return q * u;
+    }
+
+    function recalcTotals() {
+      const subtotal = items.reduce((sum, r) => sum + Number(r.subtotal || 0), 0);
+      const taxRate = Number(el("tax_rate").value || 0);
+      const tax = Math.round(subtotal * (taxRate / 100));
+      const total = subtotal + tax;
+
+      el("subtotalDisplay").textContent = fmt(subtotal);
+      el("taxDisplay").textContent = fmt(tax);
+      el("totalDisplay").textContent = fmt(total);
+
+      // Update status pill (front-end only)
+      const paid = Number(el("paid_amount").value || 0);
+      const pill = el("invoiceStatusPill");
+      if (paid <= 0) pill.textContent = "Draft";
+      else if (paid >= total && total > 0) pill.textContent = "Paid";
+      else pill.textContent = "Partially Paid";
+    }
+
+    function renderTable() {
+      const body = el("itemsBody");
+      body.innerHTML = "";
+
+      items.forEach((row, idx) => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td class="td-num">${idx + 1}</td>
+          <td>
+            <input class="row-input" type="text" value="${row.name || ""}" data-k="name" data-i="${idx}" placeholder="e.g. Tuition Fee Annual" />
+          </td>
+          <td>
+            <input class="row-input" type="number" min="0" step="1" value="${row.qty ?? 1}" data-k="qty" data-i="${idx}" />
+          </td>
+          <td class="money">
+            <input class="row-input money" type="number" step="1" value="${row.unit ?? 0}" data-k="unit" data-i="${idx}" />
+          </td>
+          <td class="money">
+            <span>${fmt(row.subtotal || 0)}</span>
+          </td>
+          <td class="td-actions">
+            <button class="btn small danger" type="button" data-act="del" data-i="${idx}">Del</button>
+          </td>
+        `;
+
+        body.appendChild(tr);
+      });
+
+      // Wire inputs
+      body.querySelectorAll("input[data-k]").forEach(inp => {
+        inp.addEventListener("input", (e) => {
+          const i = Number(e.target.dataset.i);
+          const k = e.target.dataset.k;
+          items[i][k] = (k === "name") ? e.target.value : Number(e.target.value || 0);
+          items[i].subtotal = computeRowSubtotal(items[i].qty, items[i].unit);
+          renderTable();
+          recalcTotals();
+        });
+      });
+
+      // Wire delete
+      body.querySelectorAll("button[data-act='del']").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          const i = Number(e.target.dataset.i);
+          items.splice(i, 1);
+          renderTable();
+          recalcTotals();
+        });
+      });
+    }
+
+    function addItem(name = "", qty = 1, unit = 0) {
+      items.push({
+        name,
+        qty,
+        unit,
+        subtotal: computeRowSubtotal(qty, unit),
+      });
+      renderTable();
+      recalcTotals();
+    }
+
+    // ------- Init sample rows (as per your example) -------
+    addItem("Tuition Fee Annual", 1, 4500000);
+    addItem("Tuition Fee Disc 50%", 1, -2250000);
+    addItem("Registration Fee", 1, 200000);
+    addItem("Material Fee", 1, 600000);
+    addItem("Uniform", 2, 20000);
+
+    // ------- UI Events -------
+    el("addItemBtn").addEventListener("click", () => addItem("", 1, 0));
+
+    // Payment method “Other” reveal
+    el("payment_method").addEventListener("change", () => {
+      const isOther = el("payment_method").value === "OTHER";
+      el("payment_other_wrapper").classList.toggle("hidden", !isOther);
+    });
+
+    // Proof preview
+    el("payment_proof").addEventListener("change", (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      el("proofName").textContent = file.name;
+      const url = URL.createObjectURL(file);
+      el("proofThumb").src = url;
+      el("proofPreview").style.display = "flex";
+    });
+
+    // Totals updates when tax or paid changes
+    el("tax_rate").addEventListener("input", recalcTotals);
+    el("paid_amount").addEventListener("input", recalcTotals);
+
+    // Discount modal
+    const dlg = el("discountDialog");
+    el("addDiscountBtn").addEventListener("click", () => {
+      el("discount_desc").value = "";
+      el("discount_amount").value = "";
+      dlg.showModal();
+    });
+    el("closeDiscountBtn").addEventListener("click", () => dlg.close());
+    el("discountCancel").addEventListener("click", () => dlg.close());
+    el("applyDiscount").addEventListener("click", () => {
+      const desc = el("discount_desc").value.trim();
+      const amt = Number(el("discount_amount").value || 0);
+      if (!desc) return alert("Please enter discount description.");
+      if (!amt) return alert("Please enter discount amount (negative number).");
+      addItem(desc, 1, amt);
+      dlg.close();
+    });
+
+    // Cancel / Add buttons (front-end only)
+    el("cancelBtn").addEventListener("click", () => {
+      // Adjust this behavior as needed (navigate back, clear form, etc.)
+      if (confirm("Cancel and clear changes?")) {
+        location.reload();
+      }
+    });
+
+    el("addBtn").addEventListener("click", () => {
+      // This is only UI scaffolding. Hook to Supabase later.
+      const payload = {
+        academic_year: el("academic_year").value,
+        invoice_number: el("invoice_number").value,
+        student_id: el("student_id").value.trim(),
+        student_name: el("student_name").value.trim(),
+        grade_level: el("grade_level").value,
+        issue_date: el("issue_date").value,
+        due_date: el("due_date").value,
+        tax_rate: Number(el("tax_rate").value || 0),
+        items: items.map(r => ({ ...r })),
+        totals: {
+          subtotal: items.reduce((s, r) => s + Number(r.subtotal || 0), 0),
+        },
+        payment: {
+          method: el("payment_method").value,
+          other: el("payment_other").value.trim(),
+          paid_amount: Number(el("paid_amount").value || 0),
+          remark: el("remark").value.trim()
+        }
+      };
+
+      el("msg").textContent = "Draft created (front-end only). Ready to connect to database.";
+      console.log("Invoice payload:", payload);
+    });
+
+    // Default dates
+    (function setDefaults(){
+      const today = new Date();
+      const iso = today.toISOString().slice(0,10);
+      el("issue_date").value = iso;
+
+      // due date = +7 days default
+      const due = new Date(today.getTime() + 7*24*60*60*1000);
+      el("due_date").value = due.toISOString().slice(0,10);
+
+      recalcTotals();
+    })();
+  </script>
+</body>
+</html>
