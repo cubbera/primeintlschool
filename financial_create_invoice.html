@@ -248,7 +248,7 @@
       background:#fff;
     }
 
-    /* CHANGED: Big bottom buttons only (Cancel & ADD) */
+    /* Big bottom buttons */
     .footer-actions{
       margin-top:14px;
       display:flex;
@@ -267,22 +267,11 @@
     }
 
     .muted{color:var(--muted)}
-    .right{margin-left:auto}
-
-    /* Compact “dropdown feel” */
-    .inline-controls{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-      margin-top:10px;
-    }
-    .inline-controls .btn{white-space:nowrap}
 
     /* Hide/show */
     .hidden{display:none !important;}
 
-    /* CHANGED: Discounts clearly visible (red, bold) and keep "-" (data stays negative) */
+    /* Discounts: red + bold */
     .discount-row td,
     .discount-row .money,
     .discount-row input{
@@ -292,6 +281,43 @@
     .discount-row input{
       border-color:#f3b4b4;
       background:#fff;
+    }
+
+    /* Payment table (side-by-side) */
+    .pay-table{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:12px;
+      overflow:hidden;
+      background:#fff;
+    }
+    .pay-table table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      min-width:0;
+    }
+    .pay-table thead th{
+      position:static;
+      background:#fafafa;
+      top:auto;
+    }
+    .pay-table td, .pay-table th{
+      padding:10px 12px;
+      border-bottom:1px solid var(--line);
+      vertical-align:middle;
+    }
+    .pay-table tr:last-child td{border-bottom:none}
+    .pay-table .cell-input{
+      padding:9px 10px;
+      border-radius:10px;
+      font-size:13px;
+    }
+    .pay-actions{
+      margin-top:10px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
     }
   </style>
 </head>
@@ -401,9 +427,7 @@
                   <th class="td-actions"></th>
                 </tr>
               </thead>
-              <tbody id="itemsBody">
-                <!-- Sample starter rows -->
-              </tbody>
+              <tbody id="itemsBody"></tbody>
             </table>
           </div>
 
@@ -433,28 +457,45 @@
         </div>
 
         <div class="card-body">
+
+          <!-- CHANGED: Payment method + paid amount side-by-side as a table + Add Payment Method -->
+          <div class="pay-table">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:60%;">Payment Method</th>
+                  <th class="money" style="width:40%;">Paid Amount</th>
+                </tr>
+              </thead>
+              <tbody id="paymentRows">
+                <tr>
+                  <td>
+                    <select class="cell-input" id="payment_method_0">
+                      <option value="CASH">Cash</option>
+                      <option value="KBZ_TRANSFER">KBZ Transfer</option>
+                      <option value="CB_TRANSFER">CB Transfer</option>
+                      <option value="KPAY">KPay</option>
+                      <option value="OTHER">Others</option>
+                    </select>
+                    <div id="payment_other_wrap_0" class="hidden" style="margin-top:8px;">
+                      <input class="cell-input" id="payment_other_0" type="text" placeholder="Specify other method" />
+                    </div>
+                  </td>
+                  <td class="money">
+                    <input class="cell-input money" id="paid_amount_0" type="number" min="0" step="1" placeholder="0" />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pay-actions">
+            <button class="btn small" type="button" id="addPaymentMethodBtn">+ Add Payment Method</button>
+          </div>
+
+          <div style="height:12px"></div>
+
           <div class="form-grid">
-            <div class="field lg">
-              <label for="payment_method">Payment Method</label>
-              <select id="payment_method">
-                <option value="CASH">Cash</option>
-                <option value="KBZ_TRANSFER">KBZ Transfer</option>
-                <option value="CB_TRANSFER">CB Transfer</option>
-                <option value="KPAY">KPay</option>
-                <option value="OTHER">Others</option>
-              </select>
-            </div>
-
-            <div class="field lg hidden" id="payment_other_wrapper">
-              <label for="payment_other">Other Method (specify)</label>
-              <input id="payment_other" type="text" placeholder="e.g. AYA Transfer" />
-            </div>
-
-            <div class="field lg">
-              <label for="paid_amount">Paid Amount</label>
-              <input id="paid_amount" type="number" min="0" step="1" placeholder="0" />
-            </div>
-
             <div class="field lg">
               <label>Payment Proof</label>
               <div class="file-box">
@@ -475,10 +516,10 @@
             </div>
           </div>
 
-          <!-- CHANGED: Cancel & ADD big at bottom -->
+          <!-- CHANGED: bottom buttons text -->
           <div class="footer-actions">
-            <button class="btn" type="button" id="cancelBtn">Cancel</button>
-            <button class="btn primary" type="button" id="addBtn">ADD</button>
+            <button class="btn" type="button" id="cancelBtn">Safe as Draft</button>
+            <button class="btn primary" type="button" id="addBtn">Submit Payment</button>
           </div>
 
           <p class="muted" id="msg" style="margin:12px 0 0; font-size:13px;"></p>
@@ -520,10 +561,9 @@
       const v = Number(n || 0);
       return v.toLocaleString("en-US");
     };
-
     const el = (id) => document.getElementById(id);
 
-    // ------- Table state -------
+    // ------- Items state -------
     const items = [];
 
     function computeRowSubtotal(qty, unit) {
@@ -533,10 +573,22 @@
     }
 
     function isDiscountRow(row) {
-      // Keep logic minimal. We treat any negative unit or subtotal as a discount row.
       const u = Number(row.unit || 0);
       const s = Number(row.subtotal || 0);
-      return (u < 0) || (s < 0) || (String(row.name || "").toLowerCase().includes("disc"));
+      return (u < 0) || (s < 0) || (String(row.name || "").toLowerCase().includes("disc")) || (String(row.name||"").toLowerCase().includes("discount"));
+    }
+
+    // ------- Payment rows state -------
+    let paymentRowCount = 1;
+
+    function getPaymentsTotal() {
+      let sum = 0;
+      for (let i = 0; i < paymentRowCount; i++) {
+        const amtEl = el(`paid_amount_${i}`);
+        if (!amtEl) continue;
+        sum += Number(amtEl.value || 0);
+      }
+      return sum;
     }
 
     function recalcTotals() {
@@ -549,8 +601,8 @@
       el("taxDisplay").textContent = fmt(tax);
       el("totalDisplay").textContent = fmt(total);
 
-      // Update status pill (front-end only)
-      const paid = Number(el("paid_amount").value || 0);
+      // Status pill based on total paid (all payment rows)
+      const paid = getPaymentsTotal();
       const pill = el("invoiceStatusPill");
       if (paid <= 0) pill.textContent = "Draft";
       else if (paid >= total && total > 0) pill.textContent = "Paid";
@@ -563,14 +615,12 @@
 
       items.forEach((row, idx) => {
         const tr = document.createElement("tr");
-
-        // CHANGED: apply discount styling class to discount rows
         if (isDiscountRow(row)) tr.classList.add("discount-row");
 
         tr.innerHTML = `
           <td class="td-num">${idx + 1}</td>
           <td>
-            <input class="row-input" type="text" value="${row.name || ""}" data-k="name" data-i="${idx}" placeholder="e.g. Tuition Fee Annual" />
+            <input class="row-input" type="text" value="${row.name || ""}" data-k="name" data-i="${idx}" placeholder="e.g. Tuition Fee" />
           </td>
           <td>
             <input class="row-input" type="number" min="0" step="1" value="${row.qty ?? 1}" data-k="qty" data-i="${idx}" />
@@ -582,10 +632,10 @@
             <span>${fmt(row.subtotal || 0)}</span>
           </td>
           <td class="td-actions">
-            <button class="btn small danger" type="button" data-act="del" data-i="${idx}">Del</button>
+            <!-- CHANGED: Del -> "--" (same delete action) -->
+            <button class="btn small danger" type="button" data-act="del" data-i="${idx}">--</button>
           </td>
         `;
-
         body.appendChild(tr);
       });
 
@@ -613,47 +663,19 @@
     }
 
     function addItem(name = "", qty = 1, unit = 0) {
-      items.push({
-        name,
-        qty,
-        unit,
-        subtotal: computeRowSubtotal(qty, unit),
-      });
+      items.push({ name, qty, unit, subtotal: computeRowSubtotal(qty, unit) });
       renderTable();
       recalcTotals();
     }
 
-    // ------- Init sample rows (as per your example) -------
-    addItem("Tuition Fee Annual", 1, 4500000);
-    // Discount stays negative; styling makes it red + bold.
-    addItem("Tuition Fee Disc 50%", 1, -2250000);
+    // ------- Init rows (CHANGED to your new list) -------
+    addItem("Tuition Fee AY26-27\nMonthly: June 2026", 1, 360300);
     addItem("Registration Fee", 1, 200000);
     addItem("Material Fee", 1, 600000);
-    addItem("Uniform", 2, 20000);
+    addItem("Uniform (size M)", 2, 20000);
 
-    // ------- UI Events -------
+    // ------- Events -------
     el("addItemBtn").addEventListener("click", () => addItem("", 1, 0));
-
-    // Payment method “Other” reveal
-    el("payment_method").addEventListener("change", () => {
-      const isOther = el("payment_method").value === "OTHER";
-      el("payment_other_wrapper").classList.toggle("hidden", !isOther);
-    });
-
-    // Proof preview
-    el("payment_proof").addEventListener("change", (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
-      el("proofName").textContent = file.name;
-      const url = URL.createObjectURL(file);
-      el("proofThumb").src = url;
-      el("proofPreview").style.display = "flex";
-    });
-
-    // Totals updates when tax or paid changes
-    el("tax_rate").addEventListener("input", recalcTotals);
-    el("paid_amount").addEventListener("input", recalcTotals);
 
     // Discount modal
     const dlg = el("discountDialog");
@@ -673,15 +695,101 @@
       dlg.close();
     });
 
-    // Cancel / Add buttons (front-end only)
-    el("cancelBtn").addEventListener("click", () => {
-      if (confirm("Cancel and clear changes?")) {
-        location.reload();
+    // Tax recalc
+    el("tax_rate").addEventListener("input", recalcTotals);
+
+    // Proof preview
+    el("payment_proof").addEventListener("change", (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      el("proofName").textContent = file.name;
+      const url = URL.createObjectURL(file);
+      el("proofThumb").src = url;
+      el("proofPreview").style.display = "flex";
+    });
+
+    // Payment method "Other" toggle per row
+    function wirePaymentRow(idx) {
+      const methodEl = el(`payment_method_${idx}`);
+      const amtEl = el(`paid_amount_${idx}`);
+      const otherWrap = el(`payment_other_wrap_${idx}`);
+
+      if (methodEl) {
+        methodEl.addEventListener("change", () => {
+          const isOther = methodEl.value === "OTHER";
+          if (otherWrap) otherWrap.classList.toggle("hidden", !isOther);
+        });
       }
+      if (amtEl) {
+        amtEl.addEventListener("input", recalcTotals);
+      }
+    }
+    wirePaymentRow(0);
+
+    // CHANGED: +Add Payment Method
+    el("addPaymentMethodBtn").addEventListener("click", () => {
+      const tbody = el("paymentRows");
+      const idx = paymentRowCount;
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>
+          <select class="cell-input" id="payment_method_${idx}">
+            <option value="CASH">Cash</option>
+            <option value="KBZ_TRANSFER">KBZ Transfer</option>
+            <option value="CB_TRANSFER">CB Transfer</option>
+            <option value="KPAY">KPay</option>
+            <option value="OTHER">Others</option>
+          </select>
+          <div id="payment_other_wrap_${idx}" class="hidden" style="margin-top:8px;">
+            <input class="cell-input" id="payment_other_${idx}" type="text" placeholder="Specify other method" />
+          </div>
+        </td>
+        <td class="money">
+          <input class="cell-input money" id="paid_amount_${idx}" type="number" min="0" step="1" placeholder="0" />
+        </td>
+      `;
+      tbody.appendChild(tr);
+
+      paymentRowCount += 1;
+      wirePaymentRow(idx);
+      recalcTotals();
+    });
+
+    // Bottom actions (front-end only)
+    el("cancelBtn").addEventListener("click", () => {
+      // "Safe as Draft" behavior: keep page, just message + console payload
+      const payload = collectPayload();
+      el("msg").textContent = "Saved as Draft (front-end only).";
+      console.log("Draft payload:", payload);
     });
 
     el("addBtn").addEventListener("click", () => {
-      const payload = {
+      const payload = collectPayload();
+      el("msg").textContent = "Submitted Payment (front-end only).";
+      console.log("Submit payload:", payload);
+    });
+
+    function collectPayload() {
+      const payments = [];
+      for (let i = 0; i < paymentRowCount; i++) {
+        const m = el(`payment_method_${i}`);
+        const a = el(`paid_amount_${i}`);
+        const o = el(`payment_other_${i}`);
+        if (!m || !a) continue;
+        payments.push({
+          method: m.value,
+          other: (o ? o.value.trim() : ""),
+          amount: Number(a.value || 0),
+        });
+      }
+
+      const subtotal = items.reduce((s, r) => s + Number(r.subtotal || 0), 0);
+      const taxRate = Number(el("tax_rate").value || 0);
+      const tax = Math.round(subtotal * (taxRate / 100));
+      const total = subtotal + tax;
+
+      return {
         academic_year: el("academic_year").value,
         invoice_number: el("invoice_number").value,
         student_id: el("student_id").value.trim(),
@@ -689,22 +797,14 @@
         grade_level: el("grade_level").value,
         issue_date: el("issue_date").value,
         due_date: el("due_date").value,
-        tax_rate: Number(el("tax_rate").value || 0),
+        tax_rate: taxRate,
         items: items.map(r => ({ ...r })),
-        totals: {
-          subtotal: items.reduce((s, r) => s + Number(r.subtotal || 0), 0),
-        },
-        payment: {
-          method: el("payment_method").value,
-          other: el("payment_other").value.trim(),
-          paid_amount: Number(el("paid_amount").value || 0),
-          remark: el("remark").value.trim()
-        }
+        totals: { subtotal, tax, total },
+        payments,
+        payment_proof_file: el("payment_proof").files?.[0]?.name || null,
+        remark: el("remark").value.trim()
       };
-
-      el("msg").textContent = "Draft created (front-end only). Ready to connect to database.";
-      console.log("Invoice payload:", payload);
-    });
+    }
 
     // Default dates
     (function setDefaults(){
@@ -712,7 +812,6 @@
       const iso = today.toISOString().slice(0,10);
       el("issue_date").value = iso;
 
-      // due date = +7 days default
       const due = new Date(today.getTime() + 7*24*60*60*1000);
       el("due_date").value = due.toISOString().slice(0,10);
 
