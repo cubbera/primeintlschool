@@ -248,12 +248,22 @@
       background:#fff;
     }
 
+    /* CHANGED: Big bottom buttons only (Cancel & ADD) */
     .footer-actions{
       margin-top:14px;
       display:flex;
-      justify-content:flex-end;
-      gap:10px;
+      justify-content:space-between;
+      gap:12px;
       flex-wrap:wrap;
+      padding-top:14px;
+      border-top:1px solid var(--line);
+    }
+    .footer-actions #cancelBtn,
+    .footer-actions #addBtn{
+      flex:1 1 220px;
+      padding:18px 20px;
+      font-size:18px;
+      border-radius:14px;
     }
 
     .muted{color:var(--muted)}
@@ -271,6 +281,18 @@
 
     /* Hide/show */
     .hidden{display:none !important;}
+
+    /* CHANGED: Discounts clearly visible (red, bold) and keep "-" (data stays negative) */
+    .discount-row td,
+    .discount-row .money,
+    .discount-row input{
+      color:var(--danger);
+      font-weight:700;
+    }
+    .discount-row input{
+      border-color:#f3b4b4;
+      background:#fff;
+    }
   </style>
 </head>
 
@@ -453,6 +475,7 @@
             </div>
           </div>
 
+          <!-- CHANGED: Cancel & ADD big at bottom -->
           <div class="footer-actions">
             <button class="btn" type="button" id="cancelBtn">Cancel</button>
             <button class="btn primary" type="button" id="addBtn">ADD</button>
@@ -483,7 +506,7 @@
           </div>
         </div>
 
-        <div class="footer-actions" style="justify-content:flex-end; padding-top:12px;">
+        <div class="footer-actions" style="justify-content:flex-end; padding-top:12px; border-top:none; padding-bottom:16px;">
           <button class="btn" type="button" id="discountCancel">Cancel</button>
           <button class="btn primary" type="button" id="applyDiscount">Apply Discount</button>
         </div>
@@ -507,6 +530,13 @@
       const q = Number(qty || 0);
       const u = Number(unit || 0);
       return q * u;
+    }
+
+    function isDiscountRow(row) {
+      // Keep logic minimal. We treat any negative unit or subtotal as a discount row.
+      const u = Number(row.unit || 0);
+      const s = Number(row.subtotal || 0);
+      return (u < 0) || (s < 0) || (String(row.name || "").toLowerCase().includes("disc"));
     }
 
     function recalcTotals() {
@@ -533,6 +563,9 @@
 
       items.forEach((row, idx) => {
         const tr = document.createElement("tr");
+
+        // CHANGED: apply discount styling class to discount rows
+        if (isDiscountRow(row)) tr.classList.add("discount-row");
 
         tr.innerHTML = `
           <td class="td-num">${idx + 1}</td>
@@ -592,6 +625,7 @@
 
     // ------- Init sample rows (as per your example) -------
     addItem("Tuition Fee Annual", 1, 4500000);
+    // Discount stays negative; styling makes it red + bold.
     addItem("Tuition Fee Disc 50%", 1, -2250000);
     addItem("Registration Fee", 1, 200000);
     addItem("Material Fee", 1, 600000);
@@ -635,20 +669,18 @@
       const amt = Number(el("discount_amount").value || 0);
       if (!desc) return alert("Please enter discount description.");
       if (!amt) return alert("Please enter discount amount (negative number).");
-      addItem(desc, 1, amt);
+      addItem(desc, 1, amt); // keep negative
       dlg.close();
     });
 
     // Cancel / Add buttons (front-end only)
     el("cancelBtn").addEventListener("click", () => {
-      // Adjust this behavior as needed (navigate back, clear form, etc.)
       if (confirm("Cancel and clear changes?")) {
         location.reload();
       }
     });
 
     el("addBtn").addEventListener("click", () => {
-      // This is only UI scaffolding. Hook to Supabase later.
       const payload = {
         academic_year: el("academic_year").value,
         invoice_number: el("invoice_number").value,
