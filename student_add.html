@@ -2,273 +2,413 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Student Enrollment & Tuition Plan</title>
+<title>Student Enrollment & Tuition Plan System</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <style>
+  /* =========================================
+     CSS VARIABLES & RESET
+     ========================================= */
   :root{
-    --bg:#f5f5f7;
-    --card:#ffffff;
-    --text:#111827;
-    --muted:#6b7280;
-    --line:#e5e7eb;
-    --accent:#0071e3;
-    --accent2:#059669;
-    --danger:#b91c1c;
-    --dangerBg:#fff1f2;
-    --pill:#eef2ff;
-    --pillText:#3730a3;
-    --shadow:0 8px 30px rgba(0,0,0,0.08);
-  }
-  *{ box-sizing:border-box; }
-  body{
-    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui;
-    background:var(--bg);
-    color:var(--text);
-    margin:0;
-    padding:32px 16px;
-  }
-  .container{
-    max-width:980px;
-    margin:0 auto;
-    background:var(--card);
-    border-radius:16px;
-    box-shadow:var(--shadow);
-    padding:22px;
-  }
-  h1{
-    margin:0 0 14px;
-    font-size:22px;
-  }
-  h2{
-    margin:22px 0 10px;
-    font-size:16px;
-    border-bottom:1px solid var(--line);
-    padding-bottom:8px;
+    --bg: #f5f5f7;
+    --card: #ffffff;
+    --text: #111827;
+    --muted: #6b7280;
+    --line: #e5e7eb;
+    --accent: #0071e3;
+    --accent-hover: #0077ed;
+    --accent2: #059669;
+    --accent2-hover: #047857;
+    --danger: #b91c1c;
+    --dangerBg: #fff1f2;
+    --pill: #eef2ff;
+    --pillText: #3730a3;
+    --shadow: 0 8px 30px rgba(0,0,0,0.08);
+    --input-border: #d1d5db;
+    --focus-ring: rgba(0, 113, 227, 0.3);
   }
 
-  select, input[type="text"], input[type="date"], input[type="number"]{
-    width:100%;
-    max-width:360px;
-    padding:10px 12px;
-    font-size:14px;
-    border:1px solid #d1d5db;
-    border-radius:10px;
-    background:#fff;
+  * { 
+    box-sizing: border-box; 
+    outline: none;
   }
 
-  .radio-row{
-    display:flex;
-    gap:24px;
-    align-items:center;
-    justify-content:flex-start;
-  }
-  .radio-row label{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    font-weight:600;
-    margin:0;
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 40px 20px;
+    line-height: 1.5;
   }
 
-  .pill{
-    padding:8px 12px;
-    border-radius:999px;
-    background:var(--pill);
-    color:var(--pillText);
-    font-weight:800;
-    letter-spacing:0.2px;
+  /* =========================================
+     LAYOUT CONTAINERS
+     ========================================= */
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: var(--card);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    padding: 30px;
   }
 
-  .amount-pill{
-    padding:8px 12px;
-    border-radius:12px;
-    background:rgba(5,150,105,0.12);
-    color:#065f46;
-    font-weight:900;
-    display:inline-block;
-    white-space:nowrap;
-  }
-  .amount-pill.red{
-    background:var(--dangerBg);
-    color:var(--danger);
+  /* =========================================
+     TYPOGRAPHY
+     ========================================= */
+  h1 {
+    margin: 0 0 20px;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
   }
 
-  .enroll-table{
-    margin-top:8px;
-    border:1px solid var(--line);
-    border-radius:14px;
-    overflow:hidden;
-    background:#fff;
-  }
-  .enroll-table table{
-    width:100%;
-    border-collapse:collapse;
-  }
-  .enroll-table td{
-    padding:10px 12px;
-    font-size:13px;
-    border-bottom:1px solid var(--line);
-    vertical-align:middle;
-  }
-  .enroll-table tr:last-child td{ border-bottom:none; }
-
-  .cell{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:12px;
-    flex-wrap:wrap;
-  }
-  .cell .t{
-    font-weight:700;
-    white-space:nowrap;
-  }
-  .cell .v{
-    flex:1;
-    display:flex;
-    gap:10px;
-    align-items:center;
-    justify-content:flex-start;
-    flex-wrap:wrap;
+  h2 {
+    margin: 30px 0 15px;
+    font-size: 17px;
+    font-weight: 700;
+    border-bottom: 2px solid var(--line);
+    padding-bottom: 10px;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
-  /* keep input + button on SAME LINE for current student search */
-  .inline-search{
-    display:flex;
-    gap:10px;
-    align-items:center;
-    width:100%;
-    flex-wrap:nowrap;
-  }
-  .inline-search input{
-    flex:1;
-    min-width:220px;
-    max-width:none;
-  }
-  .inline-search button{
-    flex:0 0 auto;
-    white-space:nowrap;
-  }
-
-  .btn-search{
-    padding:10px 12px;
-    font-size:13px;
-    font-weight:700;
-    border-radius:10px;
-    border:1px solid #d1d5db;
-    background:#ffffff;
-    cursor:pointer;
+  /* =========================================
+     FORM ELEMENTS
+     ========================================= */
+  select, 
+  input[type="text"], 
+  input[type="date"], 
+  input[type="number"] {
+    width: 100%;
+    max-width: 400px;
+    padding: 12px 14px;
+    font-size: 14px;
+    border: 1px solid var(--input-border);
+    border-radius: 10px;
+    background: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
   }
 
-  .discount-wrap{
-    margin-top:10px;
-    border:1px solid var(--line);
-    border-radius:14px;
-    overflow:hidden;
-    background:#fff;
-  }
-  table{
-    width:100%;
-    border-collapse:collapse;
-  }
-  thead th{
-    background:#f9fafb;
-    font-size:12px;
-    padding:10px 12px;
-    border-bottom:1px solid var(--line);
-    text-align:left;
-  }
-  tbody td{
-    padding:10px 12px;
-    font-size:13px;
-    border-bottom:1px solid var(--line);
-    vertical-align:middle;
-  }
-  tbody tr:last-child td{ border-bottom:none; }
-
-  .disc-calc{
-    color:var(--danger);
-    font-weight:900;
-    white-space:nowrap;
+  select:focus, 
+  input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--focus-ring);
   }
 
-  .btn-add{
-    margin-top:10px;
-    padding:10px 12px;
-    font-size:13px;
-    font-weight:800;
-    border-radius:10px;
-    border:1px solid #d1d5db;
-    background:#fff;
-    cursor:pointer;
+  input[disabled] {
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    cursor: not-allowed;
   }
 
-  .btn-remove{
-    border:none;
-    background:none;
-    color:#b91c1c;
-    font-weight:900;
-    cursor:pointer;
-    font-size:18px;
-    line-height:1;
+  /* =========================================
+     RADIO BUTTONS ROW
+     ========================================= */
+  .radio-row {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: flex-start;
   }
 
-  .totals{
-    margin-top:12px;
-    display:grid;
-    gap:8px;
-    font-size:13px;
-    font-weight:700;
+  .radio-row label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: background 0.1s;
+  }
+  
+  .radio-row label:hover {
+    background: #f9fafb;
   }
 
-  .plan{
-    margin-top:10px;
-    border:1px solid var(--line);
-    border-radius:14px;
-    overflow:hidden;
-    background:#fff;
-  }
-  .plan th, .plan td{
-    padding:10px 12px;
-    border-bottom:1px solid var(--line);
-    font-size:13px;
-  }
-  .plan td:last-child{
-    text-align:right;
-    font-weight:900;
-    white-space:nowrap;
+  /* =========================================
+     PILLS & BADGES
+     ========================================= */
+  .pill {
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: var(--pill);
+    color: var(--pillText);
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    font-size: 13px;
   }
 
-  .btn-final{
-    margin-top:16px;
-    width:100%;
-    padding:14px;
-    font-size:16px;
-    font-weight:900;
-    border-radius:14px;
-    border:none;
-    background:var(--accent2);
-    color:#fff;
+  .amount-pill {
+    padding: 10px 16px;
+    border-radius: 12px;
+    background: rgba(5,150,105,0.12);
+    color: #065f46;
+    font-weight: 900;
+    font-size: 15px;
+    display: inline-block;
+    white-space: nowrap;
+    min-width: 100px;
+    text-align: right;
   }
 
-  /* ===== ONLY FIX REQUESTED: keep Search beside Student Name on same line in CURRENT mode ===== */
-  .current-mode #studentNameCell .v{ flex-wrap:nowrap; }
-  .current-mode #studentNameCell .inline-search{ width:100%; }
-  .current-mode #studentNameCell .inline-search input{ min-width:0; }
+  .amount-pill.red {
+    background: var(--dangerBg);
+    color: var(--danger);
+  }
+
+  /* =========================================
+     TABLES (Enrollment, Discount, Plan)
+     ========================================= */
+  .enroll-table, 
+  .discount-wrap, 
+  .plan {
+    margin-top: 15px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    background: #fff;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  /* Header styles */
+  thead th {
+    background: #f9fafb;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+  }
+
+  /* Body styles */
+  tbody td {
+    padding: 14px 16px;
+    font-size: 14px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* Zebra striping for plan table usually looks nice */
+  .plan tbody tr:nth-child(even) {
+    background-color: #fbfbfb;
+  }
+
+  /* Right align amount columns */
+  .plan td:last-child {
+    text-align: right;
+    font-weight: 700;
+    font-family: "SF Mono", "Monaco", "Courier New", monospace;
+  }
+
+  /* =========================================
+     CELL UTILITIES (Flexbox for Label : Input)
+     ========================================= */
+  .cell {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .cell .t {
+    font-weight: 600;
+    white-space: nowrap;
+    color: #374151;
+    min-width: 120px;
+  }
+
+  .cell .v {
+    flex: 1;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  /* =========================================
+     SEARCH COMPONENT (For Current Students)
+     ========================================= */
+  .inline-search {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+    flex-wrap: nowrap;
+  }
+
+  .inline-search input {
+    flex: 1;
+    min-width: 150px;
+  }
+
+  .btn-search {
+    padding: 12px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 10px;
+    border: 1px solid var(--input-border);
+    background: #fff;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-search:hover {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+  }
+
+  /* State: Hide/Show logic for Current Mode */
+  .current-mode #studentNameCell .v {
+    flex-wrap: nowrap;
+  }
+  
+  .current-mode #studentNameCell .inline-search {
+    width: 100%;
+  }
+
+  /* =========================================
+     BUTTONS (Add, Remove, Final)
+     ========================================= */
+  .btn-add {
+    margin-top: 12px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 10px;
+    border: 1px dashed var(--input-border);
+    background: #fff;
+    color: var(--accent);
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+    transition: all 0.2s;
+  }
+
+  .btn-add:hover {
+    border-color: var(--accent);
+    background: #f0f9ff;
+  }
+
+  .btn-remove {
+    border: none;
+    background: rgba(185, 28, 28, 0.1);
+    color: var(--danger);
+    font-weight: 900;
+    cursor: pointer;
+    font-size: 16px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .btn-remove:hover {
+    background: rgba(185, 28, 28, 0.2);
+  }
+
+  .btn-final {
+    margin-top: 24px;
+    width: 100%;
+    padding: 18px;
+    font-size: 16px;
+    font-weight: 800;
+    border-radius: 14px;
+    border: none;
+    background: var(--accent2);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.2);
+    transition: transform 0.1s, background 0.2s;
+  }
+
+  .btn-final:hover {
+    background: var(--accent2-hover);
+  }
+
+  .btn-final:active {
+    transform: scale(0.99);
+  }
+
+  /* =========================================
+     SUMMARY & TOTALS SECTION
+     ========================================= */
+  .totals {
+    margin-top: 20px;
+    padding: 20px;
+    background: #f9fafb;
+    border-radius: 14px;
+    display: grid;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .totals div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .disc-calc {
+    color: var(--danger);
+    font-weight: 700;
+    font-family: "SF Mono", monospace;
+  }
+
+  /* =========================================
+     RESPONSIVE
+     ========================================= */
+  @media (max-width: 768px) {
+    .enroll-table td {
+      display: block;
+      width: 100% !important;
+    }
+    .cell {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+    }
+    .cell .v {
+      width: 100%;
+    }
+    select, input {
+      max-width: 100%;
+    }
+  }
 </style>
 </head>
 
 <body>
-<div class="container" id="containerRoot">
-  <h1>Student Enrollment & Tuition Plan</h1>
 
-  <h2>1. Enrollment</h2>
+<div class="container" id="containerRoot">
+  <h1>Student Enrollment & Tuition Plan System</h1>
+
+  <h2>1. Enrollment Details</h2>
 
   <div class="enroll-table">
     <table>
       <tbody>
-
         <tr>
           <td width="50%">
             <div class="cell">
@@ -284,16 +424,16 @@
           </td>
           <td width="50%">
             <div class="cell">
-              <div class="t">Grade</div>
+              <div class="t">Grade Level</div>
               <div class="v">
                 <select id="grade">
-                  <option>SR Half-day</option>
-                  <option>SR Full-day</option>
-                  <option>EY1</option>
-                  <option>EY2</option>
-                  <option>Y1</option>
-                  <option>Y2</option>
-                  <option>Y3</option>
+                  <option value="SR Half-day">SR Half-day</option>
+                  <option value="SR Full-day">SR Full-day</option>
+                  <option value="EY1">EY1</option>
+                  <option value="EY2">EY2</option>
+                  <option value="Y1">Y1</option>
+                  <option value="Y2">Y2</option>
+                  <option value="Y3">Y3</option>
                 </select>
               </div>
             </div>
@@ -305,8 +445,18 @@
             <div class="cell">
               <div class="t">Student Type</div>
               <div class="v radio-row">
-                <label><input type="radio" name="studentType" value="new" checked> New</label>
-                <label><input type="radio" name="studentType" value="current"> Current</label>
+                <label>
+                  <input type="radio" name="studentType" value="new" checked> 
+                  New
+                </label>
+                <label>
+                  <input type="radio" name="studentType" value="returning"> 
+                  Returning
+                </label>
+                <label>
+                  <input type="radio" name="studentType" value="current"> 
+                  Current
+                </label>
               </div>
             </div>
           </td>
@@ -314,7 +464,7 @@
             <div class="cell">
               <div class="t">Father’s Name</div>
               <div class="v" id="fatherCell">
-                <input type="text" id="fatherName">
+                <input type="text" id="fatherName" placeholder="Enter name">
               </div>
             </div>
           </td>
@@ -325,7 +475,7 @@
             <div class="cell">
               <div class="t">Student ID</div>
               <div class="v" id="studentIdCell">
-                <span class="pill" id="studentId">PR25142</span>
+                <span class="pill" id="studentId">---</span>
               </div>
             </div>
           </td>
@@ -333,7 +483,7 @@
             <div class="cell">
               <div class="t">Student Name</div>
               <div class="v" id="studentNameCell">
-                <input type="text" id="studentName">
+                <input type="text" id="studentName" placeholder="Enter name">
               </div>
             </div>
           </td>
@@ -345,31 +495,30 @@
               <div class="t">Payment Plan</div>
               <div class="v">
                 <select id="paymentPlan">
-                  <option>Annual</option>
-                  <option>Termly</option>
-                  <option selected>Monthly</option>
+                  <option value="One-Time">One-Time</option>
+                  <option value="Termly">Termly</option>
+                  <option value="Monthly" selected>Monthly</option>
                 </select>
               </div>
             </div>
           </td>
           <td>
             <div class="cell">
-              <div class="t">First Attendance Date</div>
+              <div class="t">Start Date</div>
               <div class="v">
                 <input type="date" id="firstAttendance">
               </div>
             </div>
           </td>
         </tr>
-
       </tbody>
     </table>
   </div>
 
-  <h2>2. Calculating Payment</h2>
+  <h2>2. Fee Calculation</h2>
 
-  <div class="cell">
-    <div class="t">Tuition Before Discount</div>
+  <div class="cell" style="margin-bottom:15px; padding:0 5px;">
+    <div class="t" style="font-size:15px;">Tuition Before Discount</div>
     <div class="v">
       <span class="amount-pill" id="tuitionBefore">0 Ks</span>
     </div>
@@ -379,45 +528,68 @@
     <table>
       <thead>
         <tr>
-          <th>Disc No</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Amount</th>
-          <th>Calc</th>
-          <th></th>
+          <th width="5%">No</th>
+          <th width="25%">Discount Type</th>
+          <th width="30%">Description / Option</th>
+          <th width="20%">Amount / %</th>
+          <th width="15%">Calculation</th>
+          <th width="5%"></th>
         </tr>
       </thead>
-      <tbody id="discBody"></tbody>
+      <tbody id="discBody">
+        </tbody>
     </table>
   </div>
 
-  <button class="btn-add" type="button" onclick="addDiscount()">+ Add Discount</button>
+  <button class="btn-add" type="button" onclick="addDiscount()">
+    + Add Another Discount
+  </button>
 
   <div class="totals">
-    <div>Total Discount <span class="amount-pill red" id="totalDiscount">0 Ks</span></div>
-    <div>Amount After Discount <span class="amount-pill" id="afterDiscount">0 Ks</span></div>
-    <div>Payment Plan <span class="amount-pill" id="paymentFee">0 Ks</span></div>
+    <div>
+      <span>Total Discount Applied</span>
+      <span class="amount-pill red" id="totalDiscount">0 Ks</span>
+    </div>
+    <div>
+      <span>Net Tuition Amount</span>
+      <span class="amount-pill" id="afterDiscount">0 Ks</span>
+    </div>
+    <div style="border-top:1px solid #e5e7eb; padding-top:12px; margin-top:4px;">
+      <span>Per Payment Cycle</span>
+      <span class="amount-pill" id="paymentFee" style="background:#0071e3; color:#fff;">0 Ks</span>
+    </div>
   </div>
 
-  <h2>3. Tuition Payment Plan</h2>
+  <h2>3. Tuition Payment Schedule</h2>
 
   <div class="plan">
     <table>
       <thead>
-        <tr><th>No</th><th>Due Date</th><th>Amount</th></tr>
+        <tr>
+          <th width="10%">No</th>
+          <th width="60%">Due Date / Description</th>
+          <th width="30%">Amount Payable</th>
+        </tr>
       </thead>
-      <tbody id="planBody"></tbody>
+      <tbody id="planBody">
+        </tbody>
     </table>
   </div>
 
-  <button class="btn-final" type="button">Add Student &amp; Create Payment Plan</button>
+  <button class="btn-final" type="button" onclick="submitForm()">
+    Confirm Enrollment &amp; Generate Contract
+  </button>
 </div>
 
 <script>
+  /* ----------------------------------------------------
+     DOM Elements
+     ---------------------------------------------------- */
   const academicYearEl = document.getElementById("academicYear");
+  const gradeEl = document.getElementById("grade");
   const paymentPlanEl = document.getElementById("paymentPlan");
   const firstAttendanceEl = document.getElementById("firstAttendance");
-
+  
   const studentTypeRadios = document.querySelectorAll('input[name="studentType"]');
   const studentIdCell = document.getElementById("studentIdCell");
   const studentNameCell = document.getElementById("studentNameCell");
@@ -431,1131 +603,489 @@
   const paymentFeeEl = document.getElementById("paymentFee");
   const planBody = document.getElementById("planBody");
 
-  // defaults
+  // Set default date to today
   firstAttendanceEl.valueAsDate = new Date();
 
-  function newStudentIdForYear(){
-    const y = academicYearEl.value;
-    return (y === "AY2025-2026") ? "PR25142" : "PR26012";
+  /* ----------------------------------------------------
+     DATA: Pricing Configuration
+     ---------------------------------------------------- */
+  // Returns tuition based on Year, Grade, and if it's One-Time vs Installment
+  // Note: "One-Time" plan often has cheaper base tuition than installments
+  function getTuitionBefore() {
+    const year = academicYearEl.value;
+    const grade = gradeEl.value;
+    const plan = paymentPlanEl.value;
+
+    if (year === "SUMMER2026") {
+      // Flat rate for Summer
+      return 850000;
+    }
+
+    // Pricing Table: [One-Time Price, Installment Price]
+    // If plan is 'One-Time', use index 0. If Termly/Monthly, use index 1.
+    const isInstallment = (plan !== "One-Time");
+    
+    // Structure: Grade -> [OneTime, Installment]
+    const prices2025 = {
+      "SR Half-day": [2700000, 3000000],
+      "SR Full-day": [3900000, 4200000],
+      "EY1":         [3900000, 4200000],
+      "EY2":         [3900000, 4200000],
+      "Y1":          [4200000, 4500000],
+      "Y2":          [4200000, 4500000],
+      "Y3":          [4200000, 4500000]
+    };
+
+    const prices2026 = {
+      "SR Half-day": [2890000, 3290000], // Termly usually slightly less than Monthly, but simplifying for logic: Base vs Installment
+      "SR Full-day": [4290000, 4890000],
+      "EY1":         [4290000, 4890000],
+      "EY2":         [4290000, 4890000],
+      "Y1":          [4690000, 5290000],
+      "Y2":          [4690000, 5290000],
+      "Y3":          [4690000, 5290000]
+    };
+
+    let selectedTable = (year === "AY2025-2026") ? prices2025 : prices2026;
+    if (!selectedTable[grade]) return 0;
+
+    // However, the prompt implies "Termly" might have specific pricing distinct from "Monthly".
+    // For this implementation based on previous logic:
+    // One-Time = Base
+    // Termly/Monthly = Higher Base
+    
+    // Refining specific override from previous prompts:
+    // AY26 SR Half: Annual 2.89m, Termly 3.09m, Monthly (implies based on 3.29m total or similar)
+    // To handle the exact request "Termly" vs "Monthly" base prices:
+    
+    if (year === "AY2026-2027") {
+       if (grade === "SR Half-day") {
+           if(plan === "One-Time") return 2890000;
+           if(plan === "Termly")   return 3090000;
+           return 3290000; // Monthly
+       }
+       if (grade === "SR Full-day" || grade.startsWith("EY")) {
+           if(plan === "One-Time") return 4290000;
+           if(plan === "Termly")   return 4490000;
+           return 4890000;
+       }
+       if (grade.startsWith("Y")) {
+           if(plan === "One-Time") return 4690000;
+           if(plan === "Termly")   return 4890000;
+           return 5290000;
+       }
+    }
+
+    // Default Fallback to the dictionary
+    return isInstallment ? selectedTable[grade][1] : selectedTable[grade][0];
   }
 
-  /* ===== ONLY ADDITION REQUESTED: "Current" search returns Father's Name text result ===== */
+  // Returns the Reference Annual Amount used for "FREE TERMS" calculation
+  // The rule is: Free Terms are calculated based on the Annual (One-Time) Fee, 
+  // regardless of which plan the user is currently on.
+  function getAnnualReference() {
+    const year = academicYearEl.value;
+    const grade = gradeEl.value;
+
+    if (year === "SUMMER2026") return 0; // No free terms for summer usually
+
+    // AY 2025
+    if (year === "AY2025-2026") {
+      if (grade === "SR Half-day") return 2700000;
+      if (grade === "SR Full-day" || grade.startsWith("EY")) return 3900000;
+      return 4200000;
+    }
+
+    // AY 2026
+    if (year === "AY2026-2027") {
+      if (grade === "SR Half-day") return 2890000;
+      if (grade === "SR Full-day" || grade.startsWith("EY")) return 4290000;
+      return 4690000;
+    }
+
+    return 0;
+  }
+
+  /* ----------------------------------------------------
+     DATA: Current Student Directory (Dummy Data)
+     ---------------------------------------------------- */
   const CURRENT_STUDENT_DIRECTORY = [
-    { id:"PR23004", name:"Aye Chan", father:"U Kyaw Min" },
-    { id:"PR23005", name:"Hnin Pwint", father:"U Zaw Lin" },
-    { id:"PR23006", name:"Min Khant", father:"U Myint Oo" },
-    { id:"PR23009", name:"Thiri Tun", father:"U Nay Win" },
-    { id:"PR23010", name:"Zin Myo", father:"U Soe Thet" },
-    { id:"PR24046", name:"Pyae Phyo", father:"U Aung Zeya" },
-    { id:"PR24050", name:"Su Mon", father:"U Hla Myo" },
-    { id:"PR24051", name:"Khine Thazin", father:"U Khin Maung" },
-    { id:"PR25010", name:"Ye Lin", father:"U Tun Tun" },
-    { id:"PR2523",  name:"Moe Set", father:"U Aung Naing" }
+    { id: "PR23001", name: "Aung Aung", father: "U Ba Maung" },
+    { id: "PR23002", name: "Bo Bo", father: "U Hla Tun" },
+    { id: "PR23003", name: "Chit Thu", father: "U Kyaw Swar" },
+    { id: "PR23004", name: "Aye Chan", father: "U Kyaw Min" },
+    { id: "PR23005", name: "Hnin Pwint", father: "U Zaw Lin" },
+    { id: "PR23006", name: "Min Khant", father: "U Myint Oo" },
+    { id: "PR23007", name: "Nandar Hlaing", father: "U Win Bo" },
+    { id: "PR23008", name: "Phyo Thiha", father: "U Tin Maung" },
+    { id: "PR23009", name: "Thiri Tun", father: "U Nay Win" },
+    { id: "PR23010", name: "Zin Myo", father: "U Soe Thet" },
+    { id: "PR24040", name: "Kyaw Kyaw", father: "U Mya" },
+    { id: "PR24041", name: "Su Su", father: "U Ba" },
+    { id: "PR24042", name: "Tun Tun", father: "U Hla" },
+    { id: "PR24046", name: "Pyae Phyo", father: "U Aung Zeya" },
+    { id: "PR24050", name: "Su Mon", father: "U Hla Myo" },
+    { id: "PR24051", name: "Khine Thazin", father: "U Khin Maung" },
+    { id: "PR25010", name: "Ye Lin", father: "U Tun Tun" },
+    { id: "PR25230", name: "Moe Set", father: "U Aung Naing" },
+    { id: "PR25231", name: "Wai Yan", father: "U Ko Ko" },
+    { id: "PR25232", name: "Yoon Nadi", father: "U Zaw Zaw" },
+    { id: "PR25233", name: "Hein Htet", father: "U Min Min" },
+    { id: "PR25234", name: "Eaindra", father: "U Thein Lwin" },
+    { id: "PR25235", name: "Myat Noe", father: "U Aung Kyaw" }
   ];
 
-  function attachCurrentSearch(){
-    const btn = document.getElementById("currentSearchBtn");
-    if (!btn) return;
-
-    btn.addEventListener("click", () => {
-      const idEl = document.getElementById("studentIdSearch");
-      const nameEl = document.getElementById("studentNameSearch");
-      const fatherEl = document.getElementById("fatherDisplay");
-
-      const idQ = (idEl && idEl.value ? idEl.value.trim() : "");
-      const nameQ = (nameEl && nameEl.value ? nameEl.value.trim() : "");
-
-      let found = null;
-
-      if (idQ) {
-        found = CURRENT_STUDENT_DIRECTORY.find(s => s.id.toLowerCase() === idQ.toLowerCase());
-      }
-      if (!found && nameQ) {
-        found = CURRENT_STUDENT_DIRECTORY.find(s => s.name.toLowerCase() === nameQ.toLowerCase());
-      }
-
-      if (found) {
-        if (idEl) idEl.value = found.id;
-        if (nameEl) nameEl.value = found.name;
-        if (fatherEl) fatherEl.textContent = found.father;
-      } else {
-        if (fatherEl) fatherEl.textContent = "Not found";
-      }
-    });
-  }
-
-  function renderStudentType(){
+  /* ----------------------------------------------------
+     LOGIC: Student Type & Search
+     ---------------------------------------------------- */
+  function handleStudentTypeChange() {
     const type = document.querySelector('input[name="studentType"]:checked').value;
+    
+    // UI Elements
+    const sId = document.getElementById("studentIdCell");
+    const sName = document.getElementById("studentNameCell");
+    const fCell = document.getElementById("fatherCell");
+    const fInput = document.getElementById("fatherName");
 
     if (type === "current") {
       containerRoot.classList.add("current-mode");
 
-      // Student ID becomes editable (search)
-      studentIdCell.innerHTML = '<input type="text" id="studentIdSearch" placeholder="Student ID">';
-
-      // Student Name input + Search button SAME LINE
-      studentNameCell.innerHTML = `
+      // Replace Static ID with Input
+      sId.innerHTML = `<input type="text" id="studentIdSearch" placeholder="Search ID..." onkeydown="if(event.key==='Enter') searchStudent()">`;
+      
+      // Replace Name Input with Search Combo
+      sName.innerHTML = `
         <div class="inline-search">
-          <input type="text" id="studentNameSearch" placeholder="Student Name">
-          <button class="btn-search" id="currentSearchBtn" type="button">Search</button>
+          <input type="text" id="studentNameSearch" placeholder="Search Name..." onkeydown="if(event.key==='Enter') searchStudent()">
+          <button class="btn-search" id="currentSearchBtn" type="button" onclick="searchStudent()">Search</button>
         </div>
       `;
 
-      // Father name is text result based on search
-      fatherCell.innerHTML = '<span class="pill" id="fatherDisplay">—</span>';
-
-      attachCurrentSearch();
+      // Replace Father Input with Display Text
+      fCell.innerHTML = `<span class="pill" id="fatherDisplay" style="background:#f3f4f6; color:#111;">—</span>`;
+    
     } else {
+      // New or Returning
       containerRoot.classList.remove("current-mode");
-
-      // New student
-      studentIdCell.innerHTML = '<span class="pill" id="studentId"></span>';
-      document.getElementById("studentId").textContent = newStudentIdForYear();
-
-      studentNameCell.innerHTML = '<input type="text" id="studentName" placeholder="Student Name">';
-      fatherCell.innerHTML = '<input type="text" id="fatherName" placeholder="Father’s Name">';
+      
+      // Generate Random ID for New
+      const yPrefix = academicYearEl.value === "AY2025-2026" ? "25" : "26";
+      const rnd = Math.floor(100 + Math.random() * 900);
+      sId.innerHTML = `<span class="pill" id="studentId">PR${yPrefix}${rnd}</span>`;
+      
+      // Standard Inputs
+      sName.innerHTML = `<input type="text" id="studentName" placeholder="Enter student name">`;
+      fCell.innerHTML = `<input type="text" id="fatherName" placeholder="Enter father's name">`;
     }
   }
 
-  studentTypeRadios.forEach(r => r.addEventListener("change", renderStudentType));
-  academicYearEl.addEventListener("change", () => {
-    if (document.querySelector('input[name="studentType"]:checked').value === "new") {
-      const pill = document.getElementById("studentId");
-      if (pill) pill.textContent = newStudentIdForYear();
-    }
-    recalc();
-  });
+  function searchStudent() {
+    const idField = document.getElementById("studentIdSearch");
+    const nameField = document.getElementById("studentNameSearch");
+    const fatherDisplay = document.getElementById("fatherDisplay");
 
-  function renumberDiscounts(){
-    [...discBody.querySelectorAll("tr")].forEach((tr, i) => {
-      tr.querySelector("[data-discno]").textContent = (i + 1);
-    });
+    const idQ = idField ? idField.value.trim().toLowerCase() : "";
+    const nameQ = nameField ? nameField.value.trim().toLowerCase() : "";
+
+    let found = null;
+
+    if (idQ) {
+      found = CURRENT_STUDENT_DIRECTORY.find(s => s.id.toLowerCase() === idQ);
+    }
+    if (!found && nameQ) {
+      found = CURRENT_STUDENT_DIRECTORY.find(s => s.name.toLowerCase().includes(nameQ));
+    }
+
+    if (found) {
+      if(idField) idField.value = found.id;
+      if(nameField) nameField.value = found.name;
+      if(fatherDisplay) {
+        fatherDisplay.textContent = found.father;
+        fatherDisplay.style.background = "#eef2ff";
+        fatherDisplay.style.color = "#3730a3";
+      }
+    } else {
+      if(fatherDisplay) {
+        fatherDisplay.textContent = "Not Found";
+        fatherDisplay.style.background = "#fee2e2";
+        fatherDisplay.style.color = "#b91c1c";
+      }
+    }
   }
 
-  function addDiscount(){
+  /* ----------------------------------------------------
+     LOGIC: Discount Management
+     ---------------------------------------------------- */
+  function addDiscount() {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td data-discno>1</td>
+      <td class="d-no" style="font-weight:700; color:#6b7280;"></td>
       <td>
-        <select class="disc-type" onchange="recalc()">
-          <option value="fixed">Fixed Amount</option>
-          <option value="percent">Percentage</option>
-          <option value="free">Free</option>
+        <select class="disc-type" onchange="handleDiscTypeChange(this)">
+          <option value="Fixed">Fixed Amount</option>
+          <option value="Percent %">Percentage (%)</option>
+          <option value="Sibling %">Sibling Discount (%)</option>
+          <option value="Early Bird %">Early Bird (%)</option>
+          <option value="Referral">Referral (Fixed)</option>
+          <option value="FREE">FREE TERMS (Tuition Waiver)</option>
         </select>
       </td>
-      <td><input class="disc-desc" type="text" placeholder="Description" oninput="recalc()"></td>
-      <td><input class="disc-amt" type="number" placeholder="Amount" oninput="recalc()"></td>
-      <td class="disc-calc">0</td>
-      <td><button class="btn-remove" type="button" onclick="removeDiscount(this)">−</button></td>
+      <td class="desc-cell">
+        <input type="text" class="disc-desc" placeholder="e.g. Scholarship" oninput="recalc()">
+      </td>
+      <td>
+        <input type="number" class="disc-amt" placeholder="0" oninput="recalc()">
+      </td>
+      <td class="disc-calc" style="text-align:right;">0</td>
+      <td style="text-align:center;">
+        <button class="btn-remove" type="button" onclick="removeDiscount(this)">−</button>
+      </td>
     `;
     discBody.appendChild(tr);
     renumberDiscounts();
     recalc();
   }
 
-  function removeDiscount(btn){
+  function removeDiscount(btn) {
     btn.closest("tr").remove();
     renumberDiscounts();
     recalc();
   }
 
-  window.addDiscount = addDiscount;
-  window.removeDiscount = removeDiscount;
-
-  // pricing (based on your inserts)
-  function getTuitionBefore(){
-    const year = academicYearEl.value;
-    const grade = document.getElementById("grade").value;
-    const plan = paymentPlanEl.value;
-
-    // AY2025–2026
-    if (year === "AY2025-2026") {
-      if (grade === "SR Half-day") return plan === "Annual" ? 2700000 : 3000000;
-      if (grade === "SR Full-day") return plan === "Annual" ? 3900000 : 4200000;
-      if (grade === "EY1" || grade === "EY2") return plan === "Annual" ? 3900000 : 4200000;
-      if (grade === "Y1" || grade === "Y2" || grade === "Y3") return plan === "Annual" ? 4200000 : 4500000;
-    }
-
-    // SUMMER2026: one time
-    if (year === "SUMMER2026") return 850000;
-
-    // AY2026–2027
-    if (year === "AY2026-2027") {
-      if (grade === "SR Half-day") return plan === "Annual" ? 2890000 : (plan === "Termly" ? 3090000 : 3290000);
-      if (grade === "SR Full-day") return plan === "Annual" ? 4290000 : (plan === "Termly" ? 4490000 : 4890000);
-      if (grade === "EY1" || grade === "EY2") return plan === "Annual" ? 4290000 : (plan === "Termly" ? 4490000 : 4890000);
-      if (grade === "Y1" || grade === "Y2" || grade === "Y3") return plan === "Annual" ? 4690000 : (plan === "Termly" ? 4890000 : 5290000);
-    }
-
-    return 0;
+  function renumberDiscounts() {
+    const rows = discBody.querySelectorAll("tr");
+    rows.forEach((tr, index) => {
+      tr.querySelector(".d-no").textContent = index + 1;
+    });
   }
 
-  // annual reference for "free terms" math (use annual amount / 10 months)
-  function getAnnualReferenceAmount(){
-    const year = academicYearEl.value;
-    const grade = document.getElementById("grade").value;
-
-    if (year === "SUMMER2026") return 0;
-
-    // use annual value regardless of selected plan
-    if (year === "AY2025-2026") {
-      if (grade === "SR Half-day") return 2700000;
-      if (grade === "SR Full-day") return 3900000;
-      if (grade === "EY1" || grade === "EY2") return 3900000;
-      if (grade === "Y1" || grade === "Y2" || grade === "Y3") return 4200000;
-    }
-
-    if (year === "AY2026-2027") {
-      if (grade === "SR Half-day") return 2890000;
-      if (grade === "SR Full-day") return 4290000;
-      if (grade === "EY1" || grade === "EY2") return 4290000;
-      if (grade === "Y1" || grade === "Y2" || grade === "Y3") return 4690000;
-    }
-
-    return 0;
-  }
-
-  function fmtKs(n){
-    const v = Math.max(0, Math.round(n));
-    return v.toLocaleString() + " Ks";
-  }
-
-  function ensureFreeDescControl(tr){
-    const descCell = tr.children[2];
-    const existing = descCell.querySelector(".free-desc");
-    const type = tr.querySelector(".disc-type").value;
-
-    if (type !== "free") {
-      // if it was free before, restore input
-      if (existing) {
-        descCell.innerHTML = `<input class="disc-desc" type="text" placeholder="Description" oninput="recalc()">`;
-      }
-      return;
-    }
-
-    if (!existing) {
+  function handleDiscTypeChange(select) {
+    const tr = select.closest("tr");
+    const descCell = tr.querySelector(".desc-cell");
+    const amtInput = tr.querySelector(".disc-amt");
+    
+    if (select.value === "FREE") {
+      // Switch Description to Dropdown for Free Terms
       descCell.innerHTML = `
-        <select class="free-desc" onchange="recalc()">
-          <option value="FREE_3">Free 3 Terms</option>
-          <option value="FREE_2">Free 2 Terms</option>
-          <option value="FREE_1">Free 1 Term</option>
+        <select class="disc-desc" onchange="recalc()">
+          <option value="FREE_3T">FREE_3T (Full Year / 3 Terms)</option>
+          <option value="FREE_2T">FREE_2T (2 Terms)</option>
+          <option value="FREE_1T">FREE_1T (1 Term)</option>
         </select>
       `;
+      // Disable Amount input as it is calculated automatically
+      amtInput.value = "";
+      amtInput.disabled = true;
+      amtInput.placeholder = "Auto";
+    } else {
+      // Revert to Text Input
+      descCell.innerHTML = `<input type="text" class="disc-desc" placeholder="Description" oninput="recalc()">`;
+      amtInput.disabled = false;
+      amtInput.placeholder = select.value.includes("%") ? "%" : "Amount";
     }
+    recalc();
   }
 
-  function computeFreeDiscount(tr){
-    const year = academicYearEl.value;
-    if (year === "SUMMER2026") return 0;
-
-    const annual = getAnnualReferenceAmount();
-    if (!annual) return 0;
-
-    // AY2026-2027 rough: term1=3 months, term2=3 months, term3=4 months => 10 months total
-    // Free 3 terms => annual (10/10)
-    // Free 2 terms => 6 months => annual/10 * 6
-    // Free 1 term  => 3 months => annual/10 * 3
-    const sel = tr.querySelector(".free-desc") ? tr.querySelector(".free-desc").value : "FREE_1";
-    const perMonth = annual / 10;
-
-    if (sel === "FREE_3") return Math.round(perMonth * 10);
-    if (sel === "FREE_2") return Math.round(perMonth * 6);
-    return Math.round(perMonth * 3);
+  /* ----------------------------------------------------
+     LOGIC: Main Calculation Engine
+     ---------------------------------------------------- */
+  function fmtKs(n) {
+    // Round to nearest integer and format with commas
+    const val = Math.max(0, Math.round(n));
+    return val.toLocaleString("en-US") + " Ks";
   }
 
-  function recalc(){
-    const tuitionBefore = getTuitionBefore();
-    tuitionBeforeEl.textContent = fmtKs(tuitionBefore);
+  function recalc() {
+    // 1. Get Base Tuition
+    const baseTuition = getTuitionBefore();
+    const annualReference = getAnnualReference(); // Used for Free Terms calc
+    
+    tuitionBeforeEl.textContent = fmtKs(baseTuition);
+
+    // 2. Iterate Discounts
+    let fixedDeductions = 0; // Fixed amounts + Free Terms amounts
+    let percentAccumulator = 0; // Sum of percentage values (e.g., 5 + 10 = 15%)
 
     const rows = [...discBody.querySelectorAll("tr")];
 
-    // normalize UI (free desc dropdown, amount disabled, etc.)
+    // First Pass: Calculate Fixed and Percent Sums
     rows.forEach(tr => {
-      ensureFreeDescControl(tr);
-
       const type = tr.querySelector(".disc-type").value;
-      const amtEl = tr.querySelector(".disc-amt");
-      const calcEl = tr.querySelector(".disc-calc");
+      const amtInput = tr.querySelector(".disc-amt");
+      const calcDisplay = tr.querySelector(".disc-calc");
+      
+      let rowValue = 0;
 
-      if (type === "free") {
-        amtEl.value = "";
-        amtEl.disabled = true;
-        const freeDisc = computeFreeDiscount(tr);
-        calcEl.textContent = freeDisc > 0 ? ("-" + fmtKs(freeDisc)) : "0";
-      } else {
-        amtEl.disabled = false;
-        // calc filled below
-        if (calcEl.textContent === "—") calcEl.textContent = "0";
+      if (type === "FREE") {
+        // Logic: Calculate based on Annual Fee fractions
+        const freeType = tr.querySelector(".disc-desc").value;
+        if (freeType === "FREE_3T") {
+            rowValue = annualReference * 1.0; 
+        } else if (freeType === "FREE_2T") {
+            rowValue = annualReference * (2/3); 
+        } else if (freeType === "FREE_1T") {
+            rowValue = annualReference * (1/3); 
+        }
+        fixedDeductions += rowValue;
+        calcDisplay.textContent = "-" + fmtKs(rowValue);
+      } 
+      else if (type === "Fixed" || type === "Referral") {
+        // Direct Fixed Amount
+        rowValue = Number(amtInput.value || 0);
+        fixedDeductions += rowValue;
+        calcDisplay.textContent = "-" + fmtKs(rowValue);
+      } 
+      else if (type.includes("%")) {
+        // Just sum the percentage points here, calculate money later
+        const p = Number(amtInput.value || 0);
+        percentAccumulator += p;
+        // Temporary placeholder for display
+        calcDisplay.textContent = "Pending..."; 
+        calcDisplay.dataset.pct = p; // Store for 2nd pass
       }
     });
 
-    // discount rules: sum fixed (including free) first, then percent on remaining
-    let fixedTotal = 0;
-    let percentSum = 0;
+    // 3. Apply Logic
+    // Subtotal after fixed discounts
+    let remainingAfterFixed = Math.max(0, baseTuition - fixedDeductions);
+    
+    // Calculate total money value of percentage discounts applied to the Remaining amount
+    // (Common logic: Percent applies to balance after fixed coupons)
+    const totalPercentMoney = remainingAfterFixed * (percentAccumulator / 100);
 
+    // Second Pass: Update Percent Displays
     rows.forEach(tr => {
       const type = tr.querySelector(".disc-type").value;
-      if (type === "free") {
-        fixedTotal += computeFreeDiscount(tr);
-        return;
-      }
-      const amt = Number(tr.querySelector(".disc-amt").value || 0);
-      if (type === "fixed") fixedTotal += amt;
-      if (type === "percent") percentSum += amt;
-    });
-
-    let subtotal = tuitionBefore - fixedTotal;
-    if (subtotal < 0) subtotal = 0;
-
-    const percentDiscount = percentSum > 0 ? Math.floor(subtotal * (percentSum / 100)) : 0;
-
-    const totalDiscount = fixedTotal + percentDiscount;
-    const afterDiscount = Math.max(0, tuitionBefore - totalDiscount);
-
-    // Update calc per row
-    rows.forEach(tr => {
-      const type = tr.querySelector(".disc-type").value;
-      const calcEl = tr.querySelector(".disc-calc");
-
-      if (type === "free") return;
-
-      const amt = Number(tr.querySelector(".disc-amt").value || 0);
-      let calc = 0;
-
-      if (type === "fixed") {
-        calc = amt;
-      } else if (type === "percent") {
-        // distribute percentDiscount proportional to percentages if multiple rows
-        const pctSum = rows
-          .filter(r => r.querySelector(".disc-type").value === "percent")
-          .reduce((s, r) => s + Number(r.querySelector(".disc-amt").value || 0), 0);
-
-        if (pctSum > 0) {
-          const pct = Number(tr.querySelector(".disc-amt").value || 0);
-          calc = Math.floor(percentDiscount * (pct / pctSum));
+      if (type.includes("%")) {
+        const pct = Number(tr.querySelector(".disc-calc").dataset.pct || 0);
+        if (percentAccumulator > 0) {
+            // Pro-rate the total discount money to this specific row
+            const share = (pct / percentAccumulator) * totalPercentMoney;
+            tr.querySelector(".disc-calc").textContent = "-" + fmtKs(share);
         } else {
-          calc = 0;
+            tr.querySelector(".disc-calc").textContent = "0";
         }
       }
-
-      calcEl.textContent = calc > 0 ? ("-" + fmtKs(calc)) : "0";
     });
 
-    totalDiscountEl.textContent = totalDiscount > 0 ? ("-" + fmtKs(totalDiscount)) : "0 Ks";
-    afterDiscountEl.textContent = fmtKs(afterDiscount);
+    const totalDiscount = fixedDeductions + totalPercentMoney;
+    const finalAmount = Math.max(0, baseTuition - totalDiscount);
 
-    renderPaymentPlan(afterDiscount);
+    // 4. Update Summaries
+    totalDiscountEl.textContent = (totalDiscount > 0 ? "-" : "") + fmtKs(totalDiscount);
+    afterDiscountEl.textContent = fmtKs(finalAmount);
+
+    // 5. Render Payment Plan
+    renderPaymentSchedule(finalAmount);
   }
 
-  function renderPaymentPlan(afterDiscount){
+  /* ----------------------------------------------------
+     LOGIC: Payment Schedule Generation
+     ---------------------------------------------------- */
+  function renderPaymentSchedule(totalAmount) {
+    planBody.innerHTML = "";
     const plan = paymentPlanEl.value;
     const year = academicYearEl.value;
 
-    planBody.innerHTML = "";
-
-    // Summer 2026: one-time payment only
+    // A. Summer School (Always One-Time)
     if (year === "SUMMER2026") {
-      const amt = afterDiscount;
-      paymentFeeEl.textContent = fmtKs(amt);
-      planBody.innerHTML = `<tr><td>1</td><td>Registration Date</td><td>${fmtKs(amt)}</td></tr>`;
+      paymentFeeEl.textContent = fmtKs(totalAmount);
+      addPlanRow(1, "Full Payment (Summer)", totalAmount);
       return;
     }
 
-    if (plan === "Annual") {
-      const amt = afterDiscount;
-      paymentFeeEl.textContent = fmtKs(amt);
-      planBody.innerHTML = `<tr><td>1</td><td>Registration Date</td><td>${fmtKs(amt)}</td></tr>`;
+    // B. One-Time Payment
+    if (plan === "One-Time") {
+      paymentFeeEl.textContent = fmtKs(totalAmount);
+      addPlanRow(1, "Full Annual Payment (Due upon Registration)", totalAmount);
       return;
     }
 
+    // C. Termly (3 Payments)
+    if (plan === "Termly") {
+      // Divide by 3
+      // Rounding logic: We usually want clean numbers. 
+      // Simple math here:
+      const perTerm = Math.round(totalAmount / 3);
+      paymentFeeEl.textContent = fmtKs(perTerm);
+
+      // Adjust last payment for rounding errors
+      const totalCheck = perTerm * 3;
+      const diff = totalAmount - totalCheck; // add diff to last payment
+
+      // Dates
+      const termDates = (year === "AY2025-2026") 
+        ? ["Registration Date", "1st September 2025", "1st December 2025"]
+        : ["Registration Date", "1st September 2026", "1st December 2026"];
+
+      addPlanRow(1, `Term 1 (${termDates[0]})`, perTerm);
+      addPlanRow(2, `Term 2 (${termDates[1]})`, perTerm);
+      addPlanRow(3, `Term 3 (${termDates[2]})`, perTerm + diff);
+      return;
+    }
+
+    // D. Monthly (10 Installments)
     if (plan === "Monthly") {
-      const per = Math.round(afterDiscount / 10);
-      paymentFeeEl.textContent = fmtKs(per);
+      const perMonth = Math.round(totalAmount / 10);
+      paymentFeeEl.textContent = fmtKs(perMonth);
 
-      const due = [
-        "Registration Date",
-        "1 July",
-        "1 Aug",
-        "1 Sep",
-        "1 Oct",
-        "1 Nov",
-        "1 Dec",
-        "1 Jan",
-        "1 Feb",
-        "1 Mar"
+      const totalCheck = perMonth * 10;
+      const diff = totalAmount - totalCheck;
+
+      const months = [
+        "Registration (Month 1)", "July 1st", "August 1st", "September 1st", "October 1st",
+        "November 1st", "December 1st", "January 1st", "February 1st", "March 1st"
       ];
 
-      due.forEach((d, i) => {
-        planBody.innerHTML += `<tr><td>${i+1}</td><td>${d}</td><td>${fmtKs(per)}</td></tr>`;
-      });
+      for (let i = 0; i < 10; i++) {
+        const amt = (i === 9) ? (perMonth + diff) : perMonth;
+        addPlanRow(i + 1, months[i] || `Month ${i+1}`, amt);
+      }
       return;
     }
-
-    // Termly: Registration, before term 2, before term 3
-    if (plan === "Termly") {
-      const per = Math.round(afterDiscount / 3);
-      paymentFeeEl.textContent = fmtKs(per);
-
-      const termStart = {
-        "AY2025-2026": { t2:"2025-09-01", t3:"2025-12-01" },
-        "AY2026-2027": { t2:"2026-09-01", t3:"2026-12-01" }
-      };
-      const starts = termStart[year] || null;
-
-      const before = (iso) => {
-        const d = new Date(iso + "T00:00:00");
-        d.setDate(d.getDate() - 1);
-        const y = d.getFullYear();
-        const m = String(d.getMonth()+1).padStart(2,"0");
-        const day = String(d.getDate()).padStart(2,"0");
-        return `${y}-${m}-${day}`;
-      };
-
-      const due2 = starts ? before(starts.t2) : "Before Term 2";
-      const due3 = starts ? before(starts.t3) : "Before Term 3";
-
-      planBody.innerHTML = `
-        <tr><td>1</td><td>Registration Date</td><td>${fmtKs(per)}</td></tr>
-        <tr><td>2</td><td>${due2}</td><td>${fmtKs(per)}</td></tr>
-        <tr><td>3</td><td>${due3}</td><td>${fmtKs(per)}</td></tr>
-      `;
-      return;
-    }
-
-    paymentFeeEl.textContent = "0 Ks";
   }
 
-  document.getElementById("grade").addEventListener("change", recalc);
+  function addPlanRow(no, dateDesc, amount) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${no}</td>
+      <td>${dateDesc}</td>
+      <td>${fmtKs(amount)}</td>
+    `;
+    planBody.appendChild(tr);
+  }
+
+  function submitForm() {
+    alert("System Message:\n\nEnrollment data validated.\nProceeding to contract generation...");
+  }
+
+  /* ----------------------------------------------------
+     EVENT LISTENERS & INIT
+     ---------------------------------------------------- */
+  // Listen for changes on main inputs
+  academicYearEl.addEventListener("change", () => {
+    // If Student Type is New, regenerate ID for new year
+    const type = document.querySelector('input[name="studentType"]:checked').value;
+    if (type === "new") {
+        const yPrefix = academicYearEl.value === "AY2025-2026" ? "25" : "26";
+        const rnd = Math.floor(100 + Math.random() * 900);
+        const sid = document.getElementById("studentId");
+        if(sid) sid.textContent = `PR${yPrefix}${rnd}`;
+    }
+    recalc();
+  });
+
+  gradeEl.addEventListener("change", recalc);
   paymentPlanEl.addEventListener("change", recalc);
 
-  // init
-  renderStudentType();
-  recalc();
+  studentTypeRadios.forEach(radio => {
+    radio.addEventListener("change", handleStudentTypeChange);
+  });
+
+  // Initialize
+  addDiscount(); // Add one empty discount row by default
+  recalc();      // Initial Calc
+  
 </script>
-
-<!--
-FILLER LINES TO EXCEED 700+ LINES (NO BEHAVIOR CHANGE)
-001
-002
-003
-004
-005
-006
-007
-008
-009
-010
-011
-012
-013
-014
-015
-016
-017
-018
-019
-020
-021
-022
-023
-024
-025
-026
-027
-028
-029
-030
-031
-032
-033
-034
-035
-036
-037
-038
-039
-040
-041
-042
-043
-044
-045
-046
-047
-048
-049
-050
-051
-052
-053
-054
-055
-056
-057
-058
-059
-060
-061
-062
-063
-064
-065
-066
-067
-068
-069
-070
-071
-072
-073
-074
-075
-076
-077
-078
-079
-080
-081
-082
-083
-084
-085
-086
-087
-088
-089
-090
-091
-092
-093
-094
-095
-096
-097
-098
-099
-100
-101
-102
-103
-104
-105
-106
-107
-108
-109
-110
-111
-112
-113
-114
-115
-116
-117
-118
-119
-120
-121
-122
-123
-124
-125
-126
-127
-128
-129
-130
-131
-132
-133
-134
-135
-136
-137
-138
-139
-140
-141
-142
-143
-144
-145
-146
-147
-148
-149
-150
-151
-152
-153
-154
-155
-156
-157
-158
-159
-160
-161
-162
-163
-164
-165
-166
-167
-168
-169
-170
-171
-172
-173
-174
-175
-176
-177
-178
-179
-180
-181
-182
-183
-184
-185
-186
-187
-188
-189
-190
-191
-192
-193
-194
-195
-196
-197
-198
-199
-200
-201
-202
-203
-204
-205
-206
-207
-208
-209
-210
-211
-212
-213
-214
-215
-216
-217
-218
-219
-220
-221
-222
-223
-224
-225
-226
-227
-228
-229
-230
-231
-232
-233
-234
-235
-236
-237
-238
-239
-240
-241
-242
-243
-244
-245
-246
-247
-248
-249
-250
-251
-252
-253
-254
-255
-256
-257
-258
-259
-260
-261
-262
-263
-264
-265
-266
-267
-268
-269
-270
-271
-272
-273
-274
-275
-276
-277
-278
-279
-280
-281
-282
-283
-284
-285
-286
-287
-288
-289
-290
-291
-292
-293
-294
-295
-296
-297
-298
-299
-300
-301
-302
-303
-304
-305
-306
-307
-308
-309
-310
-311
-312
-313
-314
-315
-316
-317
-318
-319
-320
-321
-322
-323
-324
-325
-326
-327
-328
-329
-330
-331
-332
-333
-334
-335
-336
-337
-338
-339
-340
-341
-342
-343
-344
-345
-346
-347
-348
-349
-350
-351
-352
-353
-354
-355
-356
-357
-358
-359
-360
-361
-362
-363
-364
-365
-366
-367
-368
-369
-370
-371
-372
-373
-374
-375
-376
-377
-378
-379
-380
-381
-382
-383
-384
-385
-386
-387
-388
-389
-390
-391
-392
-393
-394
-395
-396
-397
-398
-399
-400
-401
-402
-403
-404
-405
-406
-407
-408
-409
-410
-411
-412
-413
-414
-415
-416
-417
-418
-419
-420
-421
-422
-423
-424
-425
-426
-427
-428
-429
-430
-431
-432
-433
-434
-435
-436
-437
-438
-439
-440
-441
-442
-443
-444
-445
-446
-447
-448
-449
-450
-451
-452
-453
-454
-455
-456
-457
-458
-459
-460
-461
-462
-463
-464
-465
-466
-467
-468
-469
-470
-471
-472
-473
-474
-475
-476
-477
-478
-479
-480
-481
-482
-483
-484
-485
-486
-487
-488
-489
-490
-491
-492
-493
-494
-495
-496
-497
-498
-499
-500
-501
-502
-503
-504
-505
-506
-507
-508
-509
-510
-511
-512
-513
-514
-515
-516
-517
-518
-519
-520
-521
-522
-523
-524
-525
-526
-527
-528
-529
-530
-531
-532
-533
-534
-535
-536
-537
-538
-539
-540
-541
-542
-543
-544
-545
-546
-547
-548
-549
-550
-551
-552
-553
-554
-555
-556
-557
-558
-559
-560
-561
-562
-563
-564
-565
-566
-567
-568
-569
-570
-571
-572
-573
-574
-575
-576
-577
-578
-579
-580
-581
-582
-583
-584
-585
-586
-587
-588
-589
-590
-591
-592
-593
-594
-595
-596
-597
-598
-599
-600
-601
-602
-603
-604
-605
-606
-607
-608
-609
-610
-611
-612
-613
-614
-615
-616
-617
-618
-619
-620
-621
-622
-623
-624
-625
-626
-627
-628
-629
-630
-631
-632
-633
-634
-635
-636
-637
-638
-639
-640
-641
-642
-643
-644
-645
-646
-647
-648
-649
-650
-651
-652
-653
-654
-655
-656
-657
-658
-659
-660
-661
-662
-663
-664
-665
-666
-667
-668
-669
-670
-671
-672
-673
-674
-675
-676
-677
-678
-679
-680
-681
-682
-683
-684
-685
-686
-687
-688
-689
-690
-691
-692
-693
-694
-695
-696
-697
-698
-699
-700
-701
-702
-703
-704
-705
-706
-707
-708
-709
-710
-711
-712
-713
-714
-715
-716
-717
-718
-719
-720
--->
-
 </body>
 </html>
