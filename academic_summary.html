@@ -34,6 +34,7 @@ body{
   backdrop-filter:blur(16px);
   border-bottom:1px solid var(--border);
   display:flex;justify-content:center;
+  z-index: 100;
 }
 .topbar-inner{
   max-width:var(--max-width);
@@ -108,11 +109,12 @@ th{
   background:#f2f2f7;
   color:var(--text-secondary);
   font-weight:600;
-  padding:10px;
+  padding:12px 10px;
   border-bottom:1px solid var(--border);
   cursor:pointer;
   user-select:none;
   white-space:nowrap;
+  text-align: center;
 }
 th.sort-active{
   color:var(--accent);
@@ -127,7 +129,7 @@ th.sort-active .arrow{
 }
 
 td{
-  padding:10px;border-bottom:1px solid var(--border);
+  padding:12px 10px;border-bottom:1px solid var(--border);
   text-align:center;
 }
 td.name{text-align:left;font-weight:500}
@@ -185,23 +187,23 @@ tbody tr:hover td{background:#f5f5f7}
     <div class="card"><div class="card-title">Class Average</div><div class="card-value" id="avg">–</div></div>
     <div class="card"><div class="card-title">Highest Mark</div><div class="card-value" id="high">–</div></div>
     <div class="card"><div class="card-title">Lowest Mark</div><div class="card-value" id="low">–</div></div>
-    <div class="card"><div class="card-title">Students</div><div class="card-value">10</div></div>
+    <div class="card"><div class="card-title">Students</div><div class="card-value" id="totalCount">10</div></div>
   </section>
 
   <div class="table-wrapper">
     <table id="scoreTable">
       <thead>
         <tr>
-          <th data-key="id">Student ID<span class="arrow">▲▼</span></th>
-          <th data-key="name">Student Name<span class="arrow">▲▼</span></th>
-          <th data-key="English">English<span class="arrow">▲▼</span></th>
-          <th data-key="Math">Math<span class="arrow">▲▼</span></th>
-          <th data-key="Science">Science<span class="arrow">▲▼</span></th>
-          <th data-key="ICT">ICT<span class="arrow">▲▼</span></th>
-          <th data-key="Global">Global<span class="arrow">▲▼</span></th>
-          <th data-key="Myanmar">Myanmar<span class="arrow">▲▼</span></th>
-          <th data-key="Chinese">Chinese<span class="arrow">▲▼</span></th>
-          <th data-key="avg">Average<span class="arrow">▲▼</span></th>
+          <th data-key="id">Student ID<span class="arrow">↕</span></th>
+          <th data-key="name">Student Name<span class="arrow">↕</span></th>
+          <th data-key="English">English<span class="arrow">↕</span></th>
+          <th data-key="Math">Math<span class="arrow">↕</span></th>
+          <th data-key="Science">Science<span class="arrow">↕</span></th>
+          <th data-key="ICT">ICT<span class="arrow">↕</span></th>
+          <th data-key="Global">Global<span class="arrow">↕</span></th>
+          <th data-key="Myanmar">Myanmar<span class="arrow">↕</span></th>
+          <th data-key="Chinese">Chinese<span class="arrow">↕</span></th>
+          <th data-key="avg">Average<span class="arrow">↕</span></th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -220,11 +222,12 @@ const students=[
   {id:"PR24050",name:"Su Mon"},
   {id:"PR24051",name:"Khine Thazin"},
   {id:"PR25010",name:"Ye Lin"},
-  {id:"PR2523", name:"Moe Set"}
+  {id:"PR25023",name:"Moe Set"}
 ];
 
 function rand(min,max){return Math.floor(Math.random()*(max-min+1))+min}
 
+// Generate Data
 students.forEach(s=>{
   s.English=rand(65,98);
   s.Math=rand(65,98);
@@ -238,15 +241,26 @@ students.forEach(s=>{
   );
 });
 
-let sortKey="id";
-let sortAsc=true;
+let sortKey = "id";
+let sortAsc = true;
 
-const tbody=document.querySelector("tbody");
-const headers=document.querySelectorAll("th");
+const tbody = document.querySelector("tbody");
+const headers = document.querySelectorAll("th");
 
 function render(){
+  // Sort data
+  students.sort((a, b) => {
+    let valA = a[sortKey];
+    let valB = b[sortKey];
+    if (typeof valA === 'string') {
+        return sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+    }
+    return sortAsc ? valA - valB : valB - valA;
+  });
+
   tbody.innerHTML="";
   let avgs=[];
+  
   students.forEach(s=>{
     avgs.push(s.avg);
     const tr=document.createElement("tr");
@@ -261,6 +275,37 @@ function render(){
     `;
     tbody.appendChild(tr);
   });
-  document.getElementById("avg").textContent=Math.round(avgs.reduce((a,b)=>a+b,0)/avgs.length);
-  document.getElementById("high").textContent=Math.max(...avgs);
-  document.getElementById("low")
+
+  // Update Summary Stats
+  document.getElementById("avg").textContent = Math.round(avgs.reduce((a,b)=>a+b,0)/avgs.length);
+  document.getElementById("high").textContent = Math.max(...avgs);
+  document.getElementById("low").textContent = Math.min(...avgs);
+  document.getElementById("totalCount").textContent = students.length;
+}
+
+// Add Event Listeners for Sorting
+headers.forEach(th => {
+  th.addEventListener('click', () => {
+    const key = th.getAttribute('data-key');
+    if (sortKey === key) {
+      sortAsc = !sortAsc;
+    } else {
+      sortKey = key;
+      sortAsc = true;
+    }
+    
+    // Update UI for headers
+    headers.forEach(h => h.classList.remove('sort-active'));
+    th.classList.add('sort-active');
+    th.querySelector('.arrow').textContent = sortAsc ? "▲" : "▼";
+    
+    render();
+  });
+});
+
+// Initial Render
+render();
+</script>
+
+</body>
+</html>
