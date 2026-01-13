@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Financial Management – Prime International School</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg:#f5f5f7;
+  --bg-elevated:#ffffff;
+  --border:#e5e5ea;
+  --text-primary:#111;
+  --text-secondary:#6e6e73;
+  --accent:#0071e3;
+  --danger:#eb5757;
+  --radius-card:14px;
+  --shadow:0 14px 34px rgba(0,0,0,0.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui;
+  background:var(--bg); color:var(--text-primary); padding: 20px;
+}
+.container { max-width: 1200px; margin: 0 auto; }
+
+/* Form Styling */
+.card {
+  background: var(--bg-elevated);
+  border-radius: var(--radius-card);
+  padding: 24px; box-shadow: var(--shadow);
+  margin-bottom: 24px; border: 1px solid var(--border);
+}
+.grid-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+}
+.input-group { display: flex; flex-direction: column; }
+label { font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;}
+input, select {
+  padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 13px;
+}
+.btn {
+  padding: 12px 24px; border-radius: 50px; border: none; cursor: pointer;
+  font-weight: 600; transition: 0.2s; margin-top: 15px;
+}
+.btn-primary { background: var(--accent); color: white; }
+.btn-primary:hover { opacity: 0.9; }
+
+/* Report Styling */
+table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 12px; overflow: hidden;}
+th { background: #f2f2f7; padding: 12px; font-size: 12px; text-align: left; border-bottom: 2px solid var(--border); }
+td { padding: 12px; font-size: 13px; border-bottom: 1px solid var(--border); }
+.amt-red { color: var(--danger); font-weight: 600; }
+.total-row { background: #f9f9fb; font-weight: 700; border-top: 2px solid var(--border); }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2 style="margin-bottom: 20px;">Expense Entry System</h2>
+
+  <div class="card">
+    <form id="expenseForm">
+      <div class="grid-form">
+        <div class="input-group"><label>Academic Year</label><input type="text" id="ay" value="2025-2026"></div>
+        <div class="input-group"><label>Trans Date</label><input type="date" id="trans_date"></div>
+        <div class="input-group"><label>Category (Cat1)</label><select id="cat1"><option>Operating</option><option>Fixed</option></select></div>
+        <div class="input-group"><label>Account Name</label><input type="text" id="acc_name" placeholder="e.g. Electricity"></div>
+        <div class="input-group"><label>Supplier</label><input type="text" id="supp_name" placeholder="e.g. EPC"></div>
+        <div class="input-group"><label>Description</label><input type="text" id="desc"></div>
+        <div class="input-group"><label>Paid From</label><input type="text" id="paid_from" value="Cash Office"></div>
+        <div class="input-group"><label>Amount (Right)</label><input type="number" id="amt" placeholder="0.00"></div>
+      </div>
+      <button type="submit" class="btn btn-primary">Add Expense Record</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3>Income Statement (Draft)</h3>
+    <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 15px;">Combined with school income records</p>
+    <table id="reportTable">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Account Name</th>
+          <th>Description</th>
+          <th>Income (Left)</th>
+          <th>Expense (Right)</th>
+        </tr>
+      </thead>
+      <tbody id="reportContent">
+        <tr style="color: #1c8c3a; font-weight: 600;">
+          <td>Revenue</td>
+          <td>Tuition Fees</td>
+          <td>Term 2 Collections</td>
+          <td>25,000.00</td>
+          <td>-</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr class="total-row">
+          <td colspan="3">Net Profit / (Loss)</td>
+          <td colspan="2" id="netProfit" style="text-align: right; padding-right: 40px;">25,000.00</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<script>
+// Array to store our transactions
+let transactions = [];
+let totalIncome = 25000.00;
+
+document.getElementById('expenseForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  // Create Transaction Object
+  const expense = {
+    ay: document.getElementById('ay').value,
+    date: document.getElementById('trans_date').value,
+    cat1: document.getElementById('cat1').value,
+    acc_name: document.getElementById('acc_name').value,
+    supp: document.getElementById('supp_name').value,
+    desc: document.getElementById('desc').value,
+    amt: parseFloat(document.getElementById('amt').value) || 0
+  };
+
+  transactions.push(expense);
+  updateReport();
+  this.reset(); // Clear form
+});
+
+function updateReport() {
+  const tbody = document.getElementById('reportContent');
+  const netDisplay = document.getElementById('netProfit');
+  
+  // Reset Table to show Revenue first
+  tbody.innerHTML = `
+    <tr style="color: #1c8c3a; font-weight: 600;">
+      <td>Revenue</td>
+      <td>Tuition Fees</td>
+      <td>Term 2 Collections</td>
+      <td>25,000.00</td>
+      <td>-</td>
+    </tr>
+  `;
+
+  let totalExpenses = 0;
+
+  // Append Expenses from transactions array
+  transactions.forEach(item => {
+    totalExpenses += item.amt;
+    const row = tbody.insertRow();
+    row.innerHTML = `
+      <td>${item.cat1}</td>
+      <td>${item.acc_name}</td>
+      <td>${item.desc} (${item.supp})</td>
+      <td>-</td>
+      <td class="amt-red">${item.amt.toLocaleString()}</td>
+    `;
+  });
+
+  const finalNet = totalIncome - totalExpenses;
+  netDisplay.textContent = finalNet.toLocaleString();
+  netDisplay.style.color = finalNet >= 0 ? "#1c8c3a" : "#eb5757";
+}
+
+// Set default date to today
+document.getElementById('trans_date').valueAsDate = new Date();
+</script>
+
+</body>
+</html>
