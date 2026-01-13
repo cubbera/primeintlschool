@@ -25,6 +25,7 @@ body{
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui;
   background:var(--bg);
   color:var(--text-primary);
+  line-height: 1.5;
 }
 
 /* ---------- HEADER ---------- */
@@ -34,7 +35,7 @@ body{
   backdrop-filter:blur(16px);
   border-bottom:1px solid var(--border);
   display:flex;justify-content:center;
-  z-index: 100;
+  z-index: 1000;
 }
 .topbar-inner{
   max-width:var(--max-width);
@@ -57,8 +58,11 @@ body{
   padding:6px 14px;border-radius:50px;
   border:1px solid var(--border);
   background:white;font-size:13px;cursor:pointer;
+  transition: background 0.2s;
 }
+.btn:hover { background: #f2f2f7; }
 .btn-primary{background:var(--accent);color:white;border-color:var(--accent)}
+.btn-primary:hover { background: #005bb5; }
 
 /* ---------- PAGE ---------- */
 .page{
@@ -77,6 +81,7 @@ select{
   padding:8px 14px;border-radius:999px;
   border:1px solid var(--border);
   background:white;font-size:13px;
+  outline: none;
 }
 
 /* ---------- SUMMARY ---------- */
@@ -99,7 +104,7 @@ select{
   border-radius:14px;
   border:1px solid var(--border);
   background:white;
-  overflow:auto;
+  overflow-x:auto;
 }
 table{
   width:100%;border-collapse:collapse;
@@ -113,27 +118,19 @@ th{
   border-bottom:1px solid var(--border);
   cursor:pointer;
   user-select:none;
-  white-space:nowrap;
   text-align: center;
 }
-th.sort-active{
-  color:var(--accent);
-}
-th .arrow{
-  margin-left:6px;
-  font-size:10px;
-  opacity:.4;
-}
-th.sort-active .arrow{
-  opacity:1;
-}
+th:first-child, td:first-child { text-align: left; padding-left: 20px; }
+th.sort-active{ color:var(--accent); }
+.arrow{ margin-left:5px; font-size:10px; opacity:0.3; }
+th.sort-active .arrow{ opacity:1; }
 
 td{
   padding:12px 10px;border-bottom:1px solid var(--border);
   text-align:center;
 }
 td.name{text-align:left;font-weight:500}
-td.id{text-align:left;font-family:monospace}
+td.id{text-align:left;font-family:monospace; color: var(--text-secondary);}
 
 .score-high{color:var(--success);font-weight:600}
 .score-mid{color:var(--warning);font-weight:600}
@@ -168,143 +165,140 @@ tbody tr:hover td{background:#f5f5f7}
 
   <div class="filters">
     <select>
-      <option>AY2023–2024</option>
-      <option>AY2024–2025</option>
       <option selected>AY2025–2026</option>
+      <option>AY2024–2025</option>
     </select>
     <select>
-      <option>Term 1</option>
       <option selected>Term 2</option>
-      <option>Term 3</option>
+      <option>Term 1</option>
     </select>
     <select>
-      <option>Y1-A</option>
       <option selected>Y2-A</option>
+      <option>Y1-A</option>
     </select>
   </div>
 
   <section class="summary-cards">
-    <div class="card"><div class="card-title">Class Average</div><div class="card-value" id="avg">–</div></div>
-    <div class="card"><div class="card-title">Highest Mark</div><div class="card-value" id="high">–</div></div>
-    <div class="card"><div class="card-title">Lowest Mark</div><div class="card-value" id="low">–</div></div>
-    <div class="card"><div class="card-title">Students</div><div class="card-value" id="totalCount">10</div></div>
+    <div class="card"><div class="card-title">Class Average</div><div class="card-value" id="avg">-</div></div>
+    <div class="card"><div class="card-title">Highest Mark</div><div class="card-value" id="high">-</div></div>
+    <div class="card"><div class="card-title">Lowest Mark</div><div class="card-value" id="low">-</div></div>
+    <div class="card"><div class="card-title">Students</div><div class="card-value" id="count">-</div></div>
   </section>
 
   <div class="table-wrapper">
     <table id="scoreTable">
       <thead>
         <tr>
-          <th data-key="id">Student ID<span class="arrow">↕</span></th>
-          <th data-key="name">Student Name<span class="arrow">↕</span></th>
-          <th data-key="English">English<span class="arrow">↕</span></th>
-          <th data-key="Math">Math<span class="arrow">↕</span></th>
-          <th data-key="Science">Science<span class="arrow">↕</span></th>
-          <th data-key="ICT">ICT<span class="arrow">↕</span></th>
-          <th data-key="Global">Global<span class="arrow">↕</span></th>
-          <th data-key="Myanmar">Myanmar<span class="arrow">↕</span></th>
-          <th data-key="Chinese">Chinese<span class="arrow">↕</span></th>
-          <th data-key="avg">Average<span class="arrow">↕</span></th>
+          <th data-key="id">Student ID <span class="arrow">↕</span></th>
+          <th data-key="name">Student Name <span class="arrow">↕</span></th>
+          <th data-key="English">English <span class="arrow">↕</span></th>
+          <th data-key="Math">Math <span class="arrow">↕</span></th>
+          <th data-key="Science">Science <span class="arrow">↕</span></th>
+          <th data-key="ICT">ICT <span class="arrow">↕</span></th>
+          <th data-key="Global">Global <span class="arrow">↕</span></th>
+          <th data-key="Myanmar">Myanmar <span class="arrow">↕</span></th>
+          <th data-key="Chinese">Chinese <span class="arrow">↕</span></th>
+          <th data-key="avg">Average <span class="arrow">↕</span></th>
         </tr>
       </thead>
-      <tbody></tbody>
+      <tbody id="tableBody">
+        </tbody>
     </table>
   </div>
 </main>
 
 <script>
-const students=[
-  {id:"PR23004",name:"Aye Chan"},
-  {id:"PR23005",name:"Hnin Pwint"},
-  {id:"PR23006",name:"Min Khant"},
-  {id:"PR23009",name:"Thiri Tun"},
-  {id:"PR23010",name:"Zin Myo"},
-  {id:"PR24046",name:"Pyae Phyo"},
-  {id:"PR24050",name:"Su Mon"},
-  {id:"PR24051",name:"Khine Thazin"},
-  {id:"PR25010",name:"Ye Lin"},
-  {id:"PR25023",name:"Moe Set"}
-];
+document.addEventListener('DOMContentLoaded', () => {
+    const students = [
+        {id:"PR23004", name:"Aye Chan"},
+        {id:"PR23005", name:"Hnin Pwint"},
+        {id:"PR23006", name:"Min Khant"},
+        {id:"PR23009", name:"Thiri Tun"},
+        {id:"PR23010", name:"Zin Myo"},
+        {id:"PR24046", name:"Pyae Phyo"},
+        {id:"PR24050", name:"Su Mon"},
+        {id:"PR24051", name:"Khine Thazin"},
+        {id:"PR25010", name:"Ye Lin"},
+        {id:"PR25023", name:"Moe Set"}
+    ];
 
-function rand(min,max){return Math.floor(Math.random()*(max-min+1))+min}
-
-// Generate Data
-students.forEach(s=>{
-  s.English=rand(65,98);
-  s.Math=rand(65,98);
-  s.Science=rand(65,98);
-  s.ICT=rand(65,98);
-  s.Global=rand(65,98);
-  s.Myanmar=rand(65,98);
-  s.Chinese=rand(65,98);
-  s.avg=Math.round(
-    (s.English+s.Math+s.Science+s.ICT+s.Global+s.Myanmar+s.Chinese)/7
-  );
-});
-
-let sortKey = "id";
-let sortAsc = true;
-
-const tbody = document.querySelector("tbody");
-const headers = document.querySelectorAll("th");
-
-function render(){
-  // Sort data
-  students.sort((a, b) => {
-    let valA = a[sortKey];
-    let valB = b[sortKey];
-    if (typeof valA === 'string') {
-        return sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
-    }
-    return sortAsc ? valA - valB : valB - valA;
-  });
-
-  tbody.innerHTML="";
-  let avgs=[];
-  
-  students.forEach(s=>{
-    avgs.push(s.avg);
-    const tr=document.createElement("tr");
-    tr.innerHTML=`
-      <td class="id">${s.id}</td>
-      <td class="name">${s.name}</td>
-      ${["English","Math","Science","ICT","Global","Myanmar","Chinese"].map(k=>{
-        const v=s[k];
-        return `<td class="${v>=85?'score-high':v>=70?'score-mid':'score-low'}">${v}</td>`;
-      }).join("")}
-      <td class="${s.avg>=85?'score-high':s.avg>=70?'score-mid':'score-low'}">${s.avg}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-
-  // Update Summary Stats
-  document.getElementById("avg").textContent = Math.round(avgs.reduce((a,b)=>a+b,0)/avgs.length);
-  document.getElementById("high").textContent = Math.max(...avgs);
-  document.getElementById("low").textContent = Math.min(...avgs);
-  document.getElementById("totalCount").textContent = students.length;
-}
-
-// Add Event Listeners for Sorting
-headers.forEach(th => {
-  th.addEventListener('click', () => {
-    const key = th.getAttribute('data-key');
-    if (sortKey === key) {
-      sortAsc = !sortAsc;
-    } else {
-      sortKey = key;
-      sortAsc = true;
-    }
+    const subjects = ["English", "Math", "Science", "ICT", "Global", "Myanmar", "Chinese"];
     
-    // Update UI for headers
-    headers.forEach(h => h.classList.remove('sort-active'));
-    th.classList.add('sort-active');
-    th.querySelector('.arrow').textContent = sortAsc ? "▲" : "▼";
-    
+    // 1. Generate Random Scores
+    students.forEach(s => {
+        subjects.forEach(sub => s[sub] = Math.floor(Math.random() * (98 - 65 + 1)) + 65);
+        s.avg = Math.round(subjects.reduce((sum, sub) => sum + s[sub], 0) / subjects.length);
+    });
+
+    let sortKey = 'id';
+    let sortAsc = true;
+
+    const tbody = document.getElementById('tableBody');
+    const headers = document.querySelectorAll('th');
+
+    // 2. Formatting helper
+    function getScoreClass(val) {
+        if (val >= 85) return 'score-high';
+        if (val >= 75) return 'score-mid';
+        return 'score-low';
+    }
+
+    // 3. Render Function
+    function render() {
+        // Sort
+        students.sort((a, b) => {
+            let aVal = a[sortKey];
+            let bVal = b[sortKey];
+            if (sortAsc) return aVal > bVal ? 1 : -1;
+            return aVal < bVal ? 1 : -1;
+        });
+
+        // Clear and Build Table
+        tbody.innerHTML = '';
+        students.forEach(s => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="id">${s.id}</td>
+                <td class="name">${s.name}</td>
+                ${subjects.map(sub => `<td class="${getScoreClass(s[sub])}">${s[sub]}</td>`).join('')}
+                <td class="${getScoreClass(s.avg)}">${s.avg}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Update Cards
+        const allAvgs = students.map(s => s.avg);
+        document.getElementById('avg').textContent = Math.round(allAvgs.reduce((a, b) => a + b, 0) / allAvgs.length);
+        document.getElementById('high').textContent = Math.max(...allAvgs);
+        document.getElementById('low').textContent = Math.min(...allAvgs);
+        document.getElementById('count').textContent = students.length;
+    }
+
+    // 4. Sorting logic
+    headers.forEach(th => {
+        th.addEventListener('click', () => {
+            const key = th.dataset.key;
+            if (sortKey === key) {
+                sortAsc = !sortAsc;
+            } else {
+                sortKey = key;
+                sortAsc = true;
+            }
+
+            headers.forEach(h => {
+                h.classList.remove('sort-active');
+                h.querySelector('.arrow').textContent = '↕';
+            });
+            th.classList.add('sort-active');
+            th.querySelector('.arrow').textContent = sortAsc ? '▲' : '▼';
+
+            render();
+        });
+    });
+
+    // Initial load
     render();
-  });
 });
-
-// Initial Render
-render();
 </script>
 
 </body>
