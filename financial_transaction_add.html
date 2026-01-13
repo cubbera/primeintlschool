@@ -2,174 +2,239 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Financial Management – Prime International School</title>
+<title>Add Expense</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
-:root {
-  --bg:#f5f5f7;
-  --bg-elevated:#ffffff;
-  --border:#e5e5ea;
-  --text-primary:#111;
-  --text-secondary:#6e6e73;
-  --accent:#0071e3;
-  --danger:#eb5757;
-  --radius-card:14px;
-  --shadow:0 14px 34px rgba(0,0,0,0.06);
-}
-*{box-sizing:border-box;margin:0;padding:0}
 body{
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui;
-  background:var(--bg); color:var(--text-primary); padding: 20px;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto;
+  background:#f6f7fb;
+  margin:0;
+  padding:24px;
 }
-.container { max-width: 1200px; margin: 0 auto; }
-
-/* Form Styling */
-.card {
-  background: var(--bg-elevated);
-  border-radius: var(--radius-card);
-  padding: 24px; box-shadow: var(--shadow);
-  margin-bottom: 24px; border: 1px solid var(--border);
+.container{
+  max-width:1100px;
+  margin:auto;
+  background:#fff;
+  padding:24px;
+  border-radius:14px;
+  box-shadow:0 8px 24px rgba(0,0,0,.08);
 }
-.grid-form {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 15px;
+h1{margin:0 0 8px}
+.section{
+  margin-top:24px;
 }
-.input-group { display: flex; flex-direction: column; }
-label { font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;}
-input, select {
-  padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 13px;
+.section h2{
+  font-size:16px;
+  border-bottom:1px solid #e5e7eb;
+  padding-bottom:6px;
+  margin-bottom:16px;
 }
-.btn {
-  padding: 12px 24px; border-radius: 50px; border: none; cursor: pointer;
-  font-weight: 600; transition: 0.2s; margin-top: 15px;
+.grid{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  gap:12px;
 }
-.btn-primary { background: var(--accent); color: white; }
-.btn-primary:hover { opacity: 0.9; }
-
-/* Report Styling */
-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 12px; overflow: hidden;}
-th { background: #f2f2f7; padding: 12px; font-size: 12px; text-align: left; border-bottom: 2px solid var(--border); }
-td { padding: 12px; font-size: 13px; border-bottom: 1px solid var(--border); }
-.amt-red { color: var(--danger); font-weight: 600; }
-.total-row { background: #f9f9fb; font-weight: 700; border-top: 2px solid var(--border); }
+.field{
+  grid-column:span 4;
+  display:flex;
+  flex-direction:column;
+}
+.field.sm{grid-column:span 3}
+.field.lg{grid-column:span 6}
+label{
+  font-size:12px;
+  color:#6b7280;
+}
+input, select, textarea{
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #e5e7eb;
+  font-size:14px;
+}
+textarea{min-height:80px}
+.money{
+  text-align:right;
+}
+.actions{
+  margin-top:24px;
+  display:flex;
+  justify-content:flex-end;
+  gap:12px;
+}
+button{
+  padding:14px 22px;
+  border-radius:12px;
+  border:none;
+  font-size:15px;
+  cursor:pointer;
+}
+.save{
+  background:#111827;
+  color:#fff;
+}
+.cancel{
+  background:#e5e7eb;
+}
+.note{
+  font-size:13px;
+  color:#6b7280;
+}
 </style>
 </head>
+
 <body>
-
 <div class="container">
-  <h2 style="margin-bottom: 20px;">Expense Entry System</h2>
+<h1>Add Expense</h1>
+<p class="note">Record all school expenses. This data feeds the income statement.</p>
 
-  <div class="card">
-    <form id="expenseForm">
-      <div class="grid-form">
-        <div class="input-group"><label>Academic Year</label><input type="text" id="ay" value="2025-2026"></div>
-        <div class="input-group"><label>Trans Date</label><input type="date" id="trans_date"></div>
-        <div class="input-group"><label>Category (Cat1)</label><select id="cat1"><option>Operating</option><option>Fixed</option></select></div>
-        <div class="input-group"><label>Account Name</label><input type="text" id="acc_name" placeholder="e.g. Electricity"></div>
-        <div class="input-group"><label>Supplier</label><input type="text" id="supp_name" placeholder="e.g. EPC"></div>
-        <div class="input-group"><label>Description</label><input type="text" id="desc"></div>
-        <div class="input-group"><label>Paid From</label><input type="text" id="paid_from" value="Cash Office"></div>
-        <div class="input-group"><label>Amount (Right)</label><input type="number" id="amt" placeholder="0.00"></div>
-      </div>
-      <button type="submit" class="btn btn-primary">Add Expense Record</button>
-    </form>
+<!-- BASIC INFO -->
+<div class="section">
+<h2>1. Transaction Info</h2>
+<div class="grid">
+  <div class="field sm">
+    <label>Academic Year</label>
+    <select>
+      <option>AY2025-2026</option>
+      <option>AY2026-2027</option>
+    </select>
   </div>
 
-  <div class="card">
-    <h3>Income Statement (Draft)</h3>
-    <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 15px;">Combined with school income records</p>
-    <table id="reportTable">
-      <thead>
-        <tr>
-          <th>Category</th>
-          <th>Account Name</th>
-          <th>Description</th>
-          <th>Income (Left)</th>
-          <th>Expense (Right)</th>
-        </tr>
-      </thead>
-      <tbody id="reportContent">
-        <tr style="color: #1c8c3a; font-weight: 600;">
-          <td>Revenue</td>
-          <td>Tuition Fees</td>
-          <td>Term 2 Collections</td>
-          <td>25,000.00</td>
-          <td>-</td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr class="total-row">
-          <td colspan="3">Net Profit / (Loss)</td>
-          <td colspan="2" id="netProfit" style="text-align: right; padding-right: 40px;">25,000.00</td>
-        </tr>
-      </tfoot>
-    </table>
+  <div class="field sm">
+    <label>Transaction Date</label>
+    <input type="date">
+  </div>
+
+  <div class="field sm">
+    <label>Invoice Date</label>
+    <input type="date">
+  </div>
+
+  <div class="field sm">
+    <label>Invoice No.</label>
+    <input placeholder="INV-EXP-001">
+  </div>
+
+  <div class="field sm">
+    <label>Receipt No.</label>
+    <input>
+  </div>
+
+  <div class="field sm">
+    <label>Reference No.</label>
+    <input>
   </div>
 </div>
+</div>
 
-<script>
-// Array to store our transactions
-let transactions = [];
-let totalIncome = 25000.00;
+<!-- CATEGORY -->
+<div class="section">
+<h2>2. Expense Classification</h2>
+<div class="grid">
+  <div class="field">
+    <label>Category 1</label>
+    <select>
+      <option>OPERATING EXPENSE</option>
+      <option>ADMIN EXPENSE</option>
+      <option>ACADEMIC EXPENSE</option>
+      <option>CAPITAL EXPENSE</option>
+    </select>
+  </div>
 
-document.getElementById('expenseForm').addEventListener('submit', function(e) {
-  e.preventDefault();
+  <div class="field">
+    <label>Category 2</label>
+    <select>
+      <option>Salary</option>
+      <option>Rent</option>
+      <option>Utilities</option>
+      <option>Supplies</option>
+      <option>Maintenance</option>
+    </select>
+  </div>
 
-  // Create Transaction Object
-  const expense = {
-    ay: document.getElementById('ay').value,
-    date: document.getElementById('trans_date').value,
-    cat1: document.getElementById('cat1').value,
-    acc_name: document.getElementById('acc_name').value,
-    supp: document.getElementById('supp_name').value,
-    desc: document.getElementById('desc').value,
-    amt: parseFloat(document.getElementById('amt').value) || 0
-  };
+  <div class="field">
+    <label>COA</label>
+    <select>
+      <option>5000 – Operating Expense</option>
+      <option>5100 – Salary Expense</option>
+      <option>5200 – Utilities</option>
+      <option>5300 – Maintenance</option>
+    </select>
+  </div>
+</div>
+</div>
 
-  transactions.push(expense);
-  updateReport();
-  this.reset(); // Clear form
-});
+<!-- SUPPLIER -->
+<div class="section">
+<h2>3. Supplier / Payee</h2>
+<div class="grid">
+  <div class="field lg">
+    <label>Supplier Name</label>
+    <input placeholder="Company or Person Paid">
+  </div>
 
-function updateReport() {
-  const tbody = document.getElementById('reportContent');
-  const netDisplay = document.getElementById('netProfit');
-  
-  // Reset Table to show Revenue first
-  tbody.innerHTML = `
-    <tr style="color: #1c8c3a; font-weight: 600;">
-      <td>Revenue</td>
-      <td>Tuition Fees</td>
-      <td>Term 2 Collections</td>
-      <td>25,000.00</td>
-      <td>-</td>
-    </tr>
-  `;
+  <div class="field lg">
+    <label>Description</label>
+    <textarea placeholder="What is this expense for?"></textarea>
+  </div>
+</div>
+</div>
 
-  let totalExpenses = 0;
+<!-- PAYMENT -->
+<div class="section">
+<h2>4. Payment</h2>
+<div class="grid">
+  <div class="field sm">
+    <label>Paid From</label>
+    <select>
+      <option>School Wallet</option>
+      <option>Petty Cash</option>
+      <option>Bank Account</option>
+    </select>
+  </div>
 
-  // Append Expenses from transactions array
-  transactions.forEach(item => {
-    totalExpenses += item.amt;
-    const row = tbody.insertRow();
-    row.innerHTML = `
-      <td>${item.cat1}</td>
-      <td>${item.acc_name}</td>
-      <td>${item.desc} (${item.supp})</td>
-      <td>-</td>
-      <td class="amt-red">${item.amt.toLocaleString()}</td>
-    `;
-  });
+  <div class="field sm">
+    <label>Paid To</label>
+    <input placeholder="Supplier / Vendor">
+  </div>
 
-  const finalNet = totalIncome - totalExpenses;
-  netDisplay.textContent = finalNet.toLocaleString();
-  netDisplay.style.color = finalNet >= 0 ? "#1c8c3a" : "#eb5757";
-}
+  <div class="field sm">
+    <label>Payment Method</label>
+    <select>
+      <option>Cash</option>
+      <option>Bank Transfer</option>
+      <option>KBZ Pay</option>
+      <option>Cheque</option>
+    </select>
+  </div>
 
-// Set default date to today
-document.getElementById('trans_date').valueAsDate = new Date();
-</script>
+  <div class="field sm">
+    <label>Wallet</label>
+    <select>
+      <option>KBZ Main</option>
+      <option>Cash Box</option>
+      <option>AYA Bank</option>
+    </select>
+  </div>
 
+  <div class="field sm">
+    <label>Expense Amount (LEFT)</label>
+    <input class="money" placeholder="0">
+  </div>
+
+  <div class="field sm">
+    <label>Income Amount (RIGHT)</label>
+    <input class="money" value="0" readonly>
+  </div>
+</div>
+</div>
+
+<!-- ACTIONS -->
+<div class="actions">
+  <button class="cancel">Cancel</button>
+  <button class="save">Save Expense</button>
+</div>
+
+</div>
 </body>
 </html>
