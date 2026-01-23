@@ -9,78 +9,52 @@ body{
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
   background:#f6f7fb;
   padding:24px;
+  line-height:1.6;
 }
-h2{margin-top:0}
+h2,h3{margin-top:0}
+label{font-weight:600}
+input{
+  padding:8px 10px;
+  font-size:14px;
+  margin:4px 0 12px;
+  width:280px;
+}
+.discount{
+  color:#b91c1c;
+  font-weight:700;
+}
+.output{
+  font-weight:700;
+  margin-left:6px;
+}
 .card{
   background:#fff;
-  border:1px solid #ddd;
-  border-radius:12px;
-  padding:20px;
-  margin-bottom:20px;
-}
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:16px;
-}
-.field{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-}
-label{font-size:13px;color:#555}
-input{
-  padding:10px;
   border:1px solid #ccc;
-  border-radius:8px;
-  font-size:14px;
-}
-input[readonly]{background:#f3f4f6}
-.discount{color:#b91c1c;font-weight:600}
-button{
-  padding:14px 22px;
-  font-size:15px;
-  border:none;
   border-radius:10px;
-  cursor:pointer;
+  padding:16px;
+  margin-top:16px;
 }
-.btn{
+button{
+  padding:10px 18px;
+  font-size:14px;
+  border:none;
+  border-radius:8px;
   background:#111;
   color:#fff;
+  cursor:pointer;
+  margin:10px 0;
 }
-.result{
-  background:#f9fafb;
-  border:1px dashed #bbb;
-}
-.money{font-variant-numeric: tabular-nums}
-.term{
+.month{
   padding:6px 10px;
-  border-radius:6px;
-  font-size:13px;
   color:#fff;
-  text-align:center;
+  border-radius:6px;
+  display:inline-block;
+  margin:3px;
+  font-size:13px;
 }
 .t1{background:#2563eb}
 .t2{background:#059669}
 .t3{background:#9333ea}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:10px;
-}
-th,td{
-  border:1px solid #ddd;
-  padding:8px;
-  text-align:center;
-  font-size:13px;
-}
-th{background:#f3f4f6}
-.month{
-  padding:6px;
-  border-radius:6px;
-  color:#fff;
-}
 </style>
 </head>
 
@@ -88,183 +62,140 @@ th{background:#f3f4f6}
 
 <h2>Tuition Proration & Refund Calculator</h2>
 
+<label>BASE tuition fee</label><br>
+<input id="baseFee" placeholder="10,000,000"><br>
+
+<label>Join date</label><br>
+<input type="date" id="joinDate">
+<span class="output" id="joinTerm"></span><br>
+
+<label>Tuition Fee before discount (AFTER PRORATE)</label>
+<span class="output" id="proratedFee"></span><br><br>
+
+<label>Discount #1</label><br>
+<input id="disc1" class="discount" placeholder="-100,000"><br>
+
+<label>Discount #2</label><br>
+<input id="disc2" class="discount" placeholder="-50,000"><br>
+
+<button onclick="calcFinal()">Calculate Final Amount</button><br>
+
+<label>FINAL Tuition Fee after discount</label>
+<span class="output" id="finalFee"></span><br><br>
+
+<label>Leave date</label><br>
+<input type="date" id="leaveDate">
+<span class="output" id="leaveTerm"></span><br>
+
+<button onclick="calcRefund()">Calculate Refund</button>
+
 <div class="card">
-  <div class="grid">
-    <div class="field">
-      <label>Base Tuition Fee (Annual)</label>
-      <input id="baseFee" type="text" placeholder="10,000,000">
-    </div>
-
-    <div class="field">
-      <label>Join Date</label>
-      <input id="joinDate" type="date">
-    </div>
-
-    <div class="field">
-      <label>Academic Year – Term (Join)</label>
-      <input id="joinTerm" readonly>
-    </div>
-
-    <div class="field">
-      <label>Tuition Fee Before Discount (After Prorate)</label>
-      <input id="proratedFee" readonly class="money">
-    </div>
-
-    <div class="field">
-      <label>Discount #1</label>
-      <input id="disc1" class="discount" placeholder="-100,000">
-    </div>
-
-    <div class="field">
-      <label>Discount #2</label>
-      <input id="disc2" class="discount" placeholder="-50,000">
-    </div>
-
-    <div class="field">
-      <label>Final Tuition Fee After Discount</label>
-      <input id="finalFee" readonly class="money">
-    </div>
-
-    <div class="field">
-      <label>Leave Date</label>
-      <input id="leaveDate" type="date">
-    </div>
-
-    <div class="field">
-      <label>Academic Year – Term (Leave)</label>
-      <input id="leaveTerm" readonly>
-    </div>
-  </div>
-
-  <div style="margin-top:20px">
-    <button class="btn" onclick="calculate()">Calculate</button>
-  </div>
-</div>
-
-<div class="card result">
   <h3>Result</h3>
-  <div class="grid">
-    <div class="field">
-      <label>Refundable Amount</label>
-      <input id="refundAmount" readonly class="money">
-    </div>
-    <div class="field">
-      <label>Refundable Term (Total Months)</label>
-      <input id="refundMonths" readonly>
-    </div>
-  </div>
+  Refundable amount:
+  <span class="output" id="refundAmount"></span><br>
+  Refundable term (total month):
+  <span class="output" id="refundMonths"></span>
 </div>
 
 <div class="card">
-  <h3>Academic Year Term Calendar</h3>
+<h3>Term Calendar Reference</h3>
 
-  <table>
-    <tr>
-      <th colspan="12">AY2025–2026</th>
-    </tr>
-    <tr>
-      <td class="month t1">Jun 25</td>
-      <td class="month t1">Jul</td>
-      <td class="month t1">Aug</td>
-      <td class="month t2">Sep</td>
-      <td class="month t2">Oct</td>
-      <td class="month t2">Nov</td>
-      <td class="month t3">Dec</td>
-      <td class="month t3">Jan 26</td>
-      <td class="month t3">Feb</td>
-      <td class="month t3">Mar</td>
-      <td></td><td></td>
-    </tr>
-  </table>
+<strong>AY2025–2026</strong><br>
+<span class="month t1">Jun 25</span>
+<span class="month t1">Jul</span>
+<span class="month t1">Aug</span>
+<span class="month t2">Sep</span>
+<span class="month t2">Oct</span>
+<span class="month t2">Nov</span>
+<span class="month t3">Dec</span>
+<span class="month t3">Jan 26</span>
+<span class="month t3">Feb</span>
+<span class="month t3">Mar</span>
+<span class="month t3">Apr</span>
+<span class="month t3">May</span>
 
-  <table>
-    <tr>
-      <th colspan="12">AY2026–2027</th>
-    </tr>
-    <tr>
-      <td class="month t1">Jun 26</td>
-      <td class="month t1">Jul</td>
-      <td class="month t1">Aug</td>
-      <td class="month t2">Sep</td>
-      <td class="month t2">Oct</td>
-      <td class="month t2">Nov</td>
-      <td class="month t3">Dec</td>
-      <td class="month t3">Jan 27</td>
-      <td class="month t3">Feb</td>
-      <td class="month t3">Mar</td>
-      <td></td><td></td>
-    </tr>
-  </table>
+<br><br>
+
+<strong>AY2026–2027</strong><br>
+<span class="month t1">Jun 26</span>
+<span class="month t1">Jul</span>
+<span class="month t1">Aug</span>
+<span class="month t2">Sep</span>
+<span class="month t2">Oct</span>
+<span class="month t2">Nov</span>
+<span class="month t3">Dec</span>
+<span class="month t3">Jan 27</span>
+<span class="month t3">Feb</span>
+<span class="month t3">Mar</span>
+<span class="month t3">Apr</span>
+<span class="month t3">May</span>
 </div>
 
 <script>
 const TERMS = {
   "2025": [
-    {term:"T1", start:"2025-06-10", end:"2025-08-29", months:3},
-    {term:"T2", start:"2025-09-01", end:"2025-11-28", months:3},
-    {term:"T3", start:"2025-12-01", end:"2026-04-03", months:4}
+    {t:"T1",s:"2025-06-10",e:"2025-08-29",m:3},
+    {t:"T2",s:"2025-09-01",e:"2025-11-28",m:3},
+    {t:"T3",s:"2025-12-01",e:"2026-04-03",m:4}
   ],
   "2026": [
-    {term:"T1", start:"2026-06-16", end:"2026-09-04", months:3},
-    {term:"T2", start:"2026-09-07", end:"2026-12-18", months:3},
-    {term:"T3", start:"2027-01-05", end:"2027-03-31", months:4}
+    {t:"T1",s:"2026-06-16",e:"2026-09-04",m:3},
+    {t:"T2",s:"2026-09-07",e:"2026-12-18",m:3},
+    {t:"T3",s:"2027-01-05",e:"2027-03-31",m:4}
   ]
 };
 
-function parseMoney(v){
-  return Number(v.replace(/,/g,''))||0;
-}
-function fmt(n){
-  return n.toLocaleString("en-US");
-}
+const money = v => Number(v.replace(/,/g,''))||0;
+const fmt = n => n.toLocaleString("en-US");
+
 function findTerm(d){
-  const y = d.getFullYear();
   for(const ay in TERMS){
-    for(const t of TERMS[ay]){
-      if(d>=new Date(t.start) && d<=new Date(t.end)){
-        return {ay, term:t.term, months:t.months};
-      }
+    for(const x of TERMS[ay]){
+      if(d>=new Date(x.s)&&d<=new Date(x.e))
+        return {ay,term:x.t,months:x.m};
     }
   }
   return null;
 }
 
-function calculate(){
-  const base = parseMoney(baseFee.value);
-  const monthly = base/10;
+joinDate.onchange=()=>{
+  const d=new Date(joinDate.value);
+  const r=findTerm(d);
+  joinTerm.textContent=r?`AY${r.ay} ${r.term}`:"";
+};
 
-  const jd = new Date(joinDate.value);
-  const ld = new Date(leaveDate.value);
+leaveDate.onchange=()=>{
+  const d=new Date(leaveDate.value);
+  const r=findTerm(d);
+  leaveTerm.textContent=r?`AY${r.ay} ${r.term}`:"";
+};
 
-  const jt = findTerm(jd);
-  const lt = findTerm(ld);
+function calcFinal(){
+  const base=money(baseFee.value);
+  const monthly=base/10;
+  const join=new Date(joinDate.value);
+  const used=Math.max(0,join.getMonth()-5);
+  const payable=10-used;
+  const prorate=payable*monthly;
+  proratedFee.textContent=fmt(prorate);
 
-  joinTerm.value = jt ? `AY${jt.ay} – ${jt.term}` : "";
-  leaveTerm.value = lt ? `AY${lt.ay} – ${lt.term}` : "";
+  const final=prorate+money(disc1.value)+money(disc2.value);
+  finalFee.textContent=fmt(final);
+}
 
-  const joinMonth = jd.getMonth();
-  const startMonth = 5; // June
-  const usedMonths = Math.max(0, joinMonth - startMonth);
-  const payableMonths = 10 - usedMonths;
+function calcRefund(){
+  const base=money(baseFee.value);
+  const monthly=base/10;
+  const leave=new Date(leaveDate.value);
+  const r=findTerm(leave);
+  if(!r)return;
 
-  const prorate = payableMonths * monthly;
-  proratedFee.value = fmt(prorate);
+  const future=TERMS[r.ay]
+    .slice(TERMS[r.ay].findIndex(x=>x.t===r.term)+1)
+    .reduce((s,x)=>s+x.m,0);
 
-  const totalDisc = parseMoney(disc1.value)+parseMoney(disc2.value);
-  const final = prorate + totalDisc;
-  finalFee.value = fmt(final);
-
-  let refundMonths = 0;
-  if(jt && lt){
-    const terms = TERMS[jt.ay];
-    const leaveIndex = terms.findIndex(t=>t.term===lt.term);
-    for(let i=leaveIndex+1;i<terms.length;i++){
-      refundMonths += terms[i].months;
-    }
-  }
-
-  refundMonths.value = refundMonths;
-  refundAmount.value = fmt(refundMonths*monthly);
+  refundMonths.textContent=future;
+  refundAmount.textContent=fmt(future*monthly);
 }
 </script>
 
