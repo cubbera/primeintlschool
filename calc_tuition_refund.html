@@ -2,129 +2,271 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Tuition Refund Calculator</title>
+<title>Tuition Proration & Refund Calculator</title>
+
 <style>
 body{
-  font-family: system-ui, -apple-system, Segoe UI, Roboto;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
   background:#f6f7fb;
-  padding:40px;
-}
-.card{
-  max-width:720px;
-  margin:auto;
-  background:#fff;
-  border-radius:14px;
   padding:24px;
-  box-shadow:0 8px 24px rgba(0,0,0,.08);
 }
-h1{font-size:20px;margin-bottom:16px}
-label{font-size:13px;color:#555}
-input, select{
-  width:100%;
-  padding:10px;
-  margin-top:6px;
-  margin-bottom:14px;
-  border-radius:10px;
+h2{margin-top:0}
+.card{
+  background:#fff;
   border:1px solid #ddd;
-}
-button{
-  padding:12px 18px;
   border-radius:12px;
+  padding:20px;
+  margin-bottom:20px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+label{font-size:13px;color:#555}
+input{
+  padding:10px;
+  border:1px solid #ccc;
+  border-radius:8px;
+  font-size:14px;
+}
+input[readonly]{background:#f3f4f6}
+.discount{color:#b91c1c;font-weight:600}
+button{
+  padding:14px 22px;
+  font-size:15px;
   border:none;
-  background:#111827;
-  color:#fff;
+  border-radius:10px;
   cursor:pointer;
 }
-.result{
-  margin-top:20px;
-  padding:14px;
-  background:#f9fafb;
-  border-radius:12px;
+.btn{
+  background:#111;
+  color:#fff;
 }
-strong{color:#111}
-.money{font-weight:600}
+.result{
+  background:#f9fafb;
+  border:1px dashed #bbb;
+}
+.money{font-variant-numeric: tabular-nums}
+.term{
+  padding:6px 10px;
+  border-radius:6px;
+  font-size:13px;
+  color:#fff;
+  text-align:center;
+}
+.t1{background:#2563eb}
+.t2{background:#059669}
+.t3{background:#9333ea}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+th,td{
+  border:1px solid #ddd;
+  padding:8px;
+  text-align:center;
+  font-size:13px;
+}
+th{background:#f3f4f6}
+.month{
+  padding:6px;
+  border-radius:6px;
+  color:#fff;
+}
 </style>
 </head>
 
 <body>
+
+<h2>Tuition Proration & Refund Calculator</h2>
+
 <div class="card">
-<h1>Tuition Refund Calculator</h1>
+  <div class="grid">
+    <div class="field">
+      <label>Base Tuition Fee (Annual)</label>
+      <input id="baseFee" type="text" placeholder="10,000,000">
+    </div>
 
-<label>Annual Tuition Amount</label>
-<input id="annual" type="number" value="10000000">
+    <div class="field">
+      <label>Join Date</label>
+      <input id="joinDate" type="date">
+    </div>
 
-<label>Join Month (1–10)</label>
-<input id="joinMonth" type="number" min="1" max="10" value="3">
+    <div class="field">
+      <label>Academic Year – Term (Join)</label>
+      <input id="joinTerm" readonly>
+    </div>
 
-<label>Leave Date</label>
-<input id="leaveDate" type="date">
+    <div class="field">
+      <label>Tuition Fee Before Discount (After Prorate)</label>
+      <input id="proratedFee" readonly class="money">
+    </div>
 
-<label>Academic Year</label>
-<select id="ay">
-  <option value="AY2025-2026">AY2025-2026</option>
-  <option value="AY2026-2027">AY2026-2027</option>
-</select>
+    <div class="field">
+      <label>Discount #1</label>
+      <input id="disc1" class="discount" placeholder="-100,000">
+    </div>
 
-<button onclick="calculate()">Calculate Refund</button>
+    <div class="field">
+      <label>Discount #2</label>
+      <input id="disc2" class="discount" placeholder="-50,000">
+    </div>
 
-<div class="result" id="result"></div>
+    <div class="field">
+      <label>Final Tuition Fee After Discount</label>
+      <input id="finalFee" readonly class="money">
+    </div>
+
+    <div class="field">
+      <label>Leave Date</label>
+      <input id="leaveDate" type="date">
+    </div>
+
+    <div class="field">
+      <label>Academic Year – Term (Leave)</label>
+      <input id="leaveTerm" readonly>
+    </div>
+  </div>
+
+  <div style="margin-top:20px">
+    <button class="btn" onclick="calculate()">Calculate</button>
+  </div>
+</div>
+
+<div class="card result">
+  <h3>Result</h3>
+  <div class="grid">
+    <div class="field">
+      <label>Refundable Amount</label>
+      <input id="refundAmount" readonly class="money">
+    </div>
+    <div class="field">
+      <label>Refundable Term (Total Months)</label>
+      <input id="refundMonths" readonly>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Academic Year Term Calendar</h3>
+
+  <table>
+    <tr>
+      <th colspan="12">AY2025–2026</th>
+    </tr>
+    <tr>
+      <td class="month t1">Jun 25</td>
+      <td class="month t1">Jul</td>
+      <td class="month t1">Aug</td>
+      <td class="month t2">Sep</td>
+      <td class="month t2">Oct</td>
+      <td class="month t2">Nov</td>
+      <td class="month t3">Dec</td>
+      <td class="month t3">Jan 26</td>
+      <td class="month t3">Feb</td>
+      <td class="month t3">Mar</td>
+      <td></td><td></td>
+    </tr>
+  </table>
+
+  <table>
+    <tr>
+      <th colspan="12">AY2026–2027</th>
+    </tr>
+    <tr>
+      <td class="month t1">Jun 26</td>
+      <td class="month t1">Jul</td>
+      <td class="month t1">Aug</td>
+      <td class="month t2">Sep</td>
+      <td class="month t2">Oct</td>
+      <td class="month t2">Nov</td>
+      <td class="month t3">Dec</td>
+      <td class="month t3">Jan 27</td>
+      <td class="month t3">Feb</td>
+      <td class="month t3">Mar</td>
+      <td></td><td></td>
+    </tr>
+  </table>
 </div>
 
 <script>
 const TERMS = {
-  "AY2025-2026": [
-    { name:"Term 1", start:"2025-06-10", end:"2025-08-29", months:3 },
-    { name:"Term 2", start:"2025-09-01", end:"2025-11-28", months:3 },
-    { name:"Term 3", start:"2025-12-01", end:"2026-04-03", months:4 }
+  "2025": [
+    {term:"T1", start:"2025-06-10", end:"2025-08-29", months:3},
+    {term:"T2", start:"2025-09-01", end:"2025-11-28", months:3},
+    {term:"T3", start:"2025-12-01", end:"2026-04-03", months:4}
   ],
-  "AY2026-2027": [
-    { name:"Term 1", start:"2026-06-16", end:"2026-09-04", months:3 },
-    { name:"Term 2", start:"2026-09-07", end:"2026-12-18", months:3 },
-    { name:"Term 3", start:"2027-01-05", end:"2027-03-31", months:4 }
+  "2026": [
+    {term:"T1", start:"2026-06-16", end:"2026-09-04", months:3},
+    {term:"T2", start:"2026-09-07", end:"2026-12-18", months:3},
+    {term:"T3", start:"2027-01-05", end:"2027-03-31", months:4}
   ]
 };
 
-function calculate(){
-  const annual = Number(document.getElementById("annual").value);
-  const joinMonth = Number(document.getElementById("joinMonth").value);
-  const leaveDate = new Date(document.getElementById("leaveDate").value);
-  const ay = document.getElementById("ay").value;
+function parseMoney(v){
+  return Number(v.replace(/,/g,''))||0;
+}
+function fmt(n){
+  return n.toLocaleString("en-US");
+}
+function findTerm(d){
+  const y = d.getFullYear();
+  for(const ay in TERMS){
+    for(const t of TERMS[ay]){
+      if(d>=new Date(t.start) && d<=new Date(t.end)){
+        return {ay, term:t.term, months:t.months};
+      }
+    }
+  }
+  return null;
+}
 
-  if(!leaveDate.getTime()){
-    alert("Please select leave date");
-    return;
+function calculate(){
+  const base = parseMoney(baseFee.value);
+  const monthly = base/10;
+
+  const jd = new Date(joinDate.value);
+  const ld = new Date(leaveDate.value);
+
+  const jt = findTerm(jd);
+  const lt = findTerm(ld);
+
+  joinTerm.value = jt ? `AY${jt.ay} – ${jt.term}` : "";
+  leaveTerm.value = lt ? `AY${lt.ay} – ${lt.term}` : "";
+
+  const joinMonth = jd.getMonth();
+  const startMonth = 5; // June
+  const usedMonths = Math.max(0, joinMonth - startMonth);
+  const payableMonths = 10 - usedMonths;
+
+  const prorate = payableMonths * monthly;
+  proratedFee.value = fmt(prorate);
+
+  const totalDisc = parseMoney(disc1.value)+parseMoney(disc2.value);
+  const final = prorate + totalDisc;
+  finalFee.value = fmt(final);
+
+  let refundMonths = 0;
+  if(jt && lt){
+    const terms = TERMS[jt.ay];
+    const leaveIndex = terms.findIndex(t=>t.term===lt.term);
+    for(let i=leaveIndex+1;i<terms.length;i++){
+      refundMonths += terms[i].months;
+    }
   }
 
-  const monthly = annual / 10;
-  const paidMonths = 10 - joinMonth + 1;
-  const amountPaid = monthly * paidMonths;
-
-  let refundableMonths = 0;
-  let leftInTerm = "";
-
-  TERMS[ay].forEach(t=>{
-    const termStart = new Date(t.start);
-    if(leaveDate < termStart){
-      refundableMonths += t.months;
-    }
-    if(leaveDate >= new Date(t.start) && leaveDate <= new Date(t.end)){
-      leftInTerm = t.name;
-    }
-  });
-
-  const refund = refundableMonths * monthly;
-
-  document.getElementById("result").innerHTML = `
-    <div><strong>Monthly Fee:</strong> <span class="money">${monthly.toLocaleString()}</span></div>
-    <div><strong>Amount Paid:</strong> <span class="money">${amountPaid.toLocaleString()}</span></div>
-    <div><strong>Left During:</strong> ${leftInTerm || "After all terms"}</div>
-    <div><strong>Refundable Months:</strong> ${refundableMonths}</div>
-    <div style="margin-top:10px">
-      <strong>Refund Amount:</strong>
-      <span class="money">${refund.toLocaleString()}</span>
-    </div>
-  `;
+  refundMonths.value = refundMonths;
+  refundAmount.value = fmt(refundMonths*monthly);
 }
 </script>
+
 </body>
 </html>
