@@ -14,7 +14,7 @@
     --danger:#b91c1c;
 
     --btn:#111827;
-    --btn2:#f97316; /* refund button ORANGE */
+    --btn2:#f97316; /* REFUND button = ORANGE */
 
     --t1:#2563eb;  /* Term 1 */
     --t2:#059669;  /* Term 2 */
@@ -54,6 +54,7 @@
     font-size:12px;
   }
 
+  /* Cleaner, compact card */
   .card{
     background:var(--card);
     border:1px solid var(--line);
@@ -137,7 +138,6 @@
     display:flex;
     gap:8px;
     flex-wrap:wrap;
-    align-items:center;
   }
   button{
     appearance:none;
@@ -158,14 +158,13 @@
   button.refund{
     background:var(--btn2);
     border-color:var(--btn2);
-    color:#111827;
   }
 
   .gap3{height:18px}
 
   /* Step-by-step box */
   .steps{
-    margin-top:10px;
+    margin-top:12px;
     padding:10px;
     border:1px dashed var(--line);
     border-radius:12px;
@@ -246,13 +245,18 @@
   .t3{background:var(--t3)}
   .off{background:var(--off)}
 
-  /* Toggle blocks */
+  /* Toggle helpers */
   .toggleRow{
-    margin:6px 0 8px;
     display:flex;
-    gap:8px;
-    flex-wrap:wrap;
     align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+    margin:2px 0 8px;
+  }
+  .toggleTitle{
+    font-weight:1000;
+    color:#374151;
   }
   .hidden{display:none !important;}
 </style>
@@ -264,7 +268,7 @@
   <div class="titlebar">
     <div>
       <h1>Tuition Proration & Refund Calculator</h1>
-      <p class="subtitle">Proration uses BASE ÷ 10 × months attend. Refund uses FINAL tuition after discount (per attended month) × valid refundable months of unused term.</p>
+      <p class="subtitle">Proration uses BASE ÷ 10 × months attend. Refund uses FINAL tuition after discount (per attended month) × refundable months.</p>
     </div>
   </div>
 
@@ -278,21 +282,12 @@
       </div>
     </div>
 
-    <!-- Toggle 1 -->
-    <div class="toggleRow">
-      <button type="button" class="secondary" id="toggleJoinBtn">Hide Join Date</button>
-      <span class="muted">Toggle to show/hide Join Date calendar</span>
-    </div>
-
-    <!-- Join date calendar moved into its own block (second box) -->
-    <div id="joinBlock" class="steps" style="margin-top:0;">
-      <div class="line" style="margin:0;">
-        <div class="lhs">Join date</div>
-        <div class="eq">=</div>
-        <div class="rhs">
-          <input id="joinDate" type="date" />
-          <span class="tag" id="joinTermTag">[Academic Year - Term]</span>
-        </div>
+    <div class="line">
+      <div class="lhs">Join date</div>
+      <div class="eq">=</div>
+      <div class="rhs">
+        <input id="joinDate" type="date" />
+        <span class="tag" id="joinTermTag">[Academic Year - Term]</span>
       </div>
     </div>
 
@@ -336,21 +331,12 @@
     <div class="gap3"></div>
     <div class="gap3"></div>
 
-    <!-- Toggle 2 -->
-    <div class="toggleRow">
-      <button type="button" class="secondary" id="toggleLeaveBtn">Hide Leave Date</button>
-      <span class="muted">Toggle to show/hide Leave Date calendar</span>
-    </div>
-
-    <!-- Leave date calendar moved into its own block (second box) -->
-    <div id="leaveBlock" class="steps" style="margin-top:0;">
-      <div class="line" style="margin:0;">
-        <div class="lhs">Leave date</div>
-        <div class="eq">=</div>
-        <div class="rhs">
-          <input id="leaveDate" type="date" />
-          <span class="tag" id="leaveTermTag">[Academic Year - Term]</span>
-        </div>
+    <div class="line">
+      <div class="lhs">Leave date</div>
+      <div class="eq">=</div>
+      <div class="rhs">
+        <input id="leaveDate" type="date" />
+        <span class="tag" id="leaveTermTag">[Academic Year - Term]</span>
       </div>
     </div>
 
@@ -367,39 +353,58 @@
       </div>
     </div>
 
-    <div class="steps">
-      <h3>Step-by-step calculation</h3>
-      <pre id="stepsText">Select Join date, click Calculate Final Amount, then select Leave date and click Calculate Refund.</pre>
-    </div>
-
   </div>
 
+  <!-- Reference Box 1: Term table -->
   <div class="ref">
-    <h2>Reference</h2>
-    <div class="muted">1) Term start/end table (AY2025-2026 and AY2026-2027)</div>
+    <div class="toggleRow">
+      <div class="toggleTitle">Reference 1) Term start/end table (AY2025-2026 and AY2026-2027)</div>
+      <button type="button" class="secondary" id="toggleTermsBtn">Hide</button>
+    </div>
 
-    <table>
-      <tr>
-        <th>Academic Year</th><th>Term</th><th>Start</th><th>End</th><th>Months</th>
-      </tr>
-      <tr><td rowspan="3">AY2025-2026</td><td>Term 1</td><td>2025-06-10</td><td>2025-08-29</td><td>3</td></tr>
-      <tr><td>Term 2</td><td>2025-09-01</td><td>2025-11-28</td><td>3</td></tr>
-      <tr><td>Term 3</td><td>2025-12-01</td><td>2026-04-03</td><td>4</td></tr>
+    <div id="termsRefBody">
+      <table>
+        <tr>
+          <th>Academic Year</th><th>Term</th><th>Start</th><th>End</th><th>Months</th>
+        </tr>
+        <tr><td rowspan="3">AY2025-2026</td><td>Term 1</td><td>2025-06-10</td><td>2025-08-29</td><td>3</td></tr>
+        <tr><td>Term 2</td><td>2025-09-01</td><td>2025-11-28</td><td>3</td></tr>
+        <tr><td>Term 3</td><td>2025-12-01</td><td>2026-04-03</td><td>4</td></tr>
 
-      <tr><td rowspan="3">AY2026-2027</td><td>Term 1</td><td>2026-06-16</td><td>2026-09-04</td><td>3</td></tr>
-      <tr><td>Term 2</td><td>2026-09-07</td><td>2026-12-18</td><td>3</td></tr>
-      <tr><td>Term 3</td><td>2027-01-05</td><td>2027-03-31</td><td>4</td></tr>
-    </table>
+        <tr><td rowspan="3">AY2026-2027</td><td>Term 1</td><td>2026-06-16</td><td>2026-09-04</td><td>3</td></tr>
+        <tr><td>Term 2</td><td>2026-09-07</td><td>2026-12-18</td><td>3</td></tr>
+        <tr><td>Term 3</td><td>2027-01-05</td><td>2027-03-31</td><td>4</td></tr>
+      </table>
+    </div>
+  </div>
 
-    <div class="muted" style="margin-top:10px;">2) Month view (accurate colors). Dec 26 is Term 2.</div>
+  <!-- Reference Box 2: Month calendars (moved here) -->
+  <div class="ref">
+    <div class="toggleRow">
+      <div class="toggleTitle">Reference 2) Month view (accurate colors). Dec 26 is Term 2.</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button type="button" class="secondary" id="toggleAY2526Btn">Hide AY2025-2026</button>
+        <button type="button" class="secondary" id="toggleAY2627Btn">Hide AY2026-2027</button>
+      </div>
+    </div>
 
     <div class="monthBlock">
-      <div class="ayLabel">AY2025-2026</div>
-      <div class="months" id="months2526"></div>
+      <div id="ref2526Block">
+        <div class="ayLabel">AY2025-2026</div>
+        <div class="months" id="months2526"></div>
+      </div>
 
-      <div class="ayLabel">AY2026-2027</div>
-      <div class="months" id="months2627"></div>
+      <div id="ref2627Block">
+        <div class="ayLabel">AY2026-2027</div>
+        <div class="months" id="months2627"></div>
+      </div>
     </div>
+  </div>
+
+  <!-- Step-by-step moved to MOST BOTTOM -->
+  <div class="steps">
+    <h3>Step-by-step calculation</h3>
+    <pre id="stepsText">Select Join date, click Calculate Final Amount, then select Leave date and click Calculate Refund.</pre>
   </div>
 
 </div>
@@ -474,14 +479,14 @@ function calcMonthsAttend(joinDate){
   return { ay: jt.ay, monthsAttend: months.length - idx };
 }
 
-/* Remaining terms/months AFTER leave term (unused terms) */
-function calcUnusedTermsMonths(ay, leaveTermName){
+/* Remaining terms/months AFTER leave term */
+function calcRefundableMonthsTerms(ay, leaveTermName){
   const list = TERMS[ay] || [];
   const leaveIdx = list.findIndex(t => t.name === leaveTermName);
-  const unused = leaveIdx >= 0 ? list.slice(leaveIdx + 1) : [];
+  const remaining = leaveIdx >= 0 ? list.slice(leaveIdx + 1) : [];
 
-  const termsCount = unused.length;
-  const monthsCount = unused.reduce((s,t)=>s+(t.months||0),0);
+  const termsCount = remaining.length;
+  const monthsCount = remaining.reduce((s,t)=>s+(t.months||0),0);
 
   return { termsCount, monthsCount };
 }
@@ -524,50 +529,44 @@ function formatOnBlurMoneyInput(id){
   });
 }
 
-/* Build step-by-step FINAL with real values at click time */
-function buildFinalSteps({base, monthsAttend, prorate, d1, d2, final}){
-  return `FINAL AMOUNT
-1) Base = ${formatMoney(base)}
-2) Months attend = ${monthsAttend}
-3) Prorate = Base ÷ 10 × Months attend = ${formatMoney(prorate)}
-4) Discount #1 = ${formatMoney(d1)}
-5) Discount #2 = ${formatMoney(d2)}
-6) FINAL Tuition Fee after Discount = Prorate + D1 + D2 = ${formatMoney(final)}
-
-Refund only unconsumed term (unused term).`;
-}
-
-/* Build step-by-step REFUND with real values at click time */
-function buildRefundSteps({final, monthsAttend, monthlyRate, refundableMonths, refund}){
-  return `REFUND CALCULATION
-1) FINAL Tuition Fee after Discount = ${formatMoney(final)}
-2) Total initial prorated months attend = ${monthsAttend}
-3) Monthly rate for refund = FINAL Tuition Fee after Discount ÷ initial prorated Months = ${formatMoney(Math.round(monthlyRate))}
-4) Refundable amount = Monthly rate for refund × valid refundable months of unused term = ${formatMoney(refund)}`;
-}
-
 /* Final calc */
 function calcFinal(){
-  // always normalize current inputs at click time
-  const base = parseMoney($("baseFee").value);
-  const monthsAttend = Number(String($("monthsAttendTag").textContent).replace(/[^\d]/g,"")) || 0;
+  const j = dateObj($("joinDate").value);
+  const joinTerm = findTermByDate(j);
 
-  const prorate = Math.round((base / 10) * monthsAttend);
+  const monthsAttend = Number(String($("monthsAttendTag").textContent).replace(/[^\d]/g,"")) || 0;
+  const base = parseMoney($("baseFee").value);
+
+  const prorated = Math.round((base / 10) * monthsAttend);
+  $("proratedFee").textContent = formatMoney(prorated);
 
   const d1 = parseMoney($("disc1").value);
   const d2 = parseMoney($("disc2").value);
 
-  const final = prorate + d1 + d2;
-
-  $("proratedFee").textContent = formatMoney(prorate);
+  const final = prorated + d1 + d2; // discounts are negative
   $("finalFee").textContent = formatMoney(final);
 
-  $("stepsText").textContent = buildFinalSteps({base, monthsAttend, prorate, d1, d2, final});
+  // Step-by-step (FINAL AMOUNT)
+  $("stepsText").textContent =
+`FINAL AMOUNT
+1) Base = ${formatMoney(base)}
+2) Months attend = ${monthsAttend}
+3) Prorate = Base ÷ 10 × Months attend = ${formatMoney(prorated)}
+4) Discount #1 = ${formatMoney(d1)}
+5) Discount #2 = ${formatMoney(d2)}
+6) FINAL Tuition Fee after Discount = Prorate + D1 + D2 = ${formatMoney(final)}
+
+Refund is only for unused months in unstarted terms (unconsumed terms).`;
+
+  return { monthsAttend, final };
 }
 
 /*
 Refund calc:
-Refundable amount = (FINAL tuition after discount ÷ total initial prorated months attend) × refundable months of unused term
+Refundable amount = (FINAL tuition after discount ÷ total prorated months attend) × refundable months
+- total prorated months attend is the months attend (e.g., 9 months)
+- refundable months = months in terms AFTER leave term
+- show: amount [2 terms, 7 months]
 */
 function calcRefund(){
   const j = dateObj($("joinDate").value);
@@ -584,30 +583,29 @@ function calcRefund(){
     $("refundMeta").textContent = "[0 terms, 0 months]";
     return;
   }
+
   if(joinTerm.ay !== leaveTerm.ay){
     $("refundAmount").textContent = "0";
     $("refundMeta").textContent = "[Different AY]";
     return;
   }
 
-  const { termsCount, monthsCount } = calcUnusedTermsMonths(leaveTerm.ay, leaveTerm.term);
+  const { termsCount, monthsCount } = calcRefundableMonthsTerms(leaveTerm.ay, leaveTerm.term);
 
-  const monthlyRate = final / monthsAttend;
-  const refund = Math.round(monthlyRate * monthsCount);
+  const monthlyRateExact = final / monthsAttend;
+  const refund = Math.round(monthlyRateExact * monthsCount);
 
   $("refundAmount").textContent = formatMoney(refund);
   $("refundMeta").textContent = `[${termsCount} terms, ${monthsCount} months]`;
 
-  // steps: FINAL + REFUND (using real values at click time)
-  const base = parseMoney($("baseFee").value);
-  const d1 = parseMoney($("disc1").value);
-  const d2 = parseMoney($("disc2").value);
-  const prorate = parseMoney($("proratedFee").textContent);
-
-  const finalText = buildFinalSteps({base, monthsAttend, prorate, d1, d2, final});
-  const refundText = buildRefundSteps({final, monthsAttend, monthlyRate, refundableMonths: monthsCount, refund});
-
-  $("stepsText").textContent = finalText + "\n\n" + refundText;
+  // Append REFUND CALCULATION steps using real computed values
+  $("stepsText").textContent +=
+`\n\nREFUND CALCULATION
+1) FINAL Tuition Fee after Discount = ${formatMoney(final)}
+2) Total initial prorated months attend = ${monthsAttend}
+3) Monthly rate for refund = FINAL Tuition Fee after Discount ÷ initial prorated Months = ${formatMoney(Math.round(monthlyRateExact))} (approx)
+4) Refundable amount = Monthly rate for refund × valid refundable months of unused term
+   = ${formatMoney(Math.round(monthlyRateExact))} × ${monthsCount} = ${formatMoney(refund)}`;
 }
 
 /* Month strips (correct) */
@@ -639,22 +637,27 @@ function buildMonthStrips(){
   render("months2627", months2627);
 }
 
-/* Toggle logic */
-function wireToggles(){
-  const joinBtn = $("toggleJoinBtn");
-  const joinBlock = $("joinBlock");
-
-  joinBtn.addEventListener("click", ()=>{
-    const hidden = joinBlock.classList.toggle("hidden");
-    joinBtn.textContent = hidden ? "Show Join Date" : "Hide Join Date";
+/* Reference toggles */
+function initReferenceToggles(){
+  const termsBtn = $("toggleTermsBtn");
+  const termsBody = $("termsRefBody");
+  termsBtn.addEventListener("click", ()=>{
+    const hidden = termsBody.classList.toggle("hidden");
+    termsBtn.textContent = hidden ? "Show" : "Hide";
   });
 
-  const leaveBtn = $("toggleLeaveBtn");
-  const leaveBlock = $("leaveBlock");
+  const ay2526Btn = $("toggleAY2526Btn");
+  const ay2526Block = $("ref2526Block");
+  ay2526Btn.addEventListener("click", ()=>{
+    const hidden = ay2526Block.classList.toggle("hidden");
+    ay2526Btn.textContent = hidden ? "Show AY2025-2026" : "Hide AY2025-2026";
+  });
 
-  leaveBtn.addEventListener("click", ()=>{
-    const hidden = leaveBlock.classList.toggle("hidden");
-    leaveBtn.textContent = hidden ? "Show Leave Date" : "Hide Leave Date";
+  const ay2627Btn = $("toggleAY2627Btn");
+  const ay2627Block = $("ref2627Block");
+  ay2627Btn.addEventListener("click", ()=>{
+    const hidden = ay2627Block.classList.toggle("hidden");
+    ay2627Btn.textContent = hidden ? "Show AY2026-2027" : "Hide AY2026-2027";
   });
 }
 
@@ -665,7 +668,7 @@ function wireToggles(){
   $("disc2").value = formatMoney(parseMoney($("disc2").value));
 
   buildMonthStrips();
-  wireToggles();
+  initReferenceToggles();
 
   $("joinDate").addEventListener("change", updateJoinAuto);
   $("leaveDate").addEventListener("change", updateLeaveAuto);
