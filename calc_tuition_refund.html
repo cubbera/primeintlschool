@@ -15,12 +15,12 @@
     --danger:#b91c1c;
 
     --btn:#111827;
-    --refund:#f97316; /* orange */
+    --refund:#f97316;          /* ORANGE refund button */
 
-    --t1:#2563eb;  /* Term 1 */
-    --t2:#059669;  /* Term 2 */
-    --t3:#9333ea;  /* Term 3 */
-    --off:#9ca3af; /* Outside */
+    --t1:#2563eb;              /* Term 1 */
+    --t2:#059669;              /* Term 2 */
+    --t3:#9333ea;              /* Term 3 */
+    --off:#9ca3af;             /* Break/Outside */
   }
 
   *{box-sizing:border-box}
@@ -28,7 +28,7 @@
     margin:0;
     background:var(--bg);
     color:var(--text);
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
     font-size:12px;
     line-height:1.35;
   }
@@ -55,18 +55,19 @@
     font-size:12px;
   }
 
+  /* Main card */
   .card{
     background:var(--card);
     border:1px solid var(--line);
     border-radius:12px;
     padding:12px;
-    box-shadow: 0 10px 22px rgba(17,24,39,.06);
+    box-shadow:0 10px 22px rgba(17,24,39,.06);
   }
 
-  /* single-column lines but aligned */
+  /* Single-column lines but aligned */
   .line{
     display:grid;
-    grid-template-columns: auto 18px 1fr;
+    grid-template-columns:auto 16px 1fr;
     align-items:center;
     column-gap:10px;
     margin:6px 0;
@@ -98,19 +99,18 @@
   input[type="date"]{ padding:5px 8px; }
 
   .moneyIn{
-    width:210px;
+    width:200px;
     font-weight:900;
-    font-variant-numeric: tabular-nums;
-    text-align:right;
     letter-spacing:.2px;
+    font-variant-numeric:tabular-nums;
+    text-align:right;
   }
   .discIn{
-    width:210px;
+    width:200px;
     font-weight:1000;
     color:var(--danger);
-    font-variant-numeric: tabular-nums;
+    font-variant-numeric:tabular-nums;
     text-align:right;
-    letter-spacing:.2px;
   }
 
   .tag{
@@ -123,15 +123,15 @@
     background:#f3f4f6;
     font-weight:900;
     font-size:12px;
-    white-space:nowrap;
   }
 
   .out{
     font-size:14px;
     font-weight:1000;
     letter-spacing:.3px;
-    font-variant-numeric: tabular-nums;
+    font-variant-numeric:tabular-nums;
   }
+  .muted{ color:var(--muted); font-weight:800; }
 
   .btnRow{
     margin-top:6px;
@@ -161,26 +161,32 @@
     border-color:var(--refund);
   }
 
-  .hr{
-    height:1px;
-    background:var(--line);
-    margin:10px 0;
-  }
+  .gap3{height:18px}
 
-  /* Reference box */
+  /* Reference */
   .ref{
     margin-top:12px;
     background:var(--card);
     border:1px solid var(--line);
     border-radius:12px;
     padding:12px;
-    box-shadow: 0 10px 22px rgba(17,24,39,.06);
   }
   .ref h2{
     margin:0 0 6px;
     font-size:13px;
   }
-  .muted{ color:var(--muted); font-weight:800; }
+  .refBtns{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin:8px 0 10px;
+  }
+  .refBtns button{
+    background:#fff;
+    color:var(--btn);
+    border:1px solid var(--line);
+    font-weight:900;
+  }
 
   table{
     width:100%;
@@ -197,13 +203,6 @@
     background:#fafafa;
     font-weight:1000;
     color:#374151;
-  }
-
-  .toggleRow{
-    display:flex;
-    gap:8px;
-    flex-wrap:wrap;
-    margin:8px 0 10px;
   }
 
   /* Month strips */
@@ -239,9 +238,7 @@
   .t3{background:var(--t3)}
   .off{background:var(--off)}
 
-  .hidden{display:none !important;}
-
-  /* Step-by-step (BOTTOM) */
+  /* Steps at bottom */
   .steps{
     margin-top:12px;
     padding:10px;
@@ -257,10 +254,14 @@
   .steps pre{
     margin:0;
     white-space:pre-wrap;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
     font-size:11px;
     color:#374151;
   }
+
+  /* Hide */
+  .hidden{display:none!important;}
+
 </style>
 </head>
 
@@ -306,7 +307,7 @@
       <div class="lhs">Discount #1</div>
       <div class="eq">=</div>
       <div class="rhs">
-        <input id="disc1" class="discIn" value="-100,000" inputmode="numeric" />
+        <input id="disc1" class="discIn" value="-1,000,000" inputmode="numeric" />
       </div>
     </div>
 
@@ -314,7 +315,7 @@
       <div class="lhs">Discount #2</div>
       <div class="eq">=</div>
       <div class="rhs">
-        <input id="disc2" class="discIn" value="-50,000" inputmode="numeric" />
+        <input id="disc2" class="discIn" value="-0" inputmode="numeric" />
       </div>
     </div>
 
@@ -330,7 +331,8 @@
       </div>
     </div>
 
-    <div class="hr"></div>
+    <div class="gap3"></div>
+    <div class="gap3"></div>
 
     <div class="line">
       <div class="lhs">Leave date</div>
@@ -353,20 +355,21 @@
         <span class="tag" id="refundMeta">[0 terms, 0 months]</span>
       </div>
     </div>
+
   </div>
 
-  <!-- Reference box (toggles requested) -->
   <div class="ref">
     <h2>Reference</h2>
 
-    <div class="toggleRow">
-      <button type="button" class="secondary" id="toggleTableBtn">Hide/Show Reference Calendar 1 (Table)</button>
-      <button type="button" class="secondary" id="toggleChartBtn">Hide/Show Reference Calendar 2 (Chart)</button>
+    <div class="refBtns">
+      <button type="button" id="toggleRefTableBtn">Hide/Show Reference Calendar 1 (Table)</button>
+      <button type="button" id="toggleRefChartBtn">Hide/Show Reference Calendar 2 (Chart)</button>
     </div>
 
-    <!-- Reference Calendar 1 -->
-    <div id="refTableWrap">
-      <div class="muted">1) Term start/end table</div>
+    <!-- Reference Calendar 1 (Table) -->
+    <div id="refTableBox">
+      <div class="muted">1) Term start/end table (AY2025-2026 and AY2026-2027)</div>
+
       <table>
         <tr>
           <th>Academic Year</th><th>Term</th><th>Start</th><th>End</th><th>Months</th>
@@ -381,8 +384,8 @@
       </table>
     </div>
 
-    <!-- Reference Calendar 2 -->
-    <div id="refChartWrap" style="margin-top:12px;">
+    <!-- Reference Calendar 2 (Chart) -->
+    <div id="refChartBox" style="margin-top:12px;">
       <div class="muted">2) Month view (accurate colors). Dec 26 is Term 2.</div>
 
       <div class="monthBlock">
@@ -395,17 +398,18 @@
     </div>
   </div>
 
-  <!-- Step-by-step (MOST BOTTOM, as requested) -->
+  <!-- Step-by-step moved to bottom -->
   <div class="steps">
     <h3>Step-by-step calculation</h3>
-    <pre id="stepsText">Type base/discounts, pick Join date, click "Calculate Final Amount".
-Then pick Leave date, click "Calculate Refund".</pre>
+    <pre id="stepsText">Select Join date, click Calculate Final Amount, then select Leave date and click Calculate Refund.</pre>
   </div>
 
 </div>
 
 <script>
-/* ---------------- TERM DATA ---------------- */
+/* ============================================================
+   TERM DATA (DO NOT CHANGE)
+   ============================================================ */
 const TERMS = {
   "AY2025-2026": [
     { name:"Term 1", start:"2025-06-10", end:"2025-08-29", months:3 },
@@ -419,7 +423,7 @@ const TERMS = {
   ]
 };
 
-/* 10-month model (Jun..Mar) */
+/* 10-month AY model months (Jun–Mar) */
 const AY_MONTHS = {
   "AY2025-2026": ["2025-06","2025-07","2025-08","2025-09","2025-10","2025-11","2025-12","2026-01","2026-02","2026-03"],
   "AY2026-2027": ["2026-06","2026-07","2026-08","2026-09","2026-10","2026-11","2026-12","2027-01","2027-02","2027-03"]
@@ -427,12 +431,44 @@ const AY_MONTHS = {
 
 const $ = (id)=>document.getElementById(id);
 
+/* ============================================================
+   MONEY HELPERS
+   ============================================================ */
 function parseMoney(str){
   return Number(String(str||"").replace(/,/g,"").trim()) || 0;
 }
 function formatMoney(n){
   return Number(n||0).toLocaleString("en-US");
 }
+
+/* Ensure discounts ALWAYS stay negative (and show "-") */
+function forceNegativeDisplay(rawValue){
+  // Keep a "-" always visible even if empty
+  if(rawValue == null) return "-0";
+  let s = String(rawValue).trim();
+
+  // If user typed only "-", keep it
+  if(s === "-") return "-0";
+
+  // Remove commas, parse
+  let n = parseMoney(s);
+
+  // Always store negative (or -0)
+  if(n > 0) n = -n;
+  if(n === 0) return "-0";
+
+  return "-" + formatMoney(Math.abs(n));
+}
+
+/* Format base fee (non-negative) */
+function normalizeBase(rawValue){
+  const n = parseMoney(rawValue);
+  return formatMoney(Math.max(0, n));
+}
+
+/* ============================================================
+   DATE HELPERS
+   ============================================================ */
 function dateObj(iso){
   if(!iso) return null;
   const d = new Date(iso + "T00:00:00");
@@ -462,7 +498,7 @@ function findTermByDate(d){
   return null;
 }
 
-/* Months attend: join month → end of AY (10 months total) */
+/* Months attend = join month → end of AY months list (Jun–Mar) */
 function calcMonthsAttend(joinDate){
   const jt = findTermByDate(joinDate);
   if(!jt) return { ay:null, monthsAttend:0 };
@@ -474,8 +510,51 @@ function calcMonthsAttend(joinDate){
   return { ay: jt.ay, monthsAttend: months.length - idx };
 }
 
-/* Remaining terms/months AFTER leave term */
-function calcUnusedTermMonths(ay, leaveTermName){
+/* Build list of "paid months" (YYYY-MM) from join month to AY end */
+function buildPaidMonths(ay, joinDate){
+  const months = AY_MONTHS[ay] || [];
+  const idx = months.indexOf(ymKey(joinDate));
+  if(idx === -1) return [];
+  return months.slice(idx); // inclusive join month → end
+}
+
+/* Months in refundable terms (terms AFTER leave term) */
+function buildRefundableTermMonths(ay, leaveTermName){
+  const terms = TERMS[ay] || [];
+  const leaveIdx = terms.findIndex(t => t.name === leaveTermName);
+  const remaining = leaveIdx >= 0 ? terms.slice(leaveIdx + 1) : [];
+
+  // Convert each remaining term months into list of YYYY-MM in AY months model
+  // We map by the AY_MONTHS list membership (Jun–Mar), because your policy is 10-month model.
+  const ayMonths = AY_MONTHS[ay] || [];
+  const out = [];
+
+  remaining.forEach(t=>{
+    const s = new Date(t.start + "T00:00:00");
+    const e = new Date(t.end + "T00:00:00");
+
+    // Loop months between start and end, collect YYYY-MM if present in AY months list
+    const cur = new Date(s.getFullYear(), s.getMonth(), 1);
+    const end = new Date(e.getFullYear(), e.getMonth(), 1);
+
+    while(cur <= end){
+      const y = cur.getFullYear();
+      const m = String(cur.getMonth()+1).padStart(2,"0");
+      const ym = `${y}-${m}`;
+      if(ayMonths.includes(ym) && !out.includes(ym)){
+        out.push(ym);
+      }
+      cur.setMonth(cur.getMonth()+1);
+    }
+  });
+
+  // Sort by AY month order
+  out.sort((a,b)=> (ayMonths.indexOf(a) - ayMonths.indexOf(b)));
+  return out;
+}
+
+/* Count remaining terms/months AFTER leave term (for label) */
+function calcRefundableMonthsTerms(ay, leaveTermName){
   const list = TERMS[ay] || [];
   const leaveIdx = list.findIndex(t => t.name === leaveTermName);
   const remaining = leaveIdx >= 0 ? list.slice(leaveIdx + 1) : [];
@@ -485,106 +564,135 @@ function calcUnusedTermMonths(ay, leaveTermName){
   };
 }
 
-/* UI: auto update join tags + proration */
+/* ============================================================
+   AUTO UPDATES (JOIN / LEAVE)
+   ============================================================ */
 function updateJoinAuto(){
   const j = dateObj($("joinDate").value);
   const jt = findTermByDate(j);
+
   $("joinTermTag").textContent = jt ? `[${jt.ay} - ${jt.term}]` : `[Academic Year - Term]`;
 
   const base = parseMoney($("baseFee").value);
-  const { monthsAttend } = calcMonthsAttend(j);
+  const res = calcMonthsAttend(j);
 
-  $("monthsAttendTag").textContent = `[${monthsAttend} months]`;
+  $("monthsAttendTag").textContent = `[${res.monthsAttend} months]`;
 
-  if(!jt || monthsAttend <= 0 || base <= 0){
+  if(!jt || res.monthsAttend <= 0 || base <= 0){
     $("proratedFee").textContent = "0";
     return;
   }
 
-  const prorated = Math.round((base / 10) * monthsAttend);
+  const prorated = Math.round((base / 10) * res.monthsAttend);
   $("proratedFee").textContent = formatMoney(prorated);
 }
 
-/* UI: auto update leave tag */
 function updateLeaveAuto(){
   const l = dateObj($("leaveDate").value);
   const lt = findTermByDate(l);
   $("leaveTermTag").textContent = lt ? `[${lt.ay} - ${lt.term}]` : `[Academic Year - Term]`;
 }
 
-/* Format inputs with commas */
-function formatInputWithCommas(inputEl){
-  const v = parseMoney(inputEl.value);
-  inputEl.value = formatMoney(v);
-}
-
-/* FINAL AMOUNT calculation */
+/* ============================================================
+   FINAL CALCULATION (writes step-by-step FINAL section)
+   ============================================================ */
 function calcFinal(){
-  // normalize formatting first
-  formatInputWithCommas($("baseFee"));
-  formatInputWithCommas($("disc1"));
-  formatInputWithCommas($("disc2"));
-
-  updateJoinAuto();
-
-  const prorated = parseMoney($("proratedFee").textContent);
-  const d1 = parseMoney($("disc1").value);
-  const d2 = parseMoney($("disc2").value);
-
-  const final = prorated + d1 + d2; // discounts are negative
-  $("finalFee").textContent = formatMoney(final);
+  const base = parseMoney($("baseFee").value);
+  const j = dateObj($("joinDate").value);
+  const jt = findTermByDate(j);
 
   const monthsAttend = Number(String($("monthsAttendTag").textContent).replace(/[^\d]/g,"")) || 0;
-  const base = parseMoney($("baseFee").value);
+  const prorated = parseMoney($("proratedFee").textContent);
 
-  const stepProrate = Math.round((base/10) * monthsAttend);
+  const d1 = parseMoney($("disc1").value); // negative
+  const d2 = parseMoney($("disc2").value); // negative
+
+  const final = prorated + d1 + d2;
+  $("finalFee").textContent = formatMoney(final);
+
+  const prCalc = Math.round((base/10) * monthsAttend);
 
   $("stepsText").textContent =
 `FINAL AMOUNT
 1) Base = ${formatMoney(base)}
 2) Months attend = ${monthsAttend}
-3) Prorate = Base ÷ 10 × Months attend = ${formatMoney(stepProrate)}
+3) Prorate = Base ÷ 10 × Months attend = ${formatMoney(prCalc)}
 4) Discount #1 = ${formatMoney(d1)}
 5) Discount #2 = ${formatMoney(d2)}
 6) FINAL Tuition Fee after Discount = Prorate + D1 + D2 = ${formatMoney(final)}
 
-Refund only unused months from unconsumed terms (terms after the leave term).`;
+Refund only unused months from unconsumed terms (terms after the leave term), but never more than months actually paid.`;
 }
 
-/* REFUND calculation (per your rule) */
+/* ============================================================
+   REFUND CALCULATION (clears step-by-step each click)
+   - Leave date must be AFTER join date
+   - Refund uses: FINAL ÷ initial months attend × refundable months (overlap)
+   ============================================================ */
 function calcRefund(){
-  updateJoinAuto();
-  updateLeaveAuto();
+  // ALWAYS clear step-by-step first (per your request)
+  // Then rebuild using real amounts.
+  $("stepsText").textContent = "";
 
-  // ensure final already calculated
-  if(parseMoney($("finalFee").textContent) === 0){
+  const join = dateObj($("joinDate").value);
+  const leave = dateObj($("leaveDate").value);
+
+  if(!join || !leave){
+    $("refundAmount").textContent = "0";
+    $("refundMeta").textContent = "[0 terms, 0 months]";
+    $("stepsText").textContent = "Please select both Join date and Leave date.";
+    return;
+  }
+
+  // Enforce: leave date should be after join date
+  if(leave <= join){
+    $("refundAmount").textContent = "0";
+    $("refundMeta").textContent = "[0 terms, 0 months]";
+    $("stepsText").textContent = "Leave date must be AFTER join date.";
+    alert("Leave date must be AFTER join date.");
+    return;
+  }
+
+  const joinTerm = findTermByDate(join);
+  const leaveTerm = findTermByDate(leave);
+
+  const monthsAttend = Number(String($("monthsAttendTag").textContent).replace(/[^\d]/g,"")) || 0;
+
+  // Make sure final is calculated
+  if(parseMoney($("finalFee").textContent) <= 0){
     calcFinal();
   }
 
   const final = parseMoney($("finalFee").textContent);
 
-  const j = dateObj($("joinDate").value);
-  const joinTerm = findTermByDate(j);
-  const monthsAttend = Number(String($("monthsAttendTag").textContent).replace(/[^\d]/g,"")) || 0;
-
-  const l = dateObj($("leaveDate").value);
-  const leaveTerm = findTermByDate(l);
-
   if(!joinTerm || !leaveTerm || monthsAttend <= 0 || final <= 0){
     $("refundAmount").textContent = "0";
     $("refundMeta").textContent = "[0 terms, 0 months]";
-    $("stepsText").textContent += `\n\nREFUND CALCULATION\n(Need valid join date + leave date + final amount)`;
+    $("stepsText").textContent = "Invalid dates or amounts. Please check Join/Leave dates and click Calculate Final Amount.";
     return;
   }
 
+  // Must be same AY for this calculator version
   if(joinTerm.ay !== leaveTerm.ay){
     $("refundAmount").textContent = "0";
     $("refundMeta").textContent = "[Different AY]";
-    $("stepsText").textContent += `\n\nREFUND CALCULATION\nCannot calculate across different academic years.`;
+    $("stepsText").textContent = "Join and Leave must be in the same Academic Year for this calculator.";
     return;
   }
 
-  const { termsCount, monthsCount } = calcUnusedTermMonths(leaveTerm.ay, leaveTerm.term);
+  // Paid months list (based on join month to AY end)
+  const paidMonths = buildPaidMonths(joinTerm.ay, join);
+
+  // Refundable term months = months in terms AFTER leave term
+  const refundableTermMonths = buildRefundableTermMonths(leaveTerm.ay, leaveTerm.term);
+
+  // Intersection: only refund months that were paid AND belong to unconsumed terms
+  const refundableMonths = refundableTermMonths.filter(m => paidMonths.includes(m));
+
+  // Count terms/months label still based on "terms after leave term" and their month total
+  // BUT refund months used in calculation is the INTERSECTION count.
+  const { termsCount } = calcRefundableMonthsTerms(leaveTerm.ay, leaveTerm.term);
+  const monthsCount = refundableMonths.length;
 
   const monthlyRate = final / monthsAttend;
   const refund = Math.round(monthlyRate * monthsCount);
@@ -592,17 +700,37 @@ function calcRefund(){
   $("refundAmount").textContent = formatMoney(refund);
   $("refundMeta").textContent = `[${termsCount} terms, ${monthsCount} months]`;
 
-  // append refund steps (REAL numbers)
-  $("stepsText").textContent +=
-`\n\nREFUND CALCULATION
+  // Build full step-by-step (FINAL + REFUND) fresh each time
+  const base = parseMoney($("baseFee").value);
+  const prorated = parseMoney($("proratedFee").textContent);
+  const d1 = parseMoney($("disc1").value);
+  const d2 = parseMoney($("disc2").value);
+
+  $("stepsText").textContent =
+`FINAL AMOUNT
+1) Base = ${formatMoney(base)}
+2) Months attend = ${monthsAttend}
+3) Prorate = Base ÷ 10 × Months attend = ${formatMoney(prorated)}
+4) Discount #1 = ${formatMoney(d1)}
+5) Discount #2 = ${formatMoney(d2)}
+6) FINAL Tuition Fee after Discount = Prorate + D1 + D2 = ${formatMoney(final)}
+
+Refund only unused months from unconsumed terms (terms after the leave term).
+
+REFUND CALCULATION
 1) FINAL Tuition Fee after Discount = ${formatMoney(final)}
 2) Total initial prorated months attend = ${monthsAttend}
 3) Monthly rate for refund = FINAL ÷ initial months = ${formatMoney(Math.round(monthlyRate))}
-4) Refundable amount = Monthly rate × unused term months = ${formatMoney(refund)}
-   Unused months = ${monthsCount}  |  Unused terms = ${termsCount}`;
+4) Refundable amount = Monthly rate × valid refundable months of unused term = ${formatMoney(refund)}
+
+Paid months (from join month): ${paidMonths.join(", ")}
+Unused-term months (terms after leave term): ${refundableTermMonths.join(", ")}
+Refundable months (overlap): ${refundableMonths.join(", ")}`;
 }
 
-/* Month strips (ACCURATE: Dec 26 is Term 2) */
+/* ============================================================
+   REFERENCE CHART (accurate colors, Dec 26 is Term 2)
+   ============================================================ */
 function buildMonthStrips(){
   const months2526 = [
     ["Jun 25","t1"],["Jul","t1"],["Aug","t1"],["Sep","t2"],
@@ -631,41 +759,121 @@ function buildMonthStrips(){
   render("months2627", months2627);
 }
 
-/* Toggle reference calendar 1 and 2 */
-function wireToggles(){
-  $("toggleTableBtn").addEventListener("click", ()=>{
-    $("refTableWrap").classList.toggle("hidden");
+/* ============================================================
+   INPUT NORMALIZATION (blur + safe defaults)
+   ============================================================ */
+function wireMoneyInputs(){
+  // Base fee: normal
+  $("baseFee").addEventListener("blur", ()=>{
+    $("baseFee").value = normalizeBase($("baseFee").value);
+    updateJoinAuto();
   });
-  $("toggleChartBtn").addEventListener("click", ()=>{
-    $("refChartWrap").classList.toggle("hidden");
+
+  // Discounts: ALWAYS negative, ALWAYS show "-"
+  ["disc1","disc2"].forEach(id=>{
+    const el = $(id);
+
+    // On blur: force negative formatting
+    el.addEventListener("blur", ()=>{
+      el.value = forceNegativeDisplay(el.value);
+    });
+
+    // If user deletes everything, keep "-0"
+    el.addEventListener("input", ()=>{
+      if(String(el.value).trim() === ""){
+        el.value = "-0";
+        // place cursor at end
+        try{ el.setSelectionRange(el.value.length, el.value.length); }catch(e){}
+      }
+    });
   });
 }
 
-/* Init */
+/* ============================================================
+   LEAVE DATE VALIDATION ON CHANGE
+   ============================================================ */
+function wireDateValidation(){
+  $("leaveDate").addEventListener("change", ()=>{
+    const join = dateObj($("joinDate").value);
+    const leave = dateObj($("leaveDate").value);
+    updateLeaveAuto();
+
+    if(join && leave && leave <= join){
+      alert("Leave date must be AFTER join date.");
+      $("leaveDate").value = "";
+      updateLeaveAuto();
+    }
+  });
+
+  $("joinDate").addEventListener("change", ()=>{
+    updateJoinAuto();
+
+    // If leave already selected, re-validate
+    const join = dateObj($("joinDate").value);
+    const leave = dateObj($("leaveDate").value);
+    if(join && leave && leave <= join){
+      alert("Leave date must be AFTER join date.");
+      $("leaveDate").value = "";
+      updateLeaveAuto();
+    }
+  });
+}
+
+/* ============================================================
+   REFERENCE TOGGLES (ONLY)
+   ============================================================ */
+function wireReferenceToggles(){
+  $("toggleRefTableBtn").addEventListener("click", ()=>{
+    $("refTableBox").classList.toggle("hidden");
+  });
+  $("toggleRefChartBtn").addEventListener("click", ()=>{
+    $("refChartBox").classList.toggle("hidden");
+  });
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
 (function init(){
-  // default formatting
-  $("baseFee").value = formatMoney(parseMoney($("baseFee").value));
-  $("disc1").value = formatMoney(parseMoney($("disc1").value));
-  $("disc2").value = formatMoney(parseMoney($("disc2").value));
+  // Defaults
+  $("baseFee").value = normalizeBase($("baseFee").value);
+  $("disc1").value = forceNegativeDisplay($("disc1").value);
+  $("disc2").value = forceNegativeDisplay($("disc2").value);
 
   buildMonthStrips();
-  wireToggles();
+  wireMoneyInputs();
+  wireDateValidation();
+  wireReferenceToggles();
 
-  // LIVE update as you type (proration preview)
+  // Live updates
   $("baseFee").addEventListener("input", updateJoinAuto);
   $("joinDate").addEventListener("change", updateJoinAuto);
-  $("leaveDate").addEventListener("change", updateLeaveAuto);
 
-  // format on blur (commas)
-  $("baseFee").addEventListener("blur", ()=>{ formatInputWithCommas($("baseFee")); updateJoinAuto(); });
-  $("disc1").addEventListener("blur", ()=>{ formatInputWithCommas($("disc1")); });
-  $("disc2").addEventListener("blur", ()=>{ formatInputWithCommas($("disc2")); });
+  // Buttons
+  $("calcFinalBtn").addEventListener("click", ()=>{
+    $("baseFee").value = normalizeBase($("baseFee").value);
+    $("disc1").value = forceNegativeDisplay($("disc1").value);
+    $("disc2").value = forceNegativeDisplay($("disc2").value);
+    updateJoinAuto();
+    calcFinal();
+  });
 
-  // buttons
-  $("calcFinalBtn").addEventListener("click", calcFinal);
-  $("calcRefundBtn").addEventListener("click", calcRefund);
+  $("calcRefundBtn").addEventListener("click", ()=>{
+    // normalize first
+    $("baseFee").value = normalizeBase($("baseFee").value);
+    $("disc1").value = forceNegativeDisplay($("disc1").value);
+    $("disc2").value = forceNegativeDisplay($("disc2").value);
+    updateJoinAuto();
+    updateLeaveAuto();
 
-  // initial auto state
+    // Always recompute final first (safe)
+    calcFinal();
+
+    // Then compute refund (and clear steps each time)
+    calcRefund();
+  });
+
+  // Initial render
   updateJoinAuto();
   updateLeaveAuto();
 })();
