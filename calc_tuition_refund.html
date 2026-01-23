@@ -6,244 +6,261 @@
 <title>Tuition Proration & Refund Calculator</title>
 
 <style>
-/* =========================
-   BASE THEME
-========================= */
-:root{
-  --bg:#f6f7fb;
-  --card:#ffffff;
-  --line:#e5e7eb;
-  --text:#111827;
-  --muted:#6b7280;
-  --danger:#b91c1c;
+  :root{
+    --bg:#f6f7fb;
+    --card:#ffffff;
+    --line:#e5e7eb;
+    --text:#111827;
+    --muted:#6b7280;
+    --danger:#b91c1c;
 
-  --btn:#111827;
-  --btnRefund:#f97316;
+    --btn:#111827;
+    --refund:#f97316; /* orange */
 
-  --t1:#2563eb;
-  --t2:#059669;
-  --t3:#9333ea;
-  --off:#9ca3af;
-}
+    --t1:#2563eb;  /* Term 1 */
+    --t2:#059669;  /* Term 2 */
+    --t3:#9333ea;  /* Term 3 */
+    --off:#9ca3af; /* Outside */
+  }
 
-*{box-sizing:border-box}
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    font-size:12px;
+    line-height:1.35;
+  }
+  .page{
+    max-width:980px;
+    margin:16px auto;
+    padding:0 14px 24px;
+  }
+  .titlebar{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:10px;
+  }
+  h1{
+    margin:0;
+    font-size:16px;
+    letter-spacing:.2px;
+  }
+  .subtitle{
+    margin:0;
+    color:var(--muted);
+    font-size:12px;
+  }
 
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-  font-size:12px;
-  line-height:1.35;
-}
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px;
+    box-shadow: 0 10px 22px rgba(17,24,39,.06);
+  }
 
-.page{
-  max-width:980px;
-  margin:16px auto;
-  padding:0 14px 24px;
-}
+  /* single-column lines but aligned */
+  .line{
+    display:grid;
+    grid-template-columns: auto 18px 1fr;
+    align-items:center;
+    column-gap:10px;
+    margin:6px 0;
+  }
+  .lhs{
+    white-space:nowrap;
+    font-weight:800;
+  }
+  .eq{
+    text-align:center;
+    font-weight:900;
+    color:var(--muted);
+  }
+  .rhs{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
 
-/* =========================
-   TITLE
-========================= */
-.titlebar{
-  margin-bottom:10px;
-}
-h1{
-  margin:0;
-  font-size:16px;
-}
-.subtitle{
-  margin:0;
-  color:var(--muted);
-  font-size:12px;
-}
+  input{
+    font-size:12px;
+    padding:6px 8px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:#fff;
+    outline:none;
+  }
+  input[type="date"]{ padding:5px 8px; }
 
-/* =========================
-   CARD
-========================= */
-.card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:12px;
-  box-shadow: 0 10px 22px rgba(17,24,39,.06);
-}
+  .moneyIn{
+    width:210px;
+    font-weight:900;
+    font-variant-numeric: tabular-nums;
+    text-align:right;
+    letter-spacing:.2px;
+  }
+  .discIn{
+    width:210px;
+    font-weight:1000;
+    color:var(--danger);
+    font-variant-numeric: tabular-nums;
+    text-align:right;
+    letter-spacing:.2px;
+  }
 
-/* =========================
-   FORM LINES
-========================= */
-.line{
-  display:grid;
-  grid-template-columns:auto 16px 1fr;
-  align-items:center;
-  column-gap:10px;
-  margin:6px 0;
-}
+  .tag{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:2px 9px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:#f3f4f6;
+    font-weight:900;
+    font-size:12px;
+    white-space:nowrap;
+  }
 
-.lhs{
-  font-weight:800;
-  white-space:nowrap;
-}
-.eq{
-  text-align:center;
-  font-weight:900;
-  color:var(--muted);
-}
-.rhs{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-}
+  .out{
+    font-size:14px;
+    font-weight:1000;
+    letter-spacing:.3px;
+    font-variant-numeric: tabular-nums;
+  }
 
-input{
-  font-size:12px;
-  padding:6px 8px;
-  border:1px solid var(--line);
-  border-radius:10px;
-  background:#fff;
-}
+  .btnRow{
+    margin-top:6px;
+    margin-bottom:2px;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  button{
+    appearance:none;
+    border:1px solid var(--btn);
+    background:var(--btn);
+    color:#fff;
+    font-size:12px;
+    font-weight:1000;
+    padding:8px 10px;
+    border-radius:10px;
+    cursor:pointer;
+  }
+  button.secondary{
+    background:#fff;
+    color:var(--btn);
+    border:1px solid var(--line);
+  }
+  button.refund{
+    background:var(--refund);
+    border-color:var(--refund);
+  }
 
-.moneyIn{
-  width:190px;
-  font-weight:900;
-  text-align:right;
-}
+  .hr{
+    height:1px;
+    background:var(--line);
+    margin:10px 0;
+  }
 
-.discIn{
-  width:190px;
-  font-weight:900;
-  text-align:right;
-  color:var(--danger);
-}
+  /* Reference box */
+  .ref{
+    margin-top:12px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px;
+    box-shadow: 0 10px 22px rgba(17,24,39,.06);
+  }
+  .ref h2{
+    margin:0 0 6px;
+    font-size:13px;
+  }
+  .muted{ color:var(--muted); font-weight:800; }
 
-.tag{
-  padding:2px 9px;
-  border-radius:999px;
-  border:1px solid var(--line);
-  background:#f3f4f6;
-  font-weight:900;
-}
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:11px;
+    margin-top:6px;
+  }
+  th,td{
+    border:1px solid var(--line);
+    padding:6px;
+    text-align:center;
+  }
+  th{
+    background:#fafafa;
+    font-weight:1000;
+    color:#374151;
+  }
 
-.out{
-  font-size:14px;
-  font-weight:1000;
-}
+  .toggleRow{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin:8px 0 10px;
+  }
 
-.btnRow{
-  margin-top:6px;
-  display:flex;
-  gap:8px;
-}
+  /* Month strips */
+  .monthBlock{
+    margin-top:10px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .ayLabel{
+    font-weight:1000;
+    color:#374151;
+    font-size:12px;
+    margin-top:6px;
+  }
+  .months{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .m{
+    min-width:54px;
+    padding:4px 6px;
+    border-radius:10px;
+    color:#fff;
+    font-weight:1000;
+    font-size:11px;
+    text-align:center;
+    letter-spacing:.2px;
+  }
+  .t1{background:var(--t1)}
+  .t2{background:var(--t2)}
+  .t3{background:var(--t3)}
+  .off{background:var(--off)}
 
-button{
-  appearance:none;
-  border:1px solid var(--btn);
-  background:var(--btn);
-  color:#fff;
-  font-size:12px;
-  font-weight:1000;
-  padding:8px 10px;
-  border-radius:10px;
-  cursor:pointer;
-}
+  .hidden{display:none !important;}
 
-button.secondary{
-  background:#fff;
-  color:var(--btn);
-  border:1px solid var(--line);
-}
-
-button.refund{
-  background:var(--btnRefund);
-  border-color:var(--btnRefund);
-}
-
-/* =========================
-   STEPS
-========================= */
-.steps{
-  margin-top:10px;
-  padding:10px;
-  border:1px dashed var(--line);
-  border-radius:12px;
-  background:#fafafa;
-}
-.steps h3{
-  margin:0 0 6px;
-  font-size:12px;
-}
-.steps pre{
-  margin:0;
-  white-space:pre-wrap;
-  font-family: ui-monospace, monospace;
-  font-size:11px;
-}
-
-/* =========================
-   REFERENCE
-========================= */
-.ref{
-  margin-top:14px;
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:12px;
-}
-
-.ref h2{
-  margin:0 0 6px;
-  font-size:13px;
-}
-
-.hidden{display:none!important}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  font-size:11px;
-}
-th,td{
-  border:1px solid var(--line);
-  padding:6px;
-  text-align:center;
-}
-th{
-  background:#fafafa;
-  font-weight:900;
-}
-
-/* =========================
-   MONTH COLORS
-========================= */
-.monthBlock{
-  margin-top:10px;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-
-.months{
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-}
-
-.m{
-  min-width:54px;
-  padding:4px 6px;
-  border-radius:10px;
-  color:#fff;
-  font-weight:900;
-  font-size:11px;
-  text-align:center;
-}
-
-.t1{background:var(--t1)}
-.t2{background:var(--t2)}
-.t3{background:var(--t3)}
-.off{background:var(--off)}
+  /* Step-by-step (BOTTOM) */
+  .steps{
+    margin-top:12px;
+    padding:10px;
+    border:1px dashed var(--line);
+    border-radius:12px;
+    background:#fafafa;
+  }
+  .steps h3{
+    margin:0 0 6px;
+    font-size:12px;
+    letter-spacing:.2px;
+  }
+  .steps pre{
+    margin:0;
+    white-space:pre-wrap;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size:11px;
+    color:#374151;
+  }
 </style>
 </head>
 
@@ -251,20 +268,19 @@ th{
 <div class="page">
 
   <div class="titlebar">
-    <h1>Tuition Proration & Refund Calculator</h1>
-    <p class="subtitle">Proration: BASE ÷ 10 × months attend | Refund: FINAL ÷ months × unused term months</p>
+    <div>
+      <h1>Tuition Proration & Refund Calculator</h1>
+      <p class="subtitle">Proration uses BASE ÷ 10 × months attend. Refund uses FINAL tuition after discount ÷ initial months × unused term months.</p>
+    </div>
   </div>
 
-  <!-- =========================
-       MAIN CALC CARD
-  ========================= -->
   <div class="card">
 
     <div class="line">
       <div class="lhs">BASE tuition fee</div>
       <div class="eq">=</div>
       <div class="rhs">
-        <input id="baseFee" class="moneyIn" value="10,000,000">
+        <input id="baseFee" class="moneyIn" value="10,000,000" inputmode="numeric" />
       </div>
     </div>
 
@@ -272,13 +288,13 @@ th{
       <div class="lhs">Join date</div>
       <div class="eq">=</div>
       <div class="rhs">
-        <input type="date" id="joinDate">
+        <input id="joinDate" type="date" />
         <span class="tag" id="joinTermTag">[Academic Year - Term]</span>
       </div>
     </div>
 
     <div class="line">
-      <div class="lhs">Tuition Fee before discount</div>
+      <div class="lhs">Tuition Fee before discount [AFTER PRORATE]</div>
       <div class="eq">=</div>
       <div class="rhs">
         <span class="out" id="proratedFee">0</span>
@@ -290,7 +306,7 @@ th{
       <div class="lhs">Discount #1</div>
       <div class="eq">=</div>
       <div class="rhs">
-        <input id="disc1" class="discIn" value="-100,000">
+        <input id="disc1" class="discIn" value="-100,000" inputmode="numeric" />
       </div>
     </div>
 
@@ -298,38 +314,38 @@ th{
       <div class="lhs">Discount #2</div>
       <div class="eq">=</div>
       <div class="rhs">
-        <input id="disc2" class="discIn" value="-50,000">
+        <input id="disc2" class="discIn" value="-50,000" inputmode="numeric" />
       </div>
     </div>
 
     <div class="btnRow">
-      <button id="calcFinalBtn">Calculate Final Amount</button>
+      <button type="button" id="calcFinalBtn">Calculate Final Amount</button>
     </div>
 
-    <div class="line">
-      <div class="lhs">FINAL Tuition Fee</div>
+    <div class="line" style="margin-top:8px;">
+      <div class="lhs">FINAL Tuition Fee after discount</div>
       <div class="eq">=</div>
       <div class="rhs">
         <span class="out" id="finalFee">0</span>
       </div>
     </div>
 
-    <br><br>
+    <div class="hr"></div>
 
     <div class="line">
       <div class="lhs">Leave date</div>
       <div class="eq">=</div>
       <div class="rhs">
-        <input type="date" id="leaveDate">
+        <input id="leaveDate" type="date" />
         <span class="tag" id="leaveTermTag">[Academic Year - Term]</span>
       </div>
     </div>
 
     <div class="btnRow">
-      <button class="refund" id="calcRefundBtn">Calculate Refund</button>
+      <button type="button" class="refund" id="calcRefundBtn">Calculate Refund</button>
     </div>
 
-    <div class="line">
+    <div class="line" style="margin-top:8px;">
       <div class="lhs">Refundable amount</div>
       <div class="eq">=</div>
       <div class="rhs">
@@ -337,78 +353,322 @@ th{
         <span class="tag" id="refundMeta">[0 terms, 0 months]</span>
       </div>
     </div>
-
-    <div class="steps">
-      <h3>Step-by-step calculation</h3>
-      <pre id="stepsText">Select Join date → Calculate Final → Select Leave date → Calculate Refund</pre>
-    </div>
-
   </div>
 
-  <!-- =========================
-       REFERENCE
-  ========================= -->
+  <!-- Reference box (toggles requested) -->
   <div class="ref">
+    <h2>Reference</h2>
 
-    <!-- TOGGLE 1 -->
-    <button class="secondary" id="toggleTermsBtn">Hide</button>
-    <h2>Reference Calendar 1 — Term Table</h2>
+    <div class="toggleRow">
+      <button type="button" class="secondary" id="toggleTableBtn">Hide/Show Reference Calendar 1 (Table)</button>
+      <button type="button" class="secondary" id="toggleChartBtn">Hide/Show Reference Calendar 2 (Chart)</button>
+    </div>
 
-    <div id="termsRefBody">
+    <!-- Reference Calendar 1 -->
+    <div id="refTableWrap">
+      <div class="muted">1) Term start/end table</div>
       <table>
-        <tr><th>AY</th><th>Term</th><th>Start</th><th>End</th><th>Months</th></tr>
-        <tr><td rowspan="3">AY2025-2026</td><td>T1</td><td>2025-06-10</td><td>2025-08-29</td><td>3</td></tr>
-        <tr><td>T2</td><td>2025-09-01</td><td>2025-11-28</td><td>3</td></tr>
-        <tr><td>T3</td><td>2025-12-01</td><td>2026-04-03</td><td>4</td></tr>
+        <tr>
+          <th>Academic Year</th><th>Term</th><th>Start</th><th>End</th><th>Months</th>
+        </tr>
+        <tr><td rowspan="3">AY2025-2026</td><td>Term 1</td><td>2025-06-10</td><td>2025-08-29</td><td>3</td></tr>
+        <tr><td>Term 2</td><td>2025-09-01</td><td>2025-11-28</td><td>3</td></tr>
+        <tr><td>Term 3</td><td>2025-12-01</td><td>2026-04-03</td><td>4</td></tr>
 
-        <tr><td rowspan="3">AY2026-2027</td><td>T1</td><td>2026-06-16</td><td>2026-09-04</td><td>3</td></tr>
-        <tr><td>T2</td><td>2026-09-07</td><td>2026-12-18</td><td>3</td></tr>
-        <tr><td>T3</td><td>2027-01-05</td><td>2027-03-31</td><td>4</td></tr>
+        <tr><td rowspan="3">AY2026-2027</td><td>Term 1</td><td>2026-06-16</td><td>2026-09-04</td><td>3</td></tr>
+        <tr><td>Term 2</td><td>2026-09-07</td><td>2026-12-18</td><td>3</td></tr>
+        <tr><td>Term 3</td><td>2027-01-05</td><td>2027-03-31</td><td>4</td></tr>
       </table>
     </div>
 
-    <br>
+    <!-- Reference Calendar 2 -->
+    <div id="refChartWrap" style="margin-top:12px;">
+      <div class="muted">2) Month view (accurate colors). Dec 26 is Term 2.</div>
 
-    <!-- TOGGLE 2 -->
-    <button class="secondary" id="toggleMonthsBtn">Hide</button>
-    <h2>Reference Calendar 2 — Month View</h2>
+      <div class="monthBlock">
+        <div class="ayLabel">AY2025-2026</div>
+        <div class="months" id="months2526"></div>
 
-    <div id="monthsRefBody" class="monthBlock">
-      <div class="months">
-        <span class="m t1">Jun 25</span><span class="m t1">Jul</span><span class="m t1">Aug</span>
-        <span class="m t2">Sep</span><span class="m t2">Oct</span><span class="m t2">Nov</span>
-        <span class="m t3">Dec</span><span class="m t3">Jan 26</span>
-        <span class="m t3">Feb</span><span class="m t3">Mar</span><span class="m t3">Apr</span>
-        <span class="m off">May</span>
-      </div>
-
-      <div class="months">
-        <span class="m t1">Jun 26</span><span class="m t1">Jul</span><span class="m t1">Aug</span>
-        <span class="m t2">Sep</span><span class="m t2">Oct</span><span class="m t2">Nov</span>
-        <span class="m t2">Dec</span>
-        <span class="m t3">Jan 27</span><span class="m t3">Feb</span><span class="m t3">Mar</span>
-        <span class="m off">Apr</span><span class="m off">May</span>
+        <div class="ayLabel">AY2026-2027</div>
+        <div class="months" id="months2627"></div>
       </div>
     </div>
+  </div>
 
+  <!-- Step-by-step (MOST BOTTOM, as requested) -->
+  <div class="steps">
+    <h3>Step-by-step calculation</h3>
+    <pre id="stepsText">Type base/discounts, pick Join date, click "Calculate Final Amount".
+Then pick Leave date, click "Calculate Refund".</pre>
   </div>
 
 </div>
 
 <script>
-/* ========= TOGGLE LOGIC (ONLY CHANGE REQUESTED) ========= */
-document.getElementById("toggleTermsBtn").onclick = ()=>{
-  const b = document.getElementById("termsRefBody");
-  b.classList.toggle("hidden");
-  event.target.textContent = b.classList.contains("hidden") ? "Show" : "Hide";
+/* ---------------- TERM DATA ---------------- */
+const TERMS = {
+  "AY2025-2026": [
+    { name:"Term 1", start:"2025-06-10", end:"2025-08-29", months:3 },
+    { name:"Term 2", start:"2025-09-01", end:"2025-11-28", months:3 },
+    { name:"Term 3", start:"2025-12-01", end:"2026-04-03", months:4 }
+  ],
+  "AY2026-2027": [
+    { name:"Term 1", start:"2026-06-16", end:"2026-09-04", months:3 },
+    { name:"Term 2", start:"2026-09-07", end:"2026-12-18", months:3 },
+    { name:"Term 3", start:"2027-01-05", end:"2027-03-31", months:4 }
+  ]
 };
 
-document.getElementById("toggleMonthsBtn").onclick = ()=>{
-  const b = document.getElementById("monthsRefBody");
-  b.classList.toggle("hidden");
-  event.target.textContent = b.classList.contains("hidden") ? "Show" : "Hide";
+/* 10-month model (Jun..Mar) */
+const AY_MONTHS = {
+  "AY2025-2026": ["2025-06","2025-07","2025-08","2025-09","2025-10","2025-11","2025-12","2026-01","2026-02","2026-03"],
+  "AY2026-2027": ["2026-06","2026-07","2026-08","2026-09","2026-10","2026-11","2026-12","2027-01","2027-02","2027-03"]
 };
+
+const $ = (id)=>document.getElementById(id);
+
+function parseMoney(str){
+  return Number(String(str||"").replace(/,/g,"").trim()) || 0;
+}
+function formatMoney(n){
+  return Number(n||0).toLocaleString("en-US");
+}
+function dateObj(iso){
+  if(!iso) return null;
+  const d = new Date(iso + "T00:00:00");
+  return isNaN(d.getTime()) ? null : d;
+}
+function ymKey(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  return `${y}-${m}`;
+}
+function inRange(d, startIso, endIso){
+  const s = new Date(startIso + "T00:00:00");
+  const e = new Date(endIso + "T00:00:00");
+  return d >= s && d <= e;
+}
+
+/* Find term by date */
+function findTermByDate(d){
+  if(!d) return null;
+  for(const ay of Object.keys(TERMS)){
+    for(const t of TERMS[ay]){
+      if(inRange(d, t.start, t.end)){
+        return { ay, term: t.name, months: t.months };
+      }
+    }
+  }
+  return null;
+}
+
+/* Months attend: join month → end of AY (10 months total) */
+function calcMonthsAttend(joinDate){
+  const jt = findTermByDate(joinDate);
+  if(!jt) return { ay:null, monthsAttend:0 };
+
+  const months = AY_MONTHS[jt.ay] || [];
+  const idx = months.indexOf(ymKey(joinDate));
+  if(idx === -1) return { ay:jt.ay, monthsAttend:0 };
+
+  return { ay: jt.ay, monthsAttend: months.length - idx };
+}
+
+/* Remaining terms/months AFTER leave term */
+function calcUnusedTermMonths(ay, leaveTermName){
+  const list = TERMS[ay] || [];
+  const leaveIdx = list.findIndex(t => t.name === leaveTermName);
+  const remaining = leaveIdx >= 0 ? list.slice(leaveIdx + 1) : [];
+  return {
+    termsCount: remaining.length,
+    monthsCount: remaining.reduce((s,t)=>s+(t.months||0),0)
+  };
+}
+
+/* UI: auto update join tags + proration */
+function updateJoinAuto(){
+  const j = dateObj($("joinDate").value);
+  const jt = findTermByDate(j);
+  $("joinTermTag").textContent = jt ? `[${jt.ay} - ${jt.term}]` : `[Academic Year - Term]`;
+
+  const base = parseMoney($("baseFee").value);
+  const { monthsAttend } = calcMonthsAttend(j);
+
+  $("monthsAttendTag").textContent = `[${monthsAttend} months]`;
+
+  if(!jt || monthsAttend <= 0 || base <= 0){
+    $("proratedFee").textContent = "0";
+    return;
+  }
+
+  const prorated = Math.round((base / 10) * monthsAttend);
+  $("proratedFee").textContent = formatMoney(prorated);
+}
+
+/* UI: auto update leave tag */
+function updateLeaveAuto(){
+  const l = dateObj($("leaveDate").value);
+  const lt = findTermByDate(l);
+  $("leaveTermTag").textContent = lt ? `[${lt.ay} - ${lt.term}]` : `[Academic Year - Term]`;
+}
+
+/* Format inputs with commas */
+function formatInputWithCommas(inputEl){
+  const v = parseMoney(inputEl.value);
+  inputEl.value = formatMoney(v);
+}
+
+/* FINAL AMOUNT calculation */
+function calcFinal(){
+  // normalize formatting first
+  formatInputWithCommas($("baseFee"));
+  formatInputWithCommas($("disc1"));
+  formatInputWithCommas($("disc2"));
+
+  updateJoinAuto();
+
+  const prorated = parseMoney($("proratedFee").textContent);
+  const d1 = parseMoney($("disc1").value);
+  const d2 = parseMoney($("disc2").value);
+
+  const final = prorated + d1 + d2; // discounts are negative
+  $("finalFee").textContent = formatMoney(final);
+
+  const monthsAttend = Number(String($("monthsAttendTag").textContent).replace(/[^\d]/g,"")) || 0;
+  const base = parseMoney($("baseFee").value);
+
+  const stepProrate = Math.round((base/10) * monthsAttend);
+
+  $("stepsText").textContent =
+`FINAL AMOUNT
+1) Base = ${formatMoney(base)}
+2) Months attend = ${monthsAttend}
+3) Prorate = Base ÷ 10 × Months attend = ${formatMoney(stepProrate)}
+4) Discount #1 = ${formatMoney(d1)}
+5) Discount #2 = ${formatMoney(d2)}
+6) FINAL Tuition Fee after Discount = Prorate + D1 + D2 = ${formatMoney(final)}
+
+Refund only unused months from unconsumed terms (terms after the leave term).`;
+}
+
+/* REFUND calculation (per your rule) */
+function calcRefund(){
+  updateJoinAuto();
+  updateLeaveAuto();
+
+  // ensure final already calculated
+  if(parseMoney($("finalFee").textContent) === 0){
+    calcFinal();
+  }
+
+  const final = parseMoney($("finalFee").textContent);
+
+  const j = dateObj($("joinDate").value);
+  const joinTerm = findTermByDate(j);
+  const monthsAttend = Number(String($("monthsAttendTag").textContent).replace(/[^\d]/g,"")) || 0;
+
+  const l = dateObj($("leaveDate").value);
+  const leaveTerm = findTermByDate(l);
+
+  if(!joinTerm || !leaveTerm || monthsAttend <= 0 || final <= 0){
+    $("refundAmount").textContent = "0";
+    $("refundMeta").textContent = "[0 terms, 0 months]";
+    $("stepsText").textContent += `\n\nREFUND CALCULATION\n(Need valid join date + leave date + final amount)`;
+    return;
+  }
+
+  if(joinTerm.ay !== leaveTerm.ay){
+    $("refundAmount").textContent = "0";
+    $("refundMeta").textContent = "[Different AY]";
+    $("stepsText").textContent += `\n\nREFUND CALCULATION\nCannot calculate across different academic years.`;
+    return;
+  }
+
+  const { termsCount, monthsCount } = calcUnusedTermMonths(leaveTerm.ay, leaveTerm.term);
+
+  const monthlyRate = final / monthsAttend;
+  const refund = Math.round(monthlyRate * monthsCount);
+
+  $("refundAmount").textContent = formatMoney(refund);
+  $("refundMeta").textContent = `[${termsCount} terms, ${monthsCount} months]`;
+
+  // append refund steps (REAL numbers)
+  $("stepsText").textContent +=
+`\n\nREFUND CALCULATION
+1) FINAL Tuition Fee after Discount = ${formatMoney(final)}
+2) Total initial prorated months attend = ${monthsAttend}
+3) Monthly rate for refund = FINAL ÷ initial months = ${formatMoney(Math.round(monthlyRate))}
+4) Refundable amount = Monthly rate × unused term months = ${formatMoney(refund)}
+   Unused months = ${monthsCount}  |  Unused terms = ${termsCount}`;
+}
+
+/* Month strips (ACCURATE: Dec 26 is Term 2) */
+function buildMonthStrips(){
+  const months2526 = [
+    ["Jun 25","t1"],["Jul","t1"],["Aug","t1"],["Sep","t2"],
+    ["Oct","t2"],["Nov","t2"],["Dec","t3"],["Jan 26","t3"],
+    ["Feb","t3"],["Mar","t3"],["Apr","t3"],["May","off"]
+  ];
+
+  const months2627 = [
+    ["Jun 26","t1"],["Jul","t1"],["Aug","t1"],["Sep","t2"],
+    ["Oct","t2"],["Nov","t2"],["Dec","t2"],["Jan 27","t3"],
+    ["Feb","t3"],["Mar","t3"],["Apr","off"],["May","off"]
+  ];
+
+  function render(targetId, arr){
+    const host = $(targetId);
+    host.innerHTML = "";
+    arr.forEach(([label, cls])=>{
+      const s = document.createElement("span");
+      s.className = `m ${cls}`;
+      s.textContent = label;
+      host.appendChild(s);
+    });
+  }
+
+  render("months2526", months2526);
+  render("months2627", months2627);
+}
+
+/* Toggle reference calendar 1 and 2 */
+function wireToggles(){
+  $("toggleTableBtn").addEventListener("click", ()=>{
+    $("refTableWrap").classList.toggle("hidden");
+  });
+  $("toggleChartBtn").addEventListener("click", ()=>{
+    $("refChartWrap").classList.toggle("hidden");
+  });
+}
+
+/* Init */
+(function init(){
+  // default formatting
+  $("baseFee").value = formatMoney(parseMoney($("baseFee").value));
+  $("disc1").value = formatMoney(parseMoney($("disc1").value));
+  $("disc2").value = formatMoney(parseMoney($("disc2").value));
+
+  buildMonthStrips();
+  wireToggles();
+
+  // LIVE update as you type (proration preview)
+  $("baseFee").addEventListener("input", updateJoinAuto);
+  $("joinDate").addEventListener("change", updateJoinAuto);
+  $("leaveDate").addEventListener("change", updateLeaveAuto);
+
+  // format on blur (commas)
+  $("baseFee").addEventListener("blur", ()=>{ formatInputWithCommas($("baseFee")); updateJoinAuto(); });
+  $("disc1").addEventListener("blur", ()=>{ formatInputWithCommas($("disc1")); });
+  $("disc2").addEventListener("blur", ()=>{ formatInputWithCommas($("disc2")); });
+
+  // buttons
+  $("calcFinalBtn").addEventListener("click", calcFinal);
+  $("calcRefundBtn").addEventListener("click", calcRefund);
+
+  // initial auto state
+  updateJoinAuto();
+  updateLeaveAuto();
+})();
 </script>
-
 </body>
 </html>
