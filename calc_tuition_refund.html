@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tuition Refund Calculator</title>
+<style>
+body{
+  font-family: system-ui, -apple-system, Segoe UI, Roboto;
+  background:#f6f7fb;
+  padding:40px;
+}
+.card{
+  max-width:720px;
+  margin:auto;
+  background:#fff;
+  border-radius:14px;
+  padding:24px;
+  box-shadow:0 8px 24px rgba(0,0,0,.08);
+}
+h1{font-size:20px;margin-bottom:16px}
+label{font-size:13px;color:#555}
+input, select{
+  width:100%;
+  padding:10px;
+  margin-top:6px;
+  margin-bottom:14px;
+  border-radius:10px;
+  border:1px solid #ddd;
+}
+button{
+  padding:12px 18px;
+  border-radius:12px;
+  border:none;
+  background:#111827;
+  color:#fff;
+  cursor:pointer;
+}
+.result{
+  margin-top:20px;
+  padding:14px;
+  background:#f9fafb;
+  border-radius:12px;
+}
+strong{color:#111}
+.money{font-weight:600}
+</style>
+</head>
+
+<body>
+<div class="card">
+<h1>Tuition Refund Calculator</h1>
+
+<label>Annual Tuition Amount</label>
+<input id="annual" type="number" value="10000000">
+
+<label>Join Month (1–10)</label>
+<input id="joinMonth" type="number" min="1" max="10" value="3">
+
+<label>Leave Date</label>
+<input id="leaveDate" type="date">
+
+<label>Academic Year</label>
+<select id="ay">
+  <option value="AY2025-2026">AY2025-2026</option>
+  <option value="AY2026-2027">AY2026-2027</option>
+</select>
+
+<button onclick="calculate()">Calculate Refund</button>
+
+<div class="result" id="result"></div>
+</div>
+
+<script>
+const TERMS = {
+  "AY2025-2026": [
+    { name:"Term 1", start:"2025-06-10", end:"2025-08-29", months:3 },
+    { name:"Term 2", start:"2025-09-01", end:"2025-11-28", months:3 },
+    { name:"Term 3", start:"2025-12-01", end:"2026-04-03", months:4 }
+  ],
+  "AY2026-2027": [
+    { name:"Term 1", start:"2026-06-16", end:"2026-09-04", months:3 },
+    { name:"Term 2", start:"2026-09-07", end:"2026-12-18", months:3 },
+    { name:"Term 3", start:"2027-01-05", end:"2027-03-31", months:4 }
+  ]
+};
+
+function calculate(){
+  const annual = Number(document.getElementById("annual").value);
+  const joinMonth = Number(document.getElementById("joinMonth").value);
+  const leaveDate = new Date(document.getElementById("leaveDate").value);
+  const ay = document.getElementById("ay").value;
+
+  if(!leaveDate.getTime()){
+    alert("Please select leave date");
+    return;
+  }
+
+  const monthly = annual / 10;
+  const paidMonths = 10 - joinMonth + 1;
+  const amountPaid = monthly * paidMonths;
+
+  let refundableMonths = 0;
+  let leftInTerm = "";
+
+  TERMS[ay].forEach(t=>{
+    const termStart = new Date(t.start);
+    if(leaveDate < termStart){
+      refundableMonths += t.months;
+    }
+    if(leaveDate >= new Date(t.start) && leaveDate <= new Date(t.end)){
+      leftInTerm = t.name;
+    }
+  });
+
+  const refund = refundableMonths * monthly;
+
+  document.getElementById("result").innerHTML = `
+    <div><strong>Monthly Fee:</strong> <span class="money">${monthly.toLocaleString()}</span></div>
+    <div><strong>Amount Paid:</strong> <span class="money">${amountPaid.toLocaleString()}</span></div>
+    <div><strong>Left During:</strong> ${leftInTerm || "After all terms"}</div>
+    <div><strong>Refundable Months:</strong> ${refundableMonths}</div>
+    <div style="margin-top:10px">
+      <strong>Refund Amount:</strong>
+      <span class="money">${refund.toLocaleString()}</span>
+    </div>
+  `;
+}
+</script>
+</body>
+</html>
