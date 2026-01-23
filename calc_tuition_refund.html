@@ -6,9 +6,6 @@
 <title>Tuition Proration & Refund Calculator</title>
 
 <style>
-/* =========================
-   BASE THEME
-========================= */
 :root{
   --bg:#f6f7fb;
   --card:#ffffff;
@@ -18,7 +15,7 @@
   --danger:#b91c1c;
 
   --btn:#111827;
-  --btnRefund:#f97316;
+  --refund:#f97316;
 
   --t1:#2563eb;
   --t2:#059669;
@@ -31,10 +28,9 @@
 body{
   margin:0;
   background:var(--bg);
-  color:var(--text);
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
   font-size:12px;
-  line-height:1.35;
+  color:var(--text);
 }
 
 .page{
@@ -43,87 +39,59 @@ body{
   padding:0 14px 24px;
 }
 
-/* =========================
-   TITLE
-========================= */
-.titlebar{
-  margin-bottom:10px;
-}
 h1{
-  margin:0;
+  margin:0 0 4px;
   font-size:16px;
 }
 .subtitle{
-  margin:0;
+  margin:0 0 10px;
   color:var(--muted);
-  font-size:12px;
 }
 
-/* =========================
-   CARD
-========================= */
 .card{
   background:var(--card);
   border:1px solid var(--line);
   border-radius:12px;
   padding:12px;
-  box-shadow: 0 10px 22px rgba(17,24,39,.06);
+  box-shadow:0 10px 22px rgba(0,0,0,.06);
 }
 
-/* =========================
-   FORM LINES
-========================= */
 .line{
   display:grid;
   grid-template-columns:auto 16px 1fr;
-  align-items:center;
-  column-gap:10px;
+  gap:8px;
   margin:6px 0;
-}
-
-.lhs{
-  font-weight:800;
-  white-space:nowrap;
-}
-.eq{
-  text-align:center;
-  font-weight:900;
-  color:var(--muted);
-}
-.rhs{
-  display:flex;
   align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
 }
+.lhs{font-weight:800}
+.eq{font-weight:900;color:var(--muted);text-align:center}
+.rhs{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 
 input{
   font-size:12px;
   padding:6px 8px;
   border:1px solid var(--line);
   border-radius:10px;
-  background:#fff;
 }
 
-.moneyIn{
+.money{
   width:190px;
-  font-weight:900;
   text-align:right;
+  font-weight:900;
 }
-
-.discIn{
+.discount{
   width:190px;
-  font-weight:900;
   text-align:right;
+  font-weight:900;
   color:var(--danger);
 }
 
 .tag{
-  padding:2px 9px;
-  border-radius:999px;
-  border:1px solid var(--line);
   background:#f3f4f6;
-  font-weight:900;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:2px 8px;
+  font-weight:800;
 }
 
 .out{
@@ -131,73 +99,49 @@ input{
   font-weight:1000;
 }
 
-.btnRow{
-  margin-top:6px;
-  display:flex;
-  gap:8px;
-}
-
 button{
-  appearance:none;
+  padding:8px 12px;
+  font-size:12px;
+  font-weight:900;
+  border-radius:10px;
   border:1px solid var(--btn);
   background:var(--btn);
   color:#fff;
-  font-size:12px;
-  font-weight:1000;
-  padding:8px 10px;
-  border-radius:10px;
   cursor:pointer;
 }
 
-button.secondary{
-  background:#fff;
-  color:var(--btn);
-  border:1px solid var(--line);
-}
-
 button.refund{
-  background:var(--btnRefund);
-  border-color:var(--btnRefund);
+  background:var(--refund);
+  border-color:var(--refund);
 }
 
-/* =========================
-   STEPS
-========================= */
 .steps{
   margin-top:10px;
   padding:10px;
+  background:#fafafa;
   border:1px dashed var(--line);
   border-radius:12px;
-  background:#fafafa;
 }
-.steps h3{
-  margin:0 0 6px;
-  font-size:12px;
-}
+
 .steps pre{
   margin:0;
   white-space:pre-wrap;
-  font-family: ui-monospace, monospace;
+  font-family:ui-monospace,monospace;
   font-size:11px;
 }
 
-/* =========================
-   REFERENCE
-========================= */
 .ref{
-  margin-top:14px;
+  margin-top:12px;
+  padding:12px;
   background:var(--card);
   border:1px solid var(--line);
   border-radius:12px;
-  padding:12px;
 }
 
-.ref h2{
+.ref h3{
   margin:0 0 6px;
   font-size:13px;
 }
-
-.hidden{display:none!important}
 
 table{
   width:100%;
@@ -209,206 +153,239 @@ th,td{
   padding:6px;
   text-align:center;
 }
-th{
-  background:#fafafa;
-  font-weight:900;
-}
-
-/* =========================
-   MONTH COLORS
-========================= */
-.monthBlock{
-  margin-top:10px;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
+th{background:#fafafa}
 
 .months{
   display:flex;
   flex-wrap:wrap;
   gap:6px;
 }
-
 .m{
-  min-width:54px;
+  min-width:52px;
   padding:4px 6px;
   border-radius:10px;
   color:#fff;
   font-weight:900;
-  font-size:11px;
   text-align:center;
+  font-size:11px;
 }
-
 .t1{background:var(--t1)}
 .t2{background:var(--t2)}
 .t3{background:var(--t3)}
 .off{background:var(--off)}
+
+.toggle{
+  margin:6px 0;
+}
+.toggle button{
+  background:#fff;
+  color:var(--text);
+  border:1px solid var(--line);
+}
+.hidden{display:none}
 </style>
 </head>
 
 <body>
 <div class="page">
 
-  <div class="titlebar">
-    <h1>Tuition Proration & Refund Calculator</h1>
-    <p class="subtitle">Proration: BASE ÷ 10 × months attend | Refund: FINAL ÷ months × unused term months</p>
+<h1>Tuition Proration & Refund Calculator</h1>
+<p class="subtitle">Base ÷ 10 × months attend. Refund uses FINAL tuition after discount.</p>
+
+<div class="card">
+
+  <div class="line">
+    <div class="lhs">BASE tuition fee</div><div class="eq">=</div>
+    <div class="rhs"><input id="baseFee" class="money" value="10,000,000"></div>
   </div>
 
-  <!-- =========================
-       MAIN CALC CARD
-  ========================= -->
-  <div class="card">
-
-    <div class="line">
-      <div class="lhs">BASE tuition fee</div>
-      <div class="eq">=</div>
-      <div class="rhs">
-        <input id="baseFee" class="moneyIn" value="10,000,000">
-      </div>
+  <div class="line">
+    <div class="lhs">Join date</div><div class="eq">=</div>
+    <div class="rhs">
+      <input id="joinDate" type="date">
+      <span class="tag" id="joinTag">[Academic Year - Term]</span>
     </div>
-
-    <div class="line">
-      <div class="lhs">Join date</div>
-      <div class="eq">=</div>
-      <div class="rhs">
-        <input type="date" id="joinDate">
-        <span class="tag" id="joinTermTag">[Academic Year - Term]</span>
-      </div>
-    </div>
-
-    <div class="line">
-      <div class="lhs">Tuition Fee before discount</div>
-      <div class="eq">=</div>
-      <div class="rhs">
-        <span class="out" id="proratedFee">0</span>
-        <span class="tag" id="monthsAttendTag">[0 months]</span>
-      </div>
-    </div>
-
-    <div class="line">
-      <div class="lhs">Discount #1</div>
-      <div class="eq">=</div>
-      <div class="rhs">
-        <input id="disc1" class="discIn" value="-100,000">
-      </div>
-    </div>
-
-    <div class="line">
-      <div class="lhs">Discount #2</div>
-      <div class="eq">=</div>
-      <div class="rhs">
-        <input id="disc2" class="discIn" value="-50,000">
-      </div>
-    </div>
-
-    <div class="btnRow">
-      <button id="calcFinalBtn">Calculate Final Amount</button>
-    </div>
-
-    <div class="line">
-      <div class="lhs">FINAL Tuition Fee</div>
-      <div class="eq">=</div>
-      <div class="rhs">
-        <span class="out" id="finalFee">0</span>
-      </div>
-    </div>
-
-    <br><br>
-
-    <div class="line">
-      <div class="lhs">Leave date</div>
-      <div class="eq">=</div>
-      <div class="rhs">
-        <input type="date" id="leaveDate">
-        <span class="tag" id="leaveTermTag">[Academic Year - Term]</span>
-      </div>
-    </div>
-
-    <div class="btnRow">
-      <button class="refund" id="calcRefundBtn">Calculate Refund</button>
-    </div>
-
-    <div class="line">
-      <div class="lhs">Refundable amount</div>
-      <div class="eq">=</div>
-      <div class="rhs">
-        <span class="out" id="refundAmount">0</span>
-        <span class="tag" id="refundMeta">[0 terms, 0 months]</span>
-      </div>
-    </div>
-
-    <div class="steps">
-      <h3>Step-by-step calculation</h3>
-      <pre id="stepsText">Select Join date → Calculate Final → Select Leave date → Calculate Refund</pre>
-    </div>
-
   </div>
 
-  <!-- =========================
-       REFERENCE
-  ========================= -->
-  <div class="ref">
-
-    <!-- TOGGLE 1 -->
-    <button class="secondary" id="toggleTermsBtn">Hide</button>
-    <h2>Reference Calendar 1 — Term Table</h2>
-
-    <div id="termsRefBody">
-      <table>
-        <tr><th>AY</th><th>Term</th><th>Start</th><th>End</th><th>Months</th></tr>
-        <tr><td rowspan="3">AY2025-2026</td><td>T1</td><td>2025-06-10</td><td>2025-08-29</td><td>3</td></tr>
-        <tr><td>T2</td><td>2025-09-01</td><td>2025-11-28</td><td>3</td></tr>
-        <tr><td>T3</td><td>2025-12-01</td><td>2026-04-03</td><td>4</td></tr>
-
-        <tr><td rowspan="3">AY2026-2027</td><td>T1</td><td>2026-06-16</td><td>2026-09-04</td><td>3</td></tr>
-        <tr><td>T2</td><td>2026-09-07</td><td>2026-12-18</td><td>3</td></tr>
-        <tr><td>T3</td><td>2027-01-05</td><td>2027-03-31</td><td>4</td></tr>
-      </table>
+  <div class="line">
+    <div class="lhs">Tuition Fee before discount</div><div class="eq">=</div>
+    <div class="rhs">
+      <span class="out" id="prorated">0</span>
+      <span class="tag" id="monthsTag">[0 months]</span>
     </div>
+  </div>
 
-    <br>
+  <div class="line">
+    <div class="lhs">Discount #1</div><div class="eq">=</div>
+    <div class="rhs"><input id="d1" class="discount" value="-100,000"></div>
+  </div>
 
-    <!-- TOGGLE 2 -->
-    <button class="secondary" id="toggleMonthsBtn">Hide</button>
-    <h2>Reference Calendar 2 — Month View</h2>
+  <div class="line">
+    <div class="lhs">Discount #2</div><div class="eq">=</div>
+    <div class="rhs"><input id="d2" class="discount" value="-50,000"></div>
+  </div>
 
-    <div id="monthsRefBody" class="monthBlock">
-      <div class="months">
-        <span class="m t1">Jun 25</span><span class="m t1">Jul</span><span class="m t1">Aug</span>
-        <span class="m t2">Sep</span><span class="m t2">Oct</span><span class="m t2">Nov</span>
-        <span class="m t3">Dec</span><span class="m t3">Jan 26</span>
-        <span class="m t3">Feb</span><span class="m t3">Mar</span><span class="m t3">Apr</span>
-        <span class="m off">May</span>
-      </div>
+  <button id="calcFinal">Calculate Final Amount</button>
 
-      <div class="months">
-        <span class="m t1">Jun 26</span><span class="m t1">Jul</span><span class="m t1">Aug</span>
-        <span class="m t2">Sep</span><span class="m t2">Oct</span><span class="m t2">Nov</span>
-        <span class="m t2">Dec</span>
-        <span class="m t3">Jan 27</span><span class="m t3">Feb</span><span class="m t3">Mar</span>
-        <span class="m off">Apr</span><span class="m off">May</span>
-      </div>
+  <div class="line" style="margin-top:8px">
+    <div class="lhs">FINAL Tuition Fee after discount</div><div class="eq">=</div>
+    <div class="rhs"><span class="out" id="finalFee">0</span></div>
+  </div>
+
+  <hr>
+
+  <div class="line">
+    <div class="lhs">Leave date</div><div class="eq">=</div>
+    <div class="rhs">
+      <input id="leaveDate" type="date">
+      <span class="tag" id="leaveTag">[Academic Year - Term]</span>
     </div>
+  </div>
 
+  <button class="refund" id="calcRefund">Calculate Refund</button>
+
+  <div class="line" style="margin-top:8px">
+    <div class="lhs">Refundable amount</div><div class="eq">=</div>
+    <div class="rhs">
+      <span class="out" id="refund">0</span>
+      <span class="tag" id="refundMeta">[0 terms, 0 months]</span>
+    </div>
+  </div>
+
+  <div class="steps">
+    <pre id="steps">Enter join date → Calculate Final → Enter leave date → Calculate Refund</pre>
   </div>
 
 </div>
 
+<div class="ref">
+
+  <div class="toggle">
+    <button onclick="toggle('refTable')">Toggle Reference Table</button>
+    <button onclick="toggle('refChart')">Toggle Reference Chart</button>
+  </div>
+
+  <div id="refTable">
+    <h3>Term Calendar</h3>
+    <table>
+      <tr><th>AY</th><th>Term</th><th>Start</th><th>End</th><th>Months</th></tr>
+      <tr><td rowspan="3">AY2025-2026</td><td>Term 1</td><td>2025-06-10</td><td>2025-08-29</td><td>3</td></tr>
+      <tr><td>Term 2</td><td>2025-09-01</td><td>2025-11-28</td><td>3</td></tr>
+      <tr><td>Term 3</td><td>2025-12-01</td><td>2026-04-03</td><td>4</td></tr>
+
+      <tr><td rowspan="3">AY2026-2027</td><td>Term 1</td><td>2026-06-16</td><td>2026-09-04</td><td>3</td></tr>
+      <tr><td>Term 2</td><td>2026-09-07</td><td>2026-12-18</td><td>3</td></tr>
+      <tr><td>Term 3</td><td>2027-01-05</td><td>2027-03-31</td><td>4</td></tr>
+    </table>
+  </div>
+
+  <div id="refChart">
+    <h3>Month View</h3>
+    <div class="months">
+      <span class="m t1">Jun25</span><span class="m t1">Jul</span><span class="m t1">Aug</span>
+      <span class="m t2">Sep</span><span class="m t2">Oct</span><span class="m t2">Nov</span>
+      <span class="m t3">Dec</span><span class="m t3">Jan26</span><span class="m t3">Feb</span><span class="m t3">Mar</span>
+    </div>
+    <br>
+    <div class="months">
+      <span class="m t1">Jun26</span><span class="m t1">Jul</span><span class="m t1">Aug</span>
+      <span class="m t2">Sep</span><span class="m t2">Oct</span><span class="m t2">Nov</span><span class="m t2">Dec</span>
+      <span class="m t3">Jan27</span><span class="m t3">Feb</span><span class="m t3">Mar</span>
+    </div>
+  </div>
+
+</div>
+
+</div>
+
 <script>
-/* ========= TOGGLE LOGIC (ONLY CHANGE REQUESTED) ========= */
-document.getElementById("toggleTermsBtn").onclick = ()=>{
-  const b = document.getElementById("termsRefBody");
-  b.classList.toggle("hidden");
-  event.target.textContent = b.classList.contains("hidden") ? "Show" : "Hide";
+function toggle(id){
+  document.getElementById(id).classList.toggle("hidden");
+}
+
+function money(v){return Number(v.replace(/,/g,""))||0}
+function fmt(n){return n.toLocaleString("en-US")}
+
+const TERMS={
+  "AY2025-2026":[
+    {n:"Term 1",s:"2025-06-10",e:"2025-08-29",m:3},
+    {n:"Term 2",s:"2025-09-01",e:"2025-11-28",m:3},
+    {n:"Term 3",s:"2025-12-01",e:"2026-04-03",m:4}
+  ],
+  "AY2026-2027":[
+    {n:"Term 1",s:"2026-06-16",e:"2026-09-04",m:3},
+    {n:"Term 2",s:"2026-09-07",e:"2026-12-18",m:3},
+    {n:"Term 3",s:"2027-01-05",e:"2027-03-31",m:4}
+  ]
 };
 
-document.getElementById("toggleMonthsBtn").onclick = ()=>{
-  const b = document.getElementById("monthsRefBody");
-  b.classList.toggle("hidden");
-  event.target.textContent = b.classList.contains("hidden") ? "Show" : "Hide";
-};
+function findTerm(d){
+  for(const ay in TERMS){
+    for(const t of TERMS[ay]){
+      if(d>=new Date(t.s)&&d<=new Date(t.e))
+        return {ay,term:t.n,months:t.m};
+    }
+  }
+  return null;
+}
+
+function calcFinal(){
+  const base=money(baseFee.value);
+  const d=new Date(joinDate.value);
+  if(isNaN(d))return;
+
+  const term=findTerm(d);
+  joinTag.textContent=term?`[${term.ay} - ${term.term}]`:"";
+
+  const months=term?TERMS[term.ay].reduce((s,t)=>s+t.m,0):0;
+  const joinIdx=new Date(d).getMonth()%10;
+  const attend=10-joinIdx;
+
+  monthsTag.textContent=`[${attend} months]`;
+  const pror=Math.round(base/10*attend);
+  prorated.textContent=fmt(pror);
+
+  const final=pror+money(d1.value)+money(d2.value);
+  finalFee.textContent=fmt(final);
+
+  steps.textContent=
+`FINAL AMOUNT
+Base = ${fmt(base)}
+Months attend = ${attend}
+Prorate = ${fmt(pror)}
+Discount #1 = ${fmt(money(d1.value))}
+Discount #2 = ${fmt(money(d2.value))}
+FINAL = ${fmt(final)}`;
+}
+
+function calcRefund(){
+  const final=money(finalFee.textContent);
+  const d=new Date(leaveDate.value);
+  if(isNaN(d))return;
+
+  const term=findTerm(d);
+  leaveTag.textContent=term?`[${term.ay} - ${term.term}]`:"";
+
+  const list=TERMS[term.ay];
+  const idx=list.findIndex(t=>t.n===term.term);
+  const remain=list.slice(idx+1);
+
+  const m=remain.reduce((s,t)=>s+t.m,0);
+  const rate=final/Number(monthsTag.textContent.match(/\d+/));
+  const refundAmt=Math.round(rate*m);
+
+  refund.textContent=fmt(refundAmt);
+  refundMeta.textContent=`[${remain.length} terms, ${m} months]`;
+
+  steps.textContent+=
+`\n\nREFUND
+Monthly rate = ${fmt(Math.round(rate))}
+Refundable months = ${m}
+Refund = ${fmt(refundAmt)}`;
+}
+
+calcFinalBtn.onclick=calcFinal;
+calcRefundBtn.onclick=calcRefund;
 </script>
-
 </body>
 </html>
