@@ -2,55 +2,56 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Tuition Proration & Refund Calculator</title>
+<title>Tuition Proration & Refund</title>
 
 <style>
 body{
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  font-family: system-ui, Arial;
+  font-size:13px;
   background:#f6f7fb;
-  padding:24px;
-  line-height:1.6;
+  padding:20px;
 }
-h2,h3{margin-top:0}
 label{font-weight:600}
 input{
-  padding:8px 10px;
-  font-size:14px;
-  margin:4px 0 12px;
-  width:280px;
+  font-size:13px;
+  padding:4px 6px;
+  width:200px;
 }
 .discount{
   color:#b91c1c;
   font-weight:700;
 }
-.output{
+.out{
   font-weight:700;
   margin-left:6px;
 }
-.card{
+button{
+  font-size:13px;
+  padding:6px 12px;
+  margin:6px 0;
+}
+.ref{
   background:#fff;
   border:1px solid #ccc;
-  border-radius:10px;
-  padding:16px;
-  margin-top:16px;
+  padding:12px;
+  margin-top:18px;
 }
-button{
-  padding:10px 18px;
-  font-size:14px;
-  border:none;
-  border-radius:8px;
-  background:#111;
-  color:#fff;
-  cursor:pointer;
-  margin:10px 0;
+table{
+  border-collapse:collapse;
+  width:100%;
+  font-size:12px;
+}
+th,td{
+  border:1px solid #ccc;
+  padding:6px;
+  text-align:center;
 }
 .month{
-  padding:6px 10px;
-  color:#fff;
-  border-radius:6px;
   display:inline-block;
-  margin:3px;
-  font-size:13px;
+  padding:4px 6px;
+  margin:2px;
+  color:#fff;
+  border-radius:4px;
 }
 .t1{background:#2563eb}
 .t2{background:#059669}
@@ -60,47 +61,78 @@ button{
 
 <body>
 
-<h2>Tuition Proration & Refund Calculator</h2>
+<label>BASE tuition fee</label>
+<input id="baseFee" placeholder="10,000,000">
 
-<label>BASE tuition fee</label><br>
-<input id="baseFee" placeholder="10,000,000"><br>
+<br>
 
-<label>Join date</label><br>
+<label>Join date</label>
 <input type="date" id="joinDate">
-<span class="output" id="joinTerm"></span><br>
+<span class="out" id="joinTerm"></span>
+
+<br>
 
 <label>Tuition Fee before discount (AFTER PRORATE)</label>
-<span class="output" id="proratedFee"></span><br><br>
+<span class="out" id="proratedFee"></span>
 
-<label>Discount #1</label><br>
-<input id="disc1" class="discount" placeholder="-100,000"><br>
+<br>
 
-<label>Discount #2</label><br>
-<input id="disc2" class="discount" placeholder="-50,000"><br>
+<label>Discount #1</label>
+<input id="disc1" class="discount" placeholder="-100,000">
 
-<button onclick="calcFinal()">Calculate Final Amount</button><br>
+<br>
+
+<label>Discount #2</label>
+<input id="disc2" class="discount" placeholder="-50,000">
+
+<br>
+
+<button onclick="calcFinal()">Calculate Final Amount</button>
 
 <label>FINAL Tuition Fee after discount</label>
-<span class="output" id="finalFee"></span><br><br>
+<span class="out" id="finalFee"></span>
 
-<label>Leave date</label><br>
+<br><br>
+
+<label>Leave date</label>
 <input type="date" id="leaveDate">
-<span class="output" id="leaveTerm"></span><br>
+<span class="out" id="leaveTerm"></span>
+
+<br>
 
 <button onclick="calcRefund()">Calculate Refund</button>
 
-<div class="card">
-  <h3>Result</h3>
-  Refundable amount:
-  <span class="output" id="refundAmount"></span><br>
-  Refundable term (total month):
-  <span class="output" id="refundMonths"></span>
-</div>
+<br>
 
-<div class="card">
-<h3>Term Calendar Reference</h3>
+<label>Refundable amount</label>
+<span class="out" id="refundAmount"></span>
 
-<strong>AY2025–2026</strong><br>
+<br>
+
+<label>Refundable term (total month)</label>
+<span class="out" id="refundMonths"></span>
+
+<!-- =================== REFERENCE =================== -->
+
+<div class="ref">
+<strong>1. Term Calendar (Reference)</strong>
+
+<table>
+<tr><th>Academic Year</th><th>Term</th><th>Start</th><th>End</th><th>Months</th></tr>
+<tr><td rowspan="3">AY2025-2026</td><td>Term 1</td><td>10-Jun-25</td><td>29-Aug-25</td><td>3</td></tr>
+<tr><td>Term 2</td><td>01-Sep-25</td><td>28-Nov-25</td><td>3</td></tr>
+<tr><td>Term 3</td><td>01-Dec-25</td><td>03-Apr-26</td><td>4</td></tr>
+
+<tr><td rowspan="3">AY2026-2027</td><td>Term 1</td><td>16-Jun-26</td><td>04-Sep-26</td><td>3</td></tr>
+<tr><td>Term 2</td><td>07-Sep-26</td><td>18-Dec-26</td><td>3</td></tr>
+<tr><td>Term 3</td><td>05-Jan-27</td><td>31-Mar-27</td><td>4</td></tr>
+</table>
+
+<br>
+
+<strong>2. Month View (Color by Term)</strong><br>
+
+<!-- AY2025-2026 -->
 <span class="month t1">Jun 25</span>
 <span class="month t1">Jul</span>
 <span class="month t1">Aug</span>
@@ -114,9 +146,9 @@ button{
 <span class="month t3">Apr</span>
 <span class="month t3">May</span>
 
-<br><br>
+<br>
 
-<strong>AY2026–2027</strong><br>
+<!-- AY2026-2027 -->
 <span class="month t1">Jun 26</span>
 <span class="month t1">Jul</span>
 <span class="month t1">Aug</span>
@@ -132,70 +164,64 @@ button{
 </div>
 
 <script>
-const TERMS = {
-  "2025": [
-    {t:"T1",s:"2025-06-10",e:"2025-08-29",m:3},
-    {t:"T2",s:"2025-09-01",e:"2025-11-28",m:3},
-    {t:"T3",s:"2025-12-01",e:"2026-04-03",m:4}
-  ],
-  "2026": [
-    {t:"T1",s:"2026-06-16",e:"2026-09-04",m:3},
-    {t:"T2",s:"2026-09-07",e:"2026-12-18",m:3},
-    {t:"T3",s:"2027-01-05",e:"2027-03-31",m:4}
-  ]
+const TERMS={
+"AY2025-2026":[
+{name:"Term 1",s:"2025-06-10",e:"2025-08-29",m:3},
+{name:"Term 2",s:"2025-09-01",e:"2025-11-28",m:3},
+{name:"Term 3",s:"2025-12-01",e:"2026-04-03",m:4}
+],
+"AY2026-2027":[
+{name:"Term 1",s:"2026-06-16",e:"2026-09-04",m:3},
+{name:"Term 2",s:"2026-09-07",e:"2026-12-18",m:3},
+{name:"Term 3",s:"2027-01-05",e:"2027-03-31",m:4}
+]
 };
 
-const money = v => Number(v.replace(/,/g,''))||0;
-const fmt = n => n.toLocaleString("en-US");
+const num=v=>Number(v.replace(/,/g,""))||0;
+const fmt=n=>n.toLocaleString();
 
 function findTerm(d){
-  for(const ay in TERMS){
-    for(const x of TERMS[ay]){
-      if(d>=new Date(x.s)&&d<=new Date(x.e))
-        return {ay,term:x.t,months:x.m};
-    }
-  }
-  return null;
+for(const ay in TERMS){
+for(const t of TERMS[ay]){
+if(d>=new Date(t.s)&&d<=new Date(t.e))
+return{ay,term:t.name,months:t.m};
+}}
+return null;
 }
 
 joinDate.onchange=()=>{
-  const d=new Date(joinDate.value);
-  const r=findTerm(d);
-  joinTerm.textContent=r?`AY${r.ay} ${r.term}`:"";
+const r=findTerm(new Date(joinDate.value));
+joinTerm.textContent=r?`${r.ay} ${r.term}`:"";
+calcProrate();
 };
 
-leaveDate.onchange=()=>{
-  const d=new Date(leaveDate.value);
-  const r=findTerm(d);
-  leaveTerm.textContent=r?`AY${r.ay} ${r.term}`:"";
-};
-
-function calcFinal(){
-  const base=money(baseFee.value);
-  const monthly=base/10;
-  const join=new Date(joinDate.value);
-  const used=Math.max(0,join.getMonth()-5);
-  const payable=10-used;
-  const prorate=payable*monthly;
-  proratedFee.textContent=fmt(prorate);
-
-  const final=prorate+money(disc1.value)+money(disc2.value);
-  finalFee.textContent=fmt(final);
+function calcProrate(){
+const base=num(baseFee.value);
+const monthly=base/10;
+const jm=new Date(joinDate.value).getMonth();
+const used=Math.max(0,jm-5);
+const pay=(10-used)*monthly;
+proratedFee.textContent=fmt(pay);
 }
 
+function calcFinal(){
+const base=num(proratedFee.textContent||0);
+finalFee.textContent=fmt(base+num(disc1.value)+num(disc2.value));
+}
+
+leaveDate.onchange=()=>{
+const r=findTerm(new Date(leaveDate.value));
+leaveTerm.textContent=r?`${r.ay} ${r.term}`:"";
+};
+
 function calcRefund(){
-  const base=money(baseFee.value);
-  const monthly=base/10;
-  const leave=new Date(leaveDate.value);
-  const r=findTerm(leave);
-  if(!r)return;
-
-  const future=TERMS[r.ay]
-    .slice(TERMS[r.ay].findIndex(x=>x.t===r.term)+1)
-    .reduce((s,x)=>s+x.m,0);
-
-  refundMonths.textContent=future;
-  refundAmount.textContent=fmt(future*monthly);
+const base=num(baseFee.value)/10;
+const r=findTerm(new Date(leaveDate.value));
+if(!r)return;
+const idx=TERMS[r.ay].findIndex(t=>t.name===r.term);
+const months=TERMS[r.ay].slice(idx+1).reduce((s,t)=>s+t.m,0);
+refundMonths.textContent=months;
+refundAmount.textContent=fmt(months*base);
 }
 </script>
 
