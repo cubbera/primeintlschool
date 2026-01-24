@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Late Fee Simulator</title>
+<style>
+  :root{
+    --bg:#f6f7fb;
+    --card:#ffffff;
+    --text:#111827;
+    --muted:#6b7280;
+    --line:#e5e7eb;
+    --shadow: 0 10px 26px rgba(17,24,39,.08);
+    --radius:14px;
+
+    --accent:#111827;
+    --accent2:#0b3b8f;
+    --warn:#f97316;
+    --ok:#065f46;
+    --danger:#b91c1c;
+
+    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --font: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font);
+    line-height:1.35;
+    font-size:13px;
+  }
+
+  .page{
+    max-width:1180px;
+    margin:18px auto;
+    padding:0 14px 28px;
+  }
+
+  .topbar{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:12px;
+  }
+  .topbar h1{
+    margin:0;
+    font-size:18px;
+    letter-spacing:.2px;
+  }
+  .topbar .sub{
+    margin:4px 0 0;
+    color:var(--muted);
+    font-size:12px;
+  }
+  .pill{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:7px 10px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--muted);
+    font-weight:800;
+    font-size:12px;
+    white-space:nowrap;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns: 420px 1fr;
+    gap:12px;
+    align-items:start;
+  }
+  @media (max-width: 980px){
+    .grid{grid-template-columns:1fr}
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .cardHead{
+    padding:12px 14px;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background:#fff;
+  }
+  .cardHead h2{
+    margin:0;
+    font-size:14px;
+    letter-spacing:.2px;
+  }
+  .cardBody{padding:14px}
+
+  .sectionTitle{
+    font-weight:900;
+    margin:0 0 8px;
+    font-size:13px;
+    letter-spacing:.15px;
+  }
+  .mini{
+    font-size:12px;
+    color:var(--muted);
+    margin:6px 0 0;
+  }
+
+  .row{
+    display:grid;
+    grid-template-columns: 150px 1fr;
+    gap:10px;
+    align-items:center;
+    margin:8px 0;
+  }
+  .lab{
+    color:var(--muted);
+    font-weight:900;
+    font-size:12px;
+    white-space:nowrap;
+  }
+  .val{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    flex-wrap:wrap;
+    justify-content:flex-start;
+  }
+
+  input, select{
+    padding:9px 10px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    font-size:13px;
+    background:#fff;
+    outline:none;
+  }
+  input[type="date"]{padding:8px 10px}
+  .w100{width:100px}
+  .w140{width:140px}
+  .w160{width:160px}
+  .w220{width:220px}
+  .w260{width:260px}
+  .mono{font-family:var(--mono); font-variant-numeric: tabular-nums;}
+  .right{margin-left:auto}
+
+  .btnRow{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:10px;
+  }
+  button{
+    appearance:none;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--text);
+    padding:10px 12px;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:900;
+    font-size:13px;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    user-select:none;
+  }
+  button.primary{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+  button.blue{
+    background:var(--accent2);
+    border-color:var(--accent2);
+    color:#fff;
+  }
+  button.warn{
+    background:var(--warn);
+    border-color:var(--warn);
+    color:#fff;
+  }
+  button:disabled{opacity:.55; cursor:not-allowed}
+
+  .divider{
+    height:1px;
+    background:var(--line);
+    margin:12px 0;
+  }
+
+  .calcBox{
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:#fafafa;
+    padding:12px;
+    margin-top:10px;
+  }
+  .calcBox h3{
+    margin:0 0 6px;
+    font-size:13px;
+  }
+  .calcLine{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:10px;
+    margin:6px 0;
+    font-size:12px;
+    color:#374151;
+  }
+  .calcLine strong{color:var(--text)}
+  .calcLine .mono{font-weight:900}
+
+  /* Right side */
+  .rightStack{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  .snapTitle{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .snapTitle .when{
+    font-size:12px;
+    color:var(--muted);
+    font-weight:800;
+  }
+
+  .tableWrap{
+    border:1px solid var(--line);
+    border-radius:12px;
+    overflow:auto;
+    background:#fff;
+  }
+  table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0;
+    min-width:860px;
+    font-size:12px;
+  }
+  thead th{
+    position:sticky;
+    top:0;
+    background:#fafafa;
+    border-bottom:1px solid var(--line);
+    padding:10px 10px;
+    color:var(--muted);
+    text-align:left;
+    font-weight:900;
+    white-space:nowrap;
+  }
+  tbody td{
+    border-bottom:1px solid var(--line);
+    padding:9px 10px;
+    vertical-align:middle;
+    white-space:nowrap;
+  }
+  tbody tr:last-child td{border-bottom:none}
+  .money{text-align:right; font-variant-numeric: tabular-nums;}
+  .center{text-align:center}
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:3px 8px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--muted);
+    font-weight:900;
+    font-size:11px;
+  }
+  .badge.null{background:#fff; color:#6b7280}
+  .badge.pay{border-color:#bbf7d0; background:#ecfdf5; color:var(--ok)}
+  .badge.can{border-color:#fecaca; background:#fef2f2; color:var(--danger)}
+
+  .msg{
+    margin-top:8px;
+    color:var(--muted);
+    font-size:12px;
+  }
+
+  .fmt{
+    color:var(--muted);
+    font-size:12px;
+    font-weight:800;
+    padding:2px 8px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:#fff;
+  }
+</style>
+</head>
+
+<body>
+<div class="page">
+  <div class="topbar">
+    <div>
+      <h1>Late Fee Daily Ledger Simulator</h1>
+      <div class="sub">Generates daily late-fee rows from due date and shows ledger snapshots at Tuition Payment Date, Late Fee Payment Date, and Accountant Approval Date.</div>
+    </div>
+    <div class="pill">
+      Always resets tables on <strong>Run Simulation</strong>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <!-- LEFT SIDE -->
+    <div class="card">
+      <div class="cardHead">
+        <h2>LEFT SIDE</h2>
+        <span class="fmt" id="fmtHint">Day, DD-MMM-YYYY</span>
+      </div>
+      <div class="cardBody">
+
+        <div class="sectionTitle">Calculate Late FEE</div>
+
+        <div class="row">
+          <div class="lab">Student ID</div>
+          <div class="val">
+            <input id="studentId" class="w220 mono" value="PR25004" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="lab">Student Name</div>
+          <div class="val">
+            <input id="studentName" class="w260" value="Aye Aye" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="lab">Tuition Invoice Nr</div>
+          <div class="val">
+            <input id="invoiceNr" class="w220 mono" value="INV25046-07" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="lab">Late Fee Amount</div>
+          <div class="val">
+            <input id="lateFeeAmt" class="w160 mono moneyIn" value="20,000" inputmode="numeric" />
+            <span class="mini">default = 20,000</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="lab">Due Date</div>
+          <div class="val">
+            <input id="dueDate" type="date" class="w160" value="2026-01-01" />
+            <span class="fmt" id="dueFmt">—</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="lab">Payment Date</div>
+          <div class="val">
+            <input id="paymentDate" type="date" class="w160" value="2026-01-03" />
+            <span class="fmt" id="payFmt">—</span>
+          </div>
+        </div>
+
+        <div class="btnRow">
+          <button class="primary" type="button" id="calcLateBtn">Calculate Late Fee</button>
+        </div>
+
+        <div class="calcBox" id="calcLateBox">
+          <h3>Late Fee</h3>
+          <div class="calcLine">
+            <span>Total late fee (expected)</span>
+            <strong class="mono" id="lateFeeTotal">0</strong>
+          </div>
+          <div class="calcLine">
+            <span>Days charged</span>
+            <strong class="mono" id="lateFeeDays">0</strong>
+          </div>
+          <div class="mini" id="lateFeeRuleText">
+            * On Due Date +1 00:00 insert Late Fee Amount in ledger with date Due Date.
+            If by Due Date +2 00:00 not yet approved, insert another row with date Due Date +1.
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="sectionTitle">Simulate Database</div>
+        <div class="mini" style="margin-top:-4px;">
+          Accountant manually enters the dates below. Run Simulation will rebuild snapshots from scratch.
+        </div>
+
+        <div class="row">
+          <div class="lab">Accountant System Entry Date</div>
+          <div class="val">
+            <input id="acctEntryDate" type="date" class="w160" value="2026-01-05" />
+            <span class="fmt" id="entryFmt">—</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="lab">Tuition Payment Date</div>
+          <div class="val">
+            <input id="tuitionPayDate" type="date" class="w160" value="2026-01-03" />
+            <span class="fmt" id="tuiFmt">—</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="lab">Late Fee Payment Date</div>
+          <div class="val">
+            <input id="latePayDate" type="date" class="w160" value="2026-01-03" />
+            <span class="fmt" id="lateFmt">—</span>
+          </div>
+        </div>
+
+        <div class="btnRow">
+          <button class="blue" type="button" id="runSimBtn">Run Simulation</button>
+          <button type="button" id="resetBtn">Reset</button>
+        </div>
+
+        <div class="msg" id="leftMsg"></div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="rightStack">
+
+      <!-- Snapshot 1 -->
+      <div class="card">
+        <div class="cardHead">
+          <div class="snapTitle">
+            <h2>Late Fee Daily Ledger Table on Tuition Payment Date</h2>
+            <span class="when" id="snap1When">—</span>
+          </div>
+        </div>
+        <div class="cardBody">
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>student id</th>
+                  <th>invoice number</th>
+                  <th>late fee date</th>
+                  <th class="money">late fee amount</th>
+                  <th class="center">is_cancelled</th>
+                  <th>payment date</th>
+                </tr>
+              </thead>
+              <tbody id="snap1Body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Snapshot 2 -->
+      <div class="card">
+        <div class="cardHead">
+          <div class="snapTitle">
+            <h2>Late Fee Daily Ledger Table on Late Fee Payment Date</h2>
+            <span class="when" id="snap2When">—</span>
+          </div>
+        </div>
+        <div class="cardBody">
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>student id</th>
+                  <th>invoice number</th>
+                  <th>late fee date</th>
+                  <th class="money">late fee amount</th>
+                  <th class="center">is_cancelled</th>
+                  <th>payment date</th>
+                </tr>
+              </thead>
+              <tbody id="snap2Body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Snapshot 3 -->
+      <div class="card">
+        <div class="cardHead">
+          <div class="snapTitle">
+            <h2>Late Fee Daily Ledger Table on Accountant System Entry Date</h2>
+            <span class="when" id="snap3When">—</span>
+          </div>
+        </div>
+        <div class="cardBody">
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>student id</th>
+                  <th>invoice number</th>
+                  <th>late fee date</th>
+                  <th class="money">late fee amount</th>
+                  <th class="center">is_cancelled</th>
+                  <th>payment date</th>
+                </tr>
+              </thead>
+              <tbody id="snap3Body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- rightStack -->
+
+  </div><!-- grid -->
+</div><!-- page -->
+
+<script>
+/* =========================================================
+   Helpers
+   ========================================================= */
+const $ = (id) => document.getElementById(id);
+
+function parseMoney(str){
+  return Number(String(str||"").replace(/,/g,"").trim()) || 0;
+}
+function fmtMoney(n){
+  return Number(n||0).toLocaleString("en-US");
+}
+function dateObj(isoStr){
+  if(!isoStr) return null;
+  const d = new Date(isoStr + "T00:00:00");
+  return isNaN(d.getTime()) ? null : d;
+}
+function iso(d){
+  return d.toISOString().slice(0,10);
+}
+function addDays(d, days){
+  const x = new Date(d.getTime());
+  x.setDate(x.getDate() + days);
+  return x;
+}
+function diffDays(a, b){
+  // whole days between a and b: b - a (00:00 boundaries)
+  const ms = b.getTime() - a.getTime();
+  return Math.floor(ms / (24*60*60*1000));
+}
+function escapeHtml(s){
+  return String(s ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+function fmtDayDate(isoStr){
+  const d = dateObj(isoStr);
+  if(!d) return "—";
+  const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const mons = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const dd = String(d.getDate()).padStart(2,"0");
+  const mmm = mons[d.getMonth()];
+  const yyyy = d.getFullYear();
+  return `${days[d.getDay()]}, ${dd}-${mmm}-${yyyy}`;
+}
+function badgeHtml(val){
+  // val: null | 0 | 1
+  if(val === null) return `<span class="badge null">NULL</span>`;
+  if(val === 0) return `<span class="badge pay">0</span>`;
+  return `<span class="badge can">1</span>`;
+}
+
+/* =========================================================
+   Core Logic (matches your rule text)
+   =========================================================
+   Rule interpretation for daily insert:
+   - At Due Date + 1 day 00:00 => insert a row dated Due Date.
+   - At Due Date + 2 day 00:00 => insert a row dated Due Date+1.
+   Therefore:
+   - For a snapshot taken at the start of day S (00:00), rows exist for:
+       dates = Due Date ... (S - 1 day), count = daysBetween(DueDate, S)
+   Example:
+   - Due=1 Jan
+   - Snapshot on 3 Jan 00:00 => rows for 1 Jan and 2 Jan (2 rows).
+*/
+function buildLedgerAsOf(snapshotDateISO, base){
+  // base: {studentId, invoiceNr, feeAmt, dueDate}
+  const due = dateObj(base.dueDate);
+  const snap = dateObj(snapshotDateISO);
+  if(!due || !snap) return [];
+
+  const elapsed = diffDays(due, snap); // number of midnights passed after due date
+  const count = Math.max(0, elapsed);
+
+  const rows = [];
+  for(let i=0;i<count;i++){
+    const feeDate = addDays(due, i);
+    rows.push({
+      student_id: base.studentId,
+      invoice_number: base.invoiceNr,
+      late_fee_date: iso(feeDate),
+      late_fee_amount: base.feeAmt,
+      is_cancelled: null,
+      payment_date: null
+    });
+  }
+  return rows;
+}
+
+/*
+  Approval update (applies at accountant system entry date):
+  - If late fee payment date exists:
+      rows with late_fee_date < lateFeePaymentDate => payable (is_cancelled=0)
+      rows with late_fee_date >= lateFeePaymentDate => cancelled (is_cancelled=1)
+    payment_date is set to lateFeePaymentDate for all rows (history kept)
+  - If late fee payment date is empty: do nothing (still NULL)
+*/
+function applyApproval(rows, lateFeePaymentISO){
+  const pay = dateObj(lateFeePaymentISO);
+  if(!pay) return rows;
+
+  const payISO = iso(pay);
+
+  rows.forEach(r=>{
+    const rd = dateObj(r.late_fee_date);
+    if(!rd) return;
+
+    r.payment_date = payISO;
+
+    if(rd.getTime() < pay.getTime()){
+      r.is_cancelled = 0;
+    }else{
+      r.is_cancelled = 1;
+    }
+  });
+
+  return rows;
+}
+
+/* =========================================================
+   Rendering
+   ========================================================= */
+function renderRows(tbodyId, rows){
+  const body = $(tbodyId);
+  body.innerHTML = "";
+
+  if(!rows.length){
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td colspan="6" class="center" style="padding:12px; color:#6b7280;">No rows yet (as of this date).</td>`;
+    body.appendChild(tr);
+    return;
+  }
+
+  rows.forEach(r=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="mono">${escapeHtml(r.student_id)}</td>
+      <td class="mono">${escapeHtml(r.invoice_number)}</td>
+      <td class="mono">${escapeHtml(r.late_fee_date)}</td>
+      <td class="money mono">${fmtMoney(r.late_fee_amount)}</td>
+      <td class="center">${badgeHtml(r.is_cancelled)}</td>
+      <td class="mono">${r.payment_date ? escapeHtml(r.payment_date) : '<span class="badge null">NULL</span>'}</td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+function setFmtChips(){
+  $("dueFmt").textContent   = fmtDayDate($("dueDate").value);
+  $("payFmt").textContent   = fmtDayDate($("paymentDate").value);
+  $("entryFmt").textContent = fmtDayDate($("acctEntryDate").value);
+  $("tuiFmt").textContent   = fmtDayDate($("tuitionPayDate").value);
+  $("lateFmt").textContent  = fmtDayDate($("latePayDate").value);
+
+  $("snap1When").textContent = `= ${fmtDayDate($("tuitionPayDate").value)}`;
+  $("snap2When").textContent = `= ${fmtDayDate($("latePayDate").value)}`;
+  $("snap3When").textContent = `= ${fmtDayDate($("acctEntryDate").value)}`;
+}
+
+/* =========================================================
+   LEFT: Calculate Late Fee Button
+   =========================================================
+   Uses Payment Date (left side) as "parent paid date" and estimates:
+     daysCharged = daysBetween(dueDate, paymentDate)
+     total = daysCharged * daily amount
+   This matches the ledger insertion rule (each midnight adds one daily row for the previous day).
+*/
+function calculateLateFeeExpected(){
+  const due = dateObj($("dueDate").value);
+  const pay = dateObj($("paymentDate").value);
+
+  const feeAmt = parseMoney($("lateFeeAmt").value);
+
+  if(!due || !pay){
+    $("lateFeeDays").textContent = "0";
+    $("lateFeeTotal").textContent = fmtMoney(0);
+    $("leftMsg").textContent = "Please select Due Date and Payment Date.";
+    return;
+  }
+
+  if(pay.getTime() <= due.getTime()){
+    $("lateFeeDays").textContent = "0";
+    $("lateFeeTotal").textContent = fmtMoney(0);
+    $("leftMsg").textContent = "Payment Date is on/before Due Date → no late fee rows inserted yet.";
+    return;
+  }
+
+  const days = Math.max(0, diffDays(due, pay));
+  const total = days * feeAmt;
+
+  $("lateFeeDays").textContent = String(days);
+  $("lateFeeTotal").textContent = fmtMoney(total);
+  $("leftMsg").textContent = "Late fee is calculated from daily ledger rows that would exist by Payment Date 00:00.";
+}
+
+/* =========================================================
+   Run Simulation (Always resets tables)
+   ========================================================= */
+function runSimulation(){
+  // Always reset outputs first
+  renderRows("snap1Body", []);
+  renderRows("snap2Body", []);
+  renderRows("snap3Body", []);
+
+  const studentId = $("studentId").value.trim() || "—";
+  const invoiceNr = $("invoiceNr").value.trim() || "—";
+  const feeAmt = parseMoney($("lateFeeAmt").value);
+  const dueDate = $("dueDate").value;
+
+  const tuitionPayDate = $("tuitionPayDate").value;
+  const latePayDate = $("latePayDate").value;
+  const acctEntryDate = $("acctEntryDate").value;
+
+  // Basic validation
+  const due = dateObj(dueDate);
+  const tpd = dateObj(tuitionPayDate);
+  const lpd = dateObj(latePayDate);
+  const aed = dateObj(acctEntryDate);
+
+  if(!due || !tpd || !lpd || !aed){
+    $("leftMsg").textContent = "Please fill Due Date, Tuition Payment Date, Late Fee Payment Date, and Accountant System Entry Date.";
+    return;
+  }
+
+  // Base info for ledger creation
+  const base = { studentId, invoiceNr, feeAmt, dueDate };
+
+  // Snapshot 1: ledger as-of Tuition Payment Date (00:00)
+  const snap1 = buildLedgerAsOf(tuitionPayDate, base);
+
+  // Snapshot 2: ledger as-of Late Fee Payment Date (00:00)
+  const snap2 = buildLedgerAsOf(latePayDate, base);
+
+  // Snapshot 3: ledger as-of Accountant System Entry Date (00:00),
+  //             then apply approval changes using Late Fee Payment Date
+  const snap3 = buildLedgerAsOf(acctEntryDate, base);
+
+  // Approval only applies on/after accountant entry date.
+  // That is why snapshot 1 and 2 keep NULL fields (still not approved).
+  applyApproval(snap3, latePayDate);
+
+  renderRows("snap1Body", snap1);
+  renderRows("snap2Body", snap2);
+  renderRows("snap3Body", snap3);
+
+  // Helpful message
+  $("leftMsg").textContent =
+    "Simulation complete. Tables are rebuilt from scratch each time you click Run Simulation.";
+}
+
+/* =========================================================
+   Wiring / Init
+   ========================================================= */
+function normalizeMoneyInput(){
+  $("lateFeeAmt").value = fmtMoney(parseMoney($("lateFeeAmt").value));
+}
+
+function init(){
+  normalizeMoneyInput();
+  setFmtChips();
+  calculateLateFeeExpected();
+  runSimulation();
+}
+
+$("lateFeeAmt").addEventListener("blur", ()=>{
+  normalizeMoneyInput();
+});
+
+["dueDate","paymentDate","acctEntryDate","tuitionPayDate","latePayDate"].forEach(id=>{
+  $(id).addEventListener("change", ()=>{
+    setFmtChips();
+  });
+});
+
+$("calcLateBtn").addEventListener("click", ()=>{
+  normalizeMoneyInput();
+  setFmtChips();
+  calculateLateFeeExpected();
+});
+
+$("runSimBtn").addEventListener("click", ()=>{
+  normalizeMoneyInput();
+  setFmtChips();
+  runSimulation();
+});
+
+$("resetBtn").addEventListener("click", ()=>{
+  $("studentId").value = "PR25004";
+  $("studentName").value = "Aye Aye";
+  $("invoiceNr").value = "INV25046-07";
+  $("lateFeeAmt").value = "20,000";
+  $("dueDate").value = "2026-01-01";
+  $("paymentDate").value = "2026-01-03";
+
+  $("acctEntryDate").value = "2026-01-05";
+  $("tuitionPayDate").value = "2026-01-03";
+  $("latePayDate").value = "2026-01-03";
+
+  $("leftMsg").textContent = "";
+  init();
+});
+
+init();
+</script>
+</body>
+</html>
