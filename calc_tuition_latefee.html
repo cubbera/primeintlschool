@@ -387,16 +387,20 @@
     renderTable(document.getElementById("lateFeeTable"), lateFeeSnapshot);
     renderTable(document.getElementById("approveTable"), approveSnapshot);
 
-    // Student status:
-    // - If late fee not fully paid by Jan 7 morning => FINANCIALLY SUSPENDED (until paid)
-    // - When paid (stopDate exists), status becomes ACTIVE
-    const suspensionDate = new Date("2026-01-07T00:00:00"); // "7 Jan morning"
+    // Student status (FIXED):
+    // Rule: if until 7 Jan morning not yet pay late fee -> FINANCIALLY SUSPENDED until it is paid.
+    // Interpretation consistent with your examples:
+    // - Suspension triggers at 7 Jan 00:00 if late fee NOT paid by then.
+    // - If late fee later becomes paid (lpd exists), status becomes ACTIVE (even if paid after 7 Jan).
+    const suspensionThreshold = new Date("2026-01-07T00:00:00");
+
     let status = "ACTIVE";
-    if(!stopDate && apd >= suspensionDate){
-      status = "FINANCIALLY SUSPENDED";
-    }
-    if(stopDate){
+    if(lpd){
+      // late fee paid -> active
       status = "ACTIVE";
+    } else {
+      // late fee not paid yet; if we are at/after suspension threshold (use approval date as "current system time" in simulation)
+      status = (apd >= suspensionThreshold) ? "FINANCIALLY SUSPENDED" : "ACTIVE";
     }
     document.getElementById("studentStatus").textContent = status;
 
