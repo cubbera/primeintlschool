@@ -284,7 +284,7 @@
       document.getElementById("lateFeeResult").textContent = total.toLocaleString();
       noteEl.innerHTML =
         `Late fee will be capped at 5 days (max ${(5*dailyFee).toLocaleString()}). ` +
-        `Student status: Financially Suspended</b> until both Tuition Installment and Late Fee paid.`;
+        `Student status: "Financially Suspended" until both Tuition Installment and Late Fee paid.`;
     } else {
       // Not paid yet: still accruing; show "as of tuition payment date" amount as reference.
       const dLate = daysLate(due, tpd);
@@ -320,7 +320,7 @@
     // Basic validation
     if(!sid || !inv || !due || !tpd || !apd){
       simMsg.className = "err";
-      simMsg.textContent = "Missing required fields: Student ID, Invoice Number, Due Date, Tuition Payment Date, Accountant Approve-Payment-Date.";
+      simMsg.textContent = "Missing required fields: Student ID, Invoice Number, Due Date, Tuition Payment Date, Accountant-Approve-Payment-Date.";
       renderTable(document.getElementById("tuitionTable"), []);
       renderTable(document.getElementById("lateFeeTable"), []);
       renderTable(document.getElementById("approveTable"), []);
