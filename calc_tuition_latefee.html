@@ -60,31 +60,30 @@
   </div>
 
   <div class="row">
-    <label for="dueDate">Due Date [Day, DD-MMM-YYYY]</label>
+    <label for="dueDate">Due Date</label>
     <input id="dueDate" type="date" value="2026-01-01" />
     <span class="muted" id="dueDateFmt"></span>
   </div>
 
   <div class="row">
-    <label for="tuitionPayDate">Tuition Payment Date [Day, DD-MMM-YYYY]</label>
+    <label for="tuitionPayDate">Tuition Payment Date</label>
     <input id="tuitionPayDate" type="date" />
     <span class="muted" id="tuitionPayFmt"></span>
   </div>
 
   <div class="row">
-    <label for="lateFeePayDate">Late Fee Payment Date [Day, DD-MMM-YYYY]</label>
+    <label for="lateFeePayDate">Late Fee Payment Date</label>
     <input id="lateFeePayDate" type="date" />
     <span class="muted" id="lateFeePayFmt"></span>
   </div>
 
   <div class="btnrow">
-    <div>BR</div>
     <button type="button" onclick="calculateLateFee()">Calculate Late Fee</button>
   </div>
 
   <div class="status">
     <div class="pill kpi"><b>Calculated Late Fee:</b> <span id="lateFeeResult">0</span></div>
-    <div class="pill"><b>Student Status (as-of simulation approval date):</b> <span id="studentStatus">ACTIVE</span></div>
+    <div class="pill"></div>
   </div>
 
   <div class="muted" id="calcNote" style="margin-top:8px;"></div>
@@ -96,23 +95,22 @@
 
 <fieldset>
   <div class="row">
-    <label>Tuition Payment Date [Day, DD-MMM-YYYY]</label>
+    <label>Tuition Payment Date</label>
     <div class="readonly" id="tuitionPayRead">—</div>
   </div>
 
   <div class="row">
-    <label>Late Fee Payment Date [Day, DD-MMM-YYYY]</label>
+    <label>Late Fee Payment Date</label>
     <div class="readonly" id="lateFeePayRead">—</div>
   </div>
 
   <div class="row">
-    <label for="approveDate">Accountant Approve-Payment-Date [Day, DD-MMM-YYYY]</label>
+    <label for="approveDate">Accountant Approve-Payment-Date</label>
     <input id="approveDate" type="date" />
     <span class="muted" id="approveFmt"></span>
   </div>
 
   <div class="btnrow">
-    <div>BR</div>
     <button type="button" onclick="runSimulation()">Run Simulation</button>
   </div>
 
@@ -121,7 +119,7 @@
 
 <div class="line"></div>
 
-<h2>PART 2 – Late Fee Daily Ledger Table</h2>
+<h2>Late Fee Daily Ledger Table</h2>
 
 <p class="subhead" id="tuitionHeading">Late Fee Daily Ledger Table on Tuition Payment Date = —</p>
 <table id="tuitionTable"></table>
@@ -287,7 +285,7 @@
       document.getElementById("lateFeeResult").textContent = total.toLocaleString();
       noteEl.innerHTML =
         `Late fee will be capped at 5 days (max ${(5*dailyFee).toLocaleString()}). ` +
-        `Stop date used for calculation: <b>${fmt(stopDateForCalc)}</b> (both paid).`;
+        `Student status: Financially Suspended</b> until both Tuition Installment and Late Fee paid.`;
     } else {
       // Not paid yet: still accruing; show "as of tuition payment date" amount as reference.
       const dLate = daysLate(due, tpd);
@@ -414,8 +412,7 @@
     } else {
       simMsg.className = "";
       simMsg.innerHTML =
-        `Late fee stopped on <b>${fmt(stopDate)}</b> (both paid). ` +
-        `Ledger auto-updated on approval date <b>${fmt(apd)}</b>.`;
+        ``;
     }
   }
 
