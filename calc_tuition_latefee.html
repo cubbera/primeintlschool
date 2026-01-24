@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Late Fee Calculator (Operational Simulation)</title>
+<style>
+  :root{
+    --bg:#f6f7fb;
+    --card:#ffffff;
+    --text:#111827;
+    --muted:#6b7280;
+    --line:#e5e7eb;
+    --shadow: 0 10px 26px rgba(17,24,39,.08);
+    --radius:14px;
+
+    --accent:#111827;
+    --ok:#065f46;
+    --warn:#f97316;
+    --danger:#b91c1c;
+
+    --tint:#f9fafb;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --font: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font);
+    line-height:1.35;
+    font-size:13px;
+  }
+  .page{
+    max-width:1100px;
+    margin:18px auto;
+    padding:0 14px 28px;
+  }
+
+  .header{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:12px;
+  }
+  .header h1{
+    margin:0;
+    font-size:18px;
+    letter-spacing:.2px;
+  }
+  .header .sub{
+    margin:4px 0 0;
+    color:var(--muted);
+    font-size:12px;
+  }
+  .pill{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:7px 10px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--muted);
+    font-weight:800;
+    font-size:12px;
+    white-space:nowrap;
+  }
+  .pill strong{color:var(--text)}
+
+  .grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:12px;
+  }
+  @media (max-width: 960px){
+    .grid{grid-template-columns:1fr}
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .cardHead{
+    padding:12px 14px;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background:#fff;
+  }
+  .cardHead h2{
+    margin:0;
+    font-size:14px;
+    letter-spacing:.2px;
+  }
+  .cardBody{padding:14px}
+
+  .row{
+    display:grid;
+    grid-template-columns: 150px 1fr;
+    gap:10px;
+    align-items:center;
+    margin:8px 0;
+  }
+  .row .lab{
+    color:var(--muted);
+    font-weight:800;
+    font-size:12px;
+    white-space:nowrap;
+  }
+  .row .val{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+
+  input, select{
+    padding:9px 10px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    font-size:13px;
+    background:#fff;
+    outline:none;
+  }
+  input[type="date"]{padding:8px 10px}
+  .w160{width:160px}
+  .w220{width:220px}
+  .w260{width:260px}
+  .mono{font-family:var(--mono); font-variant-numeric: tabular-nums;}
+
+  .btnRow{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:10px;
+  }
+  button{
+    appearance:none;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--text);
+    padding:10px 12px;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:900;
+    font-size:13px;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    user-select:none;
+  }
+  button.primary{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+  button.warn{
+    background:var(--warn);
+    border-color:var(--warn);
+    color:#fff;
+  }
+  button.danger{
+    background:var(--danger);
+    border-color:var(--danger);
+    color:#fff;
+  }
+  button:disabled{opacity:.55; cursor:not-allowed}
+
+  .hint{
+    margin:10px 0 0;
+    color:var(--muted);
+    font-size:12px;
+  }
+
+  .box{
+    margin-top:12px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:var(--tint);
+    padding:12px;
+  }
+  .box h3{
+    margin:0 0 8px;
+    font-size:13px;
+  }
+  .box p{margin:6px 0; color:#374151; font-size:12px}
+
+  /* Table */
+  .tableWrap{
+    border:1px solid var(--line);
+    border-radius:12px;
+    overflow:auto;
+    background:#fff;
+  }
+  table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0;
+    min-width:860px;
+    font-size:12px;
+  }
+  thead th{
+    position:sticky;
+    top:0;
+    background:#fafafa;
+    border-bottom:1px solid var(--line);
+    padding:10px 10px;
+    color:var(--muted);
+    text-align:left;
+    font-weight:900;
+    white-space:nowrap;
+  }
+  tbody td{
+    border-bottom:1px solid var(--line);
+    padding:9px 10px;
+    vertical-align:middle;
+    white-space:nowrap;
+  }
+  tbody tr:last-child td{border-bottom:none}
+
+  .money{ text-align:right; font-variant-numeric: tabular-nums; }
+  .center{ text-align:center; }
+
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:3px 8px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--muted);
+    font-weight:900;
+    font-size:11px;
+  }
+  .badge.ok{border-color:#bbf7d0; background:#ecfdf5; color:var(--ok)}
+  .badge.warn{border-color:#fed7aa; background:#fff7ed; color:#9a3412}
+  .badge.danger{border-color:#fecaca; background:#fef2f2; color:var(--danger)}
+
+  .twoCols{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  @media (max-width: 620px){
+    .twoCols{grid-template-columns:1fr}
+    .row{grid-template-columns: 1fr}
+  }
+
+  .mini{
+    font-size:11px;
+    color:var(--muted);
+  }
+  .line2{
+    height:1px;
+    background:var(--line);
+    margin:10px 0;
+  }
+
+  .toast{
+    margin-top:10px;
+    font-size:12px;
+    color:var(--muted);
+  }
+</style>
+</head>
+
+<body>
+<div class="page">
+  <div class="header">
+    <div>
+      <h1>Late Fee Calculator (Operational Simulation)</h1>
+      <div class="sub">Real-time late fee display, daily recording, and separate late-fee invoice behavior for working vs non-working days.</div>
+    </div>
+    <div class="pill">
+      Student Status:
+      <strong id="statusPill">ACTIVE</strong>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <!-- LEFT: Inputs + Rules -->
+    <div class="card">
+      <div class="cardHead">
+        <h2>Setup</h2>
+        <span class="mini">All calculation runs in this page only (front-end).</span>
+      </div>
+      <div class="cardBody">
+
+        <div class="twoCols">
+          <div>
+            <div class="row">
+              <div class="lab">Student ID</div>
+              <div class="val">
+                <input id="studentId" class="w220 mono" value="PR25004" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="lab">Student Name</div>
+              <div class="val">
+                <input id="studentName" class="w260" value="Aye Aye" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="lab">Tuition Invoice Nr</div>
+              <div class="val">
+                <input id="invoiceNr" class="w220 mono" value="INV25046-07" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="lab">Due Date</div>
+              <div class="val">
+                <input id="dueDate" type="date" class="w160" value="2026-01-01" />
+                <span class="badge" title="Late fee starts after due date">Due date</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="row">
+              <div class="lab">Late Fee / Day</div>
+              <div class="val">
+                <input id="feePerDay" class="w160 mono" value="20,000" inputmode="numeric" />
+                <span class="badge warn">MMK</span>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="lab">Max Days</div>
+              <div class="val">
+                <input id="maxDays" type="number" min="0" step="1" class="w160 mono" value="5" />
+                <span class="badge">capped</span>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="lab">Suspend after</div>
+              <div class="val">
+                <input id="suspendAfterDays" type="number" min="0" step="1" class="w160 mono" value="6" />
+                <span class="badge danger">Financially Suspended</span>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="lab">Today (simulate)</div>
+              <div class="val">
+                <input id="todayDate" type="date" class="w160" value="2026-01-04" />
+                <span class="badge">system date</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="line2"></div>
+
+        <div class="row">
+          <div class="lab">Scenario</div>
+          <div class="val">
+            <select id="scenario" class="w260">
+              <option value="S1">Scenario #1 — Pay on Fri 2 Jan (working day) incl. late fee</option>
+              <option value="S2" selected>Scenario #2 — Pay on Sat 3 Jan (non-working) incl. late fee, approve on Mon</option>
+              <option value="S3">Scenario #3 — Pay on Sat 3 Jan tuition only, late fee paid later</option>
+              <option value="S4">Scenario #4 — Late fee unpaid → suspended, paid later → active</option>
+              <option value="CUSTOM">Custom — enter payment and approval dates manually</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="twoCols">
+          <div class="row">
+            <div class="lab">Payment Date</div>
+            <div class="val">
+              <input id="paymentDate" type="date" class="w160" value="2026-01-03" />
+              <span class="badge" title="Actual date parent paid">actual</span>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="lab">Approval Date</div>
+            <div class="val">
+              <input id="approvalDate" type="date" class="w160" value="2026-01-05" />
+              <span class="badge" title="When accountant submits/approves in system">accountant</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="lab">Paid includes</div>
+          <div class="val">
+            <select id="paidMode" class="w260">
+              <option value="TUITION_AND_LATE" selected>Tuition + Late Fee</option>
+              <option value="TUITION_ONLY">Tuition Only</option>
+              <option value="LATE_ONLY">Late Fee Only</option>
+            </select>
+            <span class="mini">Used to simulate Scenario #3 / #4 behavior.</span>
+          </div>
+        </div>
+
+        <div class="btnRow">
+          <button class="primary" id="runBtn" type="button">Run Simulation</button>
+          <button class="secondary" id="resetBtn" type="button">Reset</button>
+        </div>
+
+        <div class="box">
+          <h3>Updated Late Fee Rules (implemented)</h3>
+          <p>1) Late fee shown in real time to parent app (computed up to “Today”).</p>
+          <p>2) Late fee recorded daily (one row per day).</p>
+          <p>3) Late fee invoice is separate from tuition invoice (we record daily rows regardless of tuition approval).</p>
+          <p>4) When accountant approves payment, system back-applies the <strong>actual payment date</strong> to late-fee rows and marks which rows are cancelled vs payable (per policy below).</p>
+          <p class="mini"><strong>Policy used here:</strong> If parent paid late fee on the payment date, rows up to payment date are payable; rows after payment date are cancelled. If parent did not pay late fee, rows remain payable until late fee is paid.</p>
+        </div>
+
+        <div class="toast" id="msg"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Outputs -->
+    <div class="card">
+      <div class="cardHead">
+        <h2>Output</h2>
+        <span class="mini">Late fee ledger + summary.</span>
+      </div>
+      <div class="cardBody">
+
+        <div class="twoCols">
+          <div class="box" style="margin-top:0;">
+            <h3>Real-time Late Fee (Parent View)</h3>
+            <p>
+              As of <span class="mono" id="parentAsOf">—</span>, late fee due =
+              <strong class="mono" id="parentLateFee">0</strong> MMK
+            </p>
+            <p class="mini">This is a live computed view, not the accountant’s approval view.</p>
+          </div>
+
+          <div class="box" style="margin-top:0;">
+            <h3>Accountant Summary</h3>
+            <p>Payable late-fee rows: <strong class="mono" id="payableCount">0</strong></p>
+            <p>Total payable late fee: <strong class="mono" id="payableTotal">0</strong> MMK</p>
+            <p>Cancelled rows (history kept): <strong class="mono" id="cancelledCount">0</strong></p>
+            <p class="mini">Rows after the actual payment date can be cancelled if late fee was paid.</p>
+          </div>
+        </div>
+
+        <div class="box">
+          <h3>Late Fee Daily Ledger</h3>
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>student_id</th>
+                  <th>student_name</th>
+                  <th>invoice_number</th>
+                  <th>date</th>
+                  <th class="money">late_fee</th>
+                  <th class="center">is_cancelled</th>
+                  <th>payment_date</th>
+                  <th class="center">note</th>
+                </tr>
+              </thead>
+              <tbody id="ledgerBody"></tbody>
+            </table>
+          </div>
+          <p class="mini" style="margin:8px 0 0;">
+            is_cancelled: <strong>0</strong> = payable / kept, <strong>1</strong> = cancelled due to late-fee payment date, <strong>NULL</strong> = not yet approved/processed.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   Utilities
+   ========================================================= */
+const $ = (id) => document.getElementById(id);
+
+function parseMoney(str){
+  return Number(String(str||"").replace(/,/g,"").trim()) || 0;
+}
+function fmtMoney(n){
+  return Number(n||0).toLocaleString("en-US");
+}
+function iso(d){
+  return d.toISOString().slice(0,10);
+}
+function dateObj(isoStr){
+  if(!isoStr) return null;
+  const d = new Date(isoStr + "T00:00:00");
+  return isNaN(d.getTime()) ? null : d;
+}
+function addDays(d, days){
+  const x = new Date(d.getTime());
+  x.setDate(x.getDate() + days);
+  return x;
+}
+function diffDays(a, b){
+  // difference in whole days: b - a
+  const ms = (b.getTime() - a.getTime());
+  return Math.floor(ms / (24*60*60*1000));
+}
+function clamp(n, lo, hi){
+  return Math.max(lo, Math.min(hi, n));
+}
+
+/* =========================================================
+   Late Fee Model (per your UPDATED LATE FEE notes)
+   =========================================================
+   - dueDate is the "start point" for late fee accumulation
+   - daily rows start on dueDate (1 Jan shows 20,000 in your examples)
+   - each row: date, feePerDay
+   - real-time parent late fee = sum of rows from dueDate to today, capped by maxDays
+   - status:
+       - if unpaid late fee beyond suspendAfterDays, set FINANCIALLY SUSPENDED
+   - approval behavior:
+       - accountant can approve later, but uses actual paymentDate
+       - if paid includes late fee:
+           rows with date <= paymentDate => payable (is_cancelled = 0, payment_date = paymentDate)
+           rows with date > paymentDate  => cancelled (is_cancelled = 1, payment_date = paymentDate)
+       - if paid tuition only (late fee unpaid):
+           rows up to today remain payable (is_cancelled = 0 at approval time, payment_date = date late fee actually paid)
+           (here we leave is_cancelled as 0 and set payment_date to the late-fee-payment-date when that happens)
+*/
+
+function buildLedgerRows({studentId, studentName, invoiceNr, dueDate, todayDate, feePerDay, maxDays}){
+  const rows = [];
+  const start = dateObj(dueDate);
+  const today = dateObj(todayDate);
+  if(!start || !today) return rows;
+
+  const days = diffDays(start, today); // 0 means same day
+  // We record daily rows from dueDate up to today, but capped by maxDays (5 days means 5 rows: day 0..4)
+  // Your examples show rows for 1 Jan, 2 Jan, 3 Jan, 4 Jan (4 days). That is within cap.
+  const rowCount = clamp(days + 1, 0, maxDays); // include start day
+
+  for(let i=0;i<rowCount;i++){
+    const d = addDays(start, i);
+    rows.push({
+      student_id: studentId,
+      student_name: studentName,
+      invoice_number: invoiceNr,
+      date: iso(d),
+      late_fee: feePerDay,
+      is_cancelled: null,
+      payment_date: null,
+      note: ""
+    });
+  }
+  return rows;
+}
+
+function computeParentLateFee({dueDate, todayDate, feePerDay, maxDays}){
+  const start = dateObj(dueDate);
+  const today = dateObj(todayDate);
+  if(!start || !today) return 0;
+
+  const days = diffDays(start, today);
+  const rowCount = clamp(days + 1, 0, maxDays);
+  return rowCount * feePerDay;
+}
+
+function computeStatus({dueDate, todayDate, suspendAfterDays, maxDays, lateFeePaidDate}){
+  // If late fee is paid, always ACTIVE (per your scenario #4 auto restore)
+  if(lateFeePaidDate) return "ACTIVE";
+
+  const start = dateObj(dueDate);
+  const today = dateObj(todayDate);
+  if(!start || !today) return "ACTIVE";
+
+  const daysSinceStart = diffDays(start, today); // 0 on due date
+  // Suspend rule: "On 6th ... cannot join" in your earlier examples.
+  // Here: suspendAfterDays = 6 means: if daysSinceStart >= 6 => suspended.
+  // But we also cap fee rows by maxDays; suspension is separate.
+  if(daysSinceStart >= suspendAfterDays) return "FINANCIALLY SUSPENDED";
+  return "ACTIVE";
+}
+
+function applyApprovalPolicy(rows, {paidMode, paymentDate, approvalDate}){
+  // We simulate what accountant does on approvalDate, but updates rows using paymentDate.
+  // If accountant approves without late-fee payment, we do NOT cancel anything.
+  const pay = dateObj(paymentDate);
+  const appr = dateObj(approvalDate);
+
+  if(!rows.length) return rows;
+  if(!appr) return rows; // no approval
+  if(!pay) return rows;
+
+  // Mark notes for clarity
+  const payIso = iso(pay);
+
+  if(paidMode === "TUITION_AND_LATE"){
+    // Cancel rows after payment date; keep history
+    rows.forEach(r=>{
+      const rd = dateObj(r.date);
+      if(!rd) return;
+
+      r.payment_date = payIso;
+
+      if(rd.getTime() <= pay.getTime()){
+        r.is_cancelled = 0; // payable/kept
+        r.note = "Payable (late fee paid)";
+      }else{
+        r.is_cancelled = 1; // cancelled because late fee paid earlier
+        r.note = "Cancelled (paid earlier)";
+      }
+    });
+  } else if(paidMode === "TUITION_ONLY"){
+    // Tuition approved, late fee NOT paid => leave rows payable (not cancelled).
+    // We keep is_cancelled as 0 to indicate "still payable"; payment_date remains NULL until late fee is paid later.
+    rows.forEach(r=>{
+      r.is_cancelled = 0;
+      r.payment_date = null;
+      r.note = "Late fee unpaid (still payable)";
+    });
+  } else if(paidMode === "LATE_ONLY"){
+    // Late fee paid (only) on payment date -> same as tuition+late regarding late fee ledger
+    rows.forEach(r=>{
+      const rd = dateObj(r.date);
+      if(!rd) return;
+
+      r.payment_date = payIso;
+
+      if(rd.getTime() <= pay.getTime()){
+        r.is_cancelled = 0;
+        r.note = "Payable (late fee paid)";
+      }else{
+        r.is_cancelled = 1;
+        r.note = "Cancelled (paid earlier)";
+      }
+    });
+  }
+
+  return rows;
+}
+
+function summarizeRows(rows){
+  let payableCount = 0;
+  let cancelledCount = 0;
+  let payableTotal = 0;
+
+  rows.forEach(r=>{
+    if(r.is_cancelled === 1){
+      cancelledCount++;
+    }else if(r.is_cancelled === 0){
+      payableCount++;
+      payableTotal += Number(r.late_fee || 0);
+    }else{
+      // NULL = not processed
+    }
+  });
+
+  return {payableCount, cancelledCount, payableTotal};
+}
+
+/* =========================================================
+   UI wiring (scenarios)
+   ========================================================= */
+function setScenarioDefaults(scn){
+  // Defaults based on your examples
+  if(scn === "S1"){
+    $("todayDate").value = "2026-01-02";
+    $("paymentDate").value = "2026-01-02";
+    $("approvalDate").value = "2026-01-02";
+    $("paidMode").value = "TUITION_AND_LATE";
+  }
+  if(scn === "S2"){
+    $("todayDate").value = "2026-01-04";
+    $("paymentDate").value = "2026-01-03";
+    $("approvalDate").value = "2026-01-05";
+    $("paidMode").value = "TUITION_AND_LATE";
+  }
+  if(scn === "S3"){
+    $("todayDate").value = "2026-01-04";
+    $("paymentDate").value = "2026-01-03";
+    $("approvalDate").value = "2026-01-05";
+    $("paidMode").value = "TUITION_ONLY";
+  }
+  if(scn === "S4"){
+    $("todayDate").value = "2026-01-08";
+    $("paymentDate").value = "2026-01-08";
+    $("approvalDate").value = "2026-01-08";
+    $("paidMode").value = "LATE_ONLY";
+  }
+}
+
+function renderLedger(rows){
+  const body = $("ledgerBody");
+  body.innerHTML = "";
+
+  if(!rows.length){
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td colspan="8" class="center" style="color:#6b7280; padding:14px;">No rows (check dates and max days).</td>`;
+    body.appendChild(tr);
+    return;
+  }
+
+  rows.forEach(r=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="mono">${escapeHtml(r.student_id)}</td>
+      <td>${escapeHtml(r.student_name)}</td>
+      <td class="mono">${escapeHtml(r.invoice_number)}</td>
+      <td class="mono">${escapeHtml(r.date)}</td>
+      <td class="money mono">${fmtMoney(r.late_fee)}</td>
+      <td class="center mono">${r.is_cancelled === null ? "NULL" : String(r.is_cancelled)}</td>
+      <td class="mono">${r.payment_date ? escapeHtml(r.payment_date) : "NULL"}</td>
+      <td class="center"><span class="badge ${badgeClass(r)}">${escapeHtml(r.note || "")}</span></td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+function badgeClass(r){
+  if(r.is_cancelled === 1) return "danger";
+  if(r.is_cancelled === 0){
+    if((r.note||"").includes("unpaid")) return "warn";
+    return "ok";
+  }
+  return "";
+}
+
+function escapeHtml(s){
+  return String(s ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+/* =========================================================
+   Main run
+   ========================================================= */
+function run(){
+  const studentId = $("studentId").value.trim() || "PR00000";
+  const studentName = $("studentName").value.trim() || "";
+  const invoiceNr = $("invoiceNr").value.trim() || "";
+  const dueDate = $("dueDate").value;
+  const todayDate = $("todayDate").value;
+
+  const feePerDay = parseMoney($("feePerDay").value);
+  const maxDays = Number($("maxDays").value || 0);
+  const suspendAfterDays = Number($("suspendAfterDays").value || 0);
+
+  const scenario = $("scenario").value;
+  const paymentDate = $("paymentDate").value;
+  const approvalDate = $("approvalDate").value;
+  const paidMode = $("paidMode").value;
+
+  // Build raw rows as of today (what system keeps recording daily)
+  const rawRows = buildLedgerRows({
+    studentId, studentName, invoiceNr,
+    dueDate, todayDate,
+    feePerDay, maxDays
+  });
+
+  // Parent real-time view (as of today)
+  $("parentAsOf").textContent = todayDate || "—";
+  $("parentLateFee").textContent = fmtMoney(
+    computeParentLateFee({dueDate, todayDate, feePerDay, maxDays})
+  );
+
+  // Apply accountant approval policy (updates rows with payment_date / is_cancelled)
+  const rows = applyApprovalPolicy(rawRows, {paidMode, paymentDate, approvalDate});
+
+  // Status logic:
+  // - If late fee is paid (paidMode includes late fee and approval exists) => ACTIVE
+  // - If tuition only paid => late fee not paid => status based on dueDate/todayDate and suspendAfterDays
+  let lateFeePaidDate = null;
+  if((paidMode === "TUITION_AND_LATE" || paidMode === "LATE_ONLY") && approvalDate){
+    lateFeePaidDate = paymentDate || null;
+  }
+  const status = computeStatus({dueDate, todayDate, suspendAfterDays, maxDays, lateFeePaidDate});
+  $("statusPill").textContent = status;
+  $("statusPill").style.color =
+    status === "FINANCIALLY SUSPENDED" ? "var(--danger)" : "var(--ok)";
+
+  // Summary
+  const sum = summarizeRows(rows);
+  $("payableCount").textContent = String(sum.payableCount);
+  $("cancelledCount").textContent = String(sum.cancelledCount);
+  $("payableTotal").textContent = fmtMoney(sum.payableTotal);
+
+  // Render
+  renderLedger(rows);
+
+  // Message
+  const msg = [];
+  msg.push(`Scenario: ${$("scenario").options[$("scenario").selectedIndex].text}`);
+  msg.push(`Today: ${todayDate}`);
+  msg.push(`Payment Date: ${paymentDate || "NULL"} | Approval Date: ${approvalDate || "NULL"} | Paid includes: ${paidMode.replaceAll("_"," ")}`);
+  $("msg").textContent = msg.join(" • ");
+}
+
+/* =========================================================
+   Events
+   ========================================================= */
+$("scenario").addEventListener("change", ()=>{
+  const scn = $("scenario").value;
+  if(scn !== "CUSTOM") setScenarioDefaults(scn);
+});
+
+$("runBtn").addEventListener("click", run);
+
+$("resetBtn").addEventListener("click", ()=>{
+  $("studentId").value = "PR25004";
+  $("studentName").value = "Aye Aye";
+  $("invoiceNr").value = "INV25046-07";
+  $("dueDate").value = "2026-01-01";
+  $("feePerDay").value = "20,000";
+  $("maxDays").value = "5";
+  $("suspendAfterDays").value = "6";
+
+  $("scenario").value = "S2";
+  setScenarioDefaults("S2");
+  $("msg").textContent = "";
+  run();
+});
+
+/* Auto-format feePerDay on blur */
+$("feePerDay").addEventListener("blur", ()=>{
+  $("feePerDay").value = fmtMoney(parseMoney($("feePerDay").value));
+});
+
+/* Init */
+(function init(){
+  $("feePerDay").value = fmtMoney(parseMoney($("feePerDay").value));
+  setScenarioDefaults("S2");
+  run();
+})();
+</script>
+</body>
+</html>
