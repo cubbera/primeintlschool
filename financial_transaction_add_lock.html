@@ -1,0 +1,1435 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Transaction Entry (Mockup)</title>
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#111827;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --soft:#f9fafb;
+      --soft2:#f3f4f6;
+      --focus:#2563eb;
+      --warn:#b45309;
+      --bad:#dc2626;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--text);
+      background:var(--bg);
+    }
+    .wrap{ max-width: 1400px; margin: 24px auto 40px; padding: 0 16px; }
+
+    .topbar{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom: 12px; }
+    h1{ font-size: 18px; margin: 0 0 4px; font-weight: 900; letter-spacing:.2px; }
+    .sub{ margin:0; color:var(--muted); font-size: 13px; }
+
+    .btn{
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--text);
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor:pointer;
+      font-weight:800;
+      font-size: 13px;
+      white-space:nowrap;
+    }
+    .btn:hover{ background:var(--soft); }
+    .btn.primary{ border-color: var(--focus); background: var(--focus); color: #fff; }
+    .btn.primary:hover{ filter: brightness(0.95); }
+    .btn.ghost{ background: var(--soft); }
+
+    .card{
+      border:1px solid var(--line);
+      border-radius: 14px;
+      overflow:hidden;
+      background:#fff;
+      box-shadow: 0 1px 0 rgba(0,0,0,.02);
+    }
+    .toolbar{
+      display:flex; align-items:center; justify-content:space-between;
+      gap: 12px; padding: 12px;
+      border-bottom:1px solid var(--line);
+      background:#fff;
+    }
+    .pill{
+      font-size: 12px; color: var(--muted);
+      background: var(--soft);
+      border: 1px solid var(--line);
+      padding: 6px 10px; border-radius: 999px;
+      font-weight: 800;
+    }
+    .hint{ font-size:12px; color:var(--muted); font-weight: 700; }
+
+    .tableWrap{ overflow:auto; width:100%; }
+    table{ border-collapse: collapse; width:100%; min-width: 1500px; table-layout: fixed; }
+
+    thead th{
+      position: sticky; top: 0; z-index: 2;
+      background: var(--soft);
+      border-bottom: 1px solid var(--line);
+      font-size: 12px;
+      color: var(--muted);
+      padding: 10px 8px;
+      text-align: left;
+      vertical-align: bottom;
+      white-space: nowrap;
+      font-weight: 900;
+    }
+    tbody td{
+      border-top: 1px solid var(--line);
+      padding: 6px;
+      vertical-align: top;
+      background:#fff;
+    }
+    tbody tr:hover td{ background: var(--soft); }
+
+    .rownum{
+      text-align:right;
+      color: var(--muted);
+      font-size: 12px;
+      padding-top: 14px;
+      width: 44px;
+      font-weight: 900;
+    }
+
+    .cell{
+      width:100%;
+      border:1px solid var(--line);
+      background: #fff;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 13px;
+      outline: none;
+    }
+    .cell:focus{
+      border-color: rgba(37,99,235,.55);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+    }
+    .cell.invalid{
+      border-color: rgba(220,38,38,.7);
+      box-shadow: 0 0 0 3px rgba(220,38,38,.10);
+    }
+    .cell.past{
+      border-color: rgba(180,83,9,.65);
+      box-shadow: 0 0 0 3px rgba(180,83,9,.10);
+    }
+
+    select.cell{
+      padding-right: 28px;
+      appearance: none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+        linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+      background-position:
+        calc(100% - 16px) 55%,
+        calc(100% - 11px) 55%;
+      background-size: 5px 5px, 5px 5px;
+      background-repeat: no-repeat;
+    }
+    textarea.cell{
+      resize: vertical;
+      line-height: 1.25;
+      min-height: 44px;
+      max-height: 140px;
+    }
+
+    .amount{
+      text-align:right;
+      font-variant-numeric: tabular-nums;
+      font-weight: 900;
+    }
+    .neg{ color: var(--bad); }
+    .pos{ color: var(--text); }
+
+    .fileCell{ display:flex; align-items:center; justify-content:flex-end; gap:8px; }
+    .fileInput{ width: 190px; font-size: 12px; }
+
+    .iconBtn{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius: 10px;
+      width: 38px;
+      height: 38px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      font-weight: 900;
+      color: var(--muted);
+    }
+    .iconBtn:hover{ background: var(--soft); }
+    .iconBtn.danger{ color: var(--bad); }
+
+    .footer{
+      display:flex; align-items:center; justify-content: space-between;
+      gap: 12px; padding: 12px;
+      border-top:1px solid var(--line);
+      background:#fff;
+    }
+
+    /* Category 2 "combo" (menu is rendered as BODY portal) */
+    .comboRow{ display:flex; gap:6px; align-items:center; }
+    .comboBtn{
+      width: 38px; min-width:38px;
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius: 10px;
+      padding: 8px 0;
+      cursor:pointer;
+      font-weight: 900;
+      color: var(--muted);
+    }
+    .comboBtn:hover{ background: var(--soft); }
+
+    /* Portal menu */
+    .portalMenu{
+      position: fixed;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.10);
+      max-height: 280px;
+      overflow:auto;
+      z-index: 9999;
+      display:none;
+      min-width: 260px;
+    }
+    .portalMenu.open{ display:block; }
+    .menuGroup{
+      padding: 8px 10px;
+      border-bottom:1px solid var(--line);
+      background: var(--soft);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    .menuItem{
+      padding: 10px 10px;
+      font-size: 13px;
+      cursor:pointer;
+      border-bottom: 1px solid rgba(229,231,235,.6);
+      font-weight: 700;
+    }
+    .menuItem:hover{ background: var(--soft); }
+    .menuItem:last-child{ border-bottom:none; }
+
+    /* Reports */
+    .report{
+      margin-top: 12px;
+      border:1px solid var(--line);
+      border-radius: 14px;
+      overflow:hidden;
+      background:#fff;
+      display:none;
+    }
+    .reportHead{
+      display:flex;
+      align-items:flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px;
+      border-bottom:1px solid var(--line);
+      background: var(--soft);
+    }
+    .reportHead h2{ margin:0; font-size: 14px; font-weight: 950; }
+    .reportMeta{ font-size:12px; color: var(--muted); font-weight: 800; }
+
+    .reportBody{ overflow:auto; }
+    .reportTable{
+      width:100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+    .reportTable th, .reportTable td{
+      border:1px solid var(--line);
+      padding: 10px 10px;
+      font-size: 13px;
+    }
+    .reportTable thead th{
+      position: sticky; top:0; z-index:2;
+      background:#fff;
+      color: var(--muted);
+      font-size: 12px;
+      text-align:left;
+      font-weight: 900;
+    }
+    .reportTable td.num{
+      text-align:right;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      font-weight: 950;
+    }
+    .reportTable tr.section{ background: var(--soft2); }
+    .reportTable tr.subRow td:first-child{ padding-left: 44px; font-weight: 800; }
+    .reportTable tr.total td:first-child{ font-weight: 950; }
+    .reportTable tr.spacer td{
+      background:#fff;
+      border-left:1px solid var(--line);
+      border-right:1px solid var(--line);
+      border-top:none;
+      border-bottom:none;
+      height: 12px;
+      padding: 0;
+    }
+    .toggleBtn{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius: 999px;
+      padding: 2px 8px;
+      cursor:pointer;
+      font-weight: 950;
+      margin-right: 8px;
+      width: 40px;
+      text-align:center;
+    }
+
+    /* Compact wallet report */
+    .walletWrap{
+      margin-top: 10px;
+      display:none;
+    }
+    .walletCard{
+      border:1px solid var(--line);
+      border-radius: 14px;
+      overflow:hidden;
+      background:#fff;
+      max-width: 520px;
+    }
+    .walletCard .reportTable{ min-width: 0; }
+
+    /* TOTAL highlight: highlight ONLY numeric amount cells */
+    .reportTable tr.total td{
+      background:#fff;
+      font-weight: 950;
+    }
+    .reportTable tr.total td.num{
+      background: #ecfdf3; /* very light pale green */
+    }
+    .reportTable tr.total td:first-child{
+      font-weight: 950;
+    }
+
+    /* Group headers inside report tables */
+    .reportTable tr.groupTitle td{
+      background: var(--soft);
+      color: var(--muted);
+      font-weight: 950;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h1>Transaction Entry</h1>
+        <p class="sub"></p>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <button class="btn" id="btnDummy">Fill In With Dummy</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="toolbar">
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <span class="pill" id="rowCountPill">0 row(s)</span>
+          <button class="btn ghost" id="btnAddRow">+ Add Line</button>
+        </div>
+        <div class="hint" id="validationSummary">No validation issues.</div>
+      </div>
+
+      <div class="tableWrap" id="tableWrap">
+        <table id="entryTable" aria-label="Transaction entry table">
+          <colgroup>
+            <col style="width:44px" />
+            <col style="width:130px" />
+            <col style="width:150px" />
+            <col style="width:140px" />
+            <col style="width:280px" />
+            <col style="width:300px" />
+            <col style="width:120px" />
+            <col style="width:120px" />
+            <col style="width:160px" />
+            <col style="width:160px" />
+            <col style="width:170px" />
+            <col style="width:130px" />
+            <col style="width:220px" />
+            <col style="width:60px" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Payment Date</th>
+              <th>Academic Year</th>
+              <th>Category 1</th>
+              <th>Category 2</th>
+              <th>Description</th>
+              <th>Invoice Nr</th>
+              <th>Receipt Nr</th>
+              <th>Payer Name</th>
+              <th>Receiver Name</th>
+              <th>Wallet</th>
+              <th>Amount</th>
+              <th style="text-align:right;">Attach</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="footer">
+        <div></div>
+        <button class="btn primary" id="btnSubmit">Submit Transaction(s)</button>
+      </div>
+    </div>
+
+    <div class="report" id="reportMain">
+      <div class="reportHead">
+        <div><h2>Financial Report</h2></div>
+        <div class="reportMeta" id="reportMetaMain"></div>
+      </div>
+      <div class="reportBody">
+        <table class="reportTable" id="reportTableMain" aria-label="Financial report table"></table>
+      </div>
+    </div>
+
+    <div class="walletWrap" id="walletWrap">
+      <div class="walletCard">
+        <div class="reportHead">
+          <div><h2>Wallet Balances</h2></div>
+          <div class="reportMeta" id="reportMetaWallet"></div>
+        </div>
+        <div class="reportBody">
+          <table class="reportTable" id="reportTableWallet" aria-label="Wallet balances table"></table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category 2 dropdown portal -->
+  <div class="portalMenu" id="cat2Portal"></div>
+
+<script>
+(() => {
+  const ACADEMIC_YEARS_DEFAULT = ["AY2025-2026", "Summer2026", "AY2026-2027"];
+  const WALLETS = ["Petty Cash", "KBZ Bank", "Aya Bank", "CB", "KPay", "Visa / Master Card"];
+
+  const CAT2_BY_CAT1 = {
+    Income: ["Tuition Fee","Registration Fee","Material Fee","Ferry Fee","Sales Of Merchandise"],
+    Expense: [
+      "Salary (Teaching)","Salary (Office)","Benefits And Welfare","Digital Marketing","Offline Marketing",
+      "Classroom Expenses","School Merchandise","Building & Electrical Repair","Electronic And Repair","Utility Bills",
+      "General & Administrative Expenses","Supplies","Materials And Stationery","School Event Expense","Donation & Gift","Tax"
+    ],
+    Asset: ["Construction","Solar Panel","Electrical Setup","Electronic Items","Big Furniture","Playground Equipment","Rent"],
+    Investment: ["Other (Investment)"]
+  };
+  const CAT1_ORDER = ["Income","Expense","Asset","Investment"];
+
+  const CAT2_TO_CAT1 = (() => {
+    const map = new Map();
+    for (const [cat1, list] of Object.entries(CAT2_BY_CAT1)) for (const cat2 of list) map.set(cat2, cat1);
+    return map;
+  })();
+
+  const CAT2_ALL = (() => {
+    const out = [];
+    for (const cat1 of CAT1_ORDER) for (const c2 of (CAT2_BY_CAT1[cat1] || [])) out.push(c2);
+    return out;
+  })();
+
+  function isValidCat2(v){
+    return CAT2_TO_CAT1.has(String(v || "").trim());
+  }
+
+  // DOM
+  const tbody = document.getElementById("tbody");
+  const tableWrap = document.getElementById("tableWrap");
+  const btnAddRow = document.getElementById("btnAddRow");
+  const btnDummy = document.getElementById("btnDummy");
+  const btnSubmit = document.getElementById("btnSubmit");
+  const rowCountPill = document.getElementById("rowCountPill");
+  const validationSummary = document.getElementById("validationSummary");
+
+  const reportMainWrap = document.getElementById("reportMain");
+  const reportMainTable = document.getElementById("reportTableMain");
+  const reportMainMeta = document.getElementById("reportMetaMain");
+
+  const walletWrap = document.getElementById("walletWrap");
+  const reportWalletTable = document.getElementById("reportTableWallet");
+  const reportWalletMeta = document.getElementById("reportMetaWallet");
+
+  // Portal menu
+  const portal = document.getElementById("cat2Portal");
+  let portalCtx = null; // {input, tr}
+
+  // Sequences
+  let nextInv = 1;
+  let nextRcpt = 1;
+  function seq(prefix, n, width=4){ return `${prefix}-${String(n).padStart(width,"0")}`; }
+
+  // Date helpers
+  const pad2 = (n) => String(n).padStart(2, "0");
+  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const monthIndex = (mmm) => MONTHS.findIndex(m => m.toLowerCase() === String(mmm).toLowerCase());
+
+  function toDDMMMYYYY(dateObj) {
+    return `${pad2(dateObj.getDate())}-${MONTHS[dateObj.getMonth()]}-${dateObj.getFullYear()}`;
+  }
+  function parseDDMMMYYYY(s) {
+    if (!s) return { ok:false };
+    const m = String(s).trim().match(/^(\d{2})-([A-Za-z]{3})-(\d{4})$/);
+    if (!m) return { ok:false };
+    const dd = Number(m[1]);
+    const mi = monthIndex(m[2]);
+    const yyyy = Number(m[3]);
+    if (mi < 0) return { ok:false };
+    const d = new Date(yyyy, mi, dd);
+    if (d.getFullYear() !== yyyy || d.getMonth() !== mi || d.getDate() !== dd) return { ok:false };
+    return { ok:true, date:d };
+  }
+  function isPastDate(dateObj) {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const d = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+    return d < today;
+  }
+
+  function formatMoney(n) {
+    const sign = n < 0 ? "-" : "";
+    const abs = Math.abs(n);
+    const s = abs.toFixed(2);
+    const [a,b] = s.split(".");
+    const withCommas = a.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return `${sign}${withCommas}.${b}`;
+  }
+
+  function buildSelect(options, placeholder = "Select...") {
+    const sel = document.createElement("select");
+    sel.className = "cell";
+    const opt0 = document.createElement("option");
+    opt0.value = "";
+    opt0.textContent = placeholder;
+    sel.appendChild(opt0);
+    for (const v of options) {
+      const opt = document.createElement("option");
+      opt.value = v;
+      opt.textContent = v;
+      sel.appendChild(opt);
+    }
+    return sel;
+  }
+  function buildInput(placeholder="") {
+    const inp = document.createElement("input");
+    inp.className = "cell";
+    inp.placeholder = placeholder;
+    return inp;
+  }
+  function buildTextarea(placeholder="") {
+    const ta = document.createElement("textarea");
+    ta.className = "cell";
+    ta.rows = 2;
+    ta.placeholder = placeholder;
+    return ta;
+  }
+  function buildFileInput() {
+    const inp = document.createElement("input");
+    inp.type = "file";
+    inp.className = "fileInput";
+    return inp;
+  }
+
+  function setAmountClass(el) {
+    const raw = String(el.value).replace(/,/g,"").trim();
+    const n = Number(raw);
+    el.classList.add("amount");
+    el.classList.remove("neg","pos");
+    if (!raw || !isFinite(n)) return;
+    el.classList.add(n < 0 ? "neg" : "pos");
+  }
+
+  function updateCat1(tr, cat2Val) {
+    const c1 = tr.querySelector('[data-field="category1"]');
+    c1.value = CAT2_TO_CAT1.get(cat2Val) || "";
+  }
+
+  function validateRow(tr) {
+    const pdEl = tr.querySelector('[data-field="paymentDate"]');
+    pdEl.classList.remove("invalid","past");
+
+    const raw = pdEl.value.trim();
+    if (!raw) return { errors:0, warnings:0 };
+
+    const parsed = parseDDMMMYYYY(raw);
+    if (!parsed.ok) {
+      pdEl.classList.add("invalid");
+      return { errors:1, warnings:0 };
+    }
+    if (isPastDate(parsed.date)) {
+      pdEl.classList.add("past");
+      return { errors:0, warnings:1 };
+    }
+    return { errors:0, warnings:0 };
+  }
+
+  function refreshSummaryValidation() {
+    let errors = 0, warnings = 0;
+    for (const tr of [...tbody.querySelectorAll("tr")]) {
+      const r = validateRow(tr);
+      errors += r.errors;
+      warnings += r.warnings;
+    }
+    if (errors === 0 && warnings === 0) validationSummary.textContent = "No validation issues.";
+    else {
+      const parts = [];
+      if (errors) parts.push(`${errors} error(s)`);
+      if (warnings) parts.push(`${warnings} warning(s)`);
+      validationSummary.textContent = parts.join(" • ");
+    }
+  }
+
+  // --- Portal dropdown (Category 2) ---
+  function closePortal(){
+    portal.classList.remove("open");
+    portal.innerHTML = "";
+    portalCtx = null;
+  }
+
+  function positionPortalTo(inputEl){
+    const r = inputEl.getBoundingClientRect();
+    const width = Math.max(r.width + 44, 320);
+    const left = Math.max(8, Math.min(window.innerWidth - width - 8, r.left));
+    const top = Math.min(window.innerHeight - 8, r.bottom + 6);
+    portal.style.left = `${left}px`;
+    portal.style.top = `${top}px`;
+    portal.style.width = `${width}px`;
+  }
+
+  function renderPortalMenu(query, forceAll){
+    if (!portalCtx) return;
+    const { input, tr } = portalCtx;
+    const q = String(query || "").trim().toLowerCase();
+    portal.innerHTML = "";
+
+    for (const cat1 of CAT1_ORDER) {
+      const list = CAT2_BY_CAT1[cat1] || [];
+      const filtered = forceAll || !q ? list : list.filter(x => x.toLowerCase().includes(q));
+      if (!filtered.length) continue;
+
+      const g = document.createElement("div");
+      g.className = "menuGroup";
+      g.textContent = cat1;
+      portal.appendChild(g);
+
+      for (const item of filtered) {
+        const it = document.createElement("div");
+        it.className = "menuItem";
+        it.textContent = item;
+        it.addEventListener("mousedown", (e) => {
+          e.preventDefault();
+          // locked commit
+          if (input._commitCat2) input._commitCat2(item);
+          else {
+            input.value = item;
+            updateCat1(tr, item);
+            closePortal();
+          }
+        });
+        portal.appendChild(it);
+      }
+    }
+
+    if (!portal.children.length) {
+      const empty = document.createElement("div");
+      empty.className = "menuItem";
+      empty.textContent = "No matches";
+      empty.style.color = "var(--muted)";
+      empty.style.cursor = "default";
+      portal.appendChild(empty);
+    }
+  }
+
+  function openPortalFor(input, tr, forceAll=false){
+    portalCtx = { input, tr };
+    positionPortalTo(input);
+    renderPortalMenu(forceAll ? "" : input.value, forceAll);
+    portal.classList.add("open");
+  }
+
+  // close on outside / scroll / resize
+  document.addEventListener("mousedown", (e) => {
+    if (!portal.classList.contains("open")) return;
+    if (portal.contains(e.target)) return;
+    if (e.target && e.target.closest && e.target.closest('[data-combo="cat2"]')) return;
+    closePortal();
+  });
+  window.addEventListener("resize", () => { if (portalCtx) positionPortalTo(portalCtx.input); });
+  window.addEventListener("scroll", () => { if (portalCtx) positionPortalTo(portalCtx.input); }, true);
+  tableWrap.addEventListener("scroll", () => { if (portalCtx) positionPortalTo(portalCtx.input); });
+
+  // Category 2 combo (LOCKED: must be one of allowed values)
+  function buildCategory2Combo(tr, prefillValue="") {
+    const wrap = document.createElement("div");
+    wrap.setAttribute("data-combo","cat2");
+
+    const row = document.createElement("div");
+    row.className = "comboRow";
+
+    const input = buildInput("Type to search...");
+    input.setAttribute("data-field","category2");
+    input.value = prefillValue || "";
+
+    // per-row lock state
+    let lastValid = isValidCat2(input.value) ? input.value.trim() : "";
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "comboBtn";
+    btn.textContent = "▾";
+    btn.title = "Show all";
+
+    function applyValidityUI() {
+      const v = input.value.trim();
+      const ok = !v || isValidCat2(v); // allow empty, but not invalid text
+      input.classList.toggle("invalid", !ok);
+    }
+
+    function commitSelection(val) {
+      input.value = val;
+      lastValid = val;
+      input.classList.remove("invalid");
+      updateCat1(tr, val);
+      closePortal();
+    }
+
+    // expose commit for portal clicks
+    input._commitCat2 = commitSelection;
+
+    input.addEventListener("input", () => {
+      const v = input.value.trim();
+
+      if (isValidCat2(v)) {
+        updateCat1(tr, v);
+        lastValid = v; // exact match typed is accepted
+        input.classList.remove("invalid");
+      } else {
+        updateCat1(tr, "");
+        applyValidityUI();
+      }
+
+      openPortalFor(input, tr, false);
+    });
+
+    input.addEventListener("focus", () => {
+      openPortalFor(input, tr, false);
+    });
+
+    // lock on blur: if not valid, revert or clear
+    input.addEventListener("blur", () => {
+      setTimeout(() => {
+        const v = input.value.trim();
+        if (!v) {
+          updateCat1(tr, "");
+          input.classList.remove("invalid");
+          return;
+        }
+        if (isValidCat2(v)) {
+          lastValid = v;
+          updateCat1(tr, v);
+          input.classList.remove("invalid");
+          return;
+        }
+        if (lastValid) {
+          input.value = lastValid;
+          updateCat1(tr, lastValid);
+          input.classList.remove("invalid");
+        } else {
+          input.value = "";
+          updateCat1(tr, "");
+          input.classList.remove("invalid");
+        }
+        closePortal();
+      }, 0);
+    });
+
+    btn.addEventListener("click", () => {
+      openPortalFor(input, tr, true);
+      input.focus();
+    });
+
+    row.appendChild(input);
+    row.appendChild(btn);
+    wrap.appendChild(row);
+
+    // initial cat1
+    if (isValidCat2(input.value.trim())) updateCat1(tr, input.value.trim());
+    else updateCat1(tr, "");
+
+    applyValidityUI();
+    return wrap;
+  }
+
+  // --- Rows ---
+  function renumberRows() {
+    [...tbody.querySelectorAll("tr")].forEach((tr, i) => {
+      tr.querySelector(".rownum").textContent = String(i + 1);
+    });
+  }
+  function refreshRowCount() {
+    rowCountPill.textContent = `${tbody.children.length} row(s)`;
+  }
+
+  function removeRow(tr) {
+    tr.remove();
+    renumberRows();
+    refreshRowCount();
+    refreshSummaryValidation();
+    closePortal();
+  }
+
+  function ensureSequences(invEl, rcptEl, prefill) {
+    if (prefill?.invoiceNr) invEl.value = prefill.invoiceNr;
+    else if (!invEl.value) invEl.value = seq("INV", nextInv++);
+
+    if (prefill?.receiptNr) rcptEl.value = prefill.receiptNr;
+    else if (!rcptEl.value) rcptEl.value = seq("RCPT", nextRcpt++);
+  }
+
+  function addRow(prefill={}) {
+    const tr = document.createElement("tr");
+
+    const td0 = document.createElement("td");
+    td0.className = "rownum";
+    td0.textContent = String(tbody.children.length + 1);
+    tr.appendChild(td0);
+
+    // Payment Date
+    const td1 = document.createElement("td");
+    const pd = buildInput("DD-MMM-YYYY");
+    pd.setAttribute("data-field","paymentDate");
+    pd.value = prefill.paymentDate || "";
+    td1.appendChild(pd);
+    tr.appendChild(td1);
+
+    // Academic Year
+    const td2 = document.createElement("td");
+    const ay = buildSelect(ACADEMIC_YEARS_DEFAULT, "Select...");
+    ay.setAttribute("data-field","academicYear");
+    ay.value = prefill.academicYear || "";
+    td2.appendChild(ay);
+    tr.appendChild(td2);
+
+    // Category 1 (auto)
+    const td3 = document.createElement("td");
+    const c1 = buildSelect(CAT1_ORDER, "Auto...");
+    c1.setAttribute("data-field","category1");
+    c1.disabled = true;
+    c1.value = prefill.category1 || "";
+    td3.appendChild(c1);
+    tr.appendChild(td3);
+
+    // Category 2 (locked)
+    const td4 = document.createElement("td");
+    const c2combo = buildCategory2Combo(tr, prefill.category2 || "");
+    td4.appendChild(c2combo);
+    tr.appendChild(td4);
+
+    // Description
+    const td5 = document.createElement("td");
+    const desc = buildTextarea("");
+    desc.setAttribute("data-field","description");
+    desc.value = prefill.description || "";
+    td5.appendChild(desc);
+    tr.appendChild(td5);
+
+    // Invoice (sequence)
+    const td6 = document.createElement("td");
+    const inv = buildInput("");
+    inv.setAttribute("data-field","invoiceNr");
+    inv.readOnly = true;
+    td6.appendChild(inv);
+    tr.appendChild(td6);
+
+    // Receipt (sequence)
+    const td7 = document.createElement("td");
+    const rec = buildInput("");
+    rec.setAttribute("data-field","receiptNr");
+    rec.readOnly = true;
+    td7.appendChild(rec);
+    tr.appendChild(td7);
+
+    // Payer
+    const td8 = document.createElement("td");
+    const payer = buildInput("");
+    payer.setAttribute("data-field","payerName");
+    payer.value = prefill.payerName || "";
+    td8.appendChild(payer);
+    tr.appendChild(td8);
+
+    // Receiver
+    const td9 = document.createElement("td");
+    const recv = buildInput("");
+    recv.setAttribute("data-field","receiverName");
+    recv.value = prefill.receiverName || "";
+    td9.appendChild(recv);
+    tr.appendChild(td9);
+
+    // Wallet
+    const td10 = document.createElement("td");
+    const w = buildSelect(WALLETS, "Select...");
+    w.setAttribute("data-field","wallet");
+    w.value = prefill.wallet || "";
+    td10.appendChild(w);
+    tr.appendChild(td10);
+
+    // Amount
+    const td11 = document.createElement("td");
+    const amt = buildInput("0.00");
+    amt.setAttribute("data-field","amount");
+    amt.value = (prefill.amount ?? "") === "" ? "" : String(prefill.amount);
+    td11.appendChild(amt);
+    tr.appendChild(td11);
+
+    // Attach
+    const td12 = document.createElement("td");
+    const fileCell = document.createElement("div");
+    fileCell.className = "fileCell";
+    const file = buildFileInput();
+    file.setAttribute("data-field","file");
+    fileCell.appendChild(file);
+    td12.appendChild(fileCell);
+    tr.appendChild(td12);
+
+    // Delete row
+    const td13 = document.createElement("td");
+    td13.style.textAlign = "right";
+    const del = document.createElement("button");
+    del.type = "button";
+    del.className = "iconBtn danger";
+    del.title = "Erase line";
+    del.textContent = "✕";
+    del.addEventListener("click", () => removeRow(tr));
+    td13.appendChild(del);
+    tr.appendChild(td13);
+
+    // sequences
+    ensureSequences(inv, rec, prefill);
+
+    // events
+    pd.addEventListener("input", () => { validateRow(tr); refreshSummaryValidation(); });
+    pd.addEventListener("blur",  () => { validateRow(tr); refreshSummaryValidation(); });
+
+    amt.addEventListener("input", () => setAmountClass(amt));
+    setAmountClass(amt);
+
+    tbody.appendChild(tr);
+    renumberRows();
+    refreshRowCount();
+    validateRow(tr);
+    refreshSummaryValidation();
+  }
+
+  function getRowData(tr) {
+    const get = (name) => tr.querySelector(`[data-field="${name}"]`);
+    const amountEl = get("amount");
+    const amountVal = Number(String(amountEl.value).replace(/,/g,"").trim() || "0");
+    const cat2Val = tr.querySelector('[data-field="category2"]').value.trim();
+    const cat1Val = get("category1").value || (CAT2_TO_CAT1.get(cat2Val) || "");
+    return {
+      paymentDate: get("paymentDate").value.trim(),
+      academicYear: get("academicYear").value,
+      category1: cat1Val,
+      category2: cat2Val,
+      description: get("description").value.trim(),
+      invoiceNr: get("invoiceNr").value.trim(),
+      receiptNr: get("receiptNr").value.trim(),
+      payerName: get("payerName").value.trim(),
+      receiverName: get("receiverName").value.trim(),
+      wallet: get("wallet").value,
+      amount: isFinite(amountVal) ? amountVal : 0
+    };
+  }
+
+  function collectRows() {
+    return [...tbody.querySelectorAll("tr")]
+      .map(getRowData)
+      .filter(r => {
+        const hasAnything = r.academicYear || r.category2 || r.paymentDate || r.description || r.amount || r.wallet;
+        if (!hasAnything) return false;
+        // locked: category2 must be valid if present
+        if (r.category2 && !isValidCat2(r.category2)) return false;
+        return true;
+      });
+  }
+
+  function uniqueAcademicYears(rows) {
+    const set = new Set();
+    rows.forEach(r => { if (r.academicYear) set.add(r.academicYear); });
+    const ordered = [];
+    ACADEMIC_YEARS_DEFAULT.forEach(x => { if (set.has(x)) ordered.push(x); set.delete(x); });
+    [...set].sort().forEach(x => ordered.push(x));
+    return ordered.length ? ordered : [...ACADEMIC_YEARS_DEFAULT];
+  }
+
+  function buildFinancialReport(rows) {
+    const years = uniqueAcademicYears(rows);
+
+    const agg = new Map(); // cat1 -> { totalByYear: Map, items: Map(cat2 -> Map(year->sum)) }
+    for (const r of rows) {
+      const cat1 = r.category1 || (CAT2_TO_CAT1.get(r.category2) || "");
+      if (!cat1) continue;
+      const cat2 = r.category2 || "Uncategorized";
+      const ay = r.academicYear || "Unassigned";
+      const amount = Number(r.amount || 0);
+
+      if (!agg.has(cat1)) agg.set(cat1, { totalByYear: new Map(), items: new Map() });
+      const node = agg.get(cat1);
+
+      node.totalByYear.set(ay, (node.totalByYear.get(ay) || 0) + amount);
+
+      if (!node.items.has(cat2)) node.items.set(cat2, new Map());
+      const item = node.items.get(cat2);
+      item.set(ay, (item.get(ay) || 0) + amount);
+    }
+
+    const expanded = new Map();
+    CAT1_ORDER.forEach(c => expanded.set(c, false));
+
+    const incomePlusExpenseByYear = new Map();
+    for (const y of years) {
+      const inc = (agg.get("Income")?.totalByYear.get(y) || 0);
+      const exp = (agg.get("Expense")?.totalByYear.get(y) || 0);
+      incomePlusExpenseByYear.set(y, inc + exp);
+    }
+
+    function render() {
+      const thead = document.createElement("thead");
+      const hr = document.createElement("tr");
+      const h0 = document.createElement("th");
+      h0.textContent = "Category";
+      hr.appendChild(h0);
+      for (const y of years) {
+        const th = document.createElement("th");
+        th.textContent = y;
+        hr.appendChild(th);
+      }
+      thead.appendChild(hr);
+
+      const tb = document.createElement("tbody");
+
+      function addGroupTitle(text){
+        const tr = document.createElement("tr");
+        tr.className = "groupTitle";
+        const td = document.createElement("td");
+        td.colSpan = 1 + years.length;
+        td.textContent = text;
+        tr.appendChild(td);
+        tb.appendChild(tr);
+      }
+
+      function addSection(cat1) {
+        if (!agg.has(cat1)) return;
+
+        const node = agg.get(cat1);
+        const tr = document.createElement("tr");
+        tr.className = "section";
+
+        const tdCat = document.createElement("td");
+        const toggle = document.createElement("button");
+        toggle.className = "toggleBtn";
+        toggle.textContent = expanded.get(cat1) ? "[-]" : "[+]";
+        toggle.addEventListener("click", () => {
+          expanded.set(cat1, !expanded.get(cat1));
+          renderIntoTable();
+        });
+
+        const label = document.createElement("span");
+        label.style.fontWeight = "950";
+        label.textContent = cat1.toUpperCase();
+
+        tdCat.appendChild(toggle);
+        tdCat.appendChild(label);
+        tr.appendChild(tdCat);
+
+        for (const y of years) {
+          const td = document.createElement("td");
+          td.className = "num";
+          const v = node.totalByYear.get(y) || 0;
+          td.textContent = formatMoney(v);
+          if (v < 0) td.classList.add("neg");
+          tr.appendChild(td);
+        }
+        tb.appendChild(tr);
+
+        if (expanded.get(cat1)) {
+          const itemsSorted = [...node.items.entries()].sort((a,b) => a[0].localeCompare(b[0]));
+          for (const [cat2, byYear] of itemsSorted) {
+            const r2 = document.createElement("tr");
+            r2.className = "subRow";
+
+            const td2 = document.createElement("td");
+            td2.textContent = cat2;
+            r2.appendChild(td2);
+
+            for (const y of years) {
+              const td = document.createElement("td");
+              td.className = "num";
+              const v = byYear.get(y) || 0;
+              td.textContent = formatMoney(v);
+              if (v < 0) td.classList.add("neg");
+              r2.appendChild(td);
+            }
+            tb.appendChild(r2);
+          }
+        }
+      }
+
+      addGroupTitle("Income & Operation Expense");
+      addSection("Income");
+      addSection("Expense");
+
+      // TOTAL (Income + Expense)
+      const trTot = document.createElement("tr");
+      trTot.className = "total";
+      const tdTot = document.createElement("td");
+      tdTot.textContent = "TOTAL (INCOME + EXPENSE)";
+      trTot.appendChild(tdTot);
+      for (const y of years) {
+        const td = document.createElement("td");
+        td.className = "num";
+        const v = incomePlusExpenseByYear.get(y) || 0;
+        td.textContent = formatMoney(v);
+        if (v < 0) td.classList.add("neg");
+        trTot.appendChild(td);
+      }
+      tb.appendChild(trTot);
+
+      // Spacer
+      const trSpacer = document.createElement("tr");
+      trSpacer.className = "spacer";
+      const tdSpacer = document.createElement("td");
+      tdSpacer.colSpan = 1 + years.length;
+      trSpacer.appendChild(tdSpacer);
+      tb.appendChild(trSpacer);
+
+      addGroupTitle("Asset & Investment");
+      addSection("Asset");
+      addSection("Investment"); // no total here
+
+      reportMainTable.innerHTML = "";
+      reportMainTable.appendChild(thead);
+      reportMainTable.appendChild(tb);
+    }
+
+    function renderIntoTable(){ render(); }
+
+    renderIntoTable();
+    reportMainMeta.textContent = `${rows.length} submitted row(s) • Years: ${years.join(", ")}`;
+    reportMainWrap.style.display = "block";
+  }
+
+  function buildWalletReport(rows) {
+    const bal = new Map(); // wallet -> sum(amount)
+    for (const r of rows) {
+      const w = (r.wallet || "").trim();
+      if (!w) continue;
+      const v = Number(r.amount || 0);
+      bal.set(w, (bal.get(w) || 0) + v);
+    }
+
+    const wallets = [...bal.entries()].sort((a,b) => a[0].localeCompare(b[0]));
+
+    const thead = document.createElement("thead");
+    const hr = document.createElement("tr");
+    const th1 = document.createElement("th"); th1.textContent = "Wallet";
+    const th2 = document.createElement("th"); th2.textContent = "Balance";
+    hr.appendChild(th1); hr.appendChild(th2);
+    thead.appendChild(hr);
+
+    const tb = document.createElement("tbody");
+    let grand = 0;
+
+    for (const [w, v] of wallets) {
+      grand += v;
+      const tr = document.createElement("tr");
+      const tdW = document.createElement("td"); tdW.textContent = w;
+      const tdV = document.createElement("td"); tdV.className = "num"; tdV.textContent = formatMoney(v);
+      if (v < 0) tdV.classList.add("neg");
+      tr.appendChild(tdW); tr.appendChild(tdV);
+      tb.appendChild(tr);
+    }
+
+    const trG = document.createElement("tr");
+    trG.className = "total";
+    const tdG1 = document.createElement("td"); tdG1.textContent = "TOTAL";
+    const tdG2 = document.createElement("td"); tdG2.className = "num"; tdG2.textContent = formatMoney(grand);
+    if (grand < 0) tdG2.classList.add("neg");
+    trG.appendChild(tdG1); trG.appendChild(tdG2);
+    tb.appendChild(trG);
+
+    reportWalletTable.innerHTML = "";
+    reportWalletTable.appendChild(thead);
+    reportWalletTable.appendChild(tb);
+
+    reportWalletMeta.textContent = `${wallets.length} wallet(s)`;
+    walletWrap.style.display = "block";
+  }
+
+  // --- Realistic dummy data (EXACTLY 50) ---
+  function randInt(min, max) { return Math.floor(Math.random()*(max-min+1))+min; }
+  function pick(arr) { return arr[randInt(0, arr.length-1)]; }
+
+  function randomDateInSchoolYear() {
+    const base = new Date(2025, 7, 1); // 01-Aug-2025
+    const offsetDays = randInt(0, 650);
+    const d = new Date(base.getFullYear(), base.getMonth(), base.getDate() + offsetDays);
+    return toDDMMMYYYY(d);
+  }
+
+  const STUDENTS = [
+    "Eaint Khit Amara","Bhone Marn Pyae Hmu","Noo Noo Swan Yee","Thiri Mon","Htet Naing Aung",
+    "Su Myat Noe","Ko Ko Min","May Thiri San","Aye Myat Thwe","Lin Lin Htet"
+  ];
+  const TEACHERS = ["Tr. Ei Pa Pa Phyo","Tr. Zin Mar Htun","Tr. Hnin Pwint","Tr. May Thiri"];
+
+  function buildRowTemplate(t) {
+    const cat1 = CAT2_TO_CAT1.get(t.category2) || t.category1 || "";
+    return {
+      paymentDate: t.paymentDate || randomDateInSchoolYear(),
+      academicYear: t.academicYear || pick(ACADEMIC_YEARS_DEFAULT),
+      category1: cat1,
+      category2: t.category2,
+      description: t.description || "",
+      payerName: t.payerName || "",
+      receiverName: t.receiverName || "",
+      wallet: t.wallet || pick(WALLETS),
+      amount: (typeof t.amount === "number" ? t.amount.toFixed(2) : String(t.amount ?? "0.00"))
+    };
+  }
+
+  function fillDummyExactly50() {
+    closePortal();
+    tbody.innerHTML = "";
+    nextInv = 1; nextRcpt = 1;
+
+    const fixed = [
+      buildRowTemplate({
+        paymentDate: "12-Sep-2025",
+        academicYear: "AY2025-2026",
+        category2: "Materials And Stationery",
+        description: "50% Deposit for Jolly Phonics (1to 7) SB (50x34000-15%), WB (50x20000-15%)",
+        payerName: "School Admin",
+        receiverName: "Jolly Phonics Supplier",
+        wallet: "KBZ Bank",
+        amount: -1232500
+      }),
+      buildRowTemplate({
+        paymentDate: "03-Oct-2025",
+        academicYear: "AY2025-2026",
+        category2: "Supplies",
+        description: "To Buy Trouser (Tr. Ei Pa Pa Phyo, Tr. Zin Mar Htun) (2x40000)",
+        payerName: "School Admin",
+        receiverName: "Uniform Shop",
+        wallet: "Petty Cash",
+        amount: -80000
+      }),
+      buildRowTemplate({
+        paymentDate: "05-Nov-2025",
+        academicYear: "AY2025-2026",
+        category2: "Tuition Fee",
+        description: "Monthly Payment for November 2025",
+        payerName: "Eaint Khit Amara",
+        receiverName: "School Office",
+        wallet: "KPay",
+        amount: 320000
+      }),
+      buildRowTemplate({
+        paymentDate: "05-Nov-2025",
+        academicYear: "AY2025-2026",
+        category2: "Tuition Fee",
+        description: "Monthly Payment for November 2025",
+        payerName: "Bhone Marn Pyae Hmu",
+        receiverName: "School Office",
+        wallet: "KPay",
+        amount: 300000
+      }),
+      buildRowTemplate({
+        paymentDate: "05-Nov-2025",
+        academicYear: "AY2025-2026",
+        category2: "Tuition Fee",
+        description: "Monthly Payment for November 2025",
+        payerName: "Noo Noo Swan Yee",
+        receiverName: "School Office",
+        wallet: "KPay",
+        amount: 280000
+      }),
+      buildRowTemplate({
+        paymentDate: "18-Dec-2025",
+        academicYear: "AY2025-2026",
+        category2: "Electronic And Repair",
+        description: "bicycle basket - 8000, hook - 7000, bike stopper - 5000, service charges - 5000",
+        payerName: "School Admin",
+        receiverName: "Bike Service",
+        wallet: "Petty Cash",
+        amount: -25000
+      })
+    ];
+
+    const randomTemplates = [
+      () => buildRowTemplate({
+        category2: "Registration Fee",
+        description: "Student Registration Fee",
+        payerName: pick(STUDENTS),
+        receiverName: "School Office",
+        wallet: pick(["KPay","Petty Cash"]),
+        amount: randInt(20000, 80000)
+      }),
+      () => buildRowTemplate({
+        category2: "Material Fee",
+        description: "Material Fee (Books & Copies)",
+        payerName: pick(STUDENTS),
+        receiverName: "School Office",
+        wallet: pick(["KPay","Petty Cash"]),
+        amount: randInt(15000, 60000)
+      }),
+      () => buildRowTemplate({
+        category2: "Tuition Fee",
+        description: "Monthly Tuition Payment",
+        payerName: pick(STUDENTS),
+        receiverName: "School Office",
+        wallet: pick(["KPay","KBZ Bank","Petty Cash"]),
+        amount: randInt(120000, 450000)
+      }),
+      () => buildRowTemplate({
+        category2: "Salary (Teaching)",
+        description: "Teaching Salary (Monthly)",
+        payerName: "School",
+        receiverName: pick(TEACHERS),
+        wallet: pick(["KBZ Bank","Aya Bank","CB"]),
+        amount: -randInt(250000, 900000)
+      }),
+      () => buildRowTemplate({
+        category2: "Utility Bills",
+        description: "Electricity / Water Bill",
+        payerName: "School",
+        receiverName: "Utility Provider",
+        wallet: pick(["KBZ Bank","Aya Bank","CB"]),
+        amount: -randInt(30000, 250000)
+      }),
+      () => buildRowTemplate({
+        category2: "Classroom Expenses",
+        description: "Classroom consumables (markers, tapes, printouts)",
+        payerName: "School",
+        receiverName: "Stationery Shop",
+        wallet: "Petty Cash",
+        amount: -randInt(8000, 80000)
+      }),
+      () => buildRowTemplate({
+        category2: "Construction",
+        description: "Small construction / renovation works",
+        payerName: "School",
+        receiverName: "Local Contractor",
+        wallet: pick(["KBZ Bank","Aya Bank"]),
+        amount: -randInt(400000, 4500000)
+      }),
+      () => buildRowTemplate({
+        category2: "Digital Marketing",
+        description: "Facebook ads boost (monthly campaign)",
+        payerName: "School",
+        receiverName: "Marketing Vendor",
+        wallet: "Visa / Master Card",
+        amount: -randInt(15000, 180000)
+      }),
+      () => buildRowTemplate({
+        category2: "Sales Of Merchandise",
+        description: "School T-shirt / Merchandise Sales",
+        payerName: "Walk-in Customer",
+        receiverName: "School Office",
+        wallet: pick(["Petty Cash","KPay"]),
+        amount: randInt(5000, 120000)
+      }),
+      () => buildRowTemplate({
+        category2: "Other (Investment)",
+        description: "Short-term investment / placement",
+        payerName: "School",
+        receiverName: "Finance",
+        wallet: pick(["KBZ Bank","Aya Bank","CB"]),
+        amount: (randInt(200000, 2500000) * (randInt(0,1) ? 1 : -1))
+      }),
+      () => buildRowTemplate({
+        category2: "Ferry Fee",
+        description: "Ferry fee for school trip",
+        payerName: "School",
+        receiverName: "Ferry Operator",
+        wallet: pick(["Petty Cash","KPay"]),
+        amount: -randInt(5000, 60000)
+      }),
+      () => buildRowTemplate({
+        category2: "Rent",
+        description: "Monthly Rent Payment",
+        payerName: "School",
+        receiverName: "Landlord",
+        wallet: pick(["KBZ Bank","Aya Bank"]),
+        amount: -randInt(300000, 2500000)
+      }),
+    ];
+
+    const all = [];
+    fixed.forEach(x => all.push(x));
+
+    while (all.length < 50) {
+      const t = pick(randomTemplates)();
+      all.push(t);
+    }
+
+    for (const r of all) addRow(r);
+
+    refreshSummaryValidation();
+  }
+
+  function submitAndReport() {
+    closePortal();
+    refreshSummaryValidation();
+
+    // hard-lock invalid cat2 rows (also highlight invalid inputs)
+    for (const tr of [...tbody.querySelectorAll("tr")]) {
+      const c2 = tr.querySelector('[data-field="category2"]');
+      const v = String(c2?.value || "").trim();
+      if (v && !isValidCat2(v)) c2.classList.add("invalid");
+    }
+
+    const rows = collectRows();
+    buildFinancialReport(rows);
+    buildWalletReport(rows);
+
+    reportMainWrap.style.display = rows.length ? "block" : "none";
+    walletWrap.style.display = rows.length ? "block" : "none";
+
+    if (rows.length) reportMainWrap.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // Events
+  btnAddRow.addEventListener("click", () => addRow());
+  btnDummy.addEventListener("click", () => fillDummyExactly50());
+  btnSubmit.addEventListener("click", submitAndReport);
+
+  // Init: start with 1 line only
+  addRow();
+})();
+</script>
+</body>
+</html>
