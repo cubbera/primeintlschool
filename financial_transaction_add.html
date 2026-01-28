@@ -310,12 +310,22 @@
     .walletCard .reportTable{ min-width: 0; }
 
 /* TOTAL highlight */
-.reportTable tr.total{
-  background: #ecfdf3; /* very light pale green */
-}
+/* TOTAL row: highlight ONLY the numeric amount cells */
 .reportTable tr.total td{
+  background:#fff;            /* keep normal for label cell */
   font-weight: 950;
 }
+
+.reportTable tr.total td.num{
+  background: #ecfdf3;        /* very light pale green */
+}
+
+/* optional: make the label cell slightly bolder but not green */
+.reportTable tr.total td:first-child{
+  font-weight: 950;
+}
+
+
 
 /* Group headers inside report tables */
 .reportTable tr.groupTitle td{
