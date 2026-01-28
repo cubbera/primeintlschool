@@ -3,287 +3,331 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Income & Expense Data Entry (Mockup)</title>
+  <title>Transaction Entry (Mockup)</title>
   <style>
     :root{
-      --bg:#0b1220;
-      --panel:#0f1b33;
-      --panel2:#0c1730;
-      --text:#e8eefc;
-      --muted:#a9b7d6;
-      --line:#213255;
-      --accent:#6aa7ff;
-      --good:#34d399;
-      --warn:#fbbf24;
-      --bad:#fb7185;
-      --chip:#132447;
-      --shadow: 0 14px 30px rgba(0,0,0,.35);
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+      --bg:#ffffff;
+      --text:#111827;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --soft:#f9fafb;
+      --soft2:#f3f4f6;
+      --focus:#2563eb;
+      --warn:#b45309;
+      --bad:#dc2626;
+      --good:#059669;
     }
-    *{box-sizing:border-box}
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
     body{
-      margin:0; font-family:var(--sans); color:var(--text);
-      background: radial-gradient(1200px 800px at 15% 10%, #102a5f 0%, transparent 55%),
-                  radial-gradient(900px 650px at 80% 10%, #1b2a7a 0%, transparent 50%),
-                  linear-gradient(180deg, #070c16 0%, #091022 55%, #070c16 100%);
-      min-height:100vh;
-    }
-    .wrap{max-width:1400px; margin:24px auto; padding:0 16px 48px;}
-    .topbar{
-      display:flex; align-items:flex-start; justify-content:space-between; gap:16px;
-      margin-bottom:14px;
-    }
-    h1{margin:0; font-size:18px; letter-spacing:.2px}
-    .sub{margin:6px 0 0; color:var(--muted); font-size:12px; line-height:1.35}
-    .actions{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end}
-    button{
-      border:1px solid var(--line);
-      background:linear-gradient(180deg, #162a55 0%, #0e1e44 100%);
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
       color:var(--text);
-      padding:9px 12px;
-      border-radius:10px;
+      background:var(--bg);
+    }
+    .wrap{
+      max-width: 1400px;
+      margin: 24px auto 40px;
+      padding: 0 16px;
+    }
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+    h1{
+      font-size: 18px;
+      margin: 0 0 6px;
+      font-weight: 700;
+      letter-spacing: .2px;
+    }
+    .sub{
+      margin:0;
+      color:var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    .btn{
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--text);
+      padding: 10px 12px;
+      border-radius: 10px;
       cursor:pointer;
       font-weight:600;
-      box-shadow: 0 8px 18px rgba(0,0,0,.22);
-      transition: transform .04s ease, border-color .12s ease, filter .12s ease;
+      font-size: 13px;
       white-space:nowrap;
     }
-    button:hover{border-color:#33528f; filter:brightness(1.05)}
-    button:active{transform:translateY(1px)}
-    .btn-accent{
-      border-color:#2f5fb5;
-      background:linear-gradient(180deg, #2c6bdb 0%, #1a4aa5 100%);
+    .btn:hover{ background:var(--soft); }
+    .btn.primary{
+      border-color: var(--focus);
+      background: var(--focus);
+      color: #fff;
     }
-    .btn-ghost{
-      background:transparent;
-      border-color: var(--line);
-      box-shadow:none;
+    .btn.primary:hover{ filter: brightness(0.95); }
+    .btn.ghost{
+      background: var(--soft);
     }
-    .panel{
-      background: linear-gradient(180deg, rgba(15,27,51,.92) 0%, rgba(12,23,48,.92) 100%);
+
+    .card{
       border:1px solid var(--line);
-      border-radius:16px;
-      box-shadow:var(--shadow);
+      border-radius: 14px;
       overflow:hidden;
+      background:#fff;
+      box-shadow: 0 1px 0 rgba(0,0,0,.02);
     }
-    .panel-head{
-      padding:12px 14px;
+    .toolbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 12px 12px;
+      background: linear-gradient(#fff, #fff);
       border-bottom:1px solid var(--line);
-      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
     }
-    .panel-head .left{
-      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    .toolbar .left, .toolbar .right{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex-wrap:wrap;
     }
-    .chip{
-      font-size:12px; color:var(--muted);
-      border:1px solid var(--line);
-      background:rgba(19,36,71,.55);
-      padding:6px 10px; border-radius:999px;
-    }
-    .chip strong{color:var(--text)}
     .hint{
-      font-size:12px; color:var(--muted);
-      display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+      font-size:12px;
+      color:var(--muted);
     }
-    .legend{
-      display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+    .pill{
+      font-size: 12px;
+      color: var(--muted);
+      background: var(--soft);
+      border: 1px solid var(--line);
+      padding: 6px 10px;
+      border-radius: 999px;
     }
-    .dot{width:10px; height:10px; border-radius:50%;}
-    .dot.warn{background:var(--warn)}
-    .dot.bad{background:var(--bad)}
-    .dot.good{background:var(--good)}
-    .table-wrap{
+
+    .tableWrap{
       overflow:auto;
-      max-height: 56vh;
+      width:100%;
     }
     table{
-      width:100%;
-      border-collapse:separate;
-      border-spacing:0;
-      min-width: 1300px;
-      background:rgba(10,18,36,.15);
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 1380px;
+      table-layout: fixed;
     }
     thead th{
-      position:sticky; top:0;
-      z-index:3;
-      background: linear-gradient(180deg, rgba(16,32,66,.98) 0%, rgba(12,23,48,.98) 100%);
-      border-bottom:1px solid var(--line);
-      padding:10px 8px;
-      font-size:12px;
-      text-align:left;
-      color:#d9e6ff;
-      white-space:nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: var(--soft);
+      border-bottom: 1px solid var(--line);
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: none;
+      letter-spacing: .2px;
+      padding: 10px 8px;
+      text-align: left;
+      vertical-align: bottom;
     }
     tbody td{
-      border-bottom:1px solid rgba(33,50,85,.75);
-      padding:6px 6px;
-      vertical-align:top;
-      background:rgba(7,12,22,.05);
+      border-top: 1px solid var(--line);
+      padding: 6px 6px;
+      vertical-align: top;
+      background:#fff;
     }
-    tbody tr:hover td{background:rgba(106,167,255,.06)}
+    tbody tr:nth-child(even) td{
+      background: #fff;
+    }
+    tbody tr:hover td{
+      background: var(--soft);
+    }
+
     .cell{
       width:100%;
-      min-width: 110px;
-      padding:8px 8px;
-      border-radius:10px;
-      border:1px solid rgba(33,50,85,.9);
-      background: rgba(10,18,36,.35);
-      color:var(--text);
-      outline:none;
-      font-size:13px;
+      border:1px solid transparent;
+      background: transparent;
+      border-radius: 8px;
+      padding: 8px 8px;
+      font-size: 13px;
+      outline: none;
     }
-    .cell::placeholder{color:rgba(169,183,214,.6)}
-    .cell.small{min-width:92px}
-    .cell.medium{min-width:140px}
-    .cell.long{min-width:220px}
-    .cell.mono{font-family:var(--mono); font-size:12.5px}
-    .cell[readonly]{
-      opacity:.85;
-      background: rgba(19,36,71,.28);
-      cursor:not-allowed;
+    .cell:focus{
+      border-color: rgba(37,99,235,.55);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+      background:#fff;
     }
-    select.cell{appearance:none; background-image: linear-gradient(45deg, transparent 50%, #a9b7d6 50%), linear-gradient(135deg, #a9b7d6 50%, transparent 50%);
-      background-position: calc(100% - 16px) 50%, calc(100% - 11px) 50%;
-      background-size: 6px 6px, 6px 6px;
-      background-repeat:no-repeat;
-      padding-right:28px;
+    select.cell{
+      padding-right: 28px;
+      appearance: none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+        linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+      background-position:
+        calc(100% - 16px) 55%,
+        calc(100% - 11px) 55%;
+      background-size: 5px 5px, 5px 5px;
+      background-repeat: no-repeat;
     }
-    .row-actions{
-      display:flex; gap:8px; align-items:center; justify-content:center;
+    textarea.cell{
+      resize: vertical;
+      line-height: 1.25;
+      min-height: 44px; /* ~2 lines */
+      max-height: 120px;
     }
-    .icon-btn{
-      padding:8px 10px;
-      border-radius:10px;
-      border:1px solid var(--line);
-      background:rgba(19,36,71,.35);
-      box-shadow:none;
-      font-weight:700;
+
+    .rownum{
+      text-align:right;
+      color: var(--muted);
+      font-size: 12px;
+      padding-top: 12px;
+      width: 44px;
     }
-    .icon-btn.danger{border-color: rgba(251,113,133,.55)}
-    .icon-btn:disabled{opacity:.5; cursor:not-allowed}
-    .status{
-      font-size:12px; color:var(--muted); padding:10px 14px;
-      border-top:1px solid var(--line);
-      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
-      background:rgba(8,14,26,.35);
+
+    .warn{
+      display:block;
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--warn);
     }
-    .status .left{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
-    .status .right{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
-    .error{
-      color:#ffe4e8;
-      background: rgba(251,113,133,.12);
-      border:1px solid rgba(251,113,133,.35);
-      padding:8px 10px;
-      border-radius:12px;
-      display:none;
-      max-width: 980px;
-      white-space: pre-wrap;
-      line-height:1.35;
+    .err{
+      display:block;
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--bad);
     }
     .ok{
-      color:#ddfff2;
-      background: rgba(52,211,153,.10);
-      border:1px solid rgba(52,211,153,.25);
-      padding:8px 10px;
-      border-radius:12px;
-      display:none;
+      display:block;
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--good);
     }
+
+    .amount{
+      text-align:right;
+      font-variant-numeric: tabular-nums;
+    }
+    .amount.negative{
+      color: var(--bad);
+      font-weight: 700;
+    }
+    .amount.positive{
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .fileCell{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap: 8px;
+    }
+    .fileInput{
+      width: 180px;
+      font-size: 12px;
+    }
+
+    .footer{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px;
+      border-top:1px solid var(--line);
+      background:#fff;
+    }
+
     .report{
-      margin-top:16px;
+      margin-top: 16px;
+      border:1px solid var(--line);
+      border-radius: 14px;
+      overflow:hidden;
+      background:#fff;
     }
-    .report-head{
-      padding:12px 14px;
-      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    .reportHead{
+      display:flex;
+      align-items:flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px;
       border-bottom:1px solid var(--line);
+      background: var(--soft);
     }
-    .report-title{
+    .reportHead h2{
       margin:0;
-      font-size:14px;
-      letter-spacing:.2px;
+      font-size: 14px;
+      font-weight: 800;
     }
-    .report-meta{
-      color:var(--muted);
-      font-size:12px;
-      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    .reportHead p{
+      margin: 3px 0 0;
+      font-size: 12px;
+      color: var(--muted);
     }
-    .report-body{padding:14px;}
-    .ay-block{
-      border:1px solid var(--line);
-      background: rgba(10,18,36,.25);
-      border-radius:14px;
-      overflow:hidden;
-      margin-bottom:12px;
-    }
-    .ay-head{
-      padding:10px 12px;
-      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
-      background: rgba(19,36,71,.25);
-      border-bottom:1px solid var(--line);
-    }
-    .ay-head .ay-name{font-weight:800}
-    .ay-head .ay-total{color:var(--muted); font-size:12px}
-    .cat1-grid{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:10px;
-      padding:12px;
-    }
-    @media(min-width: 860px){
-      .cat1-grid{grid-template-columns: repeat(3, 1fr);}
-    }
-    .cat1-card{
-      border:1px solid var(--line);
-      background: rgba(7,12,22,.18);
-      border-radius:14px;
-      overflow:hidden;
-      min-height: 120px;
-    }
-    .cat1-head{
-      padding:10px 10px;
-      border-bottom:1px solid var(--line);
-      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
-      background: rgba(10,18,36,.25);
-    }
-    .cat1-name{font-weight:900; text-transform:uppercase; letter-spacing:.6px; font-size:12px}
-    .cat1-sum{color:var(--muted); font-size:12px}
-    .toggle{
-      display:flex; align-items:center; gap:8px;
-      font-size:12px; color:var(--muted);
-      user-select:none;
-    }
-    .toggle input{accent-color: var(--accent)}
-    .cat2-list{
-      padding:8px 10px 10px;
-      display:flex; flex-direction:column; gap:8px;
-      max-height: 260px;
+    .reportBody{
       overflow:auto;
     }
-    .cat2-row{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      padding:8px 10px;
-      border-radius:12px;
-      border:1px solid rgba(33,50,85,.8);
-      background: rgba(19,36,71,.18);
+    .reportTable{
+      width:100%;
+      border-collapse:collapse;
+      min-width: 760px;
     }
-    .cat2-name{font-size:12.5px}
-    .cat2-amt{font-family:var(--mono); font-size:12.5px; color:#d7e6ff}
-    .muted{color:var(--muted)}
-    .warn-border{border-color: rgba(251,191,36,.6)!important}
-    .bad-border{border-color: rgba(251,113,133,.6)!important}
-    .good-border{border-color: rgba(52,211,153,.35)!important}
-    .footer-actions{
-      margin-top:10px;
-      display:flex; gap:10px; align-items:center; justify-content:flex-end; flex-wrap:wrap;
+    .reportTable th, .reportTable td{
+      padding: 10px 10px;
+      border-top:1px solid var(--line);
+      font-size: 13px;
     }
-    .kbd{
-      font-family:var(--mono);
-      font-size:11.5px;
-      padding:2px 6px;
-      border:1px solid var(--line);
-      border-radius:8px;
-      background: rgba(19,36,71,.35);
+    .reportTable thead th{
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background:#fff;
       color: var(--muted);
+      font-size: 12px;
+      border-top: none;
+      border-bottom: 1px solid var(--line);
+      text-align:left;
+    }
+    .reportTable td.num{
+      text-align:right;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .toggleBtn{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius: 999px;
+      padding: 2px 8px;
+      cursor:pointer;
+      font-weight: 800;
+      margin-right: 8px;
+      width: 36px;
+      text-align:center;
+    }
+    .catRow{
+      background: var(--soft);
+      font-weight: 800;
+    }
+    .subRow td:first-child{
+      padding-left: 44px;
+      color: var(--text);
+      font-weight: 600;
+    }
+    .muted{
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .srOnly{
+      position:absolute;
+      width:1px;
+      height:1px;
+      padding:0;
+      margin:-1px;
+      overflow:hidden;
+      clip:rect(0,0,0,0);
+      white-space:nowrap;
+      border:0;
     }
   </style>
 </head>
@@ -292,808 +336,716 @@
   <div class="wrap">
     <div class="topbar">
       <div>
-        <h1>Transaction Entry (Income / Opex / Asset)</h1>
+        <h1>Simple Transaction Entry (Income / Expense / Asset / Investment)</h1>
         <p class="sub">
-          Excel-style mockup: add rows, auto-map Category 2 ➜ Category 1, date warning if past, then generate a simple grouped report on submit.
+          Excel-like layout. Category 1 is auto-filled from Category 2. Amount can be negative (refunds, reversals).
+          Payment Date format: <b>DD-MMM-YYYY</b> (e.g. <b>05-Feb-2026</b>).
         </p>
       </div>
-      <div class="actions">
-        <button class="btn-ghost" id="btnAddRow" title="Add a new blank row">+ Add line</button>
-        <button class="btn-ghost" id="btnClear" title="Clear all rows">Clear</button>
-        <button class="btn-accent" id="btnDummy" title="Fill in 30 dummy rows">Fill in with dummy</button>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <button class="btn" id="btnDummy">Fill In With Dummy (50 rows)</button>
       </div>
     </div>
 
-    <div class="panel">
-      <div class="panel-head">
+    <div class="card">
+      <div class="toolbar">
         <div class="left">
-          <span class="chip">Rows: <strong id="rowCount">0</strong></span>
-          <span class="chip">Past-date warnings: <strong id="warnCount">0</strong></span>
-          <span class="chip">Amount issues: <strong id="amountIssueCount">0</strong></span>
+          <span class="pill" id="rowCountPill">0 rows</span>
+          <button class="btn ghost" id="btnAddRow">+ Add Line</button>
+          <span class="hint">Tip: you can paste values into cells like a spreadsheet.</span>
         </div>
-        <div class="hint">
-          <span class="legend">
-            <span class="dot warn"></span><span>Past payment date</span>
-          </span>
-          <span class="legend">
-            <span class="dot bad"></span><span>Validation issue</span>
-          </span>
-          <span class="legend">
-            <span class="dot good"></span><span>Looks OK</span>
-          </span>
-          <span class="muted">Tip: accountant picks <b>Category 2</b>; <b>Category 1</b> fills automatically.</span>
+        <div class="right">
+          <span class="hint" id="validationSummary">No validation issues.</span>
         </div>
       </div>
 
-      <div class="table-wrap">
-        <table id="entryTable" aria-label="Transaction Entry Table">
+      <div class="tableWrap">
+        <table id="entryTable" aria-label="Transaction entry table">
+          <colgroup>
+            <col style="width:44px" />
+            <col style="width:130px" />
+            <col style="width:150px" />
+            <col style="width:130px" />
+            <col style="width:250px" />
+            <col style="width:300px" />
+            <col style="width:120px" />
+            <col style="width:120px" />
+            <col style="width:160px" />
+            <col style="width:160px" />
+            <col style="width:170px" />
+            <col style="width:130px" />
+            <col style="width:220px" />
+          </colgroup>
           <thead>
             <tr>
-              <th style="width:70px;">#</th>
-              <th>Payment date</th>
-              <th>Academic year</th>
-              <th>Category 1</th>
+              <th>#</th>
+              <th>Payment Date<br><span class="muted">DD-MMM-YYYY</span></th>
+              <th>Academic Year</th>
+              <th>Category 1<br><span class="muted">(auto)</span></th>
               <th>Category 2</th>
-              <th>Description</th>
+              <th>Description<br><span class="muted">(2 lines)</span></th>
               <th>Invoice Nr</th>
               <th>Receipt Nr</th>
               <th>Payer Name</th>
               <th>Receiver Name</th>
               <th>Wallet</th>
               <th>Amount</th>
-              <th style="width:120px; text-align:center;">Row</th>
+              <th style="text-align:right;">Attach File</th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
         </table>
       </div>
 
-      <div class="status">
-        <div class="left">
-          <div class="error" id="errorBox"></div>
-          <div class="ok" id="okBox"></div>
+      <div class="footer">
+        <div class="hint">
+          Category 2 dropdown updates Category 1 automatically.
+          Payment Date warns if it’s in the past.
         </div>
-        <div class="right">
-          <span class="muted">Keyboard: <span class="kbd">Tab</span> move • <span class="kbd">Enter</span> stays in cell</span>
-          <button class="btn-accent" id="btnSubmit">Submit Transaction(s)</button>
-        </div>
+        <button class="btn primary" id="btnSubmit">Submit Transaction(s)</button>
       </div>
     </div>
 
-    <div class="panel report" id="reportPanel" style="display:none;">
-      <div class="report-head">
-        <h2 class="report-title">Simple Financial Report</h2>
-        <div class="report-meta" id="reportMeta"></div>
-      </div>
-      <div class="report-body" id="reportBody"></div>
-    </div>
-
-    <div class="panel" style="margin-top:16px;">
-      <div class="panel-head">
-        <div class="left">
-          <span class="chip"><strong>Useful feedback</strong> (implementation notes)</span>
+    <div class="report" id="report" style="display:none;">
+      <div class="reportHead">
+        <div>
+          <h2>Simple Financial Report</h2>
+          <p>Grouped by Category and Academic Year. Click [+]/[-] to show/hide items.</p>
         </div>
+        <div class="hint" id="reportMeta"></div>
       </div>
-      <div style="padding:14px; color:var(--muted); line-height:1.45; font-size:13px;">
-        <ul style="margin:0; padding-left:18px;">
-          <li><b>Make “Academic year” and “Wallet” controlled vocabularies.</b> Free-text wallets create messy reports (e.g., “KBZPay”, “KBZ Pay”, “kbzpay”). Use dropdown + allow admin to manage options.</li>
-          <li><b>Separate “Counterparty” from “Payer/Receiver”.</b> Many transactions are always “School” on one side. You can simplify with: “Direction” (In/Out) + “Counterparty Name” + auto-fill “School” for the other side.</li>
-          <li><b>Amounts: enforce sign conventions.</b> Decide whether expenses are stored as positive numbers (with Category 1 = opex/asset) or negative numbers. Reporting is far easier if you keep one consistent rule.</li>
-          <li><b>Date warning: clarify policy.</b> “Warn if past” is useful, but you may also want: (a) allow back-dated entries, (b) require a “reason” if older than N days, (c) lock closed months after accounting close.</li>
-          <li><b>Add attachment capture later.</b> Receipt/Invoice numbers help, but real audits want a file link or upload field. Even a “Drive link” column adds a lot of value.</li>
-          <li><b>Category governance.</b> Keep Category 2 as the primary, and maintain a mapping table to Category 1 (like this mockup). Consider adding “Active/Inactive” to hide old categories without breaking history.</li>
-        </ul>
+      <div class="reportBody">
+        <table class="reportTable" id="reportTable" aria-label="Financial report table"></table>
       </div>
     </div>
-
   </div>
 
-  <script>
-    // ---------- Category Model ----------
-    const ACADEMIC_YEARS = ["AY2025-2026","Summer2025","AY2026-2027"];
+<script>
+(() => {
+  // ---- Config / Lookups ----
+  const ACADEMIC_YEARS_DEFAULT = ["AY2025-2026", "Summer2026", "AY2026-2027"]; // includes Summer2026 per your report header
+  const WALLETS = ["Petty Cash", "KBZ Bank", "Aya Bank", "CB", "KPay", "Visa / Master Card"];
 
-    const CATEGORY2 = {
-      income: [
-        "tuition fee","registration fee","material fee","ferry fee","sales of merchandise"
-      ],
-      asset: [
-        "construction","solar panel","electrical setup","electronic items","big furniture",
-        "playground equipment","rent","investment"
-      ],
-      opex: [
-        "Salary (Teaching)","Salary (Office)","benefits and welfare","digital Marketing","offline marketing",
-        "Classroom Expenses","School Merchandise","building & electrical repair","electronic and repair","utility bills",
-        "general & administrative expenses","supplies","materials and stationery","School event expense","donation & gift","Tax"
-      ]
+  // Category 2 lists (as provided), mapped to Category 1.
+  const CAT2_BY_CAT1 = {
+    Income: [
+      "Tuition Fee",
+      "Registration Fee",
+      "Material Fee",
+      "Ferry Fee",
+      "Sales Of Merchandise"
+    ],
+    Asset: [
+      "Construction",
+      "Solar Panel",
+      "Electrical Setup",
+      "Electronic Items",
+      "Big Furniture",
+      "Playground Equipment",
+      "Rent"
+    ],
+    Opex: [
+      "Salary (Teaching)",
+      "Salary (Office)",
+      "Benefits And Welfare",
+      "Digital Marketing",
+      "Offline Marketing",
+      "Classroom Expenses",
+      "School Merchandise",
+      "Building & Electrical Repair",
+      "Electronic And Repair",
+      "Utility Bills",
+      "General & Administrative Expenses",
+      "Supplies",
+      "Materials And Stationery",
+      "School Event Expense",
+      "Donation & Gift",
+      "Tax"
+    ],
+    Investment: [
+      // You didn't provide items, so allow manual entry option via "Other (Investment)".
+      "Other (Investment)"
+    ]
+  };
+
+  const CAT2_TO_CAT1 = (() => {
+    const map = new Map();
+    Object.entries(CAT2_BY_CAT1).forEach(([cat1, list]) => {
+      list.forEach(cat2 => map.set(cat2, cat1));
+    });
+    return map;
+  })();
+
+  const ALL_CAT2_OPTIONS = [
+    ...CAT2_BY_CAT1.Income,
+    ...CAT2_BY_CAT1.Opex,
+    ...CAT2_BY_CAT1.Asset,
+    ...CAT2_BY_CAT1.Investment
+  ];
+
+  // ---- DOM ----
+  const tbody = document.getElementById("tbody");
+  const btnAddRow = document.getElementById("btnAddRow");
+  const btnDummy = document.getElementById("btnDummy");
+  const btnSubmit = document.getElementById("btnSubmit");
+  const rowCountPill = document.getElementById("rowCountPill");
+  const validationSummary = document.getElementById("validationSummary");
+
+  const reportWrap = document.getElementById("report");
+  const reportTable = document.getElementById("reportTable");
+  const reportMeta = document.getElementById("reportMeta");
+
+  // ---- Helpers ----
+  const pad2 = (n) => String(n).padStart(2, "0");
+
+  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const monthIndex = (mmm) => MONTHS.findIndex(m => m.toLowerCase() === String(mmm).toLowerCase());
+
+  function toDDMMMYYYY(dateObj) {
+    const dd = pad2(dateObj.getDate());
+    const mmm = MONTHS[dateObj.getMonth()];
+    const yyyy = dateObj.getFullYear();
+    return `${dd}-${mmm}-${yyyy}`;
+  }
+
+  function parseDDMMMYYYY(s) {
+    // Accepts "DD-MMM-YYYY" with MMM as Jan/Feb/...
+    if (!s) return { ok:false, reason:"Empty" };
+    const m = String(s).trim().match(/^(\d{2})-([A-Za-z]{3})-(\d{4})$/);
+    if (!m) return { ok:false, reason:"Format must be DD-MMM-YYYY" };
+    const dd = Number(m[1]);
+    const mi = monthIndex(m[2]);
+    const yyyy = Number(m[3]);
+    if (mi < 0) return { ok:false, reason:"Invalid month (use Jan, Feb, ...)" };
+    const d = new Date(yyyy, mi, dd);
+    // Validate round-trip to catch impossible dates (e.g. 31-Feb)
+    if (d.getFullYear() !== yyyy || d.getMonth() !== mi || d.getDate() !== dd) {
+      return { ok:false, reason:"Invalid calendar date" };
+    }
+    return { ok:true, date:d };
+  }
+
+  function isPastDate(dateObj) {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const d = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+    return d < today;
+  }
+
+  function formatMoney(n) {
+    // Keep it simple: 2 decimals, commas
+    const sign = n < 0 ? "-" : "";
+    const abs = Math.abs(n);
+    const s = abs.toFixed(2);
+    const [a,b] = s.split(".");
+    const withCommas = a.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return `${sign}${withCommas}.${b}`;
+  }
+
+  function normalizeTitleCase(s) {
+    return String(s)
+      .trim()
+      .toLowerCase()
+      .replace(/\b([a-z])/g, (m, c) => c.toUpperCase());
+  }
+
+  function buildSelect(options, placeholder = "Select...") {
+    const sel = document.createElement("select");
+    sel.className = "cell";
+    const opt0 = document.createElement("option");
+    opt0.value = "";
+    opt0.textContent = placeholder;
+    sel.appendChild(opt0);
+    options.forEach(v => {
+      const opt = document.createElement("option");
+      opt.value = v;
+      opt.textContent = v;
+      sel.appendChild(opt);
+    });
+    return sel;
+  }
+
+  function buildInput(placeholder = "") {
+    const inp = document.createElement("input");
+    inp.className = "cell";
+    inp.placeholder = placeholder;
+    return inp;
+  }
+
+  function buildTextarea(placeholder = "") {
+    const ta = document.createElement("textarea");
+    ta.className = "cell";
+    ta.rows = 2;
+    ta.placeholder = placeholder;
+    return ta;
+  }
+
+  function buildFileInput() {
+    const inp = document.createElement("input");
+    inp.type = "file";
+    inp.className = "fileInput";
+    return inp;
+  }
+
+  function getRowData(tr) {
+    const get = (name) => tr.querySelector(`[data-field="${name}"]`);
+    const amountEl = get("amount");
+    const amountVal = Number(String(amountEl.value).replace(/,/g,"").trim() || "0");
+    return {
+      paymentDate: get("paymentDate").value.trim(),
+      academicYear: get("academicYear").value,
+      category1: get("category1").value,
+      category2: get("category2").value,
+      description: get("description").value.trim(),
+      invoiceNr: get("invoiceNr").value.trim(),
+      receiptNr: get("receiptNr").value.trim(),
+      payerName: get("payerName").value.trim(),
+      receiverName: get("receiverName").value.trim(),
+      wallet: get("wallet").value,
+      amount: isFinite(amountVal) ? amountVal : 0,
+      file: get("file").files && get("file").files[0] ? get("file").files[0].name : ""
     };
+  }
 
-    // Reverse-map Category2 -> Category1
-    const CAT2_TO_CAT1 = (() => {
-      const m = new Map();
-      for (const [c1, list] of Object.entries(CATEGORY2)) {
-        list.forEach(c2 => m.set(c2, c1));
-      }
-      return m;
-    })();
+  function setAmountStyle(inputEl) {
+    const raw = String(inputEl.value).replace(/,/g,"").trim();
+    const n = Number(raw);
+    inputEl.classList.remove("negative","positive");
+    inputEl.classList.add("amount");
+    if (!raw) return;
+    if (!isFinite(n)) return;
+    if (n < 0) inputEl.classList.add("negative");
+    else inputEl.classList.add("positive");
+  }
 
-    const WALLET_SUGGESTIONS = ["Cash","Bank Transfer","KBZPay","WavePay","AYA Pay","Visa/Master","Petty Cash"];
+  function updateCat1FromCat2(row) {
+    const cat2 = row.querySelector('[data-field="category2"]').value;
+    const cat1El = row.querySelector('[data-field="category1"]');
+    const cat1 = CAT2_TO_CAT1.get(cat2) || "";
+    cat1El.value = cat1;
+  }
 
-    // ---------- DOM ----------
-    const tbody = document.getElementById("tbody");
-    const rowCountEl = document.getElementById("rowCount");
-    const warnCountEl = document.getElementById("warnCount");
-    const amountIssueCountEl = document.getElementById("amountIssueCount");
-    const errorBox = document.getElementById("errorBox");
-    const okBox = document.getElementById("okBox");
+  function validateRow(row) {
+    // Returns {errors:[], warnings:[]}
+    const res = { errors: [], warnings: [] };
+    const pdEl = row.querySelector('[data-field="paymentDate"]');
+    const msgEl = row.querySelector('[data-field="paymentDateMsg"]');
+    msgEl.textContent = "";
+    msgEl.className = ""; // reset
 
-    const reportPanel = document.getElementById("reportPanel");
-    const reportMeta = document.getElementById("reportMeta");
-    const reportBody = document.getElementById("reportBody");
-
-    // ---------- Utilities ----------
-    const todayISO = () => {
-      const d = new Date();
-      d.setHours(0,0,0,0);
-      return d.toISOString().slice(0,10);
-    };
-
-    function parseISODate(value) {
-      // value like YYYY-MM-DD
-      if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
-      const d = new Date(value + "T00:00:00");
-      return Number.isNaN(d.getTime()) ? null : d;
+    const parsed = parseDDMMMYYYY(pdEl.value.trim());
+    if (!pdEl.value.trim()) {
+      // allow empty while drafting; no error
+      return res;
     }
-
-    function fmtMoney(n) {
-      const sign = n < 0 ? "-" : "";
-      const abs = Math.abs(n);
-      // keep it simple
-      return sign + abs.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (!parsed.ok) {
+      res.errors.push(parsed.reason);
+      msgEl.textContent = parsed.reason;
+      msgEl.className = "err";
+      return res;
     }
-
-    function showError(msg) {
-      errorBox.style.display = "block";
-      okBox.style.display = "none";
-      errorBox.textContent = msg;
+    if (isPastDate(parsed.date)) {
+      res.warnings.push("Payment date is in the past");
+      msgEl.textContent = "Warning: Date is in the past";
+      msgEl.className = "warn";
+    } else {
+      msgEl.textContent = "OK";
+      msgEl.className = "ok";
     }
+    return res;
+  }
 
-    function showOk(msg) {
-      okBox.style.display = "block";
-      errorBox.style.display = "none";
-      okBox.textContent = msg;
-      setTimeout(() => { okBox.style.display = "none"; }, 2500);
+  function refreshSummaryValidation() {
+    let warnings = 0;
+    let errors = 0;
+    [...tbody.querySelectorAll("tr")].forEach(tr => {
+      const v = validateRow(tr);
+      warnings += v.warnings.length;
+      errors += v.errors.length;
+    });
+    if (errors === 0 && warnings === 0) {
+      validationSummary.textContent = "No validation issues.";
+      return;
     }
+    const parts = [];
+    if (errors) parts.push(`${errors} error(s)`);
+    if (warnings) parts.push(`${warnings} warning(s)`);
+    validationSummary.textContent = parts.join(" • ");
+  }
 
-    function clearMessages() {
-      errorBox.style.display = "none";
-      okBox.style.display = "none";
-      errorBox.textContent = "";
-      okBox.textContent = "";
-    }
+  // ---- Row creation ----
+  function addRow(prefill = {}) {
+    const tr = document.createElement("tr");
 
-    function makeOption(value, label=value) {
-      const o = document.createElement("option");
-      o.value = value;
-      o.textContent = label;
-      return o;
-    }
+    // Row number
+    const td0 = document.createElement("td");
+    td0.className = "rownum";
+    td0.textContent = String(tbody.children.length + 1);
+    tr.appendChild(td0);
 
-    function normalizeAmount(s) {
-      // Allow commas and spaces
-      if (typeof s !== "string") return NaN;
-      const cleaned = s.replace(/[, ]+/g,"").trim();
-      if (cleaned === "") return NaN;
-      const n = Number(cleaned);
-      return Number.isFinite(n) ? n : NaN;
-    }
+    // Payment date
+    const td1 = document.createElement("td");
+    const pd = buildInput("DD-MMM-YYYY");
+    pd.setAttribute("data-field", "paymentDate");
+    pd.value = prefill.paymentDate || "";
+    const pdMsg = document.createElement("span");
+    pdMsg.setAttribute("data-field", "paymentDateMsg");
+    td1.appendChild(pd);
+    td1.appendChild(pdMsg);
+    tr.appendChild(td1);
 
-    // ---------- Row Creation ----------
-    let nextRowId = 1;
+    // Academic year
+    const td2 = document.createElement("td");
+    const ay = buildSelect(ACADEMIC_YEARS_DEFAULT, "Select AY...");
+    ay.setAttribute("data-field", "academicYear");
+    ay.value = prefill.academicYear || "";
+    td2.appendChild(ay);
+    tr.appendChild(td2);
 
-    function createRow(data = {}) {
-      const rowId = nextRowId++;
-      const tr = document.createElement("tr");
-      tr.dataset.rowId = String(rowId);
+    // Category 1 (locked)
+    const td3 = document.createElement("td");
+    const c1 = buildSelect(["Income","Opex","Asset","Investment"], "Auto...");
+    c1.setAttribute("data-field", "category1");
+    c1.disabled = true; // cannot be typed in
+    c1.value = prefill.category1 || "";
+    td3.appendChild(c1);
+    tr.appendChild(td3);
 
-      const cells = {};
+    // Category 2
+    const td4 = document.createElement("td");
+    const c2 = buildSelect(ALL_CAT2_OPTIONS, "Select Category 2...");
+    c2.setAttribute("data-field", "category2");
+    c2.value = prefill.category2 || "";
+    td4.appendChild(c2);
+    tr.appendChild(td4);
 
-      // # (display index)
-      const tdIndex = document.createElement("td");
-      tdIndex.className = "muted";
-      tdIndex.style.fontFamily = "var(--mono)";
-      tdIndex.style.fontSize = "12px";
-      tdIndex.style.padding = "10px 8px";
-      tdIndex.textContent = "—";
-      tr.appendChild(tdIndex);
+    // Description (2 lines)
+    const td5 = document.createElement("td");
+    const desc = buildTextarea("Short details (max 2 lines recommended)");
+    desc.setAttribute("data-field", "description");
+    desc.value = prefill.description || "";
+    td5.appendChild(desc);
+    tr.appendChild(td5);
 
-      // Payment date
-      cells.payment_date = document.createElement("input");
-      cells.payment_date.type = "date";
-      cells.payment_date.className = "cell small";
-      cells.payment_date.value = data.payment_date || "";
-      appendCell(tr, cells.payment_date);
+    // Invoice Nr
+    const td6 = document.createElement("td");
+    const inv = buildInput("");
+    inv.setAttribute("data-field", "invoiceNr");
+    inv.value = prefill.invoiceNr || "";
+    td6.appendChild(inv);
+    tr.appendChild(td6);
 
-      // Academic year
-      cells.academic_year = document.createElement("select");
-      cells.academic_year.className = "cell medium";
-      cells.academic_year.appendChild(makeOption("", "Select..."));
-      ACADEMIC_YEARS.forEach(ay => cells.academic_year.appendChild(makeOption(ay)));
-      cells.academic_year.value = data.academic_year || "";
-      appendCell(tr, cells.academic_year);
+    // Receipt Nr
+    const td7 = document.createElement("td");
+    const rec = buildInput("");
+    rec.setAttribute("data-field", "receiptNr");
+    rec.value = prefill.receiptNr || "";
+    td7.appendChild(rec);
+    tr.appendChild(td7);
 
-      // Category 1 (readonly; auto-filled)
-      cells.category_1 = document.createElement("input");
-      cells.category_1.type = "text";
-      cells.category_1.className = "cell medium";
-      cells.category_1.readOnly = true;
-      cells.category_1.placeholder = "auto";
-      cells.category_1.value = data.category_1 || "";
-      appendCell(tr, cells.category_1);
+    // Payer Name
+    const td8 = document.createElement("td");
+    const payer = buildInput("");
+    payer.setAttribute("data-field", "payerName");
+    payer.value = prefill.payerName || "";
+    td8.appendChild(payer);
+    tr.appendChild(td8);
 
-      // Category 2 (dropdown)
-      cells.category_2 = document.createElement("select");
-      cells.category_2.className = "cell long";
-      cells.category_2.appendChild(makeOption("", "Select..."));
-      // Grouped options
-      for (const c1 of ["income","opex","asset"]) {
-        const og = document.createElement("optgroup");
-        og.label = c1.toUpperCase();
-        CATEGORY2[c1].forEach(c2 => og.appendChild(makeOption(c2)));
-        cells.category_2.appendChild(og);
-      }
-      cells.category_2.value = data.category_2 || "";
-      appendCell(tr, cells.category_2);
+    // Receiver Name
+    const td9 = document.createElement("td");
+    const recv = buildInput("");
+    recv.setAttribute("data-field", "receiverName");
+    recv.value = prefill.receiverName || "";
+    td9.appendChild(recv);
+    tr.appendChild(td9);
 
-      // Description
-      cells.description = document.createElement("input");
-      cells.description.type = "text";
-      cells.description.className = "cell long";
-      cells.description.placeholder = "Short note...";
-      cells.description.value = data.description || "";
-      appendCell(tr, cells.description);
+    // Wallet
+    const td10 = document.createElement("td");
+    const w = buildSelect(WALLETS, "Select wallet...");
+    w.setAttribute("data-field", "wallet");
+    w.value = prefill.wallet || "";
+    td10.appendChild(w);
+    tr.appendChild(td10);
 
-      // Invoice Nr
-      cells.invoice_nr = document.createElement("input");
-      cells.invoice_nr.type = "text";
-      cells.invoice_nr.className = "cell mono medium";
-      cells.invoice_nr.placeholder = "INV-...";
-      cells.invoice_nr.value = data.invoice_nr || "";
-      appendCell(tr, cells.invoice_nr);
+    // Amount
+    const td11 = document.createElement("td");
+    const amt = buildInput("0.00");
+    amt.setAttribute("data-field", "amount");
+    amt.classList.add("amount");
+    amt.value = (prefill.amount ?? "") === "" ? "" : String(prefill.amount);
+    td11.appendChild(amt);
+    tr.appendChild(td11);
 
-      // Receipt Nr
-      cells.receipt_nr = document.createElement("input");
-      cells.receipt_nr.type = "text";
-      cells.receipt_nr.className = "cell mono medium";
-      cells.receipt_nr.placeholder = "RCPT-...";
-      cells.receipt_nr.value = data.receipt_nr || "";
-      appendCell(tr, cells.receipt_nr);
+    // Attach
+    const td12 = document.createElement("td");
+    const wrap = document.createElement("div");
+    wrap.className = "fileCell";
+    const file = buildFileInput();
+    file.setAttribute("data-field", "file");
+    wrap.appendChild(file);
+    td12.appendChild(wrap);
+    tr.appendChild(td12);
 
-      // Payer Name
-      cells.payer_name = document.createElement("input");
-      cells.payer_name.type = "text";
-      cells.payer_name.className = "cell medium";
-      cells.payer_name.placeholder = "e.g., Student / Vendor";
-      cells.payer_name.value = data.payer_name || "";
-      appendCell(tr, cells.payer_name);
-
-      // Receiver Name
-      cells.receiver_name = document.createElement("input");
-      cells.receiver_name.type = "text";
-      cells.receiver_name.className = "cell medium";
-      cells.receiver_name.placeholder = "e.g., School / Staff";
-      cells.receiver_name.value = data.receiver_name || "";
-      appendCell(tr, cells.receiver_name);
-
-      // Wallet
-      cells.wallet = document.createElement("input");
-      cells.wallet.type = "text";
-      cells.wallet.className = "cell medium";
-      cells.wallet.placeholder = "Cash / Bank / ...";
-      cells.wallet.value = data.wallet || "";
-      cells.wallet.setAttribute("list", "walletList");
-      appendCell(tr, cells.wallet);
-
-      // Amount
-      cells.amount = document.createElement("input");
-      cells.amount.type = "text";
-      cells.amount.inputMode = "decimal";
-      cells.amount.className = "cell mono small";
-      cells.amount.placeholder = "0.00";
-      cells.amount.value = (data.amount ?? "") === "" ? "" : String(data.amount);
-      appendCell(tr, cells.amount);
-
-      // Row actions
-      const tdActions = document.createElement("td");
-      tdActions.style.textAlign = "center";
-      const box = document.createElement("div");
-      box.className = "row-actions";
-
-      const btnDup = document.createElement("button");
-      btnDup.type = "button";
-      btnDup.className = "icon-btn";
-      btnDup.title = "Duplicate row";
-      btnDup.textContent = "⧉";
-      btnDup.addEventListener("click", () => {
-        const snapshot = readRow(tr);
-        createRow(snapshot);
-        refreshRowNumbers();
-        validateAllRows();
-        showOk("Row duplicated.");
-      });
-
-      const btnDel = document.createElement("button");
-      btnDel.type = "button";
-      btnDel.className = "icon-btn danger";
-      btnDel.title = "Delete row";
-      btnDel.textContent = "✕";
-      btnDel.addEventListener("click", () => {
-        tr.remove();
-        refreshRowNumbers();
-        validateAllRows();
-      });
-
-      box.appendChild(btnDup);
-      box.appendChild(btnDel);
-      tdActions.appendChild(box);
-      tr.appendChild(tdActions);
-
-      // Events: cat2 -> cat1
-      cells.category_2.addEventListener("change", () => {
-        const c2 = cells.category_2.value;
-        const c1 = CAT2_TO_CAT1.get(c2) || "";
-        cells.category_1.value = c1;
-        validateRow(tr);
-        validateAllRows();
-      });
-
-      // Events: payment date warning
-      cells.payment_date.addEventListener("change", () => {
-        validateRow(tr);
-        validateAllRows();
-      });
-
-      // Events: amount validation
-      cells.amount.addEventListener("input", () => {
-        validateRow(tr);
-        validateAllRows();
-      });
-
-      // Keep row-level validation reactive for key fields
-      ["academic_year","description","invoice_nr","receipt_nr","payer_name","receiver_name","wallet"].forEach(k => {
-        cells[k].addEventListener("input", () => {
-          validateRow(tr);
-          validateAllRows(false);
-        });
-        cells[k].addEventListener("change", () => {
-          validateRow(tr);
-          validateAllRows(false);
-        });
-      });
-
-      // Store cell refs
-      tr._cells = cells;
-
-      tbody.appendChild(tr);
-      refreshRowNumbers();
+    // Wire events
+    c2.addEventListener("change", () => {
+      updateCat1FromCat2(tr);
+    });
+    pd.addEventListener("blur", () => {
       validateRow(tr);
-      validateAllRows();
-      return tr;
-    }
+      refreshSummaryValidation();
+    });
+    pd.addEventListener("input", () => {
+      // light validation while typing
+      validateRow(tr);
+      refreshSummaryValidation();
+    });
 
-    function appendCell(tr, inputEl) {
-      const td = document.createElement("td");
-      td.appendChild(inputEl);
-      tr.appendChild(td);
-    }
+    amt.addEventListener("input", () => setAmountStyle(amt));
+    // Initial set
+    updateCat1FromCat2(tr);
+    setAmountStyle(amt);
+    validateRow(tr);
 
-    function refreshRowNumbers() {
-      const rows = Array.from(tbody.querySelectorAll("tr"));
-      rows.forEach((tr, i) => {
-        tr.children[0].textContent = String(i + 1);
+    tbody.appendChild(tr);
+    renumberRows();
+    refreshRowCount();
+    refreshSummaryValidation();
+  }
+
+  function renumberRows() {
+    [...tbody.querySelectorAll("tr")].forEach((tr, idx) => {
+      tr.querySelector(".rownum").textContent = String(idx + 1);
+    });
+  }
+
+  function refreshRowCount() {
+    rowCountPill.textContent = `${tbody.children.length} row(s)`;
+  }
+
+  // ---- Dummy data ----
+  function randInt(min, max) { return Math.floor(Math.random()*(max-min+1))+min; }
+  function pick(arr) { return arr[randInt(0, arr.length-1)]; }
+
+  function randomName() {
+    const first = ["Aye","Min","Htet","Su","May","Thiri","Ko","Zaw","Nandar","Myo","Khine","Lin","Win","Hla","Ei","Yoon","Sai","Nyein"];
+    const last = ["Aung","Tun","Kyaw","Hlaing","Oo","Naing","Myint","Soe","Khin","Phyo","Wai","Zin","Htwe","Hnin","Lwin","Thant"];
+    return `${pick(first)} ${pick(last)}`;
+  }
+
+  function randomDesc(cat2) {
+    const a = [
+      "Monthly transaction entry",
+      "Payment received and recorded",
+      "Operational spend allocation",
+      "Procurement and delivery included",
+      "Partial refund processed",
+      "Reimbursement and supporting docs"
+    ];
+    return `${pick(a)} — ${cat2}.`;
+  }
+
+  function randomDateNearToday() {
+    const now = new Date();
+    const offset = randInt(-20, 25); // some past to trigger warnings
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
+    return toDDMMMYYYY(d);
+  }
+
+  function fillDummy(n=50) {
+    tbody.innerHTML = "";
+    for (let i=0; i<n; i++) {
+      const cat2 = pick(ALL_CAT2_OPTIONS);
+      const cat1 = CAT2_TO_CAT1.get(cat2) || "";
+      const ay = pick(ACADEMIC_YEARS_DEFAULT);
+
+      // Amount logic: income tends positive, opex/asset tend negative, investment mixed.
+      let amountBase = randInt(20, 900) * (randInt(0, 1) ? 1 : 1);
+      let amount = amountBase;
+      if (cat1 === "Income") amount = randInt(50, 1500);
+      if (cat1 === "Opex") amount = -randInt(30, 1200);
+      if (cat1 === "Asset") amount = -randInt(100, 6000);
+      if (cat1 === "Investment") amount = (randInt(0, 1) ? 1 : -1) * randInt(100, 5000);
+
+      // occasional income refund
+      if (cat2 === "Tuition Fee" && randInt(1, 12) === 1) amount = -randInt(50, 500);
+
+      addRow({
+        paymentDate: randomDateNearToday(),
+        academicYear: ay,
+        category1: cat1,
+        category2: cat2,
+        description: randomDesc(cat2),
+        invoiceNr: `INV-${randInt(1000,9999)}`,
+        receiptNr: `RCPT-${randInt(1000,9999)}`,
+        payerName: randomName(),
+        receiverName: randomName(),
+        wallet: pick(WALLETS),
+        amount: amount.toFixed(2)
       });
-      rowCountEl.textContent = String(rows.length);
+    }
+    refreshSummaryValidation();
+  }
+
+  // ---- Report ----
+  function collectRows() {
+    return [...tbody.querySelectorAll("tr")]
+      .map(getRowData)
+      // Consider a row "submitted" if it has at least AY + Cat2 + Amount or PaymentDate filled
+      .filter(r => r.academicYear || r.category2 || r.paymentDate || r.description || r.amount);
+  }
+
+  function uniqueAcademicYears(rows) {
+    const set = new Set();
+    rows.forEach(r => { if (r.academicYear) set.add(r.academicYear); });
+    // Keep defaults first if present, then others
+    const ordered = [];
+    ACADEMIC_YEARS_DEFAULT.forEach(x => { if (set.has(x)) ordered.push(x); set.delete(x); });
+    [...set].sort().forEach(x => ordered.push(x));
+    return ordered.length ? ordered : [...ACADEMIC_YEARS_DEFAULT];
+  }
+
+  function buildReport(rows) {
+    const years = uniqueAcademicYears(rows);
+
+    // Aggregate by cat1 -> cat2 -> year
+    const agg = new Map(); // cat1 -> { totalByYear, items: Map(cat2 -> byYear) }
+    const cat1Order = ["Income","Opex","Asset","Investment"];
+
+    for (const r of rows) {
+      const cat1 = r.category1 || (CAT2_TO_CAT1.get(r.category2) || "");
+      const cat2 = r.category2 || "Uncategorized";
+      const ay = r.academicYear || "Unassigned";
+      const amount = Number(r.amount || 0);
+
+      if (!agg.has(cat1)) agg.set(cat1, { totalByYear: new Map(), items: new Map() });
+      const node = agg.get(cat1);
+
+      node.totalByYear.set(ay, (node.totalByYear.get(ay) || 0) + amount);
+
+      if (!node.items.has(cat2)) node.items.set(cat2, new Map());
+      const item = node.items.get(cat2);
+      item.set(ay, (item.get(ay) || 0) + amount);
     }
 
-    function readRow(tr) {
-      const c = tr._cells;
-      return {
-        payment_date: c.payment_date.value,
-        academic_year: c.academic_year.value,
-        category_1: c.category_1.value,
-        category_2: c.category_2.value,
-        description: c.description.value,
-        invoice_nr: c.invoice_nr.value,
-        receipt_nr: c.receipt_nr.value,
-        payer_name: c.payer_name.value,
-        receiver_name: c.receiver_name.value,
-        wallet: c.wallet.value,
-        amount: c.amount.value
-      };
-    }
+    // Toggle states
+    const expanded = new Map(); // cat1 -> bool
+    cat1Order.forEach(c => expanded.set(c, false)); // collapsed by default
 
-    // ---------- Validation ----------
-    function setBorder(el, mode) {
-      el.classList.remove("warn-border","bad-border","good-border");
-      if (mode) el.classList.add(mode + "-border");
-    }
-
-    function validateRow(tr) {
-      const c = tr._cells;
-      clearMessages();
-
-      // Payment date warn if past
-      const d = parseISODate(c.payment_date.value);
-      const t = parseISODate(todayISO());
-      if (d && t && d.getTime() < t.getTime()) setBorder(c.payment_date, "warn");
-      else if (d) setBorder(c.payment_date, "good");
-      else setBorder(c.payment_date, null);
-
-      // Category 2 requires mapping, Category 1 should reflect it
-      if (c.category_2.value) {
-        setBorder(c.category_2, "good");
-        c.category_1.value = CAT2_TO_CAT1.get(c.category_2.value) || "";
-        setBorder(c.category_1, c.category_1.value ? "good" : "bad");
-      } else {
-        setBorder(c.category_2, null);
-        setBorder(c.category_1, null);
-        c.category_1.value = "";
-      }
-
-      // Academic year
-      if (c.academic_year.value) setBorder(c.academic_year, "good");
-      else setBorder(c.academic_year, null);
-
-      // Amount
-      const amt = normalizeAmount(c.amount.value);
-      if (c.amount.value.trim() === "") {
-        setBorder(c.amount, null);
-      } else if (!Number.isFinite(amt)) {
-        setBorder(c.amount, "bad");
-      } else {
-        setBorder(c.amount, "good");
-      }
-    }
-
-    function validateAllRows(updateCounters = true) {
-      const rows = Array.from(tbody.querySelectorAll("tr"));
-      let warn = 0;
-      let amountIssues = 0;
-
-      for (const tr of rows) {
-        const c = tr._cells;
-        const d = parseISODate(c.payment_date.value);
-        const t = parseISODate(todayISO());
-        if (d && t && d.getTime() < t.getTime()) warn++;
-
-        const rawAmt = c.amount.value.trim();
-        if (rawAmt !== "" && !Number.isFinite(normalizeAmount(rawAmt))) amountIssues++;
-      }
-
-      if (updateCounters) {
-        warnCountEl.textContent = String(warn);
-        amountIssueCountEl.textContent = String(amountIssues);
-      }
-    }
-
-    // ---------- Dummy Data ----------
-    function randInt(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
-    function pick(arr){ return arr[randInt(0, arr.length-1)]; }
-
-    function randomISODateAroundToday() {
-      const base = new Date();
-      base.setHours(0,0,0,0);
-      const offsetDays = randInt(-20, 35); // include past to trigger warnings
-      base.setDate(base.getDate() + offsetDays);
-      return base.toISOString().slice(0,10);
-    }
-
-    function dummyName() {
-      const first = ["Aye","Hnin","Thiri","Min","Ko","May","Nandar","Zaw","Moe","Su","Thiha","Nyein","Khant","Ei","Yoon"];
-      const last = ["Hlaing","Aung","Tun","Win","Oo","Naing","Kyaw","Myint","Soe","Htet","Moe","Hla","Zin","Htwe"];
-      return pick(first) + " " + pick(last);
-    }
-
-    function dummyWallet() {
-      return pick(WALLET_SUGGESTIONS);
-    }
-
-    function dummyInvoice(i) {
-      return "INV-" + String(2026) + "-" + String(i).padStart(4,"0");
-    }
-
-    function dummyReceipt(i) {
-      return "RCPT-" + String(2026) + "-" + String(i).padStart(4,"0");
-    }
-
-    function dummyDescription(c1, c2) {
-      const templates = [
-        `${c2} payment`,
-        `${c2} - monthly`,
-        `Settlement for ${c2}`,
-        `Advance for ${c2}`,
-        `Reimbursement - ${c2}`
-      ];
-      // Make income feel like student-facing; others more operational
-      if (c1 === "income") return pick(["Student payment - "+c2, "New enrollment - "+c2, "Fee collected - "+c2]);
-      if (c1 === "asset") return pick(["Capex - "+c2, "Purchase - "+c2, "Installation - "+c2]);
-      return pick(templates);
-    }
-
-    function dummyAmount(c1) {
-      if (c1 === "income") return (randInt(20, 200) * 1000).toFixed(2);
-      if (c1 === "asset") return (randInt(200, 2500) * 1000).toFixed(2);
-      return (randInt(30, 600) * 1000).toFixed(2);
-    }
-
-    function fillDummy(n=30) {
-      tbody.innerHTML = "";
-      nextRowId = 1;
-
-      for (let i=1;i<=n;i++){
-        const c1 = pick(["income","opex","asset"]);
-        const c2 = pick(CATEGORY2[c1]);
-        createRow({
-          payment_date: randomISODateAroundToday(),
-          academic_year: pick(ACADEMIC_YEARS),
-          category_2: c2,
-          description: dummyDescription(c1, c2),
-          invoice_nr: Math.random() < 0.65 ? dummyInvoice(i) : "",
-          receipt_nr: Math.random() < 0.75 ? dummyReceipt(i) : "",
-          payer_name: c1 === "income" ? dummyName() : pick(["School Admin","Main Office","Procurement","HR"]) ,
-          receiver_name: c1 === "income" ? "School" : dummyName(),
-          wallet: dummyWallet(),
-          amount: dummyAmount(c1)
-        });
-      }
-      refreshRowNumbers();
-      validateAllRows();
-      showOk("Filled 30 dummy rows.");
-    }
-
-    // ---------- Reporting ----------
-    function collectTransactions() {
-      const rows = Array.from(tbody.querySelectorAll("tr"));
-      const tx = [];
-
-      for (const tr of rows) {
-        const c = tr._cells;
-
-        const payment_date = c.payment_date.value.trim();
-        const academic_year = c.academic_year.value.trim();
-        const category_2 = c.category_2.value.trim();
-        const category_1 = (CAT2_TO_CAT1.get(category_2) || c.category_1.value.trim()).trim();
-
-        const amountRaw = c.amount.value;
-        const amount = normalizeAmount(amountRaw);
-
-        tx.push({
-          payment_date,
-          academic_year,
-          category_1,
-          category_2,
-          description: c.description.value.trim(),
-          invoice_nr: c.invoice_nr.value.trim(),
-          receipt_nr: c.receipt_nr.value.trim(),
-          payer_name: c.payer_name.value.trim(),
-          receiver_name: c.receiver_name.value.trim(),
-          wallet: c.wallet.value.trim(),
-          amountRaw: amountRaw.trim(),
-          amount
-        });
-      }
-      return tx;
-    }
-
-    function validateBeforeSubmit(tx) {
-      const errors = [];
-      if (tx.length === 0) errors.push("No rows to submit.");
-
-      tx.forEach((t, idx) => {
-        const rowNo = idx + 1;
-
-        // Minimal required fields for accounting usefulness
-        if (!t.payment_date) errors.push(`Row ${rowNo}: Payment date is missing.`);
-        if (!t.academic_year) errors.push(`Row ${rowNo}: Academic year is missing.`);
-        if (!t.category_2) errors.push(`Row ${rowNo}: Category 2 is missing.`);
-        if (!t.category_1) errors.push(`Row ${rowNo}: Category 1 could not be derived (check Category 2 mapping).`);
-        if (!t.wallet) errors.push(`Row ${rowNo}: Wallet is missing.`);
-        if (!t.amountRaw) errors.push(`Row ${rowNo}: Amount is missing.`);
-        if (t.amountRaw && !Number.isFinite(t.amount)) errors.push(`Row ${rowNo}: Amount is not a valid number ("${t.amountRaw}").`);
+    function render() {
+      // header
+      const thead = document.createElement("thead");
+      const hr = document.createElement("tr");
+      const h0 = document.createElement("th");
+      h0.textContent = "Category";
+      hr.appendChild(h0);
+      years.forEach(y => {
+        const th = document.createElement("th");
+        th.textContent = y;
+        hr.appendChild(th);
       });
+      thead.appendChild(hr);
 
-      return errors;
-    }
+      const tb = document.createElement("tbody");
 
-    function buildReport(tx) {
-      // Structure:
-      // AY -> cat1 -> cat2 -> total
-      const map = new Map();
+      cat1Order.forEach(cat1 => {
+        if (!agg.has(cat1)) return;
 
-      for (const t of tx) {
-        const ay = t.academic_year || "(blank)";
-        const c1 = (t.category_1 || "(blank)").toLowerCase();
-        const c2 = t.category_2 || "(blank)";
-        const amt = Number.isFinite(t.amount) ? t.amount : 0;
+        const node = agg.get(cat1);
 
-        if (!map.has(ay)) map.set(ay, new Map());
-        const m1 = map.get(ay);
+        const tr = document.createElement("tr");
+        tr.className = "catRow";
+        const tdCat = document.createElement("td");
 
-        if (!m1.has(c1)) m1.set(c1, new Map());
-        const m2 = m1.get(c1);
+        const toggle = document.createElement("button");
+        toggle.className = "toggleBtn";
+        toggle.textContent = expanded.get(cat1) ? "[-]" : "[+]";
+        toggle.title = expanded.get(cat1) ? "Hide items" : "Show items";
+        toggle.addEventListener("click", () => {
+          expanded.set(cat1, !expanded.get(cat1));
+          renderIntoTable();
+        });
 
-        m2.set(c2, (m2.get(c2) || 0) + amt);
-      }
+        const label = document.createElement("span");
+        // show tidy names + your hint about sign meanings
+        const signHint =
+          cat1 === "Income" ? "[+]" :
+          cat1 === "Opex" ? "[+]" :
+          cat1 === "Asset" ? "[-]" :
+          cat1 === "Investment" ? "[+]" : "";
+        label.textContent = `${cat1.toUpperCase()} ${signHint}`;
 
-      // Convert to render-friendly object with stable cat1 ordering
-      const ayKeys = Array.from(map.keys()).sort((a,b) => a.localeCompare(b));
-      const result = [];
+        tdCat.appendChild(toggle);
+        tdCat.appendChild(label);
+        tr.appendChild(tdCat);
 
-      for (const ay of ayKeys) {
-        const cat1Map = map.get(ay);
-        const cat1Order = ["income","opex","asset"];
-        const blocks = [];
+        years.forEach(y => {
+          const td = document.createElement("td");
+          td.className = "num";
+          const v = node.totalByYear.get(y) || 0;
+          td.textContent = formatMoney(v);
+          tr.appendChild(td);
+        });
+        tb.appendChild(tr);
 
-        for (const c1 of cat1Order) {
-          const c2map = cat1Map.get(c1) || new Map();
-          const c2rows = Array.from(c2map.entries())
-            .sort((a,b) => a[0].localeCompare(b[0]))
-            .map(([name, total]) => ({ name, total }));
+        if (expanded.get(cat1)) {
+          // items
+          const itemsSorted = [...node.items.entries()].sort((a,b) => a[0].localeCompare(b[0]));
+          itemsSorted.forEach(([cat2, byYear]) => {
+            const r2 = document.createElement("tr");
+            r2.className = "subRow";
+            const td2 = document.createElement("td");
+            td2.textContent = cat2;
+            r2.appendChild(td2);
 
-          const total = c2rows.reduce((s,r)=>s+r.total,0);
-          blocks.push({ c1, total, c2rows });
-        }
+            years.forEach(y => {
+              const td = document.createElement("td");
+              td.className = "num";
+              const v = byYear.get(y) || 0;
+              td.textContent = formatMoney(v);
+              r2.appendChild(td);
+            });
 
-        const ayTotal = blocks.reduce((s,b)=>s+b.total,0);
-        result.push({ ay, ayTotal, blocks });
-      }
-
-      return result;
-    }
-
-    function renderReport(report, txCount) {
-      reportPanel.style.display = "block";
-
-      // Meta
-      const now = new Date();
-      reportMeta.innerHTML = "";
-      const metaBits = [
-        `<span class="chip">Transactions: <strong>${txCount}</strong></span>`,
-        `<span class="chip">Generated: <strong>${now.toLocaleString()}</strong></span>`,
-        `<span class="chip">Note: Totals are simple sums of "Amount" (no sign conversion)</span>`
-      ];
-      reportMeta.innerHTML = metaBits.join("");
-
-      reportBody.innerHTML = "";
-
-      if (report.length === 0) {
-        reportBody.innerHTML = `<div class="muted">No data.</div>`;
-        return;
-      }
-
-      for (const ayBlock of report) {
-        const wrapper = document.createElement("div");
-        wrapper.className = "ay-block";
-
-        const head = document.createElement("div");
-        head.className = "ay-head";
-        head.innerHTML = `
-          <div class="ay-name">${escapeHtml(ayBlock.ay)}</div>
-          <div class="ay-total">Total: <span style="font-family:var(--mono); color:#d7e6ff;">${fmtMoney(ayBlock.ayTotal)}</span></div>
-        `;
-
-        const grid = document.createElement("div");
-        grid.className = "cat1-grid";
-
-        for (const b of ayBlock.blocks) {
-          const card = document.createElement("div");
-          card.className = "cat1-card";
-
-          const cardHead = document.createElement("div");
-          cardHead.className = "cat1-head";
-
-          const toggleId = `toggle_${ayBlock.ay}_${b.c1}`.replace(/[^a-zA-Z0-9_]/g,"_");
-
-          cardHead.innerHTML = `
-            <div>
-              <div class="cat1-name">${escapeHtml(b.c1)}</div>
-              <div class="cat1-sum">Sum: <span style="font-family:var(--mono); color:#d7e6ff;">${fmtMoney(b.total)}</span></div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="${toggleId}" checked />
-              Show Category 2
-            </label>
-          `;
-
-          const list = document.createElement("div");
-          list.className = "cat2-list";
-          list.dataset.toggleTarget = toggleId;
-
-          if (b.c2rows.length === 0) {
-            list.innerHTML = `<div class="muted" style="padding:6px 2px;">No entries.</div>`;
-          } else {
-            for (const r of b.c2rows) {
-              const row = document.createElement("div");
-              row.className = "cat2-row";
-              row.innerHTML = `
-                <div class="cat2-name">${escapeHtml(r.name)}</div>
-                <div class="cat2-amt">${fmtMoney(r.total)}</div>
-              `;
-              list.appendChild(row);
-            }
-          }
-
-          card.appendChild(cardHead);
-          card.appendChild(list);
-          grid.appendChild(card);
-
-          // Toggle behavior
-          const toggle = cardHead.querySelector(`#${CSS.escape(toggleId)}`);
-          toggle.addEventListener("change", () => {
-            list.style.display = toggle.checked ? "flex" : "none";
+            tb.appendChild(r2);
           });
         }
+      });
 
-        wrapper.appendChild(head);
-        wrapper.appendChild(grid);
-        reportBody.appendChild(wrapper);
-      }
-
-      // Scroll to report
-      reportPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+      reportTable.innerHTML = "";
+      reportTable.appendChild(thead);
+      reportTable.appendChild(tb);
     }
 
-    function escapeHtml(s) {
-      return String(s).replace(/[&<>"']/g, m => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-      }[m]));
-    }
+    function renderIntoTable() { render(); }
 
-    // ---------- Buttons ----------
-    document.getElementById("btnAddRow").addEventListener("click", () => {
-      createRow();
-      refreshRowNumbers();
-      validateAllRows();
+    renderIntoTable();
+
+    reportMeta.textContent = `${rows.length} submitted row(s) • Years: ${years.join(", ")}`;
+    reportWrap.style.display = "block";
+    reportWrap.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // ---- Events ----
+  btnAddRow.addEventListener("click", () => addRow());
+  btnDummy.addEventListener("click", () => fillDummy(50));
+
+  btnSubmit.addEventListener("click", () => {
+    // Re-validate all
+    refreshSummaryValidation();
+
+    const rows = collectRows();
+    // Auto-fill cat1 if missing
+    rows.forEach(r => {
+      if (!r.category1 && r.category2) r.category1 = CAT2_TO_CAT1.get(r.category2) || "";
     });
 
-    document.getElementById("btnDummy").addEventListener("click", () => {
-      fillDummy(30);
-    });
+    // Build report
+    buildReport(rows);
+  });
 
-    document.getElementById("btnClear").addEventListener("click", () => {
-      tbody.innerHTML = "";
-      nextRowId = 1;
-      refreshRowNumbers();
-      validateAllRows();
-      clearMessages();
-      reportPanel.style.display = "none";
-    });
-
-    document.getElementById("btnSubmit").addEventListener("click", () => {
-      clearMessages();
-      const tx = collectTransactions();
-      const errors = validateBeforeSubmit(tx);
-      if (errors.length) {
-        showError("Please fix the following before submit:\n\n" + errors.join("\n"));
-        reportPanel.style.display = "none";
-        return;
-      }
-
-      const report = buildReport(tx);
-      renderReport(report, tx.length);
-      showOk("Submitted (mock) and generated report.");
-    });
-
-    // ---------- Wallet datalist ----------
-    const dl = document.createElement("datalist");
-    dl.id = "walletList";
-    WALLET_SUGGESTIONS.forEach(w => dl.appendChild(makeOption(w)));
-    document.body.appendChild(dl);
-
-    // ---------- Init ----------
-    // Start with a few blank lines like an Excel sheet
-    for (let i=0; i<6; i++) createRow({ academic_year: "", payment_date: "" });
-    refreshRowNumbers();
-    validateAllRows();
-  </script>
+  // ---- Init ----
+  // Start with a few empty lines like a sheet.
+  for (let i=0; i<6; i++) addRow();
+})();
+</script>
 </body>
 </html>
