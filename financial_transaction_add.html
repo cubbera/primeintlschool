@@ -309,17 +309,24 @@
     }
     .walletCard .reportTable{ min-width: 0; }
 
-    /* Highlight TOTAL rows */
-.reportTable tr.total,
-.reportTable tr.section.total {
-  background: #eef2ff;              /* subtle blue */
+/* TOTAL highlight */
+.reportTable tr.total{
+  background: #ecfdf3; /* very light pale green */
+}
+.reportTable tr.total td{
+  font-weight: 950;
 }
 
-.reportTable tr.total td,
-.reportTable tr.section.total td {
-  font-weight: 900;
-  border-top: 2px solid #2563eb;     /* strong separator */
+/* Group headers inside report tables */
+.reportTable tr.groupTitle td{
+  background: var(--soft);
+  color: var(--muted);
+  font-weight: 950;
+  letter-spacing: .4px;
+  text-transform: uppercase;
 }
+
+
 
   </style>
 </head>
@@ -1001,35 +1008,55 @@
         }
       }
 
-      addSection("Income");
-      addSection("Expense");
+      function addGroupTitle(text){
+  const tr = document.createElement("tr");
+  tr.className = "groupTitle";
+  const td = document.createElement("td");
+  td.colSpan = 1 + years.length;
+  td.textContent = text;
+  tr.appendChild(td);
+  tb.appendChild(tr);
+}
 
-      // TOTAL (Income + Expense)
-      const trTot = document.createElement("tr");
-      trTot.className = "total";
-      const tdTot = document.createElement("td");
-      tdTot.textContent = "TOTAL (INCOME + EXPENSE)";
-      trTot.appendChild(tdTot);
-      for (const y of years) {
-        const td = document.createElement("td");
-        td.className = "num";
-        const v = incomePlusExpenseByYear.get(y) || 0;
-        td.textContent = formatMoney(v);
-        if (v < 0) td.classList.add("neg");
-        trTot.appendChild(td);
-      }
-      tb.appendChild(trTot);
 
-      // Spacer
-      const trSpacer = document.createElement("tr");
-      trSpacer.className = "spacer";
-      const tdSpacer = document.createElement("td");
-      tdSpacer.colSpan = 1 + years.length;
-      trSpacer.appendChild(tdSpacer);
-      tb.appendChild(trSpacer);
 
-      addSection("Asset");
-      addSection("Investment");
+
+
+addGroupTitle("Income & Operation Expense");
+addSection("Income");
+addSection("Expense");
+
+// TOTAL (Income + Expense)  ✅ keep total only for this group
+const trTot = document.createElement("tr");
+trTot.className = "total";
+const tdTot = document.createElement("td");
+tdTot.textContent = "TOTAL (INCOME + EXPENSE)";
+trTot.appendChild(tdTot);
+for (const y of years) {
+  const td = document.createElement("td");
+  td.className = "num";
+  const v = incomePlusExpenseByYear.get(y) || 0;
+  td.textContent = formatMoney(v);
+  if (v < 0) td.classList.add("neg");
+  trTot.appendChild(td);
+}
+tb.appendChild(trTot);
+
+// Spacer
+const trSpacer = document.createElement("tr");
+trSpacer.className = "spacer";
+const tdSpacer = document.createElement("td");
+tdSpacer.colSpan = 1 + years.length;
+trSpacer.appendChild(tdSpacer);
+tb.appendChild(trSpacer);
+
+addGroupTitle("Asset & Investment");
+addSection("Asset");
+addSection("Investment"); // ❌ no total here
+
+
+
+
 
       reportMainTable.innerHTML = "";
       reportMainTable.appendChild(thead);
