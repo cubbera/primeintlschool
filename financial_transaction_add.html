@@ -680,44 +680,24 @@
   tableWrap.addEventListener("scroll", () => { if (portalCtx) positionPortalTo(portalCtx.input); });
 
   // Category 2 combo (portal)
-  function buildCategory2Combo(tr, prefillValue="") {
-    const wrap = document.createElement("div");
-    wrap.setAttribute("data-combo","cat2");
-
-    const row = document.createElement("div");
-    row.className = "comboRow";
-
-    const input = buildInput("Type to search...");
-    input.setAttribute("data-field","category2");
-    input.value = prefillValue || "";
-
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "comboBtn";
-    btn.textContent = "▾";
-    btn.title = "Show all";
-
-    input.addEventListener("input", () => {
-      updateCat1(tr, input.value);
-      openPortalFor(input, tr, false);
-    });
-    input.addEventListener("focus", () => {
-      updateCat1(tr, input.value);
-      openPortalFor(input, tr, false);
-    });
-    btn.addEventListener("click", () => {
-      updateCat1(tr, input.value);
-      openPortalFor(input, tr, true); // show ALL
-      input.focus();
-    });
-
-    row.appendChild(input);
-    row.appendChild(btn);
-    wrap.appendChild(row);
-
-    updateCat1(tr, input.value);
-    return wrap;
+  function buildCategory2Select(tr, prefillValue="") {
+  const all = [];
+  for (const cat1 of CAT1_ORDER) {
+    for (const cat2 of (CAT2_BY_CAT1[cat1] || [])) all.push(cat2);
   }
+
+  const sel = buildSelect(all, "Select...");
+  sel.setAttribute("data-field", "category2");
+  sel.value = prefillValue || "";
+
+  sel.addEventListener("change", () => {
+    updateCat1(tr, sel.value);
+  });
+
+  // Initial cat1
+  updateCat1(tr, sel.value);
+  return sel;
+}
 
   // --- Rows ---
   function renumberRows() {
@@ -780,8 +760,8 @@
 
     // Category 2
     const td4 = document.createElement("td");
-    const c2combo = buildCategory2Combo(tr, prefill.category2 || "");
-    td4.appendChild(c2combo);
+    const c2sel = buildCategory2Select(tr, prefill.category2 || "");
+    td4.appendChild(c2sel);
     tr.appendChild(td4);
 
     // Description
