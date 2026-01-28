@@ -1,240 +1,1099 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Add Expense</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<style>
-body{
-  font-family: system-ui, -apple-system, Segoe UI, Roboto;
-  background:#f6f7fb;
-  margin:0;
-  padding:24px;
-}
-.container{
-  max-width:1100px;
-  margin:auto;
-  background:#fff;
-  padding:24px;
-  border-radius:14px;
-  box-shadow:0 8px 24px rgba(0,0,0,.08);
-}
-h1{margin:0 0 8px}
-.section{
-  margin-top:24px;
-}
-.section h2{
-  font-size:16px;
-  border-bottom:1px solid #e5e7eb;
-  padding-bottom:6px;
-  margin-bottom:16px;
-}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(12,1fr);
-  gap:12px;
-}
-.field{
-  grid-column:span 4;
-  display:flex;
-  flex-direction:column;
-}
-.field.sm{grid-column:span 3}
-.field.lg{grid-column:span 6}
-label{
-  font-size:12px;
-  color:#6b7280;
-}
-input, select, textarea{
-  padding:10px;
-  border-radius:10px;
-  border:1px solid #e5e7eb;
-  font-size:14px;
-}
-textarea{min-height:80px}
-.money{
-  text-align:right;
-}
-.actions{
-  margin-top:24px;
-  display:flex;
-  justify-content:flex-end;
-  gap:12px;
-}
-button{
-  padding:14px 22px;
-  border-radius:12px;
-  border:none;
-  font-size:15px;
-  cursor:pointer;
-}
-.save{
-  background:#111827;
-  color:#fff;
-}
-.cancel{
-  background:#e5e7eb;
-}
-.note{
-  font-size:13px;
-  color:#6b7280;
-}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Income & Expense Data Entry (Mockup)</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#0f1b33;
+      --panel2:#0c1730;
+      --text:#e8eefc;
+      --muted:#a9b7d6;
+      --line:#213255;
+      --accent:#6aa7ff;
+      --good:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --chip:#132447;
+      --shadow: 0 14px 30px rgba(0,0,0,.35);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:var(--sans); color:var(--text);
+      background: radial-gradient(1200px 800px at 15% 10%, #102a5f 0%, transparent 55%),
+                  radial-gradient(900px 650px at 80% 10%, #1b2a7a 0%, transparent 50%),
+                  linear-gradient(180deg, #070c16 0%, #091022 55%, #070c16 100%);
+      min-height:100vh;
+    }
+    .wrap{max-width:1400px; margin:24px auto; padding:0 16px 48px;}
+    .topbar{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:16px;
+      margin-bottom:14px;
+    }
+    h1{margin:0; font-size:18px; letter-spacing:.2px}
+    .sub{margin:6px 0 0; color:var(--muted); font-size:12px; line-height:1.35}
+    .actions{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end}
+    button{
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, #162a55 0%, #0e1e44 100%);
+      color:var(--text);
+      padding:9px 12px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:600;
+      box-shadow: 0 8px 18px rgba(0,0,0,.22);
+      transition: transform .04s ease, border-color .12s ease, filter .12s ease;
+      white-space:nowrap;
+    }
+    button:hover{border-color:#33528f; filter:brightness(1.05)}
+    button:active{transform:translateY(1px)}
+    .btn-accent{
+      border-color:#2f5fb5;
+      background:linear-gradient(180deg, #2c6bdb 0%, #1a4aa5 100%);
+    }
+    .btn-ghost{
+      background:transparent;
+      border-color: var(--line);
+      box-shadow:none;
+    }
+    .panel{
+      background: linear-gradient(180deg, rgba(15,27,51,.92) 0%, rgba(12,23,48,.92) 100%);
+      border:1px solid var(--line);
+      border-radius:16px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .panel-head{
+      padding:12px 14px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    }
+    .panel-head .left{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    }
+    .chip{
+      font-size:12px; color:var(--muted);
+      border:1px solid var(--line);
+      background:rgba(19,36,71,.55);
+      padding:6px 10px; border-radius:999px;
+    }
+    .chip strong{color:var(--text)}
+    .hint{
+      font-size:12px; color:var(--muted);
+      display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+    }
+    .legend{
+      display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+    }
+    .dot{width:10px; height:10px; border-radius:50%;}
+    .dot.warn{background:var(--warn)}
+    .dot.bad{background:var(--bad)}
+    .dot.good{background:var(--good)}
+    .table-wrap{
+      overflow:auto;
+      max-height: 56vh;
+    }
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      min-width: 1300px;
+      background:rgba(10,18,36,.15);
+    }
+    thead th{
+      position:sticky; top:0;
+      z-index:3;
+      background: linear-gradient(180deg, rgba(16,32,66,.98) 0%, rgba(12,23,48,.98) 100%);
+      border-bottom:1px solid var(--line);
+      padding:10px 8px;
+      font-size:12px;
+      text-align:left;
+      color:#d9e6ff;
+      white-space:nowrap;
+    }
+    tbody td{
+      border-bottom:1px solid rgba(33,50,85,.75);
+      padding:6px 6px;
+      vertical-align:top;
+      background:rgba(7,12,22,.05);
+    }
+    tbody tr:hover td{background:rgba(106,167,255,.06)}
+    .cell{
+      width:100%;
+      min-width: 110px;
+      padding:8px 8px;
+      border-radius:10px;
+      border:1px solid rgba(33,50,85,.9);
+      background: rgba(10,18,36,.35);
+      color:var(--text);
+      outline:none;
+      font-size:13px;
+    }
+    .cell::placeholder{color:rgba(169,183,214,.6)}
+    .cell.small{min-width:92px}
+    .cell.medium{min-width:140px}
+    .cell.long{min-width:220px}
+    .cell.mono{font-family:var(--mono); font-size:12.5px}
+    .cell[readonly]{
+      opacity:.85;
+      background: rgba(19,36,71,.28);
+      cursor:not-allowed;
+    }
+    select.cell{appearance:none; background-image: linear-gradient(45deg, transparent 50%, #a9b7d6 50%), linear-gradient(135deg, #a9b7d6 50%, transparent 50%);
+      background-position: calc(100% - 16px) 50%, calc(100% - 11px) 50%;
+      background-size: 6px 6px, 6px 6px;
+      background-repeat:no-repeat;
+      padding-right:28px;
+    }
+    .row-actions{
+      display:flex; gap:8px; align-items:center; justify-content:center;
+    }
+    .icon-btn{
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid var(--line);
+      background:rgba(19,36,71,.35);
+      box-shadow:none;
+      font-weight:700;
+    }
+    .icon-btn.danger{border-color: rgba(251,113,133,.55)}
+    .icon-btn:disabled{opacity:.5; cursor:not-allowed}
+    .status{
+      font-size:12px; color:var(--muted); padding:10px 14px;
+      border-top:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+      background:rgba(8,14,26,.35);
+    }
+    .status .left{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+    .status .right{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+    .error{
+      color:#ffe4e8;
+      background: rgba(251,113,133,.12);
+      border:1px solid rgba(251,113,133,.35);
+      padding:8px 10px;
+      border-radius:12px;
+      display:none;
+      max-width: 980px;
+      white-space: pre-wrap;
+      line-height:1.35;
+    }
+    .ok{
+      color:#ddfff2;
+      background: rgba(52,211,153,.10);
+      border:1px solid rgba(52,211,153,.25);
+      padding:8px 10px;
+      border-radius:12px;
+      display:none;
+    }
+    .report{
+      margin-top:16px;
+    }
+    .report-head{
+      padding:12px 14px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+      border-bottom:1px solid var(--line);
+    }
+    .report-title{
+      margin:0;
+      font-size:14px;
+      letter-spacing:.2px;
+    }
+    .report-meta{
+      color:var(--muted);
+      font-size:12px;
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    }
+    .report-body{padding:14px;}
+    .ay-block{
+      border:1px solid var(--line);
+      background: rgba(10,18,36,.25);
+      border-radius:14px;
+      overflow:hidden;
+      margin-bottom:12px;
+    }
+    .ay-head{
+      padding:10px 12px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+      background: rgba(19,36,71,.25);
+      border-bottom:1px solid var(--line);
+    }
+    .ay-head .ay-name{font-weight:800}
+    .ay-head .ay-total{color:var(--muted); font-size:12px}
+    .cat1-grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
+      padding:12px;
+    }
+    @media(min-width: 860px){
+      .cat1-grid{grid-template-columns: repeat(3, 1fr);}
+    }
+    .cat1-card{
+      border:1px solid var(--line);
+      background: rgba(7,12,22,.18);
+      border-radius:14px;
+      overflow:hidden;
+      min-height: 120px;
+    }
+    .cat1-head{
+      padding:10px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+      background: rgba(10,18,36,.25);
+    }
+    .cat1-name{font-weight:900; text-transform:uppercase; letter-spacing:.6px; font-size:12px}
+    .cat1-sum{color:var(--muted); font-size:12px}
+    .toggle{
+      display:flex; align-items:center; gap:8px;
+      font-size:12px; color:var(--muted);
+      user-select:none;
+    }
+    .toggle input{accent-color: var(--accent)}
+    .cat2-list{
+      padding:8px 10px 10px;
+      display:flex; flex-direction:column; gap:8px;
+      max-height: 260px;
+      overflow:auto;
+    }
+    .cat2-row{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding:8px 10px;
+      border-radius:12px;
+      border:1px solid rgba(33,50,85,.8);
+      background: rgba(19,36,71,.18);
+    }
+    .cat2-name{font-size:12.5px}
+    .cat2-amt{font-family:var(--mono); font-size:12.5px; color:#d7e6ff}
+    .muted{color:var(--muted)}
+    .warn-border{border-color: rgba(251,191,36,.6)!important}
+    .bad-border{border-color: rgba(251,113,133,.6)!important}
+    .good-border{border-color: rgba(52,211,153,.35)!important}
+    .footer-actions{
+      margin-top:10px;
+      display:flex; gap:10px; align-items:center; justify-content:flex-end; flex-wrap:wrap;
+    }
+    .kbd{
+      font-family:var(--mono);
+      font-size:11.5px;
+      padding:2px 6px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background: rgba(19,36,71,.35);
+      color: var(--muted);
+    }
+  </style>
 </head>
 
 <body>
-<div class="container">
-<h1>Add Expense</h1>
-<p class="note">Record all school expenses. This data feeds the income statement.</p>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h1>Transaction Entry (Income / Opex / Asset)</h1>
+        <p class="sub">
+          Excel-style mockup: add rows, auto-map Category 2 ➜ Category 1, date warning if past, then generate a simple grouped report on submit.
+        </p>
+      </div>
+      <div class="actions">
+        <button class="btn-ghost" id="btnAddRow" title="Add a new blank row">+ Add line</button>
+        <button class="btn-ghost" id="btnClear" title="Clear all rows">Clear</button>
+        <button class="btn-accent" id="btnDummy" title="Fill in 30 dummy rows">Fill in with dummy</button>
+      </div>
+    </div>
 
-<!-- BASIC INFO -->
-<div class="section">
-<h2>1. Transaction Info</h2>
-<div class="grid">
-  <div class="field sm">
-    <label>Academic Year</label>
-    <select>
-      <option>AY2025-2026</option>
-      <option>AY2026-2027</option>
-    </select>
+    <div class="panel">
+      <div class="panel-head">
+        <div class="left">
+          <span class="chip">Rows: <strong id="rowCount">0</strong></span>
+          <span class="chip">Past-date warnings: <strong id="warnCount">0</strong></span>
+          <span class="chip">Amount issues: <strong id="amountIssueCount">0</strong></span>
+        </div>
+        <div class="hint">
+          <span class="legend">
+            <span class="dot warn"></span><span>Past payment date</span>
+          </span>
+          <span class="legend">
+            <span class="dot bad"></span><span>Validation issue</span>
+          </span>
+          <span class="legend">
+            <span class="dot good"></span><span>Looks OK</span>
+          </span>
+          <span class="muted">Tip: accountant picks <b>Category 2</b>; <b>Category 1</b> fills automatically.</span>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table id="entryTable" aria-label="Transaction Entry Table">
+          <thead>
+            <tr>
+              <th style="width:70px;">#</th>
+              <th>Payment date</th>
+              <th>Academic year</th>
+              <th>Category 1</th>
+              <th>Category 2</th>
+              <th>Description</th>
+              <th>Invoice Nr</th>
+              <th>Receipt Nr</th>
+              <th>Payer Name</th>
+              <th>Receiver Name</th>
+              <th>Wallet</th>
+              <th>Amount</th>
+              <th style="width:120px; text-align:center;">Row</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="status">
+        <div class="left">
+          <div class="error" id="errorBox"></div>
+          <div class="ok" id="okBox"></div>
+        </div>
+        <div class="right">
+          <span class="muted">Keyboard: <span class="kbd">Tab</span> move • <span class="kbd">Enter</span> stays in cell</span>
+          <button class="btn-accent" id="btnSubmit">Submit Transaction(s)</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel report" id="reportPanel" style="display:none;">
+      <div class="report-head">
+        <h2 class="report-title">Simple Financial Report</h2>
+        <div class="report-meta" id="reportMeta"></div>
+      </div>
+      <div class="report-body" id="reportBody"></div>
+    </div>
+
+    <div class="panel" style="margin-top:16px;">
+      <div class="panel-head">
+        <div class="left">
+          <span class="chip"><strong>Useful feedback</strong> (implementation notes)</span>
+        </div>
+      </div>
+      <div style="padding:14px; color:var(--muted); line-height:1.45; font-size:13px;">
+        <ul style="margin:0; padding-left:18px;">
+          <li><b>Make “Academic year” and “Wallet” controlled vocabularies.</b> Free-text wallets create messy reports (e.g., “KBZPay”, “KBZ Pay”, “kbzpay”). Use dropdown + allow admin to manage options.</li>
+          <li><b>Separate “Counterparty” from “Payer/Receiver”.</b> Many transactions are always “School” on one side. You can simplify with: “Direction” (In/Out) + “Counterparty Name” + auto-fill “School” for the other side.</li>
+          <li><b>Amounts: enforce sign conventions.</b> Decide whether expenses are stored as positive numbers (with Category 1 = opex/asset) or negative numbers. Reporting is far easier if you keep one consistent rule.</li>
+          <li><b>Date warning: clarify policy.</b> “Warn if past” is useful, but you may also want: (a) allow back-dated entries, (b) require a “reason” if older than N days, (c) lock closed months after accounting close.</li>
+          <li><b>Add attachment capture later.</b> Receipt/Invoice numbers help, but real audits want a file link or upload field. Even a “Drive link” column adds a lot of value.</li>
+          <li><b>Category governance.</b> Keep Category 2 as the primary, and maintain a mapping table to Category 1 (like this mockup). Consider adding “Active/Inactive” to hide old categories without breaking history.</li>
+        </ul>
+      </div>
+    </div>
+
   </div>
 
-  <div class="field sm">
-    <label>Transaction Date</label>
-    <input type="date">
-  </div>
+  <script>
+    // ---------- Category Model ----------
+    const ACADEMIC_YEARS = ["AY2025-2026","Summer2025","AY2026-2027"];
 
-  <div class="field sm">
-    <label>Invoice Date</label>
-    <input type="date">
-  </div>
+    const CATEGORY2 = {
+      income: [
+        "tuition fee","registration fee","material fee","ferry fee","sales of merchandise"
+      ],
+      asset: [
+        "construction","solar panel","electrical setup","electronic items","big furniture",
+        "playground equipment","rent","investment"
+      ],
+      opex: [
+        "Salary (Teaching)","Salary (Office)","benefits and welfare","digital Marketing","offline marketing",
+        "Classroom Expenses","School Merchandise","building & electrical repair","electronic and repair","utility bills",
+        "general & administrative expenses","supplies","materials and stationery","School event expense","donation & gift","Tax"
+      ]
+    };
 
-  <div class="field sm">
-    <label>Invoice No.</label>
-    <input placeholder="INV-EXP-001">
-  </div>
+    // Reverse-map Category2 -> Category1
+    const CAT2_TO_CAT1 = (() => {
+      const m = new Map();
+      for (const [c1, list] of Object.entries(CATEGORY2)) {
+        list.forEach(c2 => m.set(c2, c1));
+      }
+      return m;
+    })();
 
-  <div class="field sm">
-    <label>Receipt No.</label>
-    <input>
-  </div>
+    const WALLET_SUGGESTIONS = ["Cash","Bank Transfer","KBZPay","WavePay","AYA Pay","Visa/Master","Petty Cash"];
 
-  <div class="field sm">
-    <label>Reference No.</label>
-    <input>
-  </div>
-</div>
-</div>
+    // ---------- DOM ----------
+    const tbody = document.getElementById("tbody");
+    const rowCountEl = document.getElementById("rowCount");
+    const warnCountEl = document.getElementById("warnCount");
+    const amountIssueCountEl = document.getElementById("amountIssueCount");
+    const errorBox = document.getElementById("errorBox");
+    const okBox = document.getElementById("okBox");
 
-<!-- CATEGORY -->
-<div class="section">
-<h2>2. Expense Classification</h2>
-<div class="grid">
-  <div class="field">
-    <label>Category 1</label>
-    <select>
-      <option>OPERATING EXPENSE</option>
-      <option>ADMIN EXPENSE</option>
-      <option>ACADEMIC EXPENSE</option>
-      <option>CAPITAL EXPENSE</option>
-    </select>
-  </div>
+    const reportPanel = document.getElementById("reportPanel");
+    const reportMeta = document.getElementById("reportMeta");
+    const reportBody = document.getElementById("reportBody");
 
-  <div class="field">
-    <label>Category 2</label>
-    <select>
-      <option>Salary</option>
-      <option>Rent</option>
-      <option>Utilities</option>
-      <option>Supplies</option>
-      <option>Maintenance</option>
-    </select>
-  </div>
+    // ---------- Utilities ----------
+    const todayISO = () => {
+      const d = new Date();
+      d.setHours(0,0,0,0);
+      return d.toISOString().slice(0,10);
+    };
 
-  <div class="field">
-    <label>COA</label>
-    <select>
-      <option>5000 – Operating Expense</option>
-      <option>5100 – Salary Expense</option>
-      <option>5200 – Utilities</option>
-      <option>5300 – Maintenance</option>
-    </select>
-  </div>
-</div>
-</div>
+    function parseISODate(value) {
+      // value like YYYY-MM-DD
+      if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+      const d = new Date(value + "T00:00:00");
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
 
-<!-- SUPPLIER -->
-<div class="section">
-<h2>3. Supplier / Payee</h2>
-<div class="grid">
-  <div class="field lg">
-    <label>Supplier Name</label>
-    <input placeholder="Company or Person Paid">
-  </div>
+    function fmtMoney(n) {
+      const sign = n < 0 ? "-" : "";
+      const abs = Math.abs(n);
+      // keep it simple
+      return sign + abs.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
 
-  <div class="field lg">
-    <label>Description</label>
-    <textarea placeholder="What is this expense for?"></textarea>
-  </div>
-</div>
-</div>
+    function showError(msg) {
+      errorBox.style.display = "block";
+      okBox.style.display = "none";
+      errorBox.textContent = msg;
+    }
 
-<!-- PAYMENT -->
-<div class="section">
-<h2>4. Payment</h2>
-<div class="grid">
-  <div class="field sm">
-    <label>Paid From</label>
-    <select>
-      <option>School Wallet</option>
-      <option>Petty Cash</option>
-      <option>Bank Account</option>
-    </select>
-  </div>
+    function showOk(msg) {
+      okBox.style.display = "block";
+      errorBox.style.display = "none";
+      okBox.textContent = msg;
+      setTimeout(() => { okBox.style.display = "none"; }, 2500);
+    }
 
-  <div class="field sm">
-    <label>Paid To</label>
-    <input placeholder="Supplier / Vendor">
-  </div>
+    function clearMessages() {
+      errorBox.style.display = "none";
+      okBox.style.display = "none";
+      errorBox.textContent = "";
+      okBox.textContent = "";
+    }
 
-  <div class="field sm">
-    <label>Payment Method</label>
-    <select>
-      <option>Cash</option>
-      <option>Bank Transfer</option>
-      <option>KBZ Pay</option>
-      <option>Cheque</option>
-    </select>
-  </div>
+    function makeOption(value, label=value) {
+      const o = document.createElement("option");
+      o.value = value;
+      o.textContent = label;
+      return o;
+    }
 
-  <div class="field sm">
-    <label>Wallet</label>
-    <select>
-      <option>KBZ Main</option>
-      <option>Cash Box</option>
-      <option>AYA Bank</option>
-    </select>
-  </div>
+    function normalizeAmount(s) {
+      // Allow commas and spaces
+      if (typeof s !== "string") return NaN;
+      const cleaned = s.replace(/[, ]+/g,"").trim();
+      if (cleaned === "") return NaN;
+      const n = Number(cleaned);
+      return Number.isFinite(n) ? n : NaN;
+    }
 
-  <div class="field sm">
-    <label>Expense Amount (LEFT)</label>
-    <input class="money" placeholder="0">
-  </div>
+    // ---------- Row Creation ----------
+    let nextRowId = 1;
 
-  <div class="field sm">
-    <label>Income Amount (RIGHT)</label>
-    <input class="money" value="0" readonly>
-  </div>
-</div>
-</div>
+    function createRow(data = {}) {
+      const rowId = nextRowId++;
+      const tr = document.createElement("tr");
+      tr.dataset.rowId = String(rowId);
 
-<!-- ACTIONS -->
-<div class="actions">
-  <button class="cancel">Cancel</button>
-  <button class="save">Save Expense</button>
-</div>
+      const cells = {};
 
-</div>
+      // # (display index)
+      const tdIndex = document.createElement("td");
+      tdIndex.className = "muted";
+      tdIndex.style.fontFamily = "var(--mono)";
+      tdIndex.style.fontSize = "12px";
+      tdIndex.style.padding = "10px 8px";
+      tdIndex.textContent = "—";
+      tr.appendChild(tdIndex);
+
+      // Payment date
+      cells.payment_date = document.createElement("input");
+      cells.payment_date.type = "date";
+      cells.payment_date.className = "cell small";
+      cells.payment_date.value = data.payment_date || "";
+      appendCell(tr, cells.payment_date);
+
+      // Academic year
+      cells.academic_year = document.createElement("select");
+      cells.academic_year.className = "cell medium";
+      cells.academic_year.appendChild(makeOption("", "Select..."));
+      ACADEMIC_YEARS.forEach(ay => cells.academic_year.appendChild(makeOption(ay)));
+      cells.academic_year.value = data.academic_year || "";
+      appendCell(tr, cells.academic_year);
+
+      // Category 1 (readonly; auto-filled)
+      cells.category_1 = document.createElement("input");
+      cells.category_1.type = "text";
+      cells.category_1.className = "cell medium";
+      cells.category_1.readOnly = true;
+      cells.category_1.placeholder = "auto";
+      cells.category_1.value = data.category_1 || "";
+      appendCell(tr, cells.category_1);
+
+      // Category 2 (dropdown)
+      cells.category_2 = document.createElement("select");
+      cells.category_2.className = "cell long";
+      cells.category_2.appendChild(makeOption("", "Select..."));
+      // Grouped options
+      for (const c1 of ["income","opex","asset"]) {
+        const og = document.createElement("optgroup");
+        og.label = c1.toUpperCase();
+        CATEGORY2[c1].forEach(c2 => og.appendChild(makeOption(c2)));
+        cells.category_2.appendChild(og);
+      }
+      cells.category_2.value = data.category_2 || "";
+      appendCell(tr, cells.category_2);
+
+      // Description
+      cells.description = document.createElement("input");
+      cells.description.type = "text";
+      cells.description.className = "cell long";
+      cells.description.placeholder = "Short note...";
+      cells.description.value = data.description || "";
+      appendCell(tr, cells.description);
+
+      // Invoice Nr
+      cells.invoice_nr = document.createElement("input");
+      cells.invoice_nr.type = "text";
+      cells.invoice_nr.className = "cell mono medium";
+      cells.invoice_nr.placeholder = "INV-...";
+      cells.invoice_nr.value = data.invoice_nr || "";
+      appendCell(tr, cells.invoice_nr);
+
+      // Receipt Nr
+      cells.receipt_nr = document.createElement("input");
+      cells.receipt_nr.type = "text";
+      cells.receipt_nr.className = "cell mono medium";
+      cells.receipt_nr.placeholder = "RCPT-...";
+      cells.receipt_nr.value = data.receipt_nr || "";
+      appendCell(tr, cells.receipt_nr);
+
+      // Payer Name
+      cells.payer_name = document.createElement("input");
+      cells.payer_name.type = "text";
+      cells.payer_name.className = "cell medium";
+      cells.payer_name.placeholder = "e.g., Student / Vendor";
+      cells.payer_name.value = data.payer_name || "";
+      appendCell(tr, cells.payer_name);
+
+      // Receiver Name
+      cells.receiver_name = document.createElement("input");
+      cells.receiver_name.type = "text";
+      cells.receiver_name.className = "cell medium";
+      cells.receiver_name.placeholder = "e.g., School / Staff";
+      cells.receiver_name.value = data.receiver_name || "";
+      appendCell(tr, cells.receiver_name);
+
+      // Wallet
+      cells.wallet = document.createElement("input");
+      cells.wallet.type = "text";
+      cells.wallet.className = "cell medium";
+      cells.wallet.placeholder = "Cash / Bank / ...";
+      cells.wallet.value = data.wallet || "";
+      cells.wallet.setAttribute("list", "walletList");
+      appendCell(tr, cells.wallet);
+
+      // Amount
+      cells.amount = document.createElement("input");
+      cells.amount.type = "text";
+      cells.amount.inputMode = "decimal";
+      cells.amount.className = "cell mono small";
+      cells.amount.placeholder = "0.00";
+      cells.amount.value = (data.amount ?? "") === "" ? "" : String(data.amount);
+      appendCell(tr, cells.amount);
+
+      // Row actions
+      const tdActions = document.createElement("td");
+      tdActions.style.textAlign = "center";
+      const box = document.createElement("div");
+      box.className = "row-actions";
+
+      const btnDup = document.createElement("button");
+      btnDup.type = "button";
+      btnDup.className = "icon-btn";
+      btnDup.title = "Duplicate row";
+      btnDup.textContent = "⧉";
+      btnDup.addEventListener("click", () => {
+        const snapshot = readRow(tr);
+        createRow(snapshot);
+        refreshRowNumbers();
+        validateAllRows();
+        showOk("Row duplicated.");
+      });
+
+      const btnDel = document.createElement("button");
+      btnDel.type = "button";
+      btnDel.className = "icon-btn danger";
+      btnDel.title = "Delete row";
+      btnDel.textContent = "✕";
+      btnDel.addEventListener("click", () => {
+        tr.remove();
+        refreshRowNumbers();
+        validateAllRows();
+      });
+
+      box.appendChild(btnDup);
+      box.appendChild(btnDel);
+      tdActions.appendChild(box);
+      tr.appendChild(tdActions);
+
+      // Events: cat2 -> cat1
+      cells.category_2.addEventListener("change", () => {
+        const c2 = cells.category_2.value;
+        const c1 = CAT2_TO_CAT1.get(c2) || "";
+        cells.category_1.value = c1;
+        validateRow(tr);
+        validateAllRows();
+      });
+
+      // Events: payment date warning
+      cells.payment_date.addEventListener("change", () => {
+        validateRow(tr);
+        validateAllRows();
+      });
+
+      // Events: amount validation
+      cells.amount.addEventListener("input", () => {
+        validateRow(tr);
+        validateAllRows();
+      });
+
+      // Keep row-level validation reactive for key fields
+      ["academic_year","description","invoice_nr","receipt_nr","payer_name","receiver_name","wallet"].forEach(k => {
+        cells[k].addEventListener("input", () => {
+          validateRow(tr);
+          validateAllRows(false);
+        });
+        cells[k].addEventListener("change", () => {
+          validateRow(tr);
+          validateAllRows(false);
+        });
+      });
+
+      // Store cell refs
+      tr._cells = cells;
+
+      tbody.appendChild(tr);
+      refreshRowNumbers();
+      validateRow(tr);
+      validateAllRows();
+      return tr;
+    }
+
+    function appendCell(tr, inputEl) {
+      const td = document.createElement("td");
+      td.appendChild(inputEl);
+      tr.appendChild(td);
+    }
+
+    function refreshRowNumbers() {
+      const rows = Array.from(tbody.querySelectorAll("tr"));
+      rows.forEach((tr, i) => {
+        tr.children[0].textContent = String(i + 1);
+      });
+      rowCountEl.textContent = String(rows.length);
+    }
+
+    function readRow(tr) {
+      const c = tr._cells;
+      return {
+        payment_date: c.payment_date.value,
+        academic_year: c.academic_year.value,
+        category_1: c.category_1.value,
+        category_2: c.category_2.value,
+        description: c.description.value,
+        invoice_nr: c.invoice_nr.value,
+        receipt_nr: c.receipt_nr.value,
+        payer_name: c.payer_name.value,
+        receiver_name: c.receiver_name.value,
+        wallet: c.wallet.value,
+        amount: c.amount.value
+      };
+    }
+
+    // ---------- Validation ----------
+    function setBorder(el, mode) {
+      el.classList.remove("warn-border","bad-border","good-border");
+      if (mode) el.classList.add(mode + "-border");
+    }
+
+    function validateRow(tr) {
+      const c = tr._cells;
+      clearMessages();
+
+      // Payment date warn if past
+      const d = parseISODate(c.payment_date.value);
+      const t = parseISODate(todayISO());
+      if (d && t && d.getTime() < t.getTime()) setBorder(c.payment_date, "warn");
+      else if (d) setBorder(c.payment_date, "good");
+      else setBorder(c.payment_date, null);
+
+      // Category 2 requires mapping, Category 1 should reflect it
+      if (c.category_2.value) {
+        setBorder(c.category_2, "good");
+        c.category_1.value = CAT2_TO_CAT1.get(c.category_2.value) || "";
+        setBorder(c.category_1, c.category_1.value ? "good" : "bad");
+      } else {
+        setBorder(c.category_2, null);
+        setBorder(c.category_1, null);
+        c.category_1.value = "";
+      }
+
+      // Academic year
+      if (c.academic_year.value) setBorder(c.academic_year, "good");
+      else setBorder(c.academic_year, null);
+
+      // Amount
+      const amt = normalizeAmount(c.amount.value);
+      if (c.amount.value.trim() === "") {
+        setBorder(c.amount, null);
+      } else if (!Number.isFinite(amt)) {
+        setBorder(c.amount, "bad");
+      } else {
+        setBorder(c.amount, "good");
+      }
+    }
+
+    function validateAllRows(updateCounters = true) {
+      const rows = Array.from(tbody.querySelectorAll("tr"));
+      let warn = 0;
+      let amountIssues = 0;
+
+      for (const tr of rows) {
+        const c = tr._cells;
+        const d = parseISODate(c.payment_date.value);
+        const t = parseISODate(todayISO());
+        if (d && t && d.getTime() < t.getTime()) warn++;
+
+        const rawAmt = c.amount.value.trim();
+        if (rawAmt !== "" && !Number.isFinite(normalizeAmount(rawAmt))) amountIssues++;
+      }
+
+      if (updateCounters) {
+        warnCountEl.textContent = String(warn);
+        amountIssueCountEl.textContent = String(amountIssues);
+      }
+    }
+
+    // ---------- Dummy Data ----------
+    function randInt(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+    function pick(arr){ return arr[randInt(0, arr.length-1)]; }
+
+    function randomISODateAroundToday() {
+      const base = new Date();
+      base.setHours(0,0,0,0);
+      const offsetDays = randInt(-20, 35); // include past to trigger warnings
+      base.setDate(base.getDate() + offsetDays);
+      return base.toISOString().slice(0,10);
+    }
+
+    function dummyName() {
+      const first = ["Aye","Hnin","Thiri","Min","Ko","May","Nandar","Zaw","Moe","Su","Thiha","Nyein","Khant","Ei","Yoon"];
+      const last = ["Hlaing","Aung","Tun","Win","Oo","Naing","Kyaw","Myint","Soe","Htet","Moe","Hla","Zin","Htwe"];
+      return pick(first) + " " + pick(last);
+    }
+
+    function dummyWallet() {
+      return pick(WALLET_SUGGESTIONS);
+    }
+
+    function dummyInvoice(i) {
+      return "INV-" + String(2026) + "-" + String(i).padStart(4,"0");
+    }
+
+    function dummyReceipt(i) {
+      return "RCPT-" + String(2026) + "-" + String(i).padStart(4,"0");
+    }
+
+    function dummyDescription(c1, c2) {
+      const templates = [
+        `${c2} payment`,
+        `${c2} - monthly`,
+        `Settlement for ${c2}`,
+        `Advance for ${c2}`,
+        `Reimbursement - ${c2}`
+      ];
+      // Make income feel like student-facing; others more operational
+      if (c1 === "income") return pick(["Student payment - "+c2, "New enrollment - "+c2, "Fee collected - "+c2]);
+      if (c1 === "asset") return pick(["Capex - "+c2, "Purchase - "+c2, "Installation - "+c2]);
+      return pick(templates);
+    }
+
+    function dummyAmount(c1) {
+      if (c1 === "income") return (randInt(20, 200) * 1000).toFixed(2);
+      if (c1 === "asset") return (randInt(200, 2500) * 1000).toFixed(2);
+      return (randInt(30, 600) * 1000).toFixed(2);
+    }
+
+    function fillDummy(n=30) {
+      tbody.innerHTML = "";
+      nextRowId = 1;
+
+      for (let i=1;i<=n;i++){
+        const c1 = pick(["income","opex","asset"]);
+        const c2 = pick(CATEGORY2[c1]);
+        createRow({
+          payment_date: randomISODateAroundToday(),
+          academic_year: pick(ACADEMIC_YEARS),
+          category_2: c2,
+          description: dummyDescription(c1, c2),
+          invoice_nr: Math.random() < 0.65 ? dummyInvoice(i) : "",
+          receipt_nr: Math.random() < 0.75 ? dummyReceipt(i) : "",
+          payer_name: c1 === "income" ? dummyName() : pick(["School Admin","Main Office","Procurement","HR"]) ,
+          receiver_name: c1 === "income" ? "School" : dummyName(),
+          wallet: dummyWallet(),
+          amount: dummyAmount(c1)
+        });
+      }
+      refreshRowNumbers();
+      validateAllRows();
+      showOk("Filled 30 dummy rows.");
+    }
+
+    // ---------- Reporting ----------
+    function collectTransactions() {
+      const rows = Array.from(tbody.querySelectorAll("tr"));
+      const tx = [];
+
+      for (const tr of rows) {
+        const c = tr._cells;
+
+        const payment_date = c.payment_date.value.trim();
+        const academic_year = c.academic_year.value.trim();
+        const category_2 = c.category_2.value.trim();
+        const category_1 = (CAT2_TO_CAT1.get(category_2) || c.category_1.value.trim()).trim();
+
+        const amountRaw = c.amount.value;
+        const amount = normalizeAmount(amountRaw);
+
+        tx.push({
+          payment_date,
+          academic_year,
+          category_1,
+          category_2,
+          description: c.description.value.trim(),
+          invoice_nr: c.invoice_nr.value.trim(),
+          receipt_nr: c.receipt_nr.value.trim(),
+          payer_name: c.payer_name.value.trim(),
+          receiver_name: c.receiver_name.value.trim(),
+          wallet: c.wallet.value.trim(),
+          amountRaw: amountRaw.trim(),
+          amount
+        });
+      }
+      return tx;
+    }
+
+    function validateBeforeSubmit(tx) {
+      const errors = [];
+      if (tx.length === 0) errors.push("No rows to submit.");
+
+      tx.forEach((t, idx) => {
+        const rowNo = idx + 1;
+
+        // Minimal required fields for accounting usefulness
+        if (!t.payment_date) errors.push(`Row ${rowNo}: Payment date is missing.`);
+        if (!t.academic_year) errors.push(`Row ${rowNo}: Academic year is missing.`);
+        if (!t.category_2) errors.push(`Row ${rowNo}: Category 2 is missing.`);
+        if (!t.category_1) errors.push(`Row ${rowNo}: Category 1 could not be derived (check Category 2 mapping).`);
+        if (!t.wallet) errors.push(`Row ${rowNo}: Wallet is missing.`);
+        if (!t.amountRaw) errors.push(`Row ${rowNo}: Amount is missing.`);
+        if (t.amountRaw && !Number.isFinite(t.amount)) errors.push(`Row ${rowNo}: Amount is not a valid number ("${t.amountRaw}").`);
+      });
+
+      return errors;
+    }
+
+    function buildReport(tx) {
+      // Structure:
+      // AY -> cat1 -> cat2 -> total
+      const map = new Map();
+
+      for (const t of tx) {
+        const ay = t.academic_year || "(blank)";
+        const c1 = (t.category_1 || "(blank)").toLowerCase();
+        const c2 = t.category_2 || "(blank)";
+        const amt = Number.isFinite(t.amount) ? t.amount : 0;
+
+        if (!map.has(ay)) map.set(ay, new Map());
+        const m1 = map.get(ay);
+
+        if (!m1.has(c1)) m1.set(c1, new Map());
+        const m2 = m1.get(c1);
+
+        m2.set(c2, (m2.get(c2) || 0) + amt);
+      }
+
+      // Convert to render-friendly object with stable cat1 ordering
+      const ayKeys = Array.from(map.keys()).sort((a,b) => a.localeCompare(b));
+      const result = [];
+
+      for (const ay of ayKeys) {
+        const cat1Map = map.get(ay);
+        const cat1Order = ["income","opex","asset"];
+        const blocks = [];
+
+        for (const c1 of cat1Order) {
+          const c2map = cat1Map.get(c1) || new Map();
+          const c2rows = Array.from(c2map.entries())
+            .sort((a,b) => a[0].localeCompare(b[0]))
+            .map(([name, total]) => ({ name, total }));
+
+          const total = c2rows.reduce((s,r)=>s+r.total,0);
+          blocks.push({ c1, total, c2rows });
+        }
+
+        const ayTotal = blocks.reduce((s,b)=>s+b.total,0);
+        result.push({ ay, ayTotal, blocks });
+      }
+
+      return result;
+    }
+
+    function renderReport(report, txCount) {
+      reportPanel.style.display = "block";
+
+      // Meta
+      const now = new Date();
+      reportMeta.innerHTML = "";
+      const metaBits = [
+        `<span class="chip">Transactions: <strong>${txCount}</strong></span>`,
+        `<span class="chip">Generated: <strong>${now.toLocaleString()}</strong></span>`,
+        `<span class="chip">Note: Totals are simple sums of "Amount" (no sign conversion)</span>`
+      ];
+      reportMeta.innerHTML = metaBits.join("");
+
+      reportBody.innerHTML = "";
+
+      if (report.length === 0) {
+        reportBody.innerHTML = `<div class="muted">No data.</div>`;
+        return;
+      }
+
+      for (const ayBlock of report) {
+        const wrapper = document.createElement("div");
+        wrapper.className = "ay-block";
+
+        const head = document.createElement("div");
+        head.className = "ay-head";
+        head.innerHTML = `
+          <div class="ay-name">${escapeHtml(ayBlock.ay)}</div>
+          <div class="ay-total">Total: <span style="font-family:var(--mono); color:#d7e6ff;">${fmtMoney(ayBlock.ayTotal)}</span></div>
+        `;
+
+        const grid = document.createElement("div");
+        grid.className = "cat1-grid";
+
+        for (const b of ayBlock.blocks) {
+          const card = document.createElement("div");
+          card.className = "cat1-card";
+
+          const cardHead = document.createElement("div");
+          cardHead.className = "cat1-head";
+
+          const toggleId = `toggle_${ayBlock.ay}_${b.c1}`.replace(/[^a-zA-Z0-9_]/g,"_");
+
+          cardHead.innerHTML = `
+            <div>
+              <div class="cat1-name">${escapeHtml(b.c1)}</div>
+              <div class="cat1-sum">Sum: <span style="font-family:var(--mono); color:#d7e6ff;">${fmtMoney(b.total)}</span></div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="${toggleId}" checked />
+              Show Category 2
+            </label>
+          `;
+
+          const list = document.createElement("div");
+          list.className = "cat2-list";
+          list.dataset.toggleTarget = toggleId;
+
+          if (b.c2rows.length === 0) {
+            list.innerHTML = `<div class="muted" style="padding:6px 2px;">No entries.</div>`;
+          } else {
+            for (const r of b.c2rows) {
+              const row = document.createElement("div");
+              row.className = "cat2-row";
+              row.innerHTML = `
+                <div class="cat2-name">${escapeHtml(r.name)}</div>
+                <div class="cat2-amt">${fmtMoney(r.total)}</div>
+              `;
+              list.appendChild(row);
+            }
+          }
+
+          card.appendChild(cardHead);
+          card.appendChild(list);
+          grid.appendChild(card);
+
+          // Toggle behavior
+          const toggle = cardHead.querySelector(`#${CSS.escape(toggleId)}`);
+          toggle.addEventListener("change", () => {
+            list.style.display = toggle.checked ? "flex" : "none";
+          });
+        }
+
+        wrapper.appendChild(head);
+        wrapper.appendChild(grid);
+        reportBody.appendChild(wrapper);
+      }
+
+      // Scroll to report
+      reportPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, m => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
+
+    // ---------- Buttons ----------
+    document.getElementById("btnAddRow").addEventListener("click", () => {
+      createRow();
+      refreshRowNumbers();
+      validateAllRows();
+    });
+
+    document.getElementById("btnDummy").addEventListener("click", () => {
+      fillDummy(30);
+    });
+
+    document.getElementById("btnClear").addEventListener("click", () => {
+      tbody.innerHTML = "";
+      nextRowId = 1;
+      refreshRowNumbers();
+      validateAllRows();
+      clearMessages();
+      reportPanel.style.display = "none";
+    });
+
+    document.getElementById("btnSubmit").addEventListener("click", () => {
+      clearMessages();
+      const tx = collectTransactions();
+      const errors = validateBeforeSubmit(tx);
+      if (errors.length) {
+        showError("Please fix the following before submit:\n\n" + errors.join("\n"));
+        reportPanel.style.display = "none";
+        return;
+      }
+
+      const report = buildReport(tx);
+      renderReport(report, tx.length);
+      showOk("Submitted (mock) and generated report.");
+    });
+
+    // ---------- Wallet datalist ----------
+    const dl = document.createElement("datalist");
+    dl.id = "walletList";
+    WALLET_SUGGESTIONS.forEach(w => dl.appendChild(makeOption(w)));
+    document.body.appendChild(dl);
+
+    // ---------- Init ----------
+    // Start with a few blank lines like an Excel sheet
+    for (let i=0; i<6; i++) createRow({ academic_year: "", payment_date: "" });
+    refreshRowNumbers();
+    validateAllRows();
+  </script>
 </body>
 </html>
