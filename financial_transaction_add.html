@@ -26,7 +26,7 @@
     .wrap{ max-width: 1400px; margin: 24px auto 40px; padding: 0 16px; }
 
     .topbar{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom: 12px; }
-    h1{ font-size: 18px; margin: 0 0 4px; font-weight: 800; letter-spacing:.2px; }
+    h1{ font-size: 18px; margin: 0 0 4px; font-weight: 900; letter-spacing:.2px; }
     .sub{ margin:0; color:var(--muted); font-size: 13px; }
 
     .btn{
@@ -36,7 +36,7 @@
       padding: 10px 12px;
       border-radius: 10px;
       cursor:pointer;
-      font-weight:700;
+      font-weight:800;
       font-size: 13px;
       white-space:nowrap;
     }
@@ -63,8 +63,9 @@
       background: var(--soft);
       border: 1px solid var(--line);
       padding: 6px 10px; border-radius: 999px;
+      font-weight: 800;
     }
-    .hint{ font-size:12px; color:var(--muted); }
+    .hint{ font-size:12px; color:var(--muted); font-weight: 700; }
 
     .tableWrap{ overflow:auto; width:100%; }
     table{ border-collapse: collapse; width:100%; min-width: 1500px; table-layout: fixed; }
@@ -79,6 +80,7 @@
       text-align: left;
       vertical-align: bottom;
       white-space: nowrap;
+      font-weight: 900;
     }
     tbody td{
       border-top: 1px solid var(--line);
@@ -94,6 +96,7 @@
       font-size: 12px;
       padding-top: 14px;
       width: 44px;
+      font-weight: 900;
     }
 
     .cell{
@@ -140,7 +143,7 @@
     .amount{
       text-align:right;
       font-variant-numeric: tabular-nums;
-      font-weight: 800;
+      font-weight: 900;
     }
     .neg{ color: var(--bad); }
     .pos{ color: var(--text); }
@@ -171,8 +174,7 @@
       background:#fff;
     }
 
-    /* Category 2 typeahead */
-    .combo{ position: relative; }
+    /* Category 2 "combo" (menu is rendered as BODY portal) */
     .comboRow{ display:flex; gap:6px; align-items:center; }
     .comboBtn{
       width: 38px; min-width:38px;
@@ -181,25 +183,25 @@
       border-radius: 10px;
       padding: 8px 0;
       cursor:pointer;
-      font-weight:900;
+      font-weight: 900;
       color: var(--muted);
     }
     .comboBtn:hover{ background: var(--soft); }
-    .menu{
-      position:absolute;
-      top: calc(100% + 6px);
-      left:0;
-      right:0;
+
+    /* Portal menu */
+    .portalMenu{
+      position: fixed;
       background:#fff;
       border:1px solid var(--line);
       border-radius: 12px;
-      box-shadow: 0 12px 30px rgba(0,0,0,.08);
+      box-shadow: 0 12px 30px rgba(0,0,0,.10);
       max-height: 280px;
       overflow:auto;
-      z-index: 10;
+      z-index: 9999;
       display:none;
+      min-width: 260px;
     }
-    .menu.open{ display:block; }
+    .portalMenu.open{ display:block; }
     .menuGroup{
       padding: 8px 10px;
       border-bottom:1px solid var(--line);
@@ -216,13 +218,14 @@
       font-size: 13px;
       cursor:pointer;
       border-bottom: 1px solid rgba(229,231,235,.6);
+      font-weight: 700;
     }
     .menuItem:hover{ background: var(--soft); }
     .menuItem:last-child{ border-bottom:none; }
 
     /* Reports */
     .report{
-      margin-top: 16px;
+      margin-top: 12px;
       border:1px solid var(--line);
       border-radius: 14px;
       overflow:hidden;
@@ -238,8 +241,8 @@
       border-bottom:1px solid var(--line);
       background: var(--soft);
     }
-    .reportHead h2{ margin:0; font-size: 14px; font-weight: 900; }
-    .reportMeta{ font-size:12px; color: var(--muted); }
+    .reportHead h2{ margin:0; font-size: 14px; font-weight: 950; }
+    .reportMeta{ font-size:12px; color: var(--muted); font-weight: 800; }
 
     .reportBody{ overflow:auto; }
     .reportTable{
@@ -258,16 +261,16 @@
       color: var(--muted);
       font-size: 12px;
       text-align:left;
+      font-weight: 900;
     }
     .reportTable td.num{
       text-align:right;
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
-      font-weight: 900;
+      font-weight: 950;
     }
     .reportTable tr.section{ background: var(--soft2); }
     .reportTable tr.subRow td:first-child{ padding-left: 44px; font-weight: 800; }
-    .reportTable tr.total{ background:#fff; }
     .reportTable tr.total td:first-child{ font-weight: 950; }
     .reportTable tr.spacer td{
       background:#fff;
@@ -284,11 +287,25 @@
       border-radius: 999px;
       padding: 2px 8px;
       cursor:pointer;
-      font-weight: 900;
+      font-weight: 950;
       margin-right: 8px;
-      width: 36px;
+      width: 40px;
       text-align:center;
     }
+
+    /* Compact wallet report */
+    .walletWrap{
+      margin-top: 10px;
+      display:none;
+    }
+    .walletCard{
+      border:1px solid var(--line);
+      border-radius: 14px;
+      overflow:hidden;
+      background:#fff;
+      max-width: 520px;
+    }
+    .walletCard .reportTable{ min-width: 0; }
   </style>
 </head>
 
@@ -297,7 +314,7 @@
     <div class="topbar">
       <div>
         <h1>Transaction Entry</h1>
-        <p class="sub"></p>
+        <p class="sub">Payment Date: DD-MMM-YYYY • Category 1 auto-fills from Category 2 • Amount can be negative</p>
       </div>
       <div style="display:flex; gap:10px; align-items:center;">
         <button class="btn" id="btnDummy">Fill In With Dummy</button>
@@ -313,7 +330,7 @@
         <div class="hint" id="validationSummary">No validation issues.</div>
       </div>
 
-      <div class="tableWrap">
+      <div class="tableWrap" id="tableWrap">
         <table id="entryTable" aria-label="Transaction entry table">
           <colgroup>
             <col style="width:44px" />
@@ -369,16 +386,21 @@
       </div>
     </div>
 
-    <div class="report" id="reportWallet">
-      <div class="reportHead">
-        <div><h2>Wallet Balances</h2></div>
-        <div class="reportMeta" id="reportMetaWallet"></div>
-      </div>
-      <div class="reportBody">
-        <table class="reportTable" id="reportTableWallet" aria-label="Wallet balances table"></table>
+    <div class="walletWrap" id="walletWrap">
+      <div class="walletCard">
+        <div class="reportHead">
+          <div><h2>Wallet Balances</h2></div>
+          <div class="reportMeta" id="reportMetaWallet"></div>
+        </div>
+        <div class="reportBody">
+          <table class="reportTable" id="reportTableWallet" aria-label="Wallet balances table"></table>
+        </div>
       </div>
     </div>
   </div>
+
+  <!-- Category 2 dropdown portal -->
+  <div class="portalMenu" id="cat2Portal"></div>
 
 <script>
 (() => {
@@ -405,6 +427,7 @@
 
   // DOM
   const tbody = document.getElementById("tbody");
+  const tableWrap = document.getElementById("tableWrap");
   const btnAddRow = document.getElementById("btnAddRow");
   const btnDummy = document.getElementById("btnDummy");
   const btnSubmit = document.getElementById("btnSubmit");
@@ -415,9 +438,18 @@
   const reportMainTable = document.getElementById("reportTableMain");
   const reportMainMeta = document.getElementById("reportMetaMain");
 
-  const reportWalletWrap = document.getElementById("reportWallet");
+  const walletWrap = document.getElementById("walletWrap");
   const reportWalletTable = document.getElementById("reportTableWallet");
   const reportWalletMeta = document.getElementById("reportMetaWallet");
+
+  // Portal menu
+  const portal = document.getElementById("cat2Portal");
+  let portalCtx = null; // {input, tr, forceAll}
+
+  // Sequences
+  let nextInv = 1;
+  let nextRcpt = 1;
+  function seq(prefix, n, width=4){ return `${prefix}-${String(n).padStart(width,"0")}`; }
 
   // Date helpers
   const pad2 = (n) => String(n).padStart(2, "0");
@@ -539,10 +571,86 @@
     }
   }
 
-  // Category 2 typeahead (filter as you type; button shows ALL)
+  // --- Portal dropdown (Category 2) ---
+  function closePortal(){
+    portal.classList.remove("open");
+    portal.innerHTML = "";
+    portalCtx = null;
+  }
+
+  function positionPortalTo(inputEl){
+    const r = inputEl.getBoundingClientRect();
+    const width = Math.max(r.width + 44, 320); // input + button feel
+    const left = Math.max(8, Math.min(window.innerWidth - width - 8, r.left));
+    const top = Math.min(window.innerHeight - 8, r.bottom + 6);
+    portal.style.left = `${left}px`;
+    portal.style.top = `${top}px`;
+    portal.style.width = `${width}px`;
+  }
+
+  function renderPortalMenu(query, forceAll){
+    if (!portalCtx) return;
+    const { input, tr } = portalCtx;
+    const q = String(query || "").trim().toLowerCase();
+    portal.innerHTML = "";
+
+    for (const cat1 of CAT1_ORDER) {
+      const list = CAT2_BY_CAT1[cat1] || [];
+      const filtered = forceAll || !q ? list : list.filter(x => x.toLowerCase().includes(q));
+      if (!filtered.length) continue;
+
+      const g = document.createElement("div");
+      g.className = "menuGroup";
+      g.textContent = cat1;
+      portal.appendChild(g);
+
+      for (const item of filtered) {
+        const it = document.createElement("div");
+        it.className = "menuItem";
+        it.textContent = item;
+        it.addEventListener("mousedown", (e) => {
+          e.preventDefault();
+          input.value = item;
+          updateCat1(tr, item);
+          closePortal();
+        });
+        portal.appendChild(it);
+      }
+    }
+
+    if (!portal.children.length) {
+      const empty = document.createElement("div");
+      empty.className = "menuItem";
+      empty.textContent = "No matches";
+      empty.style.color = "var(--muted)";
+      empty.style.cursor = "default";
+      portal.appendChild(empty);
+    }
+  }
+
+  function openPortalFor(input, tr, forceAll=false){
+    portalCtx = { input, tr };
+    positionPortalTo(input);
+    renderPortalMenu(forceAll ? "" : input.value, forceAll);
+    portal.classList.add("open");
+  }
+
+  // close on outside / scroll / resize
+  document.addEventListener("mousedown", (e) => {
+    if (!portal.classList.contains("open")) return;
+    if (portal.contains(e.target)) return;
+    // allow clicks inside the combo row without closing before it opens
+    if (e.target && e.target.closest && e.target.closest('[data-combo="cat2"]')) return;
+    closePortal();
+  });
+  window.addEventListener("resize", () => { if (portalCtx) positionPortalTo(portalCtx.input); });
+  window.addEventListener("scroll", () => { if (portalCtx) positionPortalTo(portalCtx.input); }, true);
+  tableWrap.addEventListener("scroll", () => { if (portalCtx) positionPortalTo(portalCtx.input); });
+
+  // Category 2 combo (portal)
   function buildCategory2Combo(tr, prefillValue="") {
-    const combo = document.createElement("div");
-    combo.className = "combo";
+    const wrap = document.createElement("div");
+    wrap.setAttribute("data-combo","cat2");
 
     const row = document.createElement("div");
     row.className = "comboRow";
@@ -555,78 +663,31 @@
     btn.type = "button";
     btn.className = "comboBtn";
     btn.textContent = "▾";
-
-    const menu = document.createElement("div");
-    menu.className = "menu";
-
-    function closeMenu(){ menu.classList.remove("open"); }
-    function openMenu(){ menu.classList.add("open"); }
-
-    function renderMenu(query, forceAll=false) {
-      const q = String(query || "").trim().toLowerCase();
-      menu.innerHTML = "";
-
-      for (const cat1 of CAT1_ORDER) {
-        const list = CAT2_BY_CAT1[cat1] || [];
-        const filtered = forceAll || !q ? list : list.filter(x => x.toLowerCase().includes(q));
-        if (!filtered.length) continue;
-
-        const g = document.createElement("div");
-        g.className = "menuGroup";
-        g.textContent = cat1;
-        menu.appendChild(g);
-
-        for (const item of filtered) {
-          const it = document.createElement("div");
-          it.className = "menuItem";
-          it.textContent = item;
-          it.addEventListener("mousedown", (e) => {
-            e.preventDefault();
-            input.value = item;
-            updateCat1(tr, item);
-            closeMenu();
-          });
-          menu.appendChild(it);
-        }
-      }
-
-      if (!menu.children.length) {
-        const empty = document.createElement("div");
-        empty.className = "menuItem";
-        empty.textContent = "No matches";
-        empty.style.color = "var(--muted)";
-        empty.style.cursor = "default";
-        menu.appendChild(empty);
-      }
-    }
+    btn.title = "Show all";
 
     input.addEventListener("input", () => {
-      renderMenu(input.value, false);
-      openMenu();
       updateCat1(tr, input.value);
+      openPortalFor(input, tr, false);
     });
     input.addEventListener("focus", () => {
-      renderMenu(input.value, false);
-      openMenu();
+      updateCat1(tr, input.value);
+      openPortalFor(input, tr, false);
     });
     btn.addEventListener("click", () => {
-      renderMenu("", true);
-      openMenu();
+      updateCat1(tr, input.value);
+      openPortalFor(input, tr, true); // show ALL
       input.focus();
-    });
-    document.addEventListener("mousedown", (e) => {
-      if (!combo.contains(e.target)) closeMenu();
     });
 
     row.appendChild(input);
     row.appendChild(btn);
-    combo.appendChild(row);
-    combo.appendChild(menu);
+    wrap.appendChild(row);
 
     updateCat1(tr, input.value);
-    return combo;
+    return wrap;
   }
 
+  // --- Rows ---
   function renumberRows() {
     [...tbody.querySelectorAll("tr")].forEach((tr, i) => {
       tr.querySelector(".rownum").textContent = String(i + 1);
@@ -641,6 +702,15 @@
     renumberRows();
     refreshRowCount();
     refreshSummaryValidation();
+    closePortal();
+  }
+
+  function ensureSequences(invEl, rcptEl, prefill) {
+    if (prefill?.invoiceNr) invEl.value = prefill.invoiceNr;
+    else if (!invEl.value) invEl.value = seq("INV", nextInv++);
+
+    if (prefill?.receiptNr) rcptEl.value = prefill.receiptNr;
+    else if (!rcptEl.value) rcptEl.value = seq("RCPT", nextRcpt++);
   }
 
   function addRow(prefill={}) {
@@ -690,19 +760,19 @@
     td5.appendChild(desc);
     tr.appendChild(td5);
 
-    // Invoice
+    // Invoice (sequence)
     const td6 = document.createElement("td");
     const inv = buildInput("");
     inv.setAttribute("data-field","invoiceNr");
-    inv.value = prefill.invoiceNr || "";
+    inv.readOnly = true;
     td6.appendChild(inv);
     tr.appendChild(td6);
 
-    // Receipt
+    // Receipt (sequence)
     const td7 = document.createElement("td");
     const rec = buildInput("");
     rec.setAttribute("data-field","receiptNr");
-    rec.value = prefill.receiptNr || "";
+    rec.readOnly = true;
     td7.appendChild(rec);
     tr.appendChild(td7);
 
@@ -760,7 +830,10 @@
     td13.appendChild(del);
     tr.appendChild(td13);
 
-    // Events
+    // sequences
+    ensureSequences(inv, rec, prefill);
+
+    // events
     pd.addEventListener("input", () => { validateRow(tr); refreshSummaryValidation(); });
     pd.addEventListener("blur",  () => { validateRow(tr); refreshSummaryValidation(); });
 
@@ -778,7 +851,7 @@
     const get = (name) => tr.querySelector(`[data-field="${name}"]`);
     const amountEl = get("amount");
     const amountVal = Number(String(amountEl.value).replace(/,/g,"").trim() || "0");
-    const cat2Val = get("category2").value.trim();
+    const cat2Val = tr.querySelector('[data-field="category2"]').value.trim();
     const cat1Val = get("category1").value || (CAT2_TO_CAT1.get(cat2Val) || "");
     return {
       paymentDate: get("paymentDate").value.trim(),
@@ -873,7 +946,7 @@
         });
 
         const label = document.createElement("span");
-        label.style.fontWeight = "900";
+        label.style.fontWeight = "950";
         label.textContent = cat1.toUpperCase();
 
         tdCat.appendChild(toggle);
@@ -964,6 +1037,7 @@
       bal.set(w, (bal.get(w) || 0) + v);
     }
 
+    // show even wallets with 0? (keep only present)
     const wallets = [...bal.entries()].sort((a,b) => a[0].localeCompare(b[0]));
 
     const thead = document.createElement("thead");
@@ -999,270 +1073,268 @@
     reportWalletTable.appendChild(tb);
 
     reportWalletMeta.textContent = `${wallets.length} wallet(s)`;
-    reportWalletWrap.style.display = "block";
+    walletWrap.style.display = "block";
   }
 
-  // --- Realistic dummy data ---
+  // --- Realistic dummy data (EXACTLY 50) ---
   function randInt(min, max) { return Math.floor(Math.random()*(max-min+1))+min; }
   function pick(arr) { return arr[randInt(0, arr.length-1)]; }
+
   function randomDateInSchoolYear() {
-    // bias around 2025-2027
     const base = new Date(2025, 7, 1); // 01-Aug-2025
     const offsetDays = randInt(0, 650);
     const d = new Date(base.getFullYear(), base.getMonth(), base.getDate() + offsetDays);
     return toDDMMMYYYY(d);
   }
-  function invNo() { return `INV-${randInt(1000,9999)}`; }
-  function rcptNo() { return `RCPT-${randInt(1000,9999)}`; }
 
   const STUDENTS = [
-    "Eaint Khit Amara",
-    "Bhone Marn Pyae Hmu",
-    "Noo Noo Swan Yee",
-    "Thiri Mon",
-    "Htet Naing Aung",
-    "Su Myat Noe",
-    "Ko Ko Min",
-    "May Thiri San",
-    "Aye Myat Thwe",
-    "Lin Lin Htet"
+    "Eaint Khit Amara","Bhone Marn Pyae Hmu","Noo Noo Swan Yee","Thiri Mon","Htet Naing Aung",
+    "Su Myat Noe","Ko Ko Min","May Thiri San","Aye Myat Thwe","Lin Lin Htet"
   ];
   const TEACHERS = ["Tr. Ei Pa Pa Phyo","Tr. Zin Mar Htun","Tr. Hnin Pwint","Tr. May Thiri"];
-  const VENDORS = ["Jolly Phonics Supplier","Stationery Shop","Hardware Store","Solar Vendor","Local Carpenter","Electrician Team"];
+  const VENDORS = ["Jolly Phonics Supplier","Stationery Shop","Hardware Store","Solar Vendor","Local Carpenter","Electrician Team","Utility Provider"];
 
-  function fillDummy(n=50) {
+  function buildRowTemplate(t) {
+    const cat1 = CAT2_TO_CAT1.get(t.category2) || t.category1 || "";
+    return {
+      paymentDate: t.paymentDate || randomDateInSchoolYear(),
+      academicYear: t.academicYear || pick(ACADEMIC_YEARS_DEFAULT),
+      category1: cat1,
+      category2: t.category2,
+      description: t.description || "",
+      payerName: t.payerName || "",
+      receiverName: t.receiverName || "",
+      wallet: t.wallet || pick(WALLETS),
+      amount: (typeof t.amount === "number" ? t.amount.toFixed(2) : String(t.amount ?? "0.00"))
+    };
+  }
+
+  function fillDummyExactly50() {
+    closePortal();
     tbody.innerHTML = "";
+    nextInv = 1; nextRcpt = 1;
 
-    // High-quality realistic templates (mix income/expense/asset, plus some investment)
-    const templates = [
-      // Provided examples
-      () => ({
-        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
-        paymentDate: randomDateInSchoolYear(),
+    // Fixed, realistic lines (includes your provided examples)
+    const fixed = [
+      buildRowTemplate({
+        paymentDate: "12-Sep-2025",
+        academicYear: "AY2025-2026",
         category2: "Materials And Stationery",
-        description: "50% Deposit for Jolly Phonics (1 to 7) SB (50x34000-15%), WB (50x20000-15%)",
-        invoiceNr: invNo(),
-        receiptNr: rcptNo(),
+        description: "50% Deposit for Jolly Phonics (1to 7) SB (50x34000-15%), WB (50x20000-15%)",
         payerName: "School Admin",
         receiverName: "Jolly Phonics Supplier",
-        wallet: pick(["KBZ Bank","Aya Bank","CB"]),
-        amount: (-randInt(600000, 1500000)).toFixed(2)
+        wallet: "KBZ Bank",
+        amount: -1232500
       }),
-      () => ({
-        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
-        paymentDate: randomDateInSchoolYear(),
+      buildRowTemplate({
+        paymentDate: "03-Oct-2025",
+        academicYear: "AY2025-2026",
         category2: "Supplies",
         description: "To Buy Trouser (Tr. Ei Pa Pa Phyo, Tr. Zin Mar Htun) (2x40000)",
-        invoiceNr: invNo(),
-        receiptNr: rcptNo(),
         payerName: "School Admin",
-        receiverName: pick(TEACHERS),
-        wallet: pick(["Petty Cash","KPay"]),
-        amount: (-80000).toFixed(2)
+        receiverName: "Uniform Shop",
+        wallet: "Petty Cash",
+        amount: -80000
       }),
-      () => ({
-        academicYear: pick(["AY2025-2026","AY2026-2027"]),
-        paymentDate: randomDateInSchoolYear(),
+      buildRowTemplate({
+        paymentDate: "05-Nov-2025",
+        academicYear: "AY2025-2026",
         category2: "Tuition Fee",
         description: "Monthly Payment for November 2025",
-        invoiceNr: invNo(),
-        receiptNr: rcptNo(),
-        payerName: pick(STUDENTS),
+        payerName: "Eaint Khit Amara",
         receiverName: "School Office",
-        wallet: pick(["KPay","KBZ Bank","Petty Cash"]),
-        amount: (randInt(120000, 450000)).toFixed(2)
+        wallet: "KPay",
+        amount: 320000
       }),
-      () => ({
-        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
-        paymentDate: randomDateInSchoolYear(),
+      buildRowTemplate({
+        paymentDate: "05-Nov-2025",
+        academicYear: "AY2025-2026",
+        category2: "Tuition Fee",
+        description: "Monthly Payment for November 2025",
+        payerName: "Bhone Marn Pyae Hmu",
+        receiverName: "School Office",
+        wallet: "KPay",
+        amount: 300000
+      }),
+      buildRowTemplate({
+        paymentDate: "05-Nov-2025",
+        academicYear: "AY2025-2026",
+        category2: "Tuition Fee",
+        description: "Monthly Payment for November 2025",
+        payerName: "Noo Noo Swan Yee",
+        receiverName: "School Office",
+        wallet: "KPay",
+        amount: 280000
+      }),
+      buildRowTemplate({
+        paymentDate: "18-Dec-2025",
+        academicYear: "AY2025-2026",
         category2: "Electronic And Repair",
         description: "bicycle basket - 8000, hook - 7000, bike stopper - 5000, service charges - 5000",
-        invoiceNr: invNo(),
-        receiptNr: rcptNo(),
         payerName: "School Admin",
         receiverName: "Bike Service",
         wallet: "Petty Cash",
-        amount: (-25000).toFixed(2)
-      }),
+        amount: -25000
+      })
+    ];
 
-      // More realistic school-like entries
-      () => ({
-        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
-        paymentDate: randomDateInSchoolYear(),
+    const randomTemplates = [
+      () => buildRowTemplate({
         category2: "Registration Fee",
         description: "Student Registration Fee",
-        invoiceNr: invNo(),
-        receiptNr: rcptNo(),
         payerName: pick(STUDENTS),
         receiverName: "School Office",
         wallet: pick(["KPay","Petty Cash"]),
-        amount: (randInt(20000, 80000)).toFixed(2)
+        amount: randInt(20000, 80000)
       }),
-      () => ({
-        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
-        paymentDate: randomDateInSchoolYear(),
+      () => buildRowTemplate({
         category2: "Material Fee",
         description: "Material Fee (Books & Copies)",
-        invoiceNr: invNo(),
-        receiptNr: rcptNo(),
         payerName: pick(STUDENTS),
         receiverName: "School Office",
         wallet: pick(["KPay","Petty Cash"]),
-        amount: (randInt(15000, 60000)).toFixed(2)
+        amount: randInt(15000, 60000)
       }),
-      () => ({
-        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
-        paymentDate: randomDateInSchoolYear(),
-        category2: "Salary (Teaching)",
-        description: "Teaching Salary (Monthly)",
-        invoiceNr: invNo(),
-        receiptNr: rcptNo(),
-        payerName: "School",
-        receiverName: pick(TEACHERS),
-        wallet: pick(["KBZ Bank","Aya Bank","CB"]),
-        amount: (-randInt(250000, 900000)).toFixed(2)
+      () => buildRowTemplate({
+        category2: "Tuition Fee",
+        description: "Monthly Tuition Payment",
+        payerName: pick(STUDENTS),
+        receiverName: "School Office",
+        wallet: pick(["KPay","KBZ Bank","Petty Cash"]),
+        amount: randInt(120000, 450000)
       }),
-      () => ({
-        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
-        paymentDate: randomDateInSchoolYear(),
-        category2: "Utility Bills",
-        description: "Electricity / Water Bill",
-        invoiceNr: invNo(),
-        receiptNr: rcptNo(),
-        payerName: "School",
-        receiverName: "Utility Provider",
-        wallet: pick(["KBZ Bank","Aya Bank","CB"]),
-        amount: (-randInt(30000, 250000)).toFixed(2)
-      }),
-      () => ({
-        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
-        paymentDate: randomDateInSchoolYear(),
-        category2: "Classroom Expenses",
-        description: "Classroom consumables (markers, tapes, printouts)",
-        invoiceNr: invNo(),
-        receiptNr: rcptNo(),
-        payerName: "School",
-        receiverName: "Stationery Shop",
-        wallet: "Petty Cash",
-        amount: (-randInt(8000, 80000)).toFixed(2)
-      }),
-      () => ({
-        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
-        paymentDate: randomDateInSchoolYear(),
-        category2: "Construction",
-        description: "Small construction / renovation works",
-        invoiceNr: invNo(),
-        receiptNr: rcptNo(),
-        payerName: "School",
-        receiverName: "Local Contractor",
-        wallet: pick(["KBZ Bank","Aya Bank"]),
-        amount: (-randInt(400000, 4500000)).toFixed(2)
-      }),
-      () => ({
-        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
-        paymentDate: randomDateInSchoolYear(),
-        category2: "Other (Investment)",
-        description: "Short-term investment / placement",
-        invoiceNr: invNo(),
-        receiptNr: rcptNo(),
-        payerName: "School",
-        receiverName: "Finance",
-        wallet: pick(["KBZ Bank","Aya Bank","CB"]),
-        amount: (randInt(200000, 2500000) * (randInt(0,1) ? 1 : -1)).toFixed(2)
-      }),
-      () => ({
-        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
-        paymentDate: randomDateInSchoolYear(),
+      () => buildRowTemplate({
         category2: "Tuition Fee",
         description: "Tuition Fee Refund",
-        invoiceNr: invNo(),
-        receiptNr: rcptNo(),
         payerName: "School Office",
         receiverName: pick(STUDENTS),
         wallet: pick(["KPay","KBZ Bank"]),
-        amount: (-randInt(30000, 300000)).toFixed(2)
+        amount: -randInt(30000, 300000)
       }),
-      () => ({
-        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
-        paymentDate: randomDateInSchoolYear(),
+      () => buildRowTemplate({
+        category2: "Salary (Teaching)",
+        description: "Teaching Salary (Monthly)",
+        payerName: "School",
+        receiverName: pick(TEACHERS),
+        wallet: pick(["KBZ Bank","Aya Bank","CB"]),
+        amount: -randInt(250000, 900000)
+      }),
+      () => buildRowTemplate({
+        category2: "Salary (Office)",
+        description: "Office Staff Salary (Monthly)",
+        payerName: "School",
+        receiverName: "Office Staff",
+        wallet: pick(["KBZ Bank","Aya Bank","CB"]),
+        amount: -randInt(200000, 700000)
+      }),
+      () => buildRowTemplate({
+        category2: "Utility Bills",
+        description: "Electricity / Water Bill",
+        payerName: "School",
+        receiverName: "Utility Provider",
+        wallet: pick(["KBZ Bank","Aya Bank","CB"]),
+        amount: -randInt(30000, 250000)
+      }),
+      () => buildRowTemplate({
+        category2: "Classroom Expenses",
+        description: "Classroom consumables (markers, tapes, printouts)",
+        payerName: "School",
+        receiverName: "Stationery Shop",
+        wallet: "Petty Cash",
+        amount: -randInt(8000, 80000)
+      }),
+      () => buildRowTemplate({
+        category2: "Building & Electrical Repair",
+        description: "Building / Electrical repair work",
+        payerName: "School",
+        receiverName: pick(["Electrician Team","Local Contractor"]),
+        wallet: pick(["KBZ Bank","Aya Bank"]),
+        amount: -randInt(50000, 1200000)
+      }),
+      () => buildRowTemplate({
+        category2: "Construction",
+        description: "Small construction / renovation works",
+        payerName: "School",
+        receiverName: "Local Contractor",
+        wallet: pick(["KBZ Bank","Aya Bank"]),
+        amount: -randInt(400000, 4500000)
+      }),
+      () => buildRowTemplate({
         category2: "Digital Marketing",
         description: "Facebook ads boost (monthly campaign)",
-        invoiceNr: invNo(),
-        receiptNr: rcptNo(),
         payerName: "School",
         receiverName: "Marketing Vendor",
         wallet: "Visa / Master Card",
-        amount: (-randInt(15000, 180000)).toFixed(2)
+        amount: -randInt(15000, 180000)
       }),
-      () => ({
-        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
-        paymentDate: randomDateInSchoolYear(),
+      () => buildRowTemplate({
         category2: "Sales Of Merchandise",
         description: "School T-shirt / Merchandise Sales",
-        invoiceNr: invNo(),
-        receiptNr: rcptNo(),
         payerName: "Walk-in Customer",
         receiverName: "School Office",
         wallet: pick(["Petty Cash","KPay"]),
-        amount: (randInt(5000, 120000)).toFixed(2)
+        amount: randInt(5000, 120000)
+      }),
+      () => buildRowTemplate({
+        category2: "Other (Investment)",
+        description: "Short-term investment / placement",
+        payerName: "School",
+        receiverName: "Finance",
+        wallet: pick(["KBZ Bank","Aya Bank","CB"]),
+        amount: (randInt(200000, 2500000) * (randInt(0,1) ? 1 : -1))
+      }),
+      () => buildRowTemplate({
+        category2: "Ferry Fee",
+        description: "Ferry fee for school trip",
+        payerName: "School",
+        receiverName: "Ferry Operator",
+        wallet: pick(["Petty Cash","KPay"]),
+        amount: -randInt(5000, 60000)
+      }),
+      () => buildRowTemplate({
+        category2: "Rent",
+        description: "Monthly Rent Payment",
+        payerName: "School",
+        receiverName: "Landlord",
+        wallet: pick(["KBZ Bank","Aya Bank"]),
+        amount: -randInt(300000, 2500000)
       }),
     ];
 
-    // Generate rows (repeat templates with some variation)
-    for (let i=0; i<n; i++) {
-      const t = pick(templates);
-      const row = t();
+    const all = [];
+    fixed.forEach(x => all.push(x));
 
-      // Ensure Cat1 is derived correctly
-      const cat1 = CAT2_TO_CAT1.get(row.category2) || "";
-      addRow({
-        paymentDate: row.paymentDate,
-        academicYear: row.academicYear,
-        category1: cat1,
-        category2: row.category2,
-        description: row.description,
-        invoiceNr: row.invoiceNr,
-        receiptNr: row.receiptNr,
-        payerName: row.payerName,
-        receiverName: row.receiverName,
-        wallet: row.wallet,
-        amount: row.amount
-      });
+    while (all.length < 50) {
+      const t = pick(randomTemplates)();
+      // avoid duplicating the exact forced November line too many times
+      if (t.description === "Monthly Payment for November 2025") continue;
+      all.push(t);
     }
 
-    // Force the 3 “Monthly Payment for November 2025” lines as requested
-    const forced = [
-      { payerName: "Eaint Khit Amara", wallet:"KPay", amount: 320000 },
-      { payerName: "Bhone Marn Pyae Hmu", wallet:"KPay", amount: 300000 },
-      { payerName: "Noo Noo Swan Yee", wallet:"KPay", amount: 280000 },
-    ];
-    forced.forEach((x) => addRow({
-      paymentDate: "05-Nov-2025",
-      academicYear: "AY2025-2026",
-      category1: "Income",
-      category2: "Tuition Fee",
-      description: "Monthly Payment for November 2025",
-      invoiceNr: invNo(),
-      receiptNr: rcptNo(),
-      payerName: x.payerName,
-      receiverName: "School Office",
-      wallet: x.wallet,
-      amount: x.amount.toFixed(2)
-    }));
+    // add to table
+    for (const r of all) addRow(r);
 
     refreshSummaryValidation();
   }
 
-  // Events
-  btnAddRow.addEventListener("click", () => addRow());
-  btnDummy.addEventListener("click", () => fillDummy(50));
-  btnSubmit.addEventListener("click", () => {
+  // Reports
+  function submitAndReport() {
+    closePortal();
     refreshSummaryValidation();
     const rows = collectRows();
     buildFinancialReport(rows);
     buildWalletReport(rows);
-    reportMainWrap.scrollIntoView({ behavior: "smooth", block: "start" });
-  });
+
+    reportMainWrap.style.display = rows.length ? "block" : "none";
+    walletWrap.style.display = rows.length ? "block" : "none";
+
+    if (rows.length) reportMainWrap.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // Events
+  btnAddRow.addEventListener("click", () => addRow());
+  btnDummy.addEventListener("click", () => fillDummyExactly50());
+  btnSubmit.addEventListener("click", submitAndReport);
 
   // Init: start with 1 line only
   addRow();
