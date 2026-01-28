@@ -96,7 +96,6 @@
       width: 44px;
     }
 
-    /* Input "box line" */
     .cell{
       width:100%;
       border:1px solid var(--line);
@@ -134,7 +133,7 @@
     textarea.cell{
       resize: vertical;
       line-height: 1.25;
-      min-height: 44px; /* ~2 lines */
+      min-height: 44px;
       max-height: 140px;
     }
 
@@ -290,16 +289,6 @@
       width: 36px;
       text-align:center;
     }
-
-    .twoReports{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-      margin-top: 16px;
-    }
-    @media (min-width: 1100px){
-      .twoReports{ grid-template-columns: 2fr 1fr; align-items:start; }
-    }
   </style>
 </head>
 
@@ -308,7 +297,7 @@
     <div class="topbar">
       <div>
         <h1>Transaction Entry</h1>
-        <p class="sub">Payment Date: DD-MMM-YYYY • Category 1 auto-fills from Category 2 • Amount can be negative</p>
+        <p class="sub"></p>
       </div>
       <div style="display:flex; gap:10px; align-items:center;">
         <button class="btn" id="btnDummy">Fill In With Dummy</button>
@@ -370,25 +359,23 @@
       </div>
     </div>
 
-    <div class="twoReports">
-      <div class="report" id="reportMain">
-        <div class="reportHead">
-          <div><h2>Financial Report</h2></div>
-          <div class="reportMeta" id="reportMetaMain"></div>
-        </div>
-        <div class="reportBody">
-          <table class="reportTable" id="reportTableMain" aria-label="Financial report table"></table>
-        </div>
+    <div class="report" id="reportMain">
+      <div class="reportHead">
+        <div><h2>Financial Report</h2></div>
+        <div class="reportMeta" id="reportMetaMain"></div>
       </div>
+      <div class="reportBody">
+        <table class="reportTable" id="reportTableMain" aria-label="Financial report table"></table>
+      </div>
+    </div>
 
-      <div class="report" id="reportWallet">
-        <div class="reportHead">
-          <div><h2>Wallet Balances</h2></div>
-          <div class="reportMeta" id="reportMetaWallet"></div>
-        </div>
-        <div class="reportBody">
-          <table class="reportTable" id="reportTableWallet" aria-label="Wallet balances table"></table>
-        </div>
+    <div class="report" id="reportWallet">
+      <div class="reportHead">
+        <div><h2>Wallet Balances</h2></div>
+        <div class="reportMeta" id="reportMetaWallet"></div>
+      </div>
+      <div class="reportBody">
+        <table class="reportTable" id="reportTableWallet" aria-label="Wallet balances table"></table>
       </div>
     </div>
   </div>
@@ -761,7 +748,7 @@
     td12.appendChild(fileCell);
     tr.appendChild(td12);
 
-    // Delete row (far right)
+    // Delete row
     const td13 = document.createElement("td");
     td13.style.textAlign = "right";
     const del = document.createElement("button");
@@ -926,14 +913,10 @@
         }
       }
 
-      // Order:
-      // INCOME
       addSection("Income");
-
-      // EXPENSE
       addSection("Expense");
 
-      // TOTAL (Income + Expense) - below Expense
+      // TOTAL (Income + Expense)
       const trTot = document.createElement("tr");
       trTot.className = "total";
       const tdTot = document.createElement("td");
@@ -949,7 +932,7 @@
       }
       tb.appendChild(trTot);
 
-      // One empty space
+      // Spacer
       const trSpacer = document.createElement("tr");
       trSpacer.className = "spacer";
       const tdSpacer = document.createElement("td");
@@ -957,10 +940,7 @@
       trSpacer.appendChild(tdSpacer);
       tb.appendChild(trSpacer);
 
-      // ASSET
       addSection("Asset");
-
-      // INVESTMENT
       addSection("Investment");
 
       reportMainTable.innerHTML = "";
@@ -976,11 +956,12 @@
   }
 
   function buildWalletReport(rows) {
-    const bal = new Map(); // wallet -> sum
+    const bal = new Map(); // wallet -> sum(amount)
     for (const r of rows) {
-      const w = r.wallet || "";
+      const w = (r.wallet || "").trim();
       if (!w) continue;
-      bal.set(w, (bal.get(w) || 0) + Number(r.amount || 0));
+      const v = Number(r.amount || 0);
+      bal.set(w, (bal.get(w) || 0) + v);
     }
 
     const wallets = [...bal.entries()].sort((a,b) => a[0].localeCompare(b[0]));
@@ -1021,50 +1002,254 @@
     reportWalletWrap.style.display = "block";
   }
 
-  // Dummy data
+  // --- Realistic dummy data ---
   function randInt(min, max) { return Math.floor(Math.random()*(max-min+1))+min; }
   function pick(arr) { return arr[randInt(0, arr.length-1)]; }
-  function randomName() {
-    const first = ["Aye","Min","Htet","Su","May","Thiri","Ko","Zaw","Nandar","Myo","Khine","Lin","Win","Hla","Ei","Yoon","Sai","Nyein"];
-    const last = ["Aung","Tun","Kyaw","Hlaing","Oo","Naing","Myint","Soe","Khin","Phyo","Wai","Zin","Htwe","Hnin","Lwin","Thant"];
-    return `${pick(first)} ${pick(last)}`;
-  }
-  function randomDateNearToday() {
-    const now = new Date();
-    const offset = randInt(-20, 25);
-    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
+  function randomDateInSchoolYear() {
+    // bias around 2025-2027
+    const base = new Date(2025, 7, 1); // 01-Aug-2025
+    const offsetDays = randInt(0, 650);
+    const d = new Date(base.getFullYear(), base.getMonth(), base.getDate() + offsetDays);
     return toDDMMMYYYY(d);
   }
+  function invNo() { return `INV-${randInt(1000,9999)}`; }
+  function rcptNo() { return `RCPT-${randInt(1000,9999)}`; }
+
+  const STUDENTS = [
+    "Eaint Khit Amara",
+    "Bhone Marn Pyae Hmu",
+    "Noo Noo Swan Yee",
+    "Thiri Mon",
+    "Htet Naing Aung",
+    "Su Myat Noe",
+    "Ko Ko Min",
+    "May Thiri San",
+    "Aye Myat Thwe",
+    "Lin Lin Htet"
+  ];
+  const TEACHERS = ["Tr. Ei Pa Pa Phyo","Tr. Zin Mar Htun","Tr. Hnin Pwint","Tr. May Thiri"];
+  const VENDORS = ["Jolly Phonics Supplier","Stationery Shop","Hardware Store","Solar Vendor","Local Carpenter","Electrician Team"];
+
   function fillDummy(n=50) {
     tbody.innerHTML = "";
-    const allCat2 = Object.values(CAT2_BY_CAT1).flat();
 
+    // High-quality realistic templates (mix income/expense/asset, plus some investment)
+    const templates = [
+      // Provided examples
+      () => ({
+        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
+        paymentDate: randomDateInSchoolYear(),
+        category2: "Materials And Stationery",
+        description: "50% Deposit for Jolly Phonics (1 to 7) SB (50x34000-15%), WB (50x20000-15%)",
+        invoiceNr: invNo(),
+        receiptNr: rcptNo(),
+        payerName: "School Admin",
+        receiverName: "Jolly Phonics Supplier",
+        wallet: pick(["KBZ Bank","Aya Bank","CB"]),
+        amount: (-randInt(600000, 1500000)).toFixed(2)
+      }),
+      () => ({
+        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
+        paymentDate: randomDateInSchoolYear(),
+        category2: "Supplies",
+        description: "To Buy Trouser (Tr. Ei Pa Pa Phyo, Tr. Zin Mar Htun) (2x40000)",
+        invoiceNr: invNo(),
+        receiptNr: rcptNo(),
+        payerName: "School Admin",
+        receiverName: pick(TEACHERS),
+        wallet: pick(["Petty Cash","KPay"]),
+        amount: (-80000).toFixed(2)
+      }),
+      () => ({
+        academicYear: pick(["AY2025-2026","AY2026-2027"]),
+        paymentDate: randomDateInSchoolYear(),
+        category2: "Tuition Fee",
+        description: "Monthly Payment for November 2025",
+        invoiceNr: invNo(),
+        receiptNr: rcptNo(),
+        payerName: pick(STUDENTS),
+        receiverName: "School Office",
+        wallet: pick(["KPay","KBZ Bank","Petty Cash"]),
+        amount: (randInt(120000, 450000)).toFixed(2)
+      }),
+      () => ({
+        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
+        paymentDate: randomDateInSchoolYear(),
+        category2: "Electronic And Repair",
+        description: "bicycle basket - 8000, hook - 7000, bike stopper - 5000, service charges - 5000",
+        invoiceNr: invNo(),
+        receiptNr: rcptNo(),
+        payerName: "School Admin",
+        receiverName: "Bike Service",
+        wallet: "Petty Cash",
+        amount: (-25000).toFixed(2)
+      }),
+
+      // More realistic school-like entries
+      () => ({
+        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
+        paymentDate: randomDateInSchoolYear(),
+        category2: "Registration Fee",
+        description: "Student Registration Fee",
+        invoiceNr: invNo(),
+        receiptNr: rcptNo(),
+        payerName: pick(STUDENTS),
+        receiverName: "School Office",
+        wallet: pick(["KPay","Petty Cash"]),
+        amount: (randInt(20000, 80000)).toFixed(2)
+      }),
+      () => ({
+        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
+        paymentDate: randomDateInSchoolYear(),
+        category2: "Material Fee",
+        description: "Material Fee (Books & Copies)",
+        invoiceNr: invNo(),
+        receiptNr: rcptNo(),
+        payerName: pick(STUDENTS),
+        receiverName: "School Office",
+        wallet: pick(["KPay","Petty Cash"]),
+        amount: (randInt(15000, 60000)).toFixed(2)
+      }),
+      () => ({
+        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
+        paymentDate: randomDateInSchoolYear(),
+        category2: "Salary (Teaching)",
+        description: "Teaching Salary (Monthly)",
+        invoiceNr: invNo(),
+        receiptNr: rcptNo(),
+        payerName: "School",
+        receiverName: pick(TEACHERS),
+        wallet: pick(["KBZ Bank","Aya Bank","CB"]),
+        amount: (-randInt(250000, 900000)).toFixed(2)
+      }),
+      () => ({
+        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
+        paymentDate: randomDateInSchoolYear(),
+        category2: "Utility Bills",
+        description: "Electricity / Water Bill",
+        invoiceNr: invNo(),
+        receiptNr: rcptNo(),
+        payerName: "School",
+        receiverName: "Utility Provider",
+        wallet: pick(["KBZ Bank","Aya Bank","CB"]),
+        amount: (-randInt(30000, 250000)).toFixed(2)
+      }),
+      () => ({
+        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
+        paymentDate: randomDateInSchoolYear(),
+        category2: "Classroom Expenses",
+        description: "Classroom consumables (markers, tapes, printouts)",
+        invoiceNr: invNo(),
+        receiptNr: rcptNo(),
+        payerName: "School",
+        receiverName: "Stationery Shop",
+        wallet: "Petty Cash",
+        amount: (-randInt(8000, 80000)).toFixed(2)
+      }),
+      () => ({
+        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
+        paymentDate: randomDateInSchoolYear(),
+        category2: "Construction",
+        description: "Small construction / renovation works",
+        invoiceNr: invNo(),
+        receiptNr: rcptNo(),
+        payerName: "School",
+        receiverName: "Local Contractor",
+        wallet: pick(["KBZ Bank","Aya Bank"]),
+        amount: (-randInt(400000, 4500000)).toFixed(2)
+      }),
+      () => ({
+        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
+        paymentDate: randomDateInSchoolYear(),
+        category2: "Other (Investment)",
+        description: "Short-term investment / placement",
+        invoiceNr: invNo(),
+        receiptNr: rcptNo(),
+        payerName: "School",
+        receiverName: "Finance",
+        wallet: pick(["KBZ Bank","Aya Bank","CB"]),
+        amount: (randInt(200000, 2500000) * (randInt(0,1) ? 1 : -1)).toFixed(2)
+      }),
+      () => ({
+        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
+        paymentDate: randomDateInSchoolYear(),
+        category2: "Tuition Fee",
+        description: "Tuition Fee Refund",
+        invoiceNr: invNo(),
+        receiptNr: rcptNo(),
+        payerName: "School Office",
+        receiverName: pick(STUDENTS),
+        wallet: pick(["KPay","KBZ Bank"]),
+        amount: (-randInt(30000, 300000)).toFixed(2)
+      }),
+      () => ({
+        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
+        paymentDate: randomDateInSchoolYear(),
+        category2: "Digital Marketing",
+        description: "Facebook ads boost (monthly campaign)",
+        invoiceNr: invNo(),
+        receiptNr: rcptNo(),
+        payerName: "School",
+        receiverName: "Marketing Vendor",
+        wallet: "Visa / Master Card",
+        amount: (-randInt(15000, 180000)).toFixed(2)
+      }),
+      () => ({
+        academicYear: pick(ACADEMIC_YEARS_DEFAULT),
+        paymentDate: randomDateInSchoolYear(),
+        category2: "Sales Of Merchandise",
+        description: "School T-shirt / Merchandise Sales",
+        invoiceNr: invNo(),
+        receiptNr: rcptNo(),
+        payerName: "Walk-in Customer",
+        receiverName: "School Office",
+        wallet: pick(["Petty Cash","KPay"]),
+        amount: (randInt(5000, 120000)).toFixed(2)
+      }),
+    ];
+
+    // Generate rows (repeat templates with some variation)
     for (let i=0; i<n; i++) {
-      const cat2 = pick(allCat2);
-      const cat1 = CAT2_TO_CAT1.get(cat2) || "";
-      const ay = pick(ACADEMIC_YEARS_DEFAULT);
+      const t = pick(templates);
+      const row = t();
 
-      let amount = 0;
-      if (cat1 === "Income") amount = randInt(50, 1500);
-      if (cat1 === "Expense") amount = -randInt(30, 1200);
-      if (cat1 === "Asset") amount = -randInt(100, 6000);
-      if (cat1 === "Investment") amount = randInt(0,1) ? randInt(100, 5000) : -randInt(100, 5000);
-      if (cat2 === "Tuition Fee" && randInt(1, 12) === 1) amount = -randInt(50, 500);
-
+      // Ensure Cat1 is derived correctly
+      const cat1 = CAT2_TO_CAT1.get(row.category2) || "";
       addRow({
-        paymentDate: randomDateNearToday(),
-        academicYear: ay,
+        paymentDate: row.paymentDate,
+        academicYear: row.academicYear,
         category1: cat1,
-        category2: cat2,
-        description: `Transaction — ${cat2}.`,
-        invoiceNr: `INV-${randInt(1000,9999)}`,
-        receiptNr: `RCPT-${randInt(1000,9999)}`,
-        payerName: randomName(),
-        receiverName: randomName(),
-        wallet: pick(WALLETS),
-        amount: amount.toFixed(2)
+        category2: row.category2,
+        description: row.description,
+        invoiceNr: row.invoiceNr,
+        receiptNr: row.receiptNr,
+        payerName: row.payerName,
+        receiverName: row.receiverName,
+        wallet: row.wallet,
+        amount: row.amount
       });
     }
+
+    // Force the 3 “Monthly Payment for November 2025” lines as requested
+    const forced = [
+      { payerName: "Eaint Khit Amara", wallet:"KPay", amount: 320000 },
+      { payerName: "Bhone Marn Pyae Hmu", wallet:"KPay", amount: 300000 },
+      { payerName: "Noo Noo Swan Yee", wallet:"KPay", amount: 280000 },
+    ];
+    forced.forEach((x) => addRow({
+      paymentDate: "05-Nov-2025",
+      academicYear: "AY2025-2026",
+      category1: "Income",
+      category2: "Tuition Fee",
+      description: "Monthly Payment for November 2025",
+      invoiceNr: invNo(),
+      receiptNr: rcptNo(),
+      payerName: x.payerName,
+      receiverName: "School Office",
+      wallet: x.wallet,
+      amount: x.amount.toFixed(2)
+    }));
+
     refreshSummaryValidation();
   }
 
@@ -1076,7 +1261,6 @@
     const rows = collectRows();
     buildFinancialReport(rows);
     buildWalletReport(rows);
-    // scroll to reports
     reportMainWrap.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
