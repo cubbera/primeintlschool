@@ -224,6 +224,8 @@
     .menuItem:last-child{ border-bottom:none; }
 
     /* Reports */
+
+    
     .report{
       margin-top: 12px;
       border:1px solid var(--line);
@@ -306,6 +308,19 @@
       max-width: 520px;
     }
     .walletCard .reportTable{ min-width: 0; }
+
+    /* Highlight TOTAL rows */
+.reportTable tr.total,
+.reportTable tr.section.total {
+  background: #eef2ff;              /* subtle blue */
+}
+
+.reportTable tr.total td,
+.reportTable tr.section.total td {
+  font-weight: 900;
+  border-top: 2px solid #2563eb;     /* strong separator */
+}
+
   </style>
 </head>
 
@@ -1061,7 +1076,7 @@
     }
 
     const trG = document.createElement("tr");
-    trG.className = "section";
+    trG.className = "total";
     const tdG1 = document.createElement("td"); tdG1.textContent = "TOTAL";
     const tdG2 = document.createElement("td"); tdG2.className = "num"; tdG2.textContent = formatMoney(grand);
     if (grand < 0) tdG2.classList.add("neg");
