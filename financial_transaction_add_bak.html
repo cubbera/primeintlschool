@@ -1,3 +1,5 @@
+
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -224,6 +226,8 @@
     .menuItem:last-child{ border-bottom:none; }
 
     /* Reports */
+
+    
     .report{
       margin-top: 12px;
       border:1px solid var(--line);
@@ -307,26 +311,35 @@
     }
     .walletCard .reportTable{ min-width: 0; }
 
-    /* TOTAL highlight: highlight ONLY numeric amount cells */
-    .reportTable tr.total td{
-      background:#fff;
-      font-weight: 950;
-    }
-    .reportTable tr.total td.num{
-      background: #ecfdf3; /* very light pale green */
-    }
-    .reportTable tr.total td:first-child{
-      font-weight: 950;
-    }
+/* TOTAL highlight */
+/* TOTAL row: highlight ONLY the numeric amount cells */
+.reportTable tr.total td{
+  background:#fff;            /* keep normal for label cell */
+  font-weight: 950;
+}
 
-    /* Group headers inside report tables */
-    .reportTable tr.groupTitle td{
-      background: var(--soft);
-      color: var(--muted);
-      font-weight: 950;
-      letter-spacing: .4px;
-      text-transform: uppercase;
-    }
+.reportTable tr.total td.num{
+  background: #ecfdf3;        /* very light pale green */
+}
+
+/* optional: make the label cell slightly bolder but not green */
+.reportTable tr.total td:first-child{
+  font-weight: 950;
+}
+
+
+
+/* Group headers inside report tables */
+.reportTable tr.groupTitle td{
+  background: var(--soft);
+  color: var(--muted);
+  font-weight: 950;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+}
+
+
+
   </style>
 </head>
 
@@ -446,16 +459,6 @@
     return map;
   })();
 
-  const CAT2_ALL = (() => {
-    const out = [];
-    for (const cat1 of CAT1_ORDER) for (const c2 of (CAT2_BY_CAT1[cat1] || [])) out.push(c2);
-    return out;
-  })();
-
-  function isValidCat2(v){
-    return CAT2_TO_CAT1.has(String(v || "").trim());
-  }
-
   // DOM
   const tbody = document.getElementById("tbody");
   const tableWrap = document.getElementById("tableWrap");
@@ -475,7 +478,7 @@
 
   // Portal menu
   const portal = document.getElementById("cat2Portal");
-  let portalCtx = null; // {input, tr}
+  let portalCtx = null; // {input, tr, forceAll}
 
   // Sequences
   let nextInv = 1;
@@ -611,7 +614,7 @@
 
   function positionPortalTo(inputEl){
     const r = inputEl.getBoundingClientRect();
-    const width = Math.max(r.width + 44, 320);
+    const width = Math.max(r.width + 44, 320); // input + button feel
     const left = Math.max(8, Math.min(window.innerWidth - width - 8, r.left));
     const top = Math.min(window.innerHeight - 8, r.bottom + 6);
     portal.style.left = `${left}px`;
@@ -641,13 +644,9 @@
         it.textContent = item;
         it.addEventListener("mousedown", (e) => {
           e.preventDefault();
-          // locked commit
-          if (input._commitCat2) input._commitCat2(item);
-          else {
-            input.value = item;
-            updateCat1(tr, item);
-            closePortal();
-          }
+          input.value = item;
+          updateCat1(tr, item);
+          closePortal();
         });
         portal.appendChild(it);
       }
@@ -674,6 +673,7 @@
   document.addEventListener("mousedown", (e) => {
     if (!portal.classList.contains("open")) return;
     if (portal.contains(e.target)) return;
+    // allow clicks inside the combo row without closing before it opens
     if (e.target && e.target.closest && e.target.closest('[data-combo="cat2"]')) return;
     closePortal();
   });
@@ -681,7 +681,7 @@
   window.addEventListener("scroll", () => { if (portalCtx) positionPortalTo(portalCtx.input); }, true);
   tableWrap.addEventListener("scroll", () => { if (portalCtx) positionPortalTo(portalCtx.input); });
 
-  // Category 2 combo (LOCKED: must be one of allowed values)
+  // Category 2 combo (portal)
   function buildCategory2Combo(tr, prefillValue="") {
     const wrap = document.createElement("div");
     wrap.setAttribute("data-combo","cat2");
@@ -693,81 +693,23 @@
     input.setAttribute("data-field","category2");
     input.value = prefillValue || "";
 
-    // per-row lock state
-    let lastValid = isValidCat2(input.value) ? input.value.trim() : "";
-
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "comboBtn";
     btn.textContent = "▾";
     btn.title = "Show all";
 
-    function applyValidityUI() {
-      const v = input.value.trim();
-      const ok = !v || isValidCat2(v); // allow empty, but not invalid text
-      input.classList.toggle("invalid", !ok);
-    }
-
-    function commitSelection(val) {
-      input.value = val;
-      lastValid = val;
-      input.classList.remove("invalid");
-      updateCat1(tr, val);
-      closePortal();
-    }
-
-    // expose commit for portal clicks
-    input._commitCat2 = commitSelection;
-
     input.addEventListener("input", () => {
-      const v = input.value.trim();
-
-      if (isValidCat2(v)) {
-        updateCat1(tr, v);
-        lastValid = v; // exact match typed is accepted
-        input.classList.remove("invalid");
-      } else {
-        updateCat1(tr, "");
-        applyValidityUI();
-      }
-
+      updateCat1(tr, input.value);
       openPortalFor(input, tr, false);
     });
-
     input.addEventListener("focus", () => {
+      updateCat1(tr, input.value);
       openPortalFor(input, tr, false);
     });
-
-    // lock on blur: if not valid, revert or clear
-    input.addEventListener("blur", () => {
-      setTimeout(() => {
-        const v = input.value.trim();
-        if (!v) {
-          updateCat1(tr, "");
-          input.classList.remove("invalid");
-          return;
-        }
-        if (isValidCat2(v)) {
-          lastValid = v;
-          updateCat1(tr, v);
-          input.classList.remove("invalid");
-          return;
-        }
-        if (lastValid) {
-          input.value = lastValid;
-          updateCat1(tr, lastValid);
-          input.classList.remove("invalid");
-        } else {
-          input.value = "";
-          updateCat1(tr, "");
-          input.classList.remove("invalid");
-        }
-        closePortal();
-      }, 0);
-    });
-
     btn.addEventListener("click", () => {
-      openPortalFor(input, tr, true);
+      updateCat1(tr, input.value);
+      openPortalFor(input, tr, true); // show ALL
       input.focus();
     });
 
@@ -775,11 +717,7 @@
     row.appendChild(btn);
     wrap.appendChild(row);
 
-    // initial cat1
-    if (isValidCat2(input.value.trim())) updateCat1(tr, input.value.trim());
-    else updateCat1(tr, "");
-
-    applyValidityUI();
+    updateCat1(tr, input.value);
     return wrap;
   }
 
@@ -842,7 +780,7 @@
     td3.appendChild(c1);
     tr.appendChild(td3);
 
-    // Category 2 (locked)
+    // Category 2
     const td4 = document.createElement("td");
     const c2combo = buildCategory2Combo(tr, prefill.category2 || "");
     td4.appendChild(c2combo);
@@ -967,13 +905,7 @@
   function collectRows() {
     return [...tbody.querySelectorAll("tr")]
       .map(getRowData)
-      .filter(r => {
-        const hasAnything = r.academicYear || r.category2 || r.paymentDate || r.description || r.amount || r.wallet;
-        if (!hasAnything) return false;
-        // locked: category2 must be valid if present
-        if (r.category2 && !isValidCat2(r.category2)) return false;
-        return true;
-      });
+      .filter(r => r.academicYear || r.category2 || r.paymentDate || r.description || r.amount || r.wallet);
   }
 
   function uniqueAcademicYears(rows) {
@@ -1030,16 +962,6 @@
       thead.appendChild(hr);
 
       const tb = document.createElement("tbody");
-
-      function addGroupTitle(text){
-        const tr = document.createElement("tr");
-        tr.className = "groupTitle";
-        const td = document.createElement("td");
-        td.colSpan = 1 + years.length;
-        td.textContent = text;
-        tr.appendChild(td);
-        tb.appendChild(tr);
-      }
 
       function addSection(cat1) {
         if (!agg.has(cat1)) return;
@@ -1098,37 +1020,55 @@
         }
       }
 
-      addGroupTitle("Income & Operation Expense");
-      addSection("Income");
-      addSection("Expense");
+      function addGroupTitle(text){
+  const tr = document.createElement("tr");
+  tr.className = "groupTitle";
+  const td = document.createElement("td");
+  td.colSpan = 1 + years.length;
+  td.textContent = text;
+  tr.appendChild(td);
+  tb.appendChild(tr);
+}
 
-      // TOTAL (Income + Expense)
-      const trTot = document.createElement("tr");
-      trTot.className = "total";
-      const tdTot = document.createElement("td");
-      tdTot.textContent = "TOTAL (INCOME + EXPENSE)";
-      trTot.appendChild(tdTot);
-      for (const y of years) {
-        const td = document.createElement("td");
-        td.className = "num";
-        const v = incomePlusExpenseByYear.get(y) || 0;
-        td.textContent = formatMoney(v);
-        if (v < 0) td.classList.add("neg");
-        trTot.appendChild(td);
-      }
-      tb.appendChild(trTot);
 
-      // Spacer
-      const trSpacer = document.createElement("tr");
-      trSpacer.className = "spacer";
-      const tdSpacer = document.createElement("td");
-      tdSpacer.colSpan = 1 + years.length;
-      trSpacer.appendChild(tdSpacer);
-      tb.appendChild(trSpacer);
 
-      addGroupTitle("Asset & Investment");
-      addSection("Asset");
-      addSection("Investment"); // no total here
+
+
+addGroupTitle("Income & Operation Expense");
+addSection("Income");
+addSection("Expense");
+
+// TOTAL (Income + Expense)  ✅ keep total only for this group
+const trTot = document.createElement("tr");
+trTot.className = "total";
+const tdTot = document.createElement("td");
+tdTot.textContent = "TOTAL (INCOME + EXPENSE)";
+trTot.appendChild(tdTot);
+for (const y of years) {
+  const td = document.createElement("td");
+  td.className = "num";
+  const v = incomePlusExpenseByYear.get(y) || 0;
+  td.textContent = formatMoney(v);
+  if (v < 0) td.classList.add("neg");
+  trTot.appendChild(td);
+}
+tb.appendChild(trTot);
+
+// Spacer
+const trSpacer = document.createElement("tr");
+trSpacer.className = "spacer";
+const tdSpacer = document.createElement("td");
+tdSpacer.colSpan = 1 + years.length;
+trSpacer.appendChild(tdSpacer);
+tb.appendChild(trSpacer);
+
+addGroupTitle("Asset & Investment");
+addSection("Asset");
+addSection("Investment"); // ❌ no total here
+
+
+
+
 
       reportMainTable.innerHTML = "";
       reportMainTable.appendChild(thead);
@@ -1151,6 +1091,7 @@
       bal.set(w, (bal.get(w) || 0) + v);
     }
 
+    // show even wallets with 0? (keep only present)
     const wallets = [...bal.entries()].sort((a,b) => a[0].localeCompare(b[0]));
 
     const thead = document.createElement("thead");
@@ -1205,6 +1146,7 @@
     "Su Myat Noe","Ko Ko Min","May Thiri San","Aye Myat Thwe","Lin Lin Htet"
   ];
   const TEACHERS = ["Tr. Ei Pa Pa Phyo","Tr. Zin Mar Htun","Tr. Hnin Pwint","Tr. May Thiri"];
+  const VENDORS = ["Jolly Phonics Supplier","Stationery Shop","Hardware Store","Solar Vendor","Local Carpenter","Electrician Team","Utility Provider"];
 
   function buildRowTemplate(t) {
     const cat1 = CAT2_TO_CAT1.get(t.category2) || t.category1 || "";
@@ -1226,6 +1168,7 @@
     tbody.innerHTML = "";
     nextInv = 1; nextRcpt = 1;
 
+    // Fixed, realistic lines (includes your provided examples)
     const fixed = [
       buildRowTemplate({
         paymentDate: "12-Sep-2025",
@@ -1315,12 +1258,28 @@
         amount: randInt(120000, 450000)
       }),
       () => buildRowTemplate({
+        category2: "Tuition Fee",
+        description: "Tuition Fee Refund",
+        payerName: "School Office",
+        receiverName: pick(STUDENTS),
+        wallet: pick(["KPay","KBZ Bank"]),
+        amount: -randInt(30000, 300000)
+      }),
+      () => buildRowTemplate({
         category2: "Salary (Teaching)",
         description: "Teaching Salary (Monthly)",
         payerName: "School",
         receiverName: pick(TEACHERS),
         wallet: pick(["KBZ Bank","Aya Bank","CB"]),
         amount: -randInt(250000, 900000)
+      }),
+      () => buildRowTemplate({
+        category2: "Salary (Office)",
+        description: "Office Staff Salary (Monthly)",
+        payerName: "School",
+        receiverName: "Office Staff",
+        wallet: pick(["KBZ Bank","Aya Bank","CB"]),
+        amount: -randInt(200000, 700000)
       }),
       () => buildRowTemplate({
         category2: "Utility Bills",
@@ -1337,6 +1296,14 @@
         receiverName: "Stationery Shop",
         wallet: "Petty Cash",
         amount: -randInt(8000, 80000)
+      }),
+      () => buildRowTemplate({
+        category2: "Building & Electrical Repair",
+        description: "Building / Electrical repair work",
+        payerName: "School",
+        receiverName: pick(["Electrician Team","Local Contractor"]),
+        wallet: pick(["KBZ Bank","Aya Bank"]),
+        amount: -randInt(50000, 1200000)
       }),
       () => buildRowTemplate({
         category2: "Construction",
@@ -1393,25 +1360,21 @@
 
     while (all.length < 50) {
       const t = pick(randomTemplates)();
+      // avoid duplicating the exact forced November line too many times
+      if (t.description === "Monthly Payment for November 2025") continue;
       all.push(t);
     }
 
+    // add to table
     for (const r of all) addRow(r);
 
     refreshSummaryValidation();
   }
 
+  // Reports
   function submitAndReport() {
     closePortal();
     refreshSummaryValidation();
-
-    // hard-lock invalid cat2 rows (also highlight invalid inputs)
-    for (const tr of [...tbody.querySelectorAll("tr")]) {
-      const c2 = tr.querySelector('[data-field="category2"]');
-      const v = String(c2?.value || "").trim();
-      if (v && !isValidCat2(v)) c2.classList.add("invalid");
-    }
-
     const rows = collectRows();
     buildFinancialReport(rows);
     buildWalletReport(rows);
