@@ -5,165 +5,246 @@
 <title>Assessment Entry (Quantitative)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+<!-- SheetJS for Excel import/export -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <style>
-body{
-font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui;
-background:#f5f5f7;
-padding:20px;
-}
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui;
+    background: #f5f5f7;
+    padding: 20px;
+  }
 
-.title{
-font-size:22px;
-font-weight:600;
-margin-bottom:15px;
-}
+  .title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
 
-.dropdown-label{
-font-size:14px;
-font-weight:600;
-}
+  .dropdown-label {
+    font-size: 14px;
+    font-weight: 600;
+  }
 
-select{
-padding:4px 8px;
-border-radius:6px;
-border:1px solid #ccc;
-font-size:14px;
-}
+  select {
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+  }
 
-.card{
-background:#fff;
-border-radius:14px;
-padding:20px;
-border:1px solid #ddd;
-box-shadow:0 2px 10px rgba(0,0,0,0.05);
-margin-top:15px;
-}
+  .card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    position: relative;
+    margin-top: 15px;
+  }
 
-.top-buttons{
-display:flex;
-gap:10px;
-margin-bottom:15px;
-}
+  .top-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
 
-.btn-top{
-padding:6px 12px;
-background:#0071e3;
-color:white;
-border-radius:8px;
-border:none;
-cursor:pointer;
-font-size:13px;
-}
+  .btn-top {
+    padding: 6px 12px;
+    background: #0071e3;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+  }
 
-.btn-top:hover{
-background:#005bbd;
-}
+  .btn-top:hover {
+    background: #005bbd;
+  }
 
-.cw-group{
-border:1px solid #d0d0d5;
-background:#fafafa;
-padding:12px;
-border-radius:10px;
-margin-bottom:14px;
-display:inline-block;
-}
+  /* Coursework Box */
+  .cw-group {
+    border: 1px solid #d0d0d5;
+    background: #fafafa;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+    display: inline-block;
+  }
 
-.cw-title{
-font-weight:600;
-margin-bottom:6px;
-}
+  .cw-title {
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
 
-.cw-buttons{
-display:flex;
-gap:8px;
-flex-wrap:wrap;
-}
+  .cw-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
 
-.btn{
-padding:5px 12px;
-border-radius:999px;
-border:1px solid #ccc;
-background:white;
-cursor:pointer;
-font-size:12px;
-}
+  .btn {
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1px solid #ccc;
+    background: white;
+    cursor: pointer;
+    font-size: 12px;
+  }
 
-.btn:hover{
-background:#eaeaea;
-}
+  .btn:hover {
+    background: #eaeaea;
+  }
 
-table{
-width:100%;
-border-collapse:collapse;
-background:white;
-margin-top:15px;
-font-size:13px;
-min-width:1100px;
-}
+  /* ===== SPREADSHEET-STYLE TABLE ===== */
+  .table-wrapper {
+    overflow-x: auto;
+    border: 1px solid #c0c0c0;
+    border-radius: 4px;
+    margin-top: 15px;
+  }
 
-th,td{
-border:1px solid #dcdcdc;
-padding:6px;
-text-align:center;
-}
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    font-size: 13px;
+    min-width: 1100px;
+    table-layout: fixed;
+  }
 
-th{
-background:#f2f2f7;
-font-weight:600;
-white-space:nowrap;
-}
+  th, td {
+    border: 1px solid #c0c0c0;
+    padding: 0;
+    text-align: center;
+  }
 
-.label-col{
-text-align:left;
-padding-left:8px;
-font-weight:600;
-white-space:nowrap;
-}
+  th {
+    background: #f3f3f3;
+    font-weight: 600;
+    white-space: nowrap;
+    padding: 6px 8px;
+    border-color: #b8b8b8;
+    font-size: 12px;
+    user-select: none;
+  }
 
-input.score-box{
-width:60px;
-padding:4px;
-border-radius:6px;
-border:1px solid #cfcfd4;
-text-align:right;
-}
+  /* Row number column (like spreadsheet row headers) */
+  td:first-child {
+    background: #f3f3f3;
+    border-color: #b8b8b8;
+    color: #666;
+    font-size: 11px;
+    width: 32px;
+    min-width: 32px;
+    cursor: default;
+    user-select: none;
+  }
 
-.cw-cell{background:#eaf4ff;}
-.cw-total-cell{background:#eaf4ff;font-weight:600;}
+  /* Name column */
+  td.label-col {
+    text-align: left;
+    padding: 0;
+    font-weight: 500;
+    white-space: nowrap;
+    min-width: 160px;
+  }
 
-.exam-cell{background:#fff8dc;}
-.exam-total-cell{background:#fff8dc;font-weight:600;}
+  /* Editable cells — contenteditable divs */
+  .cell-inner {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 24px;
+    padding: 4px 6px;
+    box-sizing: border-box;
+    outline: none;
+    text-align: right;
+    cursor: cell;
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 13px;
+    font-family: inherit;
+  }
 
-.total-cell{background:#eaffea;font-weight:600;}
+  .cell-inner.name-inner {
+    text-align: left;
+  }
 
-.btn-add-student{
-margin-top:14px;
-padding:6px 14px;
-border-radius:999px;
-background:#0071e3;
-color:#fff;
-border:none;
-cursor:pointer;
-font-size:13px;
-}
+  /* Selected cell highlight */
+  td.selected {
+    outline: 2px solid #1a73e8;
+    outline-offset: -2px;
+    z-index: 1;
+    position: relative;
+  }
 
-.btn-submit{
-margin-top:20px;
-padding:10px 20px;
-border-radius:999px;
-border:none;
-font-size:14px;
-background:#c7c7cc;
-color:#666;
-cursor:not-allowed;
-}
+  td.in-range {
+    background-color: rgba(26, 115, 232, 0.12) !important;
+  }
 
-  .selected-cell{
-outline:2px solid #0071e3;
-background:#dbe9ff;
-}
+  /* Computed (read-only) cells */
+  .cw-cell { background: #eaf4ff; }
+  .cw-total-cell { background: #d6ebff; font-weight: 600; }
+  .exam-cell { background: #fff8dc; }
+  .exam-total-cell { background: #fff0a0; font-weight: 600; }
+  .total-cell { background: #eaffea; font-weight: 600; }
+
+  .readonly-inner {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 24px;
+    padding: 4px 6px;
+    box-sizing: border-box;
+    text-align: right;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: default;
+    user-select: none;
+  }
+
+  .delete-col-btn {
+    font-size: 11px;
+    background: none;
+    border: none;
+    color: red;
+    cursor: pointer;
+    margin-left: 4px;
+  }
+
+  .btn-add-student {
+    margin-top: 14px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: #0071e3;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+  }
+
+  /* ===== DISABLED SUBMIT BUTTON ===== */
+  .btn-submit {
+    margin-top: 20px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    border: none;
+    font-size: 14px;
+    cursor: not-allowed;
+    background: #b0b0b0;
+    color: #fff;
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  /* Paste overlay feedback */
+  @keyframes flash {
+    0% { background: rgba(26,115,232,0.3); }
+    100% { background: transparent; }
+  }
+  .paste-flash { animation: flash 0.3s ease-out; }
 </style>
 </head>
 
@@ -171,312 +252,718 @@ background:#dbe9ff;
 
 <div class="title">Assessment Score for Report Card Calculator</div>
 
-<div style="margin-bottom:15px">
+<!-- Dropdowns -->
+<div style="margin-bottom: 15px;">
+    <div style="margin-bottom: 15px;">
+  <span class="dropdown-label">Academic Year: </span>
+  <select id="academicYear">
+    <option>2025-2026</option>
+  </select>
 
-<span class="dropdown-label">Academic Year: </span>
-<select id="academicYear">
-<option>2025-2026</option>
-</select>
+  &nbsp;&nbsp;&nbsp;
 
-&nbsp;&nbsp;&nbsp;
-
-<span class="dropdown-label">Term: </span>
-<select id="termSelect">
-<option>Term 1</option>
-<option>Term 2</option>
-<option selected>Term 3</option>
-</select>
-
-<br><br>
+  <span class="dropdown-label">Term: </span>
+  <select id="termSelect">
+    <option>Term 1</option>
+    <option>Term 2</option>
+    <option>Term 3</option>
+  </select>
+</div>
 
 <span class="dropdown-label">Class: </span>
-<select id="classSelect">
-<option value="Y1-A">Y1-A</option>
-<option value="Y2-A">Y2-A</option>
+<select id="classSelect" onchange="loadClassStudents()">
+  <option value="Y1-A">Y1-A</option>
+  <option value="Y2-A">Y2-A</option>
 </select>
 
-&nbsp;&nbsp;&nbsp;
 
-<span class="dropdown-label">Subject: </span>
-<select id="subjectSelect">
-<option>English</option>
-<option>Mathematics</option>
-<option>Science</option>
-<option>Social Studies</option>
-<option>Myanmar</option>
-<option>Myanmar Social Studies</option>
-<option>Wellbeing</option>
-<option>ICT</option>
-<option>Chinese</option>
-</select>
+  &nbsp;&nbsp;&nbsp;
 
+  <span class="dropdown-label">Subject: </span>
+  <select id="subjectSelect">
+    <option>English</option>
+    <option>Mathematics</option>
+    <option>Science</option>
+    <option>Social Studies</option>
+    <option>Myanmar</option>
+    <option>Myanmar Social Studies</option>
+    <option>Wellbeing</option>
+    <option>ICT</option>
+    <option>Chinese</option>
+  </select>
 </div>
 
 <div class="card">
 
-<div class="top-buttons">
-<button class="btn-top" onclick="importExcel()">Import from Excel</button>
-<button class="btn-top" onclick="exportExcel()">Export to Excel</button>
-</div>
+  <div class="top-buttons">
+    <button class="btn-top" onclick="importExcel()">Import from Excel</button>
+    <button class="btn-top" onclick="exportExcel()">Export to Excel</button>
+  </div>
 
-<div class="cw-group">
-<div class="cw-title">Coursework Weight: 40%</div>
-<div class="cw-buttons">
-<button class="btn" onclick="addUnitTest()">+ Add Unit Test</button>
-<button class="btn" onclick="addProject()">+ Add Project</button>
-<button class="btn" onclick="addPresentation()">+ Add Presentation</button>
-</div>
-</div>
+  <div class="cw-group">
+    <div class="cw-title">Coursework Weight: 40%</div>
+    <div class="cw-buttons">
+      <button class="btn" onclick="addUnitTest()">+ Add Unit Test</button>
+      <button class="btn" onclick="addProject()">+ Add Project</button>
+      <button class="btn" onclick="addPresentation()">+ Add Presentation</button>
+    </div>
+  </div>
 
-<table id="assessmentTable">
-<thead>
+  <!-- ASSESSMENT TABLE -->
+  <div class="table-wrapper">
+  <table id="assessmentTable">
+    <thead>
+      <!-- ROW 1: MAIN HEADERS -->
+      <tr id="headerRow1">
+        <th rowspan="2" style="width:32px;">Nr.</th>
+        <th rowspan="2" style="width:170px;text-align:left;padding-left:8px;">Student Name</th>
 
-<tr id="headerRow1">
-<th rowspan="2">Nr.</th>
-<th rowspan="2">Student Name</th>
-<th id="cwHeader" colspan="2">Coursework 40% (U.E.T = 25% + project = 15%)</th>
-<th id="examHeader" colspan="2">Term Exam 60%</th>
-<th colspan="2">TOTAL 100%</th>
-</tr>
+        <!-- Coursework -->
+        <th id="cwHeader" colspan="2">Coursework 40% (U.E.T = 25% + project = 15%)</th>
 
-<tr id="headerRow2">
-<th id="cw-ut1" data-role="cw-col">Unit Test 1</th>
-<th data-role="cw-total">Coursework Total</th>
-<th data-role="exam-score">Exam Score</th>
-<th data-role="exam-total">Exam Total</th>
-<th data-role="original-total">Original</th>
-<th data-role="rounded-total">Rounded</th>
-</tr>
+        <!-- Exam -->
+        <th id="examHeader" colspan="2">Term Exam 60%</th>
 
-</thead>
+        <!-- Total -->
+        <th colspan="2">TOTAL (100%)</th>
+      </tr>
 
-<tbody id="tbody"></tbody>
+      <!-- ROW 2: SUB-COLUMNS -->
+      <tr id="headerRow2">
+        <!-- Coursework dynamic columns -->
+        <th id="cw-ut1" data-role="cw-col" style="width:90px;">
+          Unit Test 1
+          <button class="delete-col-btn" onclick="deleteColumn('cw-ut1')">x</button>
+        </th>
 
-</table>
+        <!-- Coursework total -->
+        <th data-role="cw-total" style="width:110px;">Coursework Total</th>
 
-<button class="btn-add-student" onclick="addStudent()">+ Add Student</button>
+        <!-- Exam score, exam total -->
+        <th data-role="exam-score" style="width:90px;">Exam Score</th>
+        <th data-role="exam-total" style="width:90px;">Exam Total</th>
 
-<br>
+        <!-- Final totals -->
+        <th data-role="original-total" style="width:80px;">Original</th>
+        <th data-role="rounded-total" style="width:80px;">Rounded</th>
+      </tr>
+    </thead>
+    <tbody id="tbody">
+    </tbody>
+  </table>
+  </div>
 
-<button class="btn-submit" disabled>Submit Scores</button>
+  <button class="btn-add-student" onclick="addStudent()">+ Add Student</button>
 
-</div>
+  <br>
+
+  <button class="btn-submit" disabled title="Submit is currently disabled">Submit Scores</button>
+
+</div> <!-- end card -->
 
 <script>
+  // ============================================================
+  // CLASS STUDENT LISTS
+  // ============================================================
+  const CLASS_STUDENTS = {
+    "Y1-A": [
+      "Ye Yint Tayza Hman",
+      "Shoon La Woon Htet",
+      "Htun Lae Yi Mon",
+      "Lwin Aung Hein",
+      "Aung Bhone San",
+      "Htet Nay Bhone",
+      "Sian Vang Huai Kim",
+      "Thu Htet Htoo",
+      "Khant Su Thar",
+      "Lwin Khit",
+      "Htut Myat Aung",
+      "Myat Shwe Yee Thin",
+      "Kaung Khit Han",
+      "Linn Pyae Sone Aung",
+      "Sai Noon Wan Han",
+      "Ngwe Yati Moe",
+      "Khant Htet Zen"
+    ],
+    "Y2-A": [
+      "Zin Aung Hlaing",
+      "Phoo Pyae Heather",
+      "Shwe Sin Htet Aung",
+      "Thoon Thu San Aung",
+      "Linn Phone Khit",
+      "Khunn Thansin Han",
+      "Lin Thiri Hmue",
+      "Yuu Mi Khaing Lin",
+      "Yoon Htet Htet"
+    ]
+  };
 
-let cwColumns=["cw-ut1"];
-
-const classStudents={
-"Y1-A":[
-"Ye Yint Tayza Hman",
-"Shoon La Woon Htet",
-"Htun Lae Yi Mon",
-"Lwin Aung Hein",
-"Aung Bhone San",
-"Htet Nay Bhone",
-"Sian Vang Huai Kim",
-"Thu Htet Htoo",
-"Khant Su Thar",
-"Lwin Khit",
-"Htut Myat Aung",
-"Myat Shwe Yee Thin",
-"Kaung Khit Han",
-"Linn Pyae Sone Aung",
-"Sai Noon Wan Han",
-"Ngwe Yati Moe",
-"Khant Htet Zen"
-],
-
-"Y2-A":[
-"Zin Aung Hlaing",
-"Phoo Pyae Heather",
-"Shwe Sin Htet Aung",
-"Thoon Thu San Aung",
-"Linn Phone Khit",
-"Khunn Thansin Han",
-"Lin Thiri Hmue",
-"Yuu Mi Khaing Lin",
-"Yoon Htet Htet"
-]
-};
-
-function loadClassStudents(){
-
-const classId=document.getElementById("classSelect").value;
-const students=classStudents[classId];
-
-const tbody=document.getElementById("tbody");
-tbody.innerHTML="";
-
-students.forEach((name,i)=>{
-
-let tr=document.createElement("tr");
-
-let html=`
-<td>${i+1}</td>
-<td class="label-col">${name}</td>
-<td class="cw-cell" data-col="cw-ut1">
-<input class="score-box" type="number" min="0" max="100">
-</td>
-<td class="cw-total-cell">0.00</td>
-<td class="exam-cell exam-score-cell">
-<input class="score-box" type="number" value="0">
-</td>
-<td class="exam-total-cell">0.00</td>
-<td class="total-cell final-total-cell">0.00</td>
-<td class="total-cell rounded-total-cell">0</td>
-`;
-
-tr.innerHTML=html;
-tbody.appendChild(tr);
-
-});
-
-recalc();
-}
-
-function clamp100(v){
-v=parseFloat(v);
-if(isNaN(v))v=0;
-if(v<0)v=0;
-if(v>100)v=100;
-return v;
-}
-
-function recalc(){
-
-document.querySelectorAll("#tbody tr").forEach(row=>{
-
-let ut=row.querySelector("td[data-col] input").value;
-ut=clamp100(ut);
-
-let exam=row.querySelector(".exam-score-cell input").value;
-exam=clamp100(exam);
-
-let cw=(ut/100)*40;
-let examPercent=(exam/100)*60;
-let total=cw+examPercent;
-
-row.querySelector(".cw-total-cell").textContent=cw.toFixed(2);
-row.querySelector(".exam-total-cell").textContent=examPercent.toFixed(2);
-row.querySelector(".final-total-cell").textContent=total.toFixed(2);
-row.querySelector(".rounded-total-cell").textContent=Math.round(total);
-
-});
-}
-
-function addStudent(){
-
-const tbody=document.getElementById("tbody");
-const n=tbody.children.length+1;
-
-let tr=document.createElement("tr");
-
-tr.innerHTML=`
-<td>${n}</td>
-<td class="label-col"><input></td>
-<td class="cw-cell" data-col="cw-ut1"><input class="score-box" type="number"></td>
-<td class="cw-total-cell">0.00</td>
-<td class="exam-cell exam-score-cell"><input class="score-box" type="number" value="0"></td>
-<td class="exam-total-cell">0.00</td>
-<td class="total-cell final-total-cell">0.00</td>
-<td class="total-cell rounded-total-cell">0</td>
-`;
-
-tbody.appendChild(tr);
-}
-
-function exportExcel(){
-
-const table=document.getElementById("assessmentTable");
-
-const wb=XLSX.utils.table_to_book(table,{sheet:"Assessment"});
-XLSX.writeFile(wb,"assessment.xlsx");
-
-}
-
-function importExcel(){
-alert("Import still works using your previous structure if needed.");
-}
-
-document.addEventListener("DOMContentLoaded",()=>{
-
-loadClassStudents();
-
-document.getElementById("classSelect")
-.addEventListener("change",loadClassStudents);
-
-document.getElementById("tbody")
-.addEventListener("input",e=>{
-if(e.target.classList.contains("score-box")){
-recalc();
-}
-});
-
-});
-
-  /* ================================
-   Spreadsheet Copy / Paste Support
-   ================================ */
-
-let selectedCell = null;
-
-/* highlight selected cell */
-document.addEventListener("click", function(e){
-  if(e.target.classList.contains("score-box")){
-    if(selectedCell) selectedCell.classList.remove("selected-cell");
-    selectedCell = e.target;
-    selectedCell.classList.add("selected-cell");
+  function loadClassStudents() {
+    const classId = document.getElementById("classSelect").value;
+    const students = CLASS_STUDENTS[classId] || [];
+    const tbody = document.getElementById("tbody");
+    tbody.innerHTML = "";
+    cwColumns = ["cw-ut1"];
+    // rebuild header to reset any extra columns
+    rebuildHeaderRow2();
+    updateHeaderSpans();
+    students.forEach((name, i) => buildStudentRow(tbody, i + 1, name));
+    recalc();
   }
-});
 
-/* handle paste from Excel / Sheets */
-document.addEventListener("paste", function(e){
+  function buildStudentRow(tbody, nr, name, scores) {
+    const tr = document.createElement("tr");
+    let html = `<td>${nr}</td>`;
+    html += `<td class="label-col"><div class="cell-inner name-inner" contenteditable="false" data-editable="false">${name}</div></td>`;
 
-  if(!e.target.classList.contains("score-box")) return;
+    cwColumns.forEach(colId => {
+      const val = (scores && scores[colId] != null) ? scores[colId] : "";
+      html += `<td class="cw-cell" data-col="${colId}"><div class="cell-inner" contenteditable="true" data-type="number">${val}</div></td>`;
+    });
 
-  e.preventDefault();
+    const examVal = (scores && scores["exam"] != null) ? scores["exam"] : "";
+    html += `<td class="cw-total-cell"><span class="readonly-inner">0.00</span></td>`;
+    html += `<td class="exam-cell exam-score-cell"><div class="cell-inner" contenteditable="true" data-type="number">${examVal}</div></td>`;
+    html += `<td class="exam-total-cell"><span class="readonly-inner">0.00</span></td>`;
+    html += `<td class="total-cell final-total-cell"><span class="readonly-inner">0.00</span></td>`;
+    html += `<td class="total-cell rounded-total-cell"><span class="readonly-inner">0</span></td>`;
 
-  const paste = e.clipboardData.getData("text");
-  const rows = paste.trim().split(/\r?\n/).map(r => r.split("\t"));
+    tr.innerHTML = html;
+    tbody.appendChild(tr);
+  }
 
-  const inputs = [...document.querySelectorAll("#tbody .score-box")];
-  const startIndex = inputs.indexOf(e.target);
+  // ============================================================
+  // COURSEWORK COLUMN MANAGEMENT
+  // ============================================================
+  let cwColumns = ["cw-ut1"];
 
-  const columnsPerRow = inputs.length / document.querySelectorAll("#tbody tr").length;
+  function rebuildHeaderRow2() {
+    const headerRow2 = document.getElementById("headerRow2");
+    headerRow2.innerHTML = `
+      <th id="cw-ut1" data-role="cw-col" style="width:90px;">
+        Unit Test 1
+        <button class="delete-col-btn" onclick="deleteColumn('cw-ut1')">x</button>
+      </th>
+      <th data-role="cw-total" style="width:110px;">Coursework Total</th>
+      <th data-role="exam-score" style="width:90px;">Exam Score</th>
+      <th data-role="exam-total" style="width:90px;">Exam Total</th>
+      <th data-role="original-total" style="width:80px;">Original</th>
+      <th data-role="rounded-total" style="width:80px;">Rounded</th>
+    `;
+  }
 
-  rows.forEach((row, r)=>{
-    row.forEach((value, c)=>{
+  function updateHeaderSpans() {
+    const cwHeader = document.getElementById("cwHeader");
+    if (cwHeader) cwHeader.colSpan = cwColumns.length + 1;
+    const examHeader = document.getElementById("examHeader");
+    if (examHeader) examHeader.colSpan = 2;
+  }
 
-      const index = startIndex + r*columnsPerRow + c;
+  function nextIndexForPrefix(prefix) {
+    return cwColumns.filter(id => id.startsWith(prefix)).length + 1;
+  }
 
-      if(inputs[index]){
-        inputs[index].value = value;
+  function addUnitTest() {
+    const index = nextIndexForPrefix("cw-ut");
+    const colId = "cw-ut" + index;
+    cwColumns.push(colId);
+    addCourseworkColumn(colId, "Unit Test " + index, "cw-ut");
+  }
+
+  function addProject() {
+    const index = nextIndexForPrefix("cw-proj");
+    const colId = "cw-proj" + index;
+    cwColumns.push(colId);
+    addCourseworkColumn(colId, "Project " + index, "cw-proj");
+  }
+
+  function addPresentation() {
+    const index = nextIndexForPrefix("cw-pres");
+    const colId = "cw-pres" + index;
+    cwColumns.push(colId);
+    addCourseworkColumn(colId, "Presentation " + index, "cw-pres");
+  }
+
+  function addCourseworkColumn(colId, label, prefix) {
+    const headerRow2 = document.getElementById("headerRow2");
+    if (!headerRow2) return;
+
+    const headerCells = Array.from(headerRow2.children);
+    const cwTotalTh = headerRow2.querySelector('th[data-role="cw-total"]');
+
+    const cwColThs = headerCells.filter(th => th.getAttribute("data-role") === "cw-col");
+    let lastSameType = null;
+    cwColThs.forEach(th => {
+      if (th.id && th.id.startsWith(prefix)) lastSameType = th;
+    });
+
+    const newTh = document.createElement("th");
+    newTh.id = colId;
+    newTh.setAttribute("data-role", "cw-col");
+    newTh.style.width = "90px";
+    newTh.innerHTML = label + ` <button class="delete-col-btn" onclick="deleteColumn('${colId}')">x</button>`;
+
+    if (lastSameType && lastSameType.nextSibling) {
+      headerRow2.insertBefore(newTh, lastSameType.nextSibling);
+    } else if (cwTotalTh) {
+      headerRow2.insertBefore(newTh, cwTotalTh);
+    } else {
+      headerRow2.appendChild(newTh);
+    }
+
+    const newIndex = Array.from(headerRow2.children).indexOf(newTh);
+
+    const tbody = document.getElementById("tbody");
+    Array.from(tbody.querySelectorAll("tr")).forEach(row => {
+      const td = document.createElement("td");
+      td.className = "cw-cell";
+      td.setAttribute("data-col", colId);
+      td.innerHTML = `<div class="cell-inner" contenteditable="true" data-type="number"></div>`;
+
+      const insertPos = newIndex + 2;
+      if (insertPos >= row.children.length) {
+        row.appendChild(td);
+      } else {
+        row.insertBefore(td, row.children[insertPos]);
+      }
+    });
+
+    updateHeaderSpans();
+    attachSpreadsheetBehavior();
+    recalc();
+  }
+
+  function deleteColumn(colId) {
+    cwColumns = cwColumns.filter(id => id !== colId);
+    const th = document.getElementById(colId);
+    if (th && th.parentNode) th.parentNode.removeChild(th);
+
+    document.querySelectorAll(`td[data-col="${colId}"]`).forEach(td => {
+      if (td.parentNode) td.parentNode.removeChild(td);
+    });
+
+    if (cwColumns.length === 0) cwColumns = ["cw-ut1"];
+    updateHeaderSpans();
+    recalc();
+  }
+
+  function addStudent() {
+    const tbody = document.getElementById("tbody");
+    const rowNumber = tbody.children.length + 1;
+    buildStudentRow(tbody, rowNumber, "");
+    attachSpreadsheetBehavior();
+    recalc();
+  }
+
+  // ============================================================
+  // CALCULATION
+  // ============================================================
+  function getNumVal(el) {
+    if (!el) return 0;
+    let raw = el.textContent.trim();
+    let v = parseFloat(raw);
+    if (isNaN(v)) v = 0;
+    if (v < 0) v = 0;
+    if (v > 100) v = 100;
+    return v;
+  }
+
+  function recalc() {
+    const rows = document.querySelectorAll("#tbody tr");
+    rows.forEach(row => {
+      let utScores = [];
+      let otherScores = [];
+
+      row.querySelectorAll("td[data-col]").forEach(td => {
+        const colId = td.getAttribute("data-col");
+        const div = td.querySelector(".cell-inner");
+        if (!div) return;
+        const val = getNumVal(div);
+        if (colId.startsWith("cw-ut")) {
+          utScores.push(val);
+        } else {
+          otherScores.push(val);
+        }
+      });
+
+      const utAvg = utScores.length > 0 ? utScores.reduce((a,b) => a+b, 0) / utScores.length : 0;
+      const otherAvg = otherScores.length > 0 ? otherScores.reduce((a,b) => a+b, 0) / otherScores.length : 0;
+
+      let courseworkPercent = 0;
+      if (utScores.length > 0 && otherScores.length > 0) {
+        courseworkPercent = (utAvg / 100) * 25 + (otherAvg / 100) * 15;
+      } else if (utScores.length > 0) {
+        courseworkPercent = (utAvg / 100) * 40;
+      } else if (otherScores.length > 0) {
+        courseworkPercent = (otherAvg / 100) * 40;
       }
 
+      const examDiv = row.querySelector(".exam-score-cell .cell-inner");
+      const examRaw = getNumVal(examDiv);
+      const examPercent = (examRaw / 100) * 60;
+      const finalTotal = courseworkPercent + examPercent;
+      const roundedTotal = Math.round(finalTotal);
+
+      const cwTotalCell = row.querySelector(".cw-total-cell .readonly-inner");
+      const examTotalCell = row.querySelector(".exam-total-cell .readonly-inner");
+      const finalCell = row.querySelector(".final-total-cell .readonly-inner");
+      const roundedCell = row.querySelector(".rounded-total-cell .readonly-inner");
+
+      if (cwTotalCell) cwTotalCell.textContent = courseworkPercent.toFixed(2);
+      if (examTotalCell) examTotalCell.textContent = examPercent.toFixed(2);
+      if (finalCell) finalCell.textContent = finalTotal.toFixed(2);
+      if (roundedCell) roundedCell.textContent = roundedTotal;
     });
+  }
+
+  // ============================================================
+  // SPREADSHEET BEHAVIOR (selection, keyboard nav, copy/paste)
+  // ============================================================
+  let selectedCell = null;
+  let selStart = null;
+  let selEnd = null;
+
+  function getAllEditableCells() {
+    return Array.from(document.querySelectorAll("#tbody td")).filter(td => {
+      return td.querySelector(".cell-inner[contenteditable='true']");
+    });
+  }
+
+  function getCellCoords(td) {
+    const row = td.parentElement;
+    const tbody = document.getElementById("tbody");
+    const rows = Array.from(tbody.children);
+    const ri = rows.indexOf(row);
+    const ci = Array.from(row.children).indexOf(td);
+    return { ri, ci };
+  }
+
+  function getCellAt(ri, ci) {
+    const tbody = document.getElementById("tbody");
+    const rows = Array.from(tbody.children);
+    if (ri < 0 || ri >= rows.length) return null;
+    const cells = Array.from(rows[ri].children);
+    if (ci < 0 || ci >= cells.length) return null;
+    const td = cells[ci];
+    if (td.querySelector(".cell-inner[contenteditable='true']")) return td;
+    return null;
+  }
+
+  function selectCell(td) {
+    if (!td) return;
+    clearSelection();
+    selectedCell = td;
+    selStart = getCellCoords(td);
+    selEnd = { ...selStart };
+    td.classList.add("selected");
+    const inner = td.querySelector(".cell-inner");
+    if (inner) inner.focus();
+  }
+
+  function clearSelection() {
+    document.querySelectorAll("#tbody td.selected").forEach(t => t.classList.remove("selected"));
+    document.querySelectorAll("#tbody td.in-range").forEach(t => t.classList.remove("in-range"));
+    selectedCell = null;
+  }
+
+  function highlightRange(s, e) {
+    document.querySelectorAll("#tbody td.in-range").forEach(t => t.classList.remove("in-range"));
+    if (!s || !e) return;
+    const r1 = Math.min(s.ri, e.ri), r2 = Math.max(s.ri, e.ri);
+    const c1 = Math.min(s.ci, e.ci), c2 = Math.max(s.ci, e.ci);
+    const tbody = document.getElementById("tbody");
+    const rows = Array.from(tbody.children);
+    for (let r = r1; r <= r2; r++) {
+      for (let c = c1; c <= c2; c++) {
+        const cells = Array.from(rows[r].children);
+        if (cells[c]) cells[c].classList.add("in-range");
+      }
+    }
+  }
+
+  function attachSpreadsheetBehavior() {
+    document.querySelectorAll("#tbody td").forEach(td => {
+      if (td._ssAttached) return;
+      td._ssAttached = true;
+
+      td.addEventListener("mousedown", e => {
+        const inner = td.querySelector(".cell-inner[contenteditable='true']");
+        if (!inner) return;
+        if (e.shiftKey && selStart) {
+          selEnd = getCellCoords(td);
+          highlightRange(selStart, selEnd);
+          e.preventDefault();
+        } else {
+          selectCell(td);
+        }
+      });
+
+      const inner = td.querySelector(".cell-inner[contenteditable='true']");
+      if (!inner) return;
+
+      inner.addEventListener("focus", () => {
+        if (selectedCell !== td) selectCell(td);
+      });
+
+      inner.addEventListener("input", () => {
+        // Validate: only allow numbers for numeric cells
+        if (inner.getAttribute("data-type") === "number") {
+          let raw = inner.textContent.replace(/[^0-9.]/g, "");
+          // allow at most one dot
+          const parts = raw.split(".");
+          if (parts.length > 2) raw = parts[0] + "." + parts.slice(1).join("");
+          if (inner.textContent !== raw) {
+            inner.textContent = raw;
+            // move cursor to end
+            const range = document.createRange();
+            const sel = window.getSelection();
+            range.selectNodeContents(inner);
+            range.collapse(false);
+            sel.removeAllRanges();
+            sel.addRange(range);
+          }
+        }
+        recalc();
+      });
+
+      inner.addEventListener("keydown", e => {
+        const coords = getCellCoords(td);
+        let nextTd = null;
+
+        if (e.key === "Tab") {
+          e.preventDefault();
+          nextTd = getCellAt(coords.ri, coords.ci + 1) || getCellAt(coords.ri + 1, 2);
+          if (nextTd) selectCell(nextTd);
+        } else if (e.key === "Enter") {
+          e.preventDefault();
+          nextTd = getCellAt(coords.ri + 1, coords.ci);
+          if (nextTd) selectCell(nextTd);
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          nextTd = getCellAt(coords.ri - 1, coords.ci);
+          if (nextTd) selectCell(nextTd);
+        } else if (e.key === "ArrowDown") {
+          e.preventDefault();
+          nextTd = getCellAt(coords.ri + 1, coords.ci);
+          if (nextTd) selectCell(nextTd);
+        } else if (e.key === "ArrowLeft") {
+          const sel = window.getSelection();
+          const atStart = sel.anchorOffset === 0;
+          if (atStart) {
+            e.preventDefault();
+            nextTd = getCellAt(coords.ri, coords.ci - 1);
+            if (nextTd) selectCell(nextTd);
+          }
+        } else if (e.key === "ArrowRight") {
+          const sel = window.getSelection();
+          const atEnd = sel.anchorOffset === (inner.textContent.length);
+          if (atEnd) {
+            e.preventDefault();
+            nextTd = getCellAt(coords.ri, coords.ci + 1);
+            if (nextTd) selectCell(nextTd);
+          }
+        }
+      });
+    });
+  }
+
+  // Global paste handler
+  document.addEventListener("paste", e => {
+    if (!selectedCell) return;
+    const inner = selectedCell.querySelector(".cell-inner[contenteditable='true']");
+    if (!inner) return;
+
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData).getData("text");
+    const pasteRows = text.split(/\r?\n/).map(r => r.split("\t"));
+
+    const startCoords = selStart || getCellCoords(selectedCell);
+    const tbody = document.getElementById("tbody");
+    const bodyRows = Array.from(tbody.children);
+
+    pasteRows.forEach((pRow, rOffset) => {
+      const rowIdx = startCoords.ri + rOffset;
+      if (rowIdx >= bodyRows.length) return;
+      const cells = Array.from(bodyRows[rowIdx].children);
+
+      pRow.forEach((val, cOffset) => {
+        const colIdx = startCoords.ci + cOffset;
+        if (colIdx >= cells.length) return;
+        const cell = cells[colIdx];
+        const cellInner = cell.querySelector(".cell-inner[contenteditable='true']");
+        if (!cellInner) return;
+
+        let cleaned = val.trim();
+        if (cellInner.getAttribute("data-type") === "number") {
+          cleaned = cleaned.replace(/[^0-9.]/g, "");
+        }
+        cellInner.textContent = cleaned;
+        cell.classList.add("paste-flash");
+        setTimeout(() => cell.classList.remove("paste-flash"), 300);
+      });
+    });
+
+    recalc();
   });
 
-  recalc();
-});
+  // Global copy handler
+  document.addEventListener("copy", e => {
+    if (!selStart || !selEnd) return;
+    const r1 = Math.min(selStart.ri, selEnd.ri), r2 = Math.max(selStart.ri, selEnd.ri);
+    const c1 = Math.min(selStart.ci, selEnd.ci), c2 = Math.max(selStart.ci, selEnd.ci);
 
-/* copy selected cells like spreadsheet */
-document.addEventListener("copy", function(e){
+    // Only copy if multi-cell range
+    if (r1 === r2 && c1 === c2) return; // let default handle single cell
 
-  if(!selectedCell) return;
+    e.preventDefault();
+    const tbody = document.getElementById("tbody");
+    const rows = Array.from(tbody.children);
+    const lines = [];
+    for (let r = r1; r <= r2; r++) {
+      const cells = Array.from(rows[r].children);
+      const cols = [];
+      for (let c = c1; c <= c2; c++) {
+        const cell = cells[c];
+        if (!cell) { cols.push(""); continue; }
+        const inner = cell.querySelector(".cell-inner");
+        const ro = cell.querySelector(".readonly-inner");
+        cols.push((inner || ro) ? (inner || ro).textContent.trim() : cell.textContent.trim());
+      }
+      lines.push(cols.join("\t"));
+    }
+    e.clipboardData.setData("text/plain", lines.join("\n"));
+  });
 
-  const row = selectedCell.closest("tr");
-  const inputs = row.querySelectorAll(".score-box");
+  // ============================================================
+  // EXCEL IMPORT / EXPORT
+  // ============================================================
+  function importExcel() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".xlsx,.xls";
+    input.onchange = e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = event => {
+        const data = event.target.result;
+        const workbook = XLSX.read(data, { type: "binary" });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        populateFromExcel(rows);
+      };
+      reader.readAsBinaryString(file);
+    };
+    input.click();
+  }
 
-  const values = [...inputs].map(i => i.value || "");
+  function populateFromExcel(rows) {
+    if (!rows || rows.length < 2) return;
+    const tbody = document.getElementById("tbody");
+    tbody.innerHTML = "";
+    cwColumns = ["cw-ut1"];
+    rebuildHeaderRow2();
+    updateHeaderSpans();
 
-  const text = values.join("\t");
+    rows.slice(1).forEach((row, i) => {
+      const nr = row[0] || i + 1;
+      const name = row[1] || "";
+      const ut1 = row[2] != null ? String(row[2]) : "";
+      const exam = row[3] != null ? String(row[3]) : "";
 
-  e.clipboardData.setData("text/plain", text);
-  e.preventDefault();
+      const tr = document.createElement("tr");
+      let html = `<td>${nr}</td>`;
+      html += `<td class="label-col"><div class="cell-inner name-inner" contenteditable="false">${name}</div></td>`;
+      html += `<td class="cw-cell" data-col="cw-ut1"><div class="cell-inner" contenteditable="true" data-type="number">${ut1}</div></td>`;
+      html += `<td class="cw-total-cell"><span class="readonly-inner">0.00</span></td>`;
+      html += `<td class="exam-cell exam-score-cell"><div class="cell-inner" contenteditable="true" data-type="number">${exam}</div></td>`;
+      html += `<td class="exam-total-cell"><span class="readonly-inner">0.00</span></td>`;
+      html += `<td class="total-cell final-total-cell"><span class="readonly-inner">0.00</span></td>`;
+      html += `<td class="total-cell rounded-total-cell"><span class="readonly-inner">0</span></td>`;
+      tr.innerHTML = html;
+      tbody.appendChild(tr);
+    });
 
-});
-  
+    attachSpreadsheetBehavior();
+    recalc();
+  }
+
+  function exportExcel() {
+    const academicYear = document.getElementById("academicYear").value;
+    const term = document.getElementById("termSelect").value;
+    const class_id = document.getElementById("classSelect").value;
+    const subject = document.getElementById("subjectSelect").value;
+
+    const sheetData = [];
+    sheetData.push(["Academic Year", academicYear]);
+    sheetData.push(["Term", term]);
+    sheetData.push(["Class", class_id]);
+    sheetData.push(["Subject", subject]);
+    sheetData.push([]);
+
+    const header1 = [];
+    const header2 = [];
+    const row1Cells = document.querySelectorAll("#headerRow1 th");
+    const row2Cells = document.querySelectorAll("#headerRow2 th");
+    let row2Index = 0;
+
+    row1Cells.forEach(th => {
+      const text = th.innerText.trim();
+      const colSpan = th.colSpan || 1;
+      const rowSpan = th.rowSpan || 1;
+      for (let i = 0; i < colSpan; i++) header1.push(text);
+      if (rowSpan > 1) {
+        for (let i = 0; i < colSpan; i++) header2.push("");
+      } else {
+        for (let i = 0; i < colSpan; i++) {
+          if (row2Index < row2Cells.length) {
+            header2.push(row2Cells[row2Index].innerText.trim());
+            row2Index++;
+          } else {
+            header2.push("");
+          }
+        }
+      }
+    });
+
+    sheetData.push(header1);
+    sheetData.push(header2);
+
+    document.querySelectorAll("#tbody tr").forEach(tr => {
+      const rowArr = [];
+      tr.querySelectorAll("td").forEach(td => {
+        const inner = td.querySelector(".cell-inner");
+        const ro = td.querySelector(".readonly-inner");
+        if (inner) rowArr.push(inner.textContent.trim());
+        else if (ro) rowArr.push(ro.textContent.trim());
+        else rowArr.push(td.textContent.trim());
+      });
+      sheetData.push(rowArr);
+    });
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(sheetData);
+    ws["!cols"] = header1.map(() => ({ wch: 18 }));
+    XLSX.utils.book_append_sheet(wb, ws, "Assessment");
+    const fileName = `${class_id}_${subject}_${academicYear}_${term}_assessment.xlsx`.replace(/\s+/g, "");
+    XLSX.writeFile(wb, fileName);
+  }
+
+  // ============================================================
+  // SUBMIT (disabled)
+  // ============================================================
+  function submitScores() {
+    // disabled — button is greyed out and non-clickable
+  }
+
+  // ============================================================
+  // INIT
+  // ============================================================
+  document.addEventListener("DOMContentLoaded", () => {
+    loadClassStudents();
+    attachSpreadsheetBehavior();
+  });
 </script>
 
 </body>
