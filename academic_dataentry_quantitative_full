@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Assessment Entry — PRIME International School</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<style>
+* { box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui; background: #f0f2f5; padding: 20px; color: #1d1d1f; }
+
+.page-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.page-subtitle { font-size: 13px; color: #666; margin-bottom: 18px; }
+.dropdown-label { font-size: 13px; font-weight: 600; }
+select { padding: 4px 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 13px; }
+.meta-bar { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 22px; align-items: center; background: #fff; padding: 12px 16px; border-radius: 10px; border: 1px solid #ddd; }
+
+.subject-section { margin-bottom: 22px; }
+.subject-header { color: white; padding: 9px 14px; border-radius: 10px 10px 0 0; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.subject-tag { font-size: 11px; background: rgba(255,255,255,0.2); padding: 2px 7px; border-radius: 999px; font-weight: 400; }
+.cw-btns { margin-left: auto; display: flex; gap: 6px; }
+.btn-sm { padding: 3px 9px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.4); background: rgba(255,255,255,0.12); color: white; cursor: pointer; font-size: 11px; }
+.btn-sm:hover { background: rgba(255,255,255,0.28); }
+.card { background: #fff; border-radius: 0 0 10px 10px; border: 1px solid #ddd; border-top: none; padding: 12px; }
+.table-wrapper { overflow-x: auto; border: 1px solid #c0c0c0; border-radius: 4px; }
+
+table { width: 100%; border-collapse: collapse; background: white; font-size: 12px; }
+th, td { border: 1px solid #c0c0c0; padding: 0; text-align: center; }
+th { background: #f3f3f3; font-weight: 600; white-space: nowrap; padding: 5px 8px; border-color: #b0b0b0; font-size: 11px; user-select: none; }
+td:first-child { background: #f0f0f0; color: #999; font-size: 11px; width: 28px; min-width: 28px; user-select: none; padding: 3px; }
+td.label-col { text-align: left; padding: 0; min-width: 150px; }
+.cell-inner { display: block; width: 100%; min-height: 24px; padding: 3px 6px; outline: none; text-align: right; cursor: cell; font-size: 12px; font-family: inherit; }
+.cell-inner.name-inner { text-align: left; cursor: default; }
+td.selected { outline: 2px solid #1a73e8; outline-offset: -2px; z-index: 2; position: relative; }
+td.in-range { background-color: rgba(26,115,232,0.10) !important; }
+.cw-cell { background: #eaf4ff; }
+.cw-total-cell { background: #cfe2ff; font-weight: 600; }
+.exam-cell { background: #fffbea; }
+.exam-total-cell { background: #fff0a0; font-weight: 600; }
+.total-cell { background: #eaffea; font-weight: 600; }
+.readonly-inner { display: block; width: 100%; min-height: 24px; padding: 3px 6px; text-align: right; font-size: 12px; font-family: inherit; cursor: default; user-select: none; }
+.delete-col-btn { font-size: 10px; background: none; border: none; color: #f88; cursor: pointer; margin-left: 2px; }
+@keyframes paste-flash { 0%{background:rgba(26,115,232,0.35);} 100%{background:transparent;} }
+.paste-flash { animation: paste-flash 0.3s ease-out; }
+
+.summary-section { margin-top: 30px; }
+.section-heading { font-size: 17px; font-weight: 700; padding: 10px 16px; border-radius: 10px 10px 0 0; color: white; }
+.summary-heading { background: linear-gradient(135deg, #2d6a4f 0%, #40916c 100%); }
+.summary-card { background: #fff; border-radius: 0 0 10px 10px; border: 1px solid #ddd; border-top: none; padding: 14px; overflow-x: auto; }
+.summary-table { border-collapse: collapse; font-size: 12px; }
+.summary-table th, .summary-table td { border: 1px solid #b0b0b0; padding: 5px 8px; text-align: center; white-space: nowrap; }
+.summary-table th { background: #e8f5e9; font-weight: 700; font-size: 11px; }
+.summary-table .sub-label { text-align: left; font-weight: 600; background: #f5f5f5; min-width: 130px; }
+.summary-table .score-type { background: #fafafa; font-size: 11px; color: #555; min-width: 90px; text-align: left; padding-left: 10px; }
+.summary-table .h-student { background: #1d3557; color: white; font-size: 10px; max-width: 90px; word-break: break-word; white-space: normal; line-height: 1.3; }
+.sub-row-exam { background: #fffbea; }
+.sub-row-cw { background: #eaf4ff; }
+.sub-row-total { background: #eaffea; font-weight: 700; }
+
+.bottom-btns { margin-top: 32px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; padding: 20px; background: #fff; border-radius: 12px; border: 1px solid #ddd; }
+.btn-big { padding: 12px 26px; border-radius: 999px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+.btn-big:active { transform: scale(0.97); }
+.btn-export { background: #0071e3; color: white; }
+.btn-export:hover { background: #005bbd; }
+.btn-docs { background: #6f42c1; color: white; }
+.btn-docs:hover { background: #5a34a0; }
+.btn-submit { background: #b0b0b0; color: #fff; opacity: 0.6; cursor: not-allowed; pointer-events: none; }
+.status-msg { margin-top: 12px; font-size: 13px; color: #2d6a4f; font-weight: 600; min-height: 20px; }
+.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #ccc; border-top-color: #6f42c1; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="page-title">📋 Assessment Score — Report Card Calculator</div>
+<div class="page-subtitle">PRIME International School · All subjects on one page</div>
+
+<div class="meta-bar">
+  <span class="dropdown-label">Academic Year:</span>
+  <select id="academicYear"><option>2025-2026</option></select>
+  <span class="dropdown-label">Term:</span>
+  <select id="termSelect"><option>Term 1</option><option>Term 2</option><option>Term 3</option></select>
+  <span class="dropdown-label">Class:</span>
+  <select id="classSelect" onchange="loadClass()">
+    <option value="Y1-A">Y1-A</option>
+    <option value="Y2-A">Y2-A</option>
+  </select>
+</div>
+
+<div id="subjectSections"></div>
+
+<div class="summary-section">
+  <div class="section-heading summary-heading">📊 Student Report Summary</div>
+  <div class="summary-card" id="summaryContainer"></div>
+</div>
+
+<div class="bottom-btns">
+  <button class="btn-big btn-export" onclick="exportAllToSheets()">📥 Export All to Sheets</button>
+  <button class="btn-big btn-docs" onclick="createAllStudentReports()">📄 Create All Student Reports to Docs</button>
+  <button class="btn-big btn-submit" disabled>Submit Scores</button>
+</div>
+<div class="status-msg" id="statusMsg"></div>
+
+<script>
+// ===== DATA =====
+const CLASS_STUDENTS = {
+  "Y1-A": ["Ye Yint Tayza Hman","Shoon La Woon Htet","Htun Lae Yi Mon","Lwin Aung Hein","Aung Bhone San","Htet Nay Bhone","Sian Vang Huai Kim","Thu Htet Htoo","Khant Su Thar","Lwin Khit","Htut Myat Aung","Myat Shwe Yee Thin","Kaung Khit Han","Linn Pyae Sone Aung","Sai Noon Wan Han","Ngwe Yati Moe","Khant Htet Zen"],
+  "Y2-A": ["Zin Aung Hlaing","Phoo Pyae Heather","Shwe Sin Htet Aung","Thoon Thu San Aung","Linn Phone Khit","Khunn Thansin Han","Lin Thiri Hmue","Yuu Mi Khaing Lin","Yoon Htet Htet"]
+};
+const CLASS_SUBJECTS = {
+  "Y1-A": ["English","Mathematics","Science","Social Studies","Myanmar","Wellbeing","ICT","Chinese"],
+  "Y2-A": ["English","Mathematics","Science","Social Studies","Myanmar","Myanmar Social Studies","Wellbeing","ICT","Chinese"]
+};
+const EXAM_ONLY_SUBJECTS = ["Chinese"];
+const SUBJECT_COLORS = {
+  "English":"#1d3557","Mathematics":"#8b3a0f","Science":"#1a6b2a","Social Studies":"#7b4f12",
+  "Myanmar":"#8b1a4a","Myanmar Social Studies":"#5b2d8e","Wellbeing":"#0e6b6b","ICT":"#1a3d6b","Chinese":"#8b0000"
+};
+
+let subjectData = {}, currentClass = "Y1-A";
+
+// ===== INIT =====
+function loadClass() {
+  currentClass = document.getElementById("classSelect").value;
+  subjectData = {};
+  CLASS_SUBJECTS[currentClass].forEach(s => { subjectData[s] = { cwColumns: ["cw-ut1"] }; });
+  renderAllSubjects();
+  updateSummary();
+}
+
+function SK(s) { return s.replace(/\s+/g,"_").replace(/[^a-zA-Z0-9_]/g,""); }
+function colLabel(id) {
+  if (id.startsWith("cw-ut")) return "Unit Test "+id.replace("cw-ut","");
+  if (id.startsWith("cw-proj")) return "Project "+id.replace("cw-proj","");
+  if (id.startsWith("cw-pres")) return "Presentation "+id.replace("cw-pres","");
+  return id;
+}
+
+// ===== RENDER =====
+function renderAllSubjects() {
+  const container = document.getElementById("subjectSections");
+  container.innerHTML = "";
+  CLASS_SUBJECTS[currentClass].forEach(subject => renderSubject(subject, container));
+  attachSS();
+}
+
+function renderSubject(subject, container) {
+  const examOnly = EXAM_ONLY_SUBJECTS.includes(subject);
+  const sd = subjectData[subject];
+  const sk = SK(subject);
+  const color = SUBJECT_COLORS[subject] || "#1d3557";
+  const students = CLASS_STUDENTS[currentClass];
+
+  const div = document.createElement("div");
+  div.className = "subject-section";
+  div.id = "sec_"+sk;
+
+  const cwBtns = examOnly ? "" : `<div class="cw-btns">
+    <button class="btn-sm" onclick="addCW('${subject}','ut')">+ Unit Test</button>
+    <button class="btn-sm" onclick="addCW('${subject}','proj')">+ Project</button>
+    <button class="btn-sm" onclick="addCW('${subject}','pres')">+ Presentation</button>
+  </div>`;
+
+  const cwHdrHtml = examOnly ? "" : `<th id="cwHdr_${sk}" colspan="${sd.cwColumns.length+1}" style="background:#d6ebff;">Coursework 40%</th>`;
+  const examHdrHtml = examOnly
+    ? `<th colspan="2" style="background:#fff0a0;">Term Exam 100%</th>`
+    : `<th colspan="2" style="background:#fff0a0;">Term Exam 60%</th>`;
+  const totalHdrHtml = examOnly ? "" : `<th colspan="2" style="background:#eaffea;">TOTAL (100%)</th>`;
+
+  const cwSubCols = examOnly ? "" : sd.cwColumns.map(id =>
+    `<th id="cwcol_${sk}_${id}" data-role="cw-col" style="min-width:78px;">${colLabel(id)} <button class="delete-col-btn" onclick="delCW('${subject}','${id}')">×</button></th>`
+  ).join("") + `<th data-role="cw-total" style="min-width:75px;">CW Total</th>`;
+
+  const totalSubCols = examOnly ? "" : `<th data-role="original-total" style="min-width:68px;">Original</th><th data-role="rounded-total" style="min-width:68px;">Rounded</th>`;
+  const examSubCols = examOnly
+    ? `<th data-role="exam-score" style="min-width:78px;">Exam Score</th><th data-role="exam-total-rounded" style="min-width:68px;">Total</th>`
+    : `<th data-role="exam-score" style="min-width:78px;">Exam Score</th><th data-role="exam-total" style="min-width:75px;">Exam Total</th>`;
+
+  div.innerHTML = `
+    <div class="subject-header" style="background:${color};">
+      ${subject} <span class="subject-tag">${examOnly?"Exam Only":"40% CW + 60% Exam"}</span>
+      ${cwBtns}
+    </div>
+    <div class="card">
+      <div class="table-wrapper">
+        <table id="tbl_${sk}">
+          <thead>
+            <tr><th rowspan="2">Nr.</th><th rowspan="2" style="min-width:155px;text-align:left;padding-left:8px;">Student Name</th>${cwHdrHtml}${examHdrHtml}${totalHdrHtml}</tr>
+            <tr>${cwSubCols}${examSubCols}${totalSubCols}</tr>
+          </thead>
+          <tbody id="tbody_${sk}"></tbody>
+        </table>
+      </div>
+    </div>`;
+
+  container.appendChild(div);
+  const tbody = div.querySelector(`#tbody_${sk}`);
+  students.forEach((name,i) => buildRow(tbody, i+1, name, subject, examOnly));
+  recalc(subject);
+}
+
+function buildRow(tbody, nr, name, subject, examOnly) {
+  const sd = subjectData[subject];
+  const tr = document.createElement("tr");
+  tr.setAttribute("data-student", name);
+  let html = `<td>${nr}</td><td class="label-col"><div class="cell-inner name-inner" contenteditable="false">${name}</div></td>`;
+  if (!examOnly) {
+    sd.cwColumns.forEach(id => { html += `<td class="cw-cell" data-col="${id}"><div class="cell-inner" contenteditable="true" data-type="number"></div></td>`; });
+    html += `<td class="cw-total-cell"><span class="readonly-inner">0.00</span></td>`;
+  }
+  html += `<td class="exam-cell exam-score-cell"><div class="cell-inner" contenteditable="true" data-type="number"></div></td>`;
+  if (examOnly) {
+    html += `<td class="total-cell exam-only-rounded"><span class="readonly-inner">0</span></td>`;
+  } else {
+    html += `<td class="exam-total-cell"><span class="readonly-inner">0.00</span></td>`;
+    html += `<td class="total-cell final-total-cell"><span class="readonly-inner">0.00</span></td>`;
+    html += `<td class="total-cell rounded-total-cell"><span class="readonly-inner">0</span></td>`;
+  }
+  tr.innerHTML = html;
+  tbody.appendChild(tr);
+}
+
+// ===== CW COLUMNS =====
+function addCW(subject, type) {
+  const sd = subjectData[subject]; const prefix = "cw-"+type;
+  const idx = sd.cwColumns.filter(id=>id.startsWith(prefix)).length+1;
+  const colId = prefix+idx; sd.cwColumns.push(colId);
+  const sk = SK(subject);
+  const hdr2 = document.getElementById("tbl_"+sk).querySelector("thead tr:nth-child(2)");
+  const cwTotalTh = hdr2.querySelector('th[data-role="cw-total"]');
+  const newTh = document.createElement("th");
+  newTh.id="cwcol_"+sk+"_"+colId; newTh.setAttribute("data-role","cw-col"); newTh.style.minWidth="78px";
+  newTh.innerHTML = `${colLabel(colId)} <button class="delete-col-btn" onclick="delCW('${subject}','${colId}')">×</button>`;
+  hdr2.insertBefore(newTh, cwTotalTh);
+  const newIdx = Array.from(hdr2.children).indexOf(newTh);
+  document.querySelectorAll(`#tbody_${sk} tr`).forEach(row => {
+    const td = document.createElement("td"); td.className="cw-cell"; td.setAttribute("data-col",colId);
+    td.innerHTML=`<div class="cell-inner" contenteditable="true" data-type="number"></div>`;
+    const pos=newIdx+2; if(pos>=row.children.length) row.appendChild(td); else row.insertBefore(td,row.children[pos]);
+  });
+  updateCWSpan(subject); attachSS(); recalc(subject);
+}
+
+function delCW(subject, colId) {
+  const sd = subjectData[subject]; sd.cwColumns=sd.cwColumns.filter(id=>id!==colId);
+  if (!sd.cwColumns.length) sd.cwColumns=["cw-ut1"];
+  const sk=SK(subject);
+  document.getElementById("cwcol_"+sk+"_"+colId)?.remove();
+  document.querySelectorAll(`#tbody_${sk} td[data-col="${colId}"]`).forEach(td=>td.remove());
+  updateCWSpan(subject); recalc(subject);
+}
+
+function updateCWSpan(subject) {
+  const sk=SK(subject); const h=document.getElementById("cwHdr_"+sk);
+  if(h) h.colSpan=subjectData[subject].cwColumns.length+1;
+}
+
+// ===== CALC =====
+function getN(el) { if(!el) return 0; const v=parseFloat(el.textContent.trim()); return isNaN(v)?0:Math.min(100,Math.max(0,v)); }
+
+function recalc(subject) {
+  const examOnly=EXAM_ONLY_SUBJECTS.includes(subject), sk=SK(subject);
+  document.querySelectorAll(`#tbody_${sk} tr`).forEach(row => {
+    if (examOnly) {
+      const raw=getN(row.querySelector(".exam-score-cell .cell-inner"));
+      const c=row.querySelector(".exam-only-rounded .readonly-inner"); if(c) c.textContent=Math.round(raw);
+    } else {
+      let ut=[],other=[];
+      row.querySelectorAll("td[data-col]").forEach(td=>{
+        const id=td.getAttribute("data-col"), v=getN(td.querySelector(".cell-inner"));
+        if(id.startsWith("cw-ut")) ut.push(v); else other.push(v);
+      });
+      const utA=ut.length?ut.reduce((a,b)=>a+b,0)/ut.length:0;
+      const otA=other.length?other.reduce((a,b)=>a+b,0)/other.length:0;
+      let cw=0;
+      if(ut.length&&other.length) cw=(utA/100)*25+(otA/100)*15;
+      else if(ut.length) cw=(utA/100)*40;
+      else if(other.length) cw=(otA/100)*40;
+      const examRaw=getN(row.querySelector(".exam-score-cell .cell-inner"));
+      const examPct=(examRaw/100)*60, total=cw+examPct;
+      const s=(q,v)=>{const e=row.querySelector(q);if(e)e.textContent=v;};
+      s(".cw-total-cell .readonly-inner",cw.toFixed(2));
+      s(".exam-total-cell .readonly-inner",examPct.toFixed(2));
+      s(".final-total-cell .readonly-inner",total.toFixed(2));
+      s(".rounded-total-cell .readonly-inner",Math.round(total));
+    }
+  });
+  updateSummary();
+}
+
+// ===== SCORES =====
+function getScores() {
+  const result={};
+  CLASS_STUDENTS[currentClass].forEach(n=>{result[n]={};});
+  CLASS_SUBJECTS[currentClass].forEach(subject=>{
+    const examOnly=EXAM_ONLY_SUBJECTS.includes(subject), sk=SK(subject);
+    document.querySelectorAll(`#tbody_${sk} tr`).forEach(row=>{
+      const name=row.querySelector(".name-inner")?.textContent.trim(); if(!name||!result[name]) return;
+      if(examOnly){
+        const t=parseInt(row.querySelector(".exam-only-rounded .readonly-inner")?.textContent)||0;
+        result[name][subject]={exam:t,cw:0,total:t};
+      } else {
+        const cw=parseFloat(row.querySelector(".cw-total-cell .readonly-inner")?.textContent)||0;
+        const ex=parseFloat(row.querySelector(".exam-total-cell .readonly-inner")?.textContent)||0;
+        const total=parseInt(row.querySelector(".rounded-total-cell .readonly-inner")?.textContent)||0;
+        result[name][subject]={exam:parseFloat(ex.toFixed(2)),cw:parseFloat(cw.toFixed(2)),total};
+      }
+    });
+  });
+  return result;
+}
+
+// ===== SUMMARY =====
+function updateSummary() {
+  const subjects=CLASS_SUBJECTS[currentClass], students=CLASS_STUDENTS[currentClass], scores=getScores();
+  let html=`<table class="summary-table"><thead><tr>
+    <th class="sub-label">Subject</th><th class="score-type">Score Type</th>
+    ${students.map(s=>`<th class="h-student">${s}</th>`).join("")}
+  </tr></thead><tbody>`;
+  subjects.forEach(subject=>{
+    const examOnly=EXAM_ONLY_SUBJECTS.includes(subject);
+    if(examOnly){
+      html+=`<tr><td class="sub-label" rowspan="1"><b>${subject}</b></td>
+        <td class="score-type sub-row-total">Total (100%)</td>
+        ${students.map(s=>`<td class="sub-row-total">${(scores[s]||{})[subject]?.total??0}</td>`).join("")}</tr>`;
+    } else {
+      html+=`<tr><td class="sub-label" rowspan="3"><b>${subject}</b></td>
+        <td class="score-type sub-row-exam">Exam (60%)</td>
+        ${students.map(s=>`<td class="sub-row-exam">${((scores[s]||{})[subject]?.exam??0).toFixed(2)}</td>`).join("")}</tr>
+      <tr><td class="score-type sub-row-cw">CW (40%)</td>
+        ${students.map(s=>`<td class="sub-row-cw">${((scores[s]||{})[subject]?.cw??0).toFixed(2)}</td>`).join("")}</tr>
+      <tr><td class="score-type sub-row-total">Total (100%)</td>
+        ${students.map(s=>`<td class="sub-row-total">${(scores[s]||{})[subject]?.total??0}</td>`).join("")}</tr>`;
+    }
+  });
+  document.getElementById("summaryContainer").innerHTML=html+"</tbody></table>";
+}
+
+// ===== SPREADSHEET =====
+let selCell=null,selStart=null,selEnd=null;
+
+function attachSS() {
+  document.querySelectorAll("tbody td").forEach(td=>{
+    if(td._ss) return; td._ss=true;
+    td.addEventListener("mousedown",e=>{
+      const inner=td.querySelector(".cell-inner[contenteditable='true']");
+      if(!inner) return;
+      if(e.shiftKey&&selStart){selEnd=coords(td);highlightRange(selStart,selEnd);e.preventDefault();}
+      else selCell2(td);
+    });
+    const inner=td.querySelector(".cell-inner[contenteditable='true']");
+    if(!inner) return;
+    inner.addEventListener("focus",()=>{ if(selCell!==td) selCell2(td); });
+    inner.addEventListener("input",()=>{
+      if(inner.getAttribute("data-type")==="number"){
+        let raw=inner.textContent.replace(/[^0-9.]/g,"");
+        const p=raw.split("."); if(p.length>2) raw=p[0]+"."+p.slice(1).join("");
+        if(inner.textContent!==raw){
+          inner.textContent=raw;
+          const r=document.createRange(),s2=window.getSelection();
+          r.selectNodeContents(inner);r.collapse(false);s2.removeAllRanges();s2.addRange(r);
+        }
+      }
+      const tbody=td.closest("tbody");
+      if(tbody){const sk=tbody.id.replace("tbody_","");const subj=CLASS_SUBJECTS[currentClass].find(s=>SK(s)===sk);if(subj)recalc(subj);}
+    });
+    inner.addEventListener("keydown",e=>{
+      const c=coords(td);let next=null;
+      if(e.key==="Tab"){e.preventDefault();next=cellAt(td,c.ri,c.ci+1)||cellAt(td,c.ri+1,2);}
+      else if(e.key==="Enter"){e.preventDefault();next=cellAt(td,c.ri+1,c.ci);}
+      else if(e.key==="ArrowUp"){e.preventDefault();next=cellAt(td,c.ri-1,c.ci);}
+      else if(e.key==="ArrowDown"){e.preventDefault();next=cellAt(td,c.ri+1,c.ci);}
+      if(next)selCell2(next);
+    });
+  });
+}
+
+function coords(td){const row=td.parentElement,tbody=row.parentElement;return{ri:Array.from(tbody.children).indexOf(row),ci:Array.from(row.children).indexOf(td)};}
+function cellAt(ref,ri,ci){const tbody=ref.closest("tbody");if(!tbody)return null;const rows=Array.from(tbody.children);if(ri<0||ri>=rows.length)return null;const cells=Array.from(rows[ri].children);if(ci<0||ci>=cells.length)return null;return cells[ci].querySelector(".cell-inner[contenteditable='true']")?cells[ci]:null;}
+function selCell2(td){clearSel();selCell=td;selStart=coords(td);selEnd={...selStart};td.classList.add("selected");td.querySelector(".cell-inner")?.focus();}
+function clearSel(){document.querySelectorAll("td.selected").forEach(t=>t.classList.remove("selected"));document.querySelectorAll("td.in-range").forEach(t=>t.classList.remove("in-range"));selCell=null;}
+function highlightRange(s,e){
+  document.querySelectorAll("td.in-range").forEach(t=>t.classList.remove("in-range"));
+  if(!s||!e||!selCell)return;
+  const tbody=selCell.closest("tbody");if(!tbody)return;
+  const r1=Math.min(s.ri,e.ri),r2=Math.max(s.ri,e.ri),c1=Math.min(s.ci,e.ci),c2=Math.max(s.ci,e.ci);
+  Array.from(tbody.children).slice(r1,r2+1).forEach(row=>Array.from(row.children).slice(c1,c2+1).forEach(c=>c.classList.add("in-range")));
+}
+
+document.addEventListener("paste",e=>{
+  if(!selCell)return;
+  if(!selCell.querySelector(".cell-inner[contenteditable='true']"))return;
+  e.preventDefault();
+  const text=(e.clipboardData||window.clipboardData).getData("text");
+  const rows=text.split(/\r?\n/).map(r=>r.split("\t"));
+  const start=selStart||coords(selCell);
+  const tbody=selCell.closest("tbody");if(!tbody)return;
+  const bRows=Array.from(tbody.children);
+  rows.forEach((pr,ro)=>{
+    const ri=start.ri+ro;if(ri>=bRows.length)return;
+    const cells=Array.from(bRows[ri].children);
+    pr.forEach((val,co)=>{
+      const ci=start.ci+co;if(ci>=cells.length)return;
+      const inner=cells[ci].querySelector(".cell-inner[contenteditable='true']");if(!inner)return;
+      let v=val.trim();if(inner.getAttribute("data-type")==="number")v=v.replace(/[^0-9.]/g,"");
+      inner.textContent=v;cells[ci].classList.add("paste-flash");setTimeout(()=>cells[ci].classList.remove("paste-flash"),300);
+    });
+  });
+  const sk=tbody.id.replace("tbody_","");const subj=CLASS_SUBJECTS[currentClass].find(s=>SK(s)===sk);if(subj)recalc(subj);
+});
+
+document.addEventListener("copy",e=>{
+  if(!selStart||!selEnd||!selCell)return;
+  const r1=Math.min(selStart.ri,selEnd.ri),r2=Math.max(selStart.ri,selEnd.ri),c1=Math.min(selStart.ci,selEnd.ci),c2=Math.max(selStart.ci,selEnd.ci);
+  if(r1===r2&&c1===c2)return;
+  e.preventDefault();
+  const tbody=selCell.closest("tbody");if(!tbody)return;
+  const rows=Array.from(tbody.children);
+  const lines=[];
+  for(let r=r1;r<=r2;r++){const cells=Array.from(rows[r].children);const cols=[];for(let c=c1;c<=c2;c++){const cell=cells[c];const inner=cell?.querySelector(".cell-inner")||cell?.querySelector(".readonly-inner");cols.push(inner?inner.textContent.trim():cell?.textContent.trim()||"");}lines.push(cols.join("\t"));}
+  e.clipboardData.setData("text/plain",lines.join("\n"));
+});
+
+// ===== EXPORT TO SHEETS =====
+function exportAllToSheets(){
+  const ay=document.getElementById("academicYear").value;
+  const term=document.getElementById("termSelect").value;
+  const cls=document.getElementById("classSelect").value;
+  const subjects=CLASS_SUBJECTS[currentClass],students=CLASS_STUDENTS[currentClass],scores=getScores();
+  const wb=XLSX.utils.book_new();
+
+  subjects.forEach(subject=>{
+    const examOnly=EXAM_ONLY_SUBJECTS.includes(subject),sk=SK(subject),sd=subjectData[subject];
+    const data=[];
+    data.push(["PRIME International School"]);
+    data.push(["Academic Year:",ay,"Term:",term,"Class:",cls]);
+    data.push(["Subject:",subject]);
+    data.push([]);
+    if(examOnly){
+      data.push(["Nr.","Student Name","Exam Score (100%)","Total (Rounded)"]);
+    } else {
+      data.push(["Nr.","Student Name",...sd.cwColumns.map(id=>colLabel(id)),"CW Total (40%)","Exam Score","Exam Total (60%)","Original","Rounded"]);
+    }
+    const tbody=document.getElementById("tbody_"+sk);
+    if(tbody){
+      Array.from(tbody.querySelectorAll("tr")).forEach((row,i)=>{
+        const name=row.querySelector(".name-inner")?.textContent.trim()||"";
+        const r=[i+1,name];
+        if(examOnly){const raw=getN(row.querySelector(".exam-score-cell .cell-inner"));r.push(raw,Math.round(raw));}
+        else{
+          sd.cwColumns.forEach(id=>{r.push(parseFloat(row.querySelector(`td[data-col="${id}"] .cell-inner`)?.textContent)||0);});
+          r.push(
+            parseFloat(row.querySelector(".cw-total-cell .readonly-inner")?.textContent)||0,
+            parseFloat(row.querySelector(".exam-score-cell .cell-inner")?.textContent)||0,
+            parseFloat(row.querySelector(".exam-total-cell .readonly-inner")?.textContent)||0,
+            parseFloat(row.querySelector(".final-total-cell .readonly-inner")?.textContent)||0,
+            parseInt(row.querySelector(".rounded-total-cell .readonly-inner")?.textContent)||0
+          );
+        }
+        data.push(r);
+      });
+    }
+    const ws=XLSX.utils.aoa_to_sheet(data);
+    ws["!cols"]=(data[4]||[]).map(()=>({wch:16}));
+    XLSX.utils.book_append_sheet(wb,ws,subject.substring(0,31));
+  });
+
+  // Summary tab
+  const sd2=[];
+  sd2.push(["PRIME International School — Student Report Summary"]);
+  sd2.push(["Academic Year:",ay,"Term:",term,"Class:",cls]);
+  sd2.push([]);
+  sd2.push(["Subject","Score Type",...students]);
+  subjects.forEach(subject=>{
+    const examOnly=EXAM_ONLY_SUBJECTS.includes(subject);
+    if(examOnly){sd2.push([subject,"Total (100%)",...students.map(s=>(scores[s]||{})[subject]?.total??0)]);}
+    else{
+      sd2.push([subject,"Exam Total (60%)",...students.map(s=>((scores[s]||{})[subject]?.exam??0).toFixed(2))]);
+      sd2.push(["","CW Total (40%)",...students.map(s=>((scores[s]||{})[subject]?.cw??0).toFixed(2))]);
+      sd2.push(["","Total (100% Rounded)",...students.map(s=>(scores[s]||{})[subject]?.total??0)]);
+    }
+  });
+  const ws2=XLSX.utils.aoa_to_sheet(sd2);
+  ws2["!cols"]=[{wch:24},{wch:20},...students.map(()=>({wch:18}))];
+  XLSX.utils.book_append_sheet(wb,ws2,"Student Report Summary");
+
+  const fn=`${cls}_${ay.replace(/-/g,"_")}_${term.replace(/\s+/g,"_")}_Assessment.xlsx`;
+  XLSX.writeFile(wb,fn);
+  document.getElementById("statusMsg").textContent="✅ Exported: "+fn;
+}
+
+// ===== CREATE STUDENT REPORTS (DOCX via node script download) =====
+async function createAllStudentReports(){
+  const statusEl=document.getElementById("statusMsg");
+  statusEl.innerHTML=`<span class="spinner"></span> Preparing report data...`;
+  await new Promise(r=>setTimeout(r,50));
+
+  const ay=document.getElementById("academicYear").value;
+  const term=document.getElementById("termSelect").value;
+  const cls=document.getElementById("classSelect").value;
+  const subjects=CLASS_SUBJECTS[currentClass];
+  const students=CLASS_STUDENTS[currentClass];
+  const scores=getScores();
+
+  // Export JSON for node script
+  const reportData={academicYear:ay,term,classId:cls,subjects,students,scores,examOnlySubjects:EXAM_ONLY_SUBJECTS};
+  const jsonStr=JSON.stringify(reportData,null,2);
+
+  // Also create a ready-to-run Node.js script
+  const nodeScript=generateNodeScript();
+
+  // Bundle both as a zip
+  const zip=new JSZip();
+  zip.file("report_data.json",jsonStr);
+  zip.file("generate_reports.js",nodeScript);
+  zip.file("README.txt",`PRIME International School — Student Report Generator
+=====================================================
+1. Install Node.js if not installed: https://nodejs.org
+2. Run: npm install docx
+3. Run: node generate_reports.js
+4. DOCX files for each student will be created in the current folder.
+
+NOTE: This generates one .docx file per student based on the scores entered.
+`);
+
+  const zipBlob=await zip.generateAsync({type:"blob"});
+  const url=URL.createObjectURL(zipBlob);
+  const a=document.createElement("a");
+  a.href=url; a.download=`${cls}_${term.replace(/\s+/g,"_")}_Reports_Generator.zip`; a.click();
+  URL.revokeObjectURL(url);
+  statusEl.textContent=`✅ Downloaded generator package! Unzip, run "npm install docx", then "node generate_reports.js" to create all ${students.length} student DOCX reports.`;
+}
+
+function generateNodeScript(){
+  const ay=document.getElementById("academicYear").value;
+  const term=document.getElementById("termSelect").value;
+  const cls=document.getElementById("classSelect").value;
+  const subjects=CLASS_SUBJECTS[currentClass];
+  const students=CLASS_STUDENTS[currentClass];
+  const scores=getScores();
+  const examOnly=EXAM_ONLY_SUBJECTS;
+
+  return `// PRIME International School — Student Report Generator
+// Run: npm install docx && node generate_reports.js
+
+const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+        AlignmentType, WidthType, BorderStyle, ShadingType, VerticalAlign } = require('docx');
+const fs = require('fs');
+
+const DATA = ${JSON.stringify({academicYear:ay,term,classId:cls,subjects,students,scores,examOnly},null,2)};
+
+const cellBorder = { style: BorderStyle.SINGLE, size: 4, color: "CCCCCC" };
+const allBorders = { top: cellBorder, bottom: cellBorder, left: cellBorder, right: cellBorder };
+
+function cell(text, opts = {}) {
+  const { bold=false, fill="FFFFFF", align=AlignmentType.CENTER, w=1400 } = opts;
+  return new TableCell({
+    borders: allBorders,
+    width: { size: w, type: WidthType.DXA },
+    shading: { fill, type: ShadingType.CLEAR },
+    margins: { top: 60, bottom: 60, left: 80, right: 80 },
+    verticalAlign: VerticalAlign.CENTER,
+    children: [new Paragraph({ alignment: align, children: [new TextRun({ text: String(text ?? ""), bold, font: "Arial", size: 20 })] })]
+  });
+}
+
+function hCell(text, opts={}) { return cell(text, { bold:true, fill:"D6E4F0", ...opts }); }
+
+async function generateStudent(name) {
+  const sc = DATA.scores[name] || {};
+  const paperSubjects = DATA.subjects.filter(s => !DATA.examOnly.includes(s));
+  const examOnlySubs = DATA.subjects.filter(s => DATA.examOnly.includes(s));
+  const obsSubjects = ["PE","Taekwondo","Art","Music"];
+
+  const doc = new Document({
+    sections: [{
+      properties: { page: { size:{width:11906,height:16838}, margin:{top:900,right:900,bottom:900,left:900} } },
+      children: [
+        new Paragraph({ alignment: AlignmentType.RIGHT, spacing:{after:0}, children:[new TextRun({text:"Progress Report",bold:true,size:28,font:"Arial"})] }),
+        new Paragraph({ alignment: AlignmentType.RIGHT, spacing:{after:0}, children:[new TextRun({text:"Academic Year "+DATA.academicYear,size:22,font:"Arial"})] }),
+        new Paragraph({ alignment: AlignmentType.RIGHT, spacing:{after:200}, children:[new TextRun({text:DATA.term,size:22,font:"Arial"})] }),
+        new Paragraph({ spacing:{before:0,after:60}, children:[new TextRun({text:"Student's Name : ",bold:true,font:"Arial",size:22}),new TextRun({text:name,font:"Arial",size:22})] }),
+        new Paragraph({ spacing:{after:60}, children:[new TextRun({text:"Student's ID : ",bold:true,font:"Arial",size:22}),new TextRun({text:"",font:"Arial",size:22})] }),
+        new Paragraph({ spacing:{after:60}, children:[new TextRun({text:"Class : ",bold:true,font:"Arial",size:22}),new TextRun({text:DATA.classId,font:"Arial",size:22})] }),
+        new Paragraph({ spacing:{after:60}, children:[new TextRun({text:"Teacher's Name : ",bold:true,font:"Arial",size:22}),new TextRun({text:"",font:"Arial",size:22})] }),
+        new Paragraph({ spacing:{after:160}, children:[new TextRun({text:"Issue Date : ",bold:true,font:"Arial",size:22}),new TextRun({text:"",font:"Arial",size:22})] }),
+
+        new Paragraph({ spacing:{before:0,after:80}, children:[new TextRun({text:"Attendance",bold:true,size:22,font:"Arial"})] }),
+        new Table({ width:{size:5400,type:WidthType.DXA}, columnWidths:[1800,1800,1800], rows:[
+          new TableRow({children:[hCell("Total School Days",{w:1800}),hCell("Days of Presence",{w:1800}),hCell("Days of Absence",{w:1800})]}),
+          new TableRow({children:[cell("",{w:1800}),cell("",{w:1800}),cell("",{w:1800})]})
+        ]}),
+
+        new Paragraph({ spacing:{before:240,after:100}, children:[new TextRun({text:"Paper-Based Assessment",bold:true,size:24,font:"Arial"})] }),
+        new Table({ width:{size:6200,type:WidthType.DXA}, columnWidths:[2000,900,1200,1200,900],
+          rows:[
+            new TableRow({children:[hCell("Paper-Based Test",{w:2000,align:AlignmentType.LEFT}),hCell("Max Marks",{w:900}),hCell("Term Exam 60%",{w:1200}),hCell("Course Work 40%",{w:1200}),hCell("TOTAL",{w:900})]}),
+            ...paperSubjects.map(s=>{
+              const d=sc[s]||{exam:0,cw:0,total:0};
+              return new TableRow({children:[cell(s,{w:2000,align:AlignmentType.LEFT}),cell("100",{w:900}),cell(d.exam.toFixed?d.exam.toFixed(2):d.exam,{w:1200}),cell(d.cw.toFixed?d.cw.toFixed(2):d.cw,{w:1200}),cell(d.total,{bold:true,fill:"EAFFEA",w:900})]});
+            })
+          ]
+        }),
+
+        ...(examOnlySubs.length ? [
+          new Paragraph({ spacing:{before:180,after:80}, children:[new TextRun({text:"Exam-Only Subjects",bold:true,size:24,font:"Arial"})] }),
+          new Table({ width:{size:6200,type:WidthType.DXA}, columnWidths:[2000,900,2400,900],
+            rows:[
+              new TableRow({children:[hCell("Paper-Based Test",{w:2000,align:AlignmentType.LEFT}),hCell("Max Marks",{w:900}),hCell("Term Exam",{w:2400}),hCell("TOTAL",{w:900})]}),
+              ...examOnlySubs.map(s=>{
+                const d=sc[s]||{total:0};
+                return new TableRow({children:[cell(s,{w:2000,align:AlignmentType.LEFT}),cell("100",{w:900}),cell(d.total,{w:2400}),cell(d.total,{bold:true,fill:"EAFFEA",w:900})]});
+              })
+            ]
+          })
+        ] : []),
+
+        new Paragraph({ spacing:{before:180,after:80}, children:[new TextRun({text:"Observational Assessments",bold:true,size:24,font:"Arial"})] }),
+        new Table({ width:{size:6800,type:WidthType.DXA}, columnWidths:[2800,1600,1200,1200],
+          rows:[
+            new TableRow({children:[hCell("Observational Assessments",{w:2800,align:AlignmentType.LEFT}),hCell("Strong Proficiency",{w:1600}),hCell("Proficient",{w:1200}),hCell("Developing",{w:1200})]}),
+            ...obsSubjects.map(s=>new TableRow({children:[cell(s,{w:2800,align:AlignmentType.LEFT}),cell("",{w:1600}),cell("",{w:1200}),cell("",{w:1200})]}))
+          ]
+        }),
+
+        new Paragraph({ spacing:{before:240,after:100}, children:[new TextRun({text:"Commentary Section "+DATA.term,bold:true,size:24,font:"Arial"})] }),
+        new Table({ width:{size:9026,type:WidthType.DXA}, columnWidths:[1500,7526],
+          rows:[
+            new TableRow({children:[hCell("Subjects",{w:1500}),hCell("Comments",{w:7526,align:AlignmentType.LEFT})]}),
+            ...paperSubjects.map(s=>new TableRow({children:[cell(s,{w:1500,align:AlignmentType.LEFT,bold:true,fill:"F5F5F5"}),cell("",{w:7526,align:AlignmentType.LEFT})]}))
+          ]
+        }),
+
+        new Paragraph({ spacing:{before:400,after:0}, children:[] }),
+        new Paragraph({ children:[
+          new TextRun({text:"Principal's Signature",bold:true,font:"Arial",size:20}),
+          new TextRun({text:"                    ",font:"Arial",size:20}),
+          new TextRun({text:"Class Teacher's Signature",bold:true,font:"Arial",size:20}),
+          new TextRun({text:"                    ",font:"Arial",size:20}),
+          new TextRun({text:"Parent's Signature",bold:true,font:"Arial",size:20}),
+        ]}),
+      ]
+    }]
+  });
+
+  const buf = await Packer.toBuffer(doc);
+  const filename = name.replace(/\\s+/g,"_")+"_Progress_Report_"+DATA.term.replace(/\\s+/g,"_")+".docx";
+  fs.writeFileSync(filename, buf);
+  console.log("✅ Created:", filename);
+}
+
+(async () => {
+  console.log("Generating student reports for", DATA.students.length, "students...");
+  for (const name of DATA.students) {
+    await generateStudent(name);
+  }
+  console.log("\\n✅ All reports generated!");
+})();
+`;
+}
+
+document.addEventListener("DOMContentLoaded", () => { loadClass(); });
+</script>
+</body>
+</html>
