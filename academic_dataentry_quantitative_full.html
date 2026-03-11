@@ -83,7 +83,7 @@ td.in-range { background-color: rgba(26,115,232,0.10) !important; }
 </head>
 <body>
 
-<div class="page-title">&#128203; Assessment Score &mdash; Report Card Calculator V5</div>
+<div class="page-title">&#128203; Assessment Score &mdash; Report Card Calculator v7</div>
 <div class="page-subtitle">PRIME International School &middot; All subjects on one page</div>
 
 <!-- Upload / Template bar -->
@@ -788,7 +788,7 @@ function downloadTemplate() {
 }
 
 // ============================================================
-// FILE UPLOAD — smart parser
+// FILE UPLOAD — position-based parser (works with template format)
 // ============================================================
 function handleFileUpload(event) {
   const file = event.target.files[0];
@@ -801,135 +801,111 @@ function handleFileUpload(event) {
     try {
       const wb = XLSX.read(e.target.result, { type: "binary" });
 
-      // Known subject names for this class (normalised for matching)
       const subjects = CLASS_SUBJECTS[currentClass];
-      const students = CLASS_STUDENTS[currentClass];
+      const normalize = s => String(s || "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
 
-      // Build a lookup: normalised sheet name -> subject
-      const normalize = s => s.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+      // Build lookup: normalised name -> canonical subject
       const subjectMap = {};
       subjects.forEach(s => { subjectMap[normalize(s)] = s; });
 
       let filled = 0, skipped = [];
 
       wb.SheetNames.forEach(sheetName => {
-        const normSheet = normalize(sheetName);
-        const subject = subjectMap[normSheet];
-        if (!subject) { skipped.push(sheetName); return; }  // ignore unrecognised tabs
+        const subject = subjectMap[normalize(sheetName)];
+        if (!subject) { skipped.push(sheetName); return; }
 
-        const ws     = wb.Sheets[sheetName];
-        const rows   = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
+        const ws       = wb.Sheets[sheetName];
+        const rows     = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
         const isTestOnly = TEST_ONLY_SUBJECTS.includes(subject);
 
-        // Find the header row (contains "Student Name" or "Nr.")
-        let headerIdx = -1;
+        // Find header row: look for "Student Name" or "Nr."
+        let hdr = -1;
         for (let r = 0; r < Math.min(rows.length, 10); r++) {
-          const rowStr = rows[r].join(" ").toLowerCase();
-          if (rowStr.includes("student") || rowStr.includes("nr.")) { headerIdx = r; break; }
+          const joined = rows[r].join(" ").toLowerCase();
+          if (joined.includes("student") || joined.includes("nr.")) { hdr = r; break; }
         }
-        if (headerIdx < 0) return;
+        if (hdr < 0) return;
 
-        const headers = rows[headerIdx].map(h => String(h).trim().toLowerCase());
-        const nameCol = headers.findIndex(h => h.includes("student") || h.includes("name"));
+        const headers = rows[hdr].map(h => normalize(h));
+
+        // Find name column
+        const nameCol = headers.findIndex(h => h.includes("student") || h === "name");
         if (nameCol < 0) return;
 
-        // Identify score columns
-        const examCol   = headers.findIndex(h => h.includes("exam score") || h === "exam");
-        const cwCols    = [];  // {idx, label}
-        const testCols  = [];  // {idx, label}
+        // Collect all numeric-input columns AFTER the name column
+        // Skip known computed/summary columns
+        const skipLabels = new Set(["examtotal", "cwtotal", "cwtotal40", "original", "rounded", "nr", "max", "examtotal60"]);
+        const scoreCols = []; // {idx, isExam, label}
         headers.forEach((h, i) => {
-          if (i === nameCol || i === examCol) return;
-          if (h.includes("unit test") || (h.includes("test") && !h.includes("exam")))  { testCols.push({idx:i, label:String(rows[headerIdx][i]).trim()}); }
-          else if (h.includes("project") || h.includes("presentation"))                { cwCols.push({idx:i, label:String(rows[headerIdx][i]).trim(), type:"proj"}); }
-          else if (h.includes("unit") || h === "")                                     {}  // skip blanks
+          if (i <= nameCol) return;
+          if (skipLabels.has(h) || h === "" || h.includes("total") || h === "max") return;
+          const isExam = h.includes("examscore") || h === "exam";
+          scoreCols.push({ idx: i, isExam, label: rows[hdr][i] });
         });
-        // Also treat plain numbered cols after name as tests for test-only subjects
-        if (isTestOnly && testCols.length === 0) {
-          headers.forEach((h, i) => {
-            if (i > nameCol && i !== examCol) testCols.push({idx:i, label:String(rows[headerIdx][i]).trim()});
-          });
-        }
 
-        const sk = SK(subject);
+        const sk    = SK(subject);
         const tbody = document.getElementById("tbody_" + sk);
         if (!tbody) return;
 
-        // Build student row map
+        // Build name -> tr map (case-insensitive, trim)
         const rowMap = {};
         Array.from(tbody.querySelectorAll("tr")).forEach(tr => {
-          const nm = tr.querySelector(".name-inner")?.textContent.trim();
+          const nm = (tr.querySelector(".name-inner")?.textContent || "").trim();
           if (nm) rowMap[nm.toLowerCase()] = tr;
         });
 
-        // Get subjectData columns to know what's in the table
-        const sd = subjectData[subject];
-
-        for (let r = headerIdx + 1; r < rows.length; r++) {
-          const row = rows[r];
+        for (let r = hdr + 1; r < rows.length; r++) {
+          const row     = rows[r];
           const rawName = String(row[nameCol] || "").trim();
           if (!rawName) continue;
           const tr = rowMap[rawName.toLowerCase()];
           if (!tr) continue;
 
           if (isTestOnly) {
-            // Fill test cells in order
-            const testCells = Array.from(tr.querySelectorAll(".cw-cell .cell-inner"));
-            testCols.forEach((tc, ci) => {
-              const val = row[tc.idx];
-              if (val !== "" && val !== undefined && ci < testCells.length) {
-                testCells[ci].textContent = String(parseFloat(val) || 0);
-              }
+            // Fill editable CW cells (which are the test inputs) in column order
+            const testInputs = Array.from(tr.querySelectorAll(".cw-cell .cell-inner"));
+            let pos = 0;
+            scoreCols.forEach(sc => {
+              if (pos >= testInputs.length) return;
+              const val = row[sc.idx];
+              if (val === "" || val == null) return;
+              const num = parseFloat(val);
+              if (!isNaN(num)) { testInputs[pos].textContent = String(num); pos++; }
             });
           } else {
-            // Fill exam score
-            if (examCol >= 0 && row[examCol] !== "") {
-              const examInput = tr.querySelector(".exam-score-cell .cell-inner");
-              if (examInput) examInput.textContent = String(parseFloat(row[examCol]) || 0);
-            }
-            // Fill CW columns: match by label, or by position
-            // Get all editable CW cells in row order
-            const editableCWCells = [];
-            sd.cwColumns.forEach(colId => {
-              const cell = tr.querySelector(`td[data-col="${colId}"] .cell-inner`);
-              if (cell) editableCWCells.push({cell, colId, label: colLabel(colId).toLowerCase()});
-            });
-
-            // Try matching by label first, then fallback to position
-            const allScoreCols = [...testCols, ...cwCols];
-            if (allScoreCols.length > 0) {
-              allScoreCols.forEach(sc2 => {
-                const val = row[sc2.idx];
-                if (val === "" || val === undefined) return;
-                // Find matching cell by label
-                const labelNorm = sc2.label.toLowerCase().replace(/[^a-z0-9]/g, "");
-                let matched = editableCWCells.find(c => c.label.replace(/[^a-z0-9]/g, "") === labelNorm);
-                if (!matched) return; // skip if can't match by label
-                matched.cell.textContent = String(parseFloat(val) || 0);
-              });
-              // Fallback: fill by position for unmatched CW cells
-              let cwPos = 0;
-              allScoreCols.forEach(sc2 => {
-                const val = row[sc2.idx];
-                if (val === "" || val === undefined) return;
-                const labelNorm = sc2.label.toLowerCase().replace(/[^a-z0-9]/g, "");
-                const matched = editableCWCells.find(c => c.label.replace(/[^a-z0-9]/g, "") === labelNorm);
-                if (!matched && cwPos < editableCWCells.length) {
-                  editableCWCells[cwPos].cell.textContent = String(parseFloat(val) || 0);
-                  cwPos++;
+            // Exam score
+            const examSc = scoreCols.find(sc => sc.isExam);
+            if (examSc) {
+              const val = row[examSc.idx];
+              if (val !== "" && val != null) {
+                const examInput = tr.querySelector(".exam-score-cell .cell-inner");
+                if (examInput) {
+                  const num = parseFloat(val);
+                  if (!isNaN(num)) examInput.textContent = String(num);
                 }
-              });
+              }
             }
+            // CW columns — fill in DOM order (position-based)
+            const cwInputs = Array.from(tr.querySelectorAll(".cw-cell .cell-inner"));
+            const cwScoreCols = scoreCols.filter(sc => !sc.isExam);
+            cwScoreCols.forEach((sc, pos) => {
+              if (pos >= cwInputs.length) return;
+              const val = row[sc.idx];
+              if (val === "" || val == null) return;
+              const num = parseFloat(val);
+              if (!isNaN(num)) cwInputs[pos].textContent = String(num);
+            });
           }
           filled++;
         }
         recalc();
       });
 
-      const ignoredMsg = skipped.length > 0 ? ` (ignored tabs: ${skipped.join(", ")})` : "";
-      statusEl.textContent = `✅ Loaded! Filled ${filled} student-rows${ignoredMsg}`;
+      const ignoredMsg = skipped.length ? ` · Ignored tabs: ${skipped.join(", ")}` : "";
+      statusEl.textContent = `✅ Loaded! Filled ${filled} student rows${ignoredMsg}`;
       document.getElementById("fileUploadInput").value = "";
     } catch(err) {
-      statusEl.textContent = "❌ Error reading file: " + err.message;
+      statusEl.textContent = "❌ Error: " + err.message;
       console.error(err);
     }
   };
