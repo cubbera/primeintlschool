@@ -654,31 +654,51 @@ async function createAllStudentReports() {
 }
 
 function buildReadme(cls, term, count) {
-  return `PRIME International School — Student Report Generator
-=====================================================
-This package generates one .docx report per student (${count} students).
-
-REQUIREMENTS
-  • Node.js  →  https://nodejs.org  (LTS version recommended)
-  • Works on macOS, Windows, and Linux
-
-STEPS
-  1. Unzip this package into a folder.
-  2. Open Terminal (Mac) or Command Prompt / PowerShell (Windows).
-  3. Navigate to the folder:
-       Mac/Linux:  cd ~/Downloads/${cls}_${term.replace(/\s+/g,"_")}_Reports_Generator
-       Windows:    cd %USERPROFILE%\\Downloads\\${cls}_${term.replace(/\s+/g,"_")}_Reports_Generator
-  4. Install the required library (first time only):
-       npm install docx
-  5. Run the generator:
-       node generate_reports.js
-  6. All .docx files will appear in the same folder.
-
-TROUBLESHOOTING
-  • "node: command not found"  →  Node.js is not installed. Download from https://nodejs.org
-  • "Cannot find module 'docx'"  →  Run: npm install docx
-  • Permission error on Mac  →  Try: chmod +x generate_reports.js
-`;
+  const folder = cls+"_"+term.replace(/\s+/g,"_")+"_Reports_Generator";
+  return "PRIME International School - Student Report Generator\n" +
+"=====================================================\n" +
+"Generates "+count+" individual student .docx progress reports.\n\n" +
+"MAC INSTRUCTIONS\n" +
+"-----------------------------------------------------\n" +
+"Step 1 - Unzip this file (double-click the .zip in Finder).\n\n" +
+"Step 2 - Open Terminal.\n" +
+"         (Press Cmd+Space, type Terminal, press Enter)\n\n" +
+"Step 3 - Navigate INTO the unzipped folder.\n" +
+"         EASIEST: type  cd  (with a space), then drag the\n" +
+"         unzipped '"+folder+"' folder\n" +
+"         from Finder into the Terminal window, then press Enter.\n\n" +
+"         OR type manually:\n" +
+"         cd ~/Downloads/"+folder+"\n\n" +
+"Step 4 - Install library (first time only, ~10 sec):\n" +
+"         npm install docx\n\n" +
+"Step 5 - Run the generator:\n" +
+"         node generate_reports.js\n\n" +
+"Step 6 - Done! All .docx files appear in the same folder.\n\n" +
+"WINDOWS INSTRUCTIONS\n" +
+"-----------------------------------------------------\n" +
+"Step 1 - Unzip this file (right-click -> Extract All).\n\n" +
+"Step 2 - Open the unzipped folder in File Explorer.\n\n" +
+"Step 3 - Click the address bar at the top of File Explorer,\n" +
+"         type  cmd  and press Enter.\n" +
+"         (Opens Command Prompt already in the right folder!)\n\n" +
+"Step 4 - Install library (first time only):\n" +
+"         npm install docx\n\n" +
+"Step 5 - Run the generator:\n" +
+"         node generate_reports.js\n\n" +
+"Step 6 - Done! All .docx files appear in the same folder.\n\n" +
+"TROUBLESHOOTING\n" +
+"-----------------------------------------------------\n" +
+"  Error: Cannot find module '.../generate_reports.js'\n" +
+"  -> You ran the command from the wrong folder.\n" +
+"     You MUST cd into the unzipped folder first (Step 3).\n" +
+"     The folder must contain generate_reports.js before running.\n\n" +
+"  node: command not found\n" +
+"  -> Node.js is not installed.\n" +
+"     Download from: https://nodejs.org  (choose LTS)\n\n" +
+"  Cannot find module 'docx'\n" +
+"  -> Run: npm install docx  (Step 4 was skipped)\n\n" +
+"  npm permission error on Mac\n" +
+"  -> Do NOT use sudo. Run: npm install docx --prefix .\n";
 }
 
 // ---- Node.js generator script (embedded as a string) ----
@@ -693,11 +713,25 @@ function buildNodeScript(data) {
 const path = require('path');
 const fs   = require('fs');
 
+// ── Guard: make sure we are running from the correct directory ──
+const scriptDir  = path.dirname(require.main ? require.main.filename : __filename);
+const scriptFile = path.join(scriptDir, 'generate_reports.js');
+if (!fs.existsSync(scriptFile)) {
+  console.error('\\nERROR: Please run this script from inside the unzipped folder.');
+  console.error('  Mac:     cd ~/Downloads/[folder-name]  then  node generate_reports.js');
+  console.error('  Windows: open the folder in Explorer, click the address bar, type cmd, press Enter');
+  console.error('           then run:  node generate_reports.js\\n');
+  process.exit(1);
+}
+// Change working directory to the script location so all files land in the right place
+process.chdir(scriptDir);
+
 let docx;
 try {
   docx = require('docx');
 } catch(e) {
-  console.error('\\n❌  Missing dependency. Please run:  npm install docx\\n');
+  console.error('\\nERROR: Missing dependency. Please run:  npm install docx');
+  console.error('(Make sure you run npm install docx inside the unzipped folder first)\\n');
   process.exit(1);
 }
 
