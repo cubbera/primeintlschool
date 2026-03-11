@@ -159,6 +159,11 @@ background:#c7c7cc;
 color:#666;
 cursor:not-allowed;
 }
+
+  .selected-cell{
+outline:2px solid #0071e3;
+background:#dbe9ff;
+}
 </style>
 </head>
 
@@ -410,6 +415,68 @@ recalc();
 
 });
 
+  /* ================================
+   Spreadsheet Copy / Paste Support
+   ================================ */
+
+let selectedCell = null;
+
+/* highlight selected cell */
+document.addEventListener("click", function(e){
+  if(e.target.classList.contains("score-box")){
+    if(selectedCell) selectedCell.classList.remove("selected-cell");
+    selectedCell = e.target;
+    selectedCell.classList.add("selected-cell");
+  }
+});
+
+/* handle paste from Excel / Sheets */
+document.addEventListener("paste", function(e){
+
+  if(!e.target.classList.contains("score-box")) return;
+
+  e.preventDefault();
+
+  const paste = e.clipboardData.getData("text");
+  const rows = paste.trim().split(/\r?\n/).map(r => r.split("\t"));
+
+  const inputs = [...document.querySelectorAll("#tbody .score-box")];
+  const startIndex = inputs.indexOf(e.target);
+
+  const columnsPerRow = inputs.length / document.querySelectorAll("#tbody tr").length;
+
+  rows.forEach((row, r)=>{
+    row.forEach((value, c)=>{
+
+      const index = startIndex + r*columnsPerRow + c;
+
+      if(inputs[index]){
+        inputs[index].value = value;
+      }
+
+    });
+  });
+
+  recalc();
+});
+
+/* copy selected cells like spreadsheet */
+document.addEventListener("copy", function(e){
+
+  if(!selectedCell) return;
+
+  const row = selectedCell.closest("tr");
+  const inputs = row.querySelectorAll(".score-box");
+
+  const values = [...inputs].map(i => i.value || "");
+
+  const text = values.join("\t");
+
+  e.clipboardData.setData("text/plain", text);
+  e.preventDefault();
+
+});
+  
 </script>
 
 </body>
