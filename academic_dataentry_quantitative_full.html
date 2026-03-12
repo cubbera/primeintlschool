@@ -83,14 +83,14 @@ td.in-range { background-color: rgba(26,115,232,0.10) !important; }
 </head>
 <body>
 
-<div class="page-title">&#128203; Assessment Score &mdash; Report Card Calculator v7</div>
-<div class="page-subtitle">PRIME International School &middot; All subjects on one page</div>
+<div class="page-title">&#128203; Assessment Score &mdash; Report Card Calculator v2</div>
+<div class="page-subtitle">PRIME International School &middot; All subjects on one page &middot; Student Report Summary at the bottom</div>
 
 <!-- Upload / Template bar -->
 <div class="upload-bar">
   <div class="upload-bar-title">&#128196; Import Scores from Google Sheets / Excel</div>
   <button class="btn-upload-template" onclick="downloadTemplate()">&#11015; Download Template</button>
-  <label class="btn-upload-file" for="fileUploadInput">&#128196; Upload Filled Sheet (.xlsx)</label>
+  <label class="btn-upload-file" for="fileUploadInput"disabled>&#128196; Upload Filled Sheet (.xlsx)</label>
   <input type="file" id="fileUploadInput" accept=".xlsx,.xls" onchange="handleFileUpload(event)">
   <span class="upload-hint">Upload fills in scores automatically &mdash; manual editing still works after upload.</span>
   <span class="upload-status" id="uploadStatus"></span>
