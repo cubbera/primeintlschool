@@ -417,53 +417,46 @@ input.calc-date              { width: 140px; }
             <div class="val"><input type="text" class="ay-in" id="ayLabel" value="AY2026-2027"></div>
           </div>
         </td>
-        <td width="60%">
-          <div class="row" style="color:var(--muted); font-size:11px; font-style:italic;">
-            Set term start &amp; end dates below
-          </div>
-        </td>
+        <td width="60%"></td>
       </tr>
 
-      <!-- Term 1 -->
-      <tr><td colspan="2" class="stripe s1">◆ Term 1</td></tr>
+      <!-- Term 1 (dates inline in header) -->
       <tr>
-        <td colspan="2">
-          <div class="row">
-            <span class="lbl">Term 1 <small>start → end</small></span>
-            <div class="val">
-              <input type="date" id="t1Start" value="2026-06-16">
+        <td colspan="2" class="stripe s1">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+            <span>◆ Term 1</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <input type="date" id="t1Start" value="2026-06-16" style="border-color:var(--t1bd);background:var(--t1bg);color:var(--t1c);font-weight:700;">
               <span class="arrow">→</span>
-              <input type="date" id="t1End" value="2026-09-04">
+              <input type="date" id="t1End" value="2026-09-04" style="border-color:var(--t1bd);background:var(--t1bg);color:var(--t1c);font-weight:700;">
             </div>
           </div>
         </td>
       </tr>
 
-      <!-- Term 2 -->
-      <tr><td colspan="2" class="stripe s2">◆ Term 2</td></tr>
+      <!-- Term 2 (dates inline in header) -->
       <tr>
-        <td colspan="2">
-          <div class="row">
-            <span class="lbl">Term 2 <small>start → end</small></span>
-            <div class="val">
-              <input type="date" id="t2Start" value="2026-09-07">
+        <td colspan="2" class="stripe s2">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+            <span>◆ Term 2</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <input type="date" id="t2Start" value="2026-09-07" style="border-color:var(--t2bd);background:var(--t2bg);color:var(--t2c);font-weight:700;">
               <span class="arrow">→</span>
-              <input type="date" id="t2End" value="2026-12-18">
+              <input type="date" id="t2End" value="2026-12-18" style="border-color:var(--t2bd);background:var(--t2bg);color:var(--t2c);font-weight:700;">
             </div>
           </div>
         </td>
       </tr>
 
-      <!-- Term 3 -->
-      <tr><td colspan="2" class="stripe s3">◆ Term 3</td></tr>
+      <!-- Term 3 (dates inline in header) -->
       <tr>
-        <td colspan="2">
-          <div class="row">
-            <span class="lbl">Term 3 <small>start → end</small></span>
-            <div class="val">
-              <input type="date" id="t3Start" value="2027-01-05">
+        <td colspan="2" class="stripe s3">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+            <span>◆ Term 3</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <input type="date" id="t3Start" value="2027-01-05" style="border-color:var(--t3bd);background:var(--t3bg);color:var(--t3c);font-weight:700;">
               <span class="arrow">→</span>
-              <input type="date" id="t3End" value="2027-03-31">
+              <input type="date" id="t3End" value="2027-03-31" style="border-color:var(--t3bd);background:var(--t3bg);color:var(--t3c);font-weight:700;">
             </div>
           </div>
         </td>
@@ -514,13 +507,6 @@ input.calc-date              { width: 140px; }
       <label>First Calculation Date</label>
       <input type="date" id="firstCalcDate" class="calc-date" value="2026-06-16">
     </div>
-    <div class="cbg" style="margin-left:auto;">
-      <label style="opacity:0;">x</label>
-      <button class="btn-add-disc" type="button" onclick="addDiscount()"
-        style="padding:6px 14px; font-size:12px; border-radius:8px; border-style:solid;">
-        + Add Discount
-      </button>
-    </div>
   </div>
 
   <!-- Fee summary -->
@@ -556,9 +542,9 @@ input.calc-date              { width: 140px; }
       <div class="fval green" id="displayFinal">—</div>
     </div>
 
-    <!-- Per payment cycle — directly below final, inside the same card -->
+    <!-- Per Month Payment — directly below final -->
     <div class="cycle-row">
-      <span>Per Payment Cycle</span>
+      <span>Per Month Payment</span>
       <span class="cycle-val" id="displayCycle">—</span>
     </div>
 
@@ -767,8 +753,9 @@ function recalc() {
     chipEl.innerHTML = `<span class="pchip" style="background:#f0fdf4;color:var(--accent2);">✓ full year</span>`;
   }
 
-  // Discounts
-  let fixedTotal = 0, pctAccum = 0;
+  // Discounts — ALL calculated from afterProrate, never cascading
+  // Fixed: face value. Percent: always % of afterProrate regardless of other discounts.
+  let fixedTotal = 0, pctTotal = 0;
 
   discounts.forEach(disc => {
     if (disc.type === "FREE") {
@@ -779,40 +766,27 @@ function recalc() {
       disc._calc = Number(disc.amt||0);
       fixedTotal += disc._calc;
     } else if (disc.type.includes("%")) {
-      disc._pct = Number(disc.amt||0);
-      pctAccum += disc._pct;
-    }
-  });
-
-  const balForPct = Math.max(0, afterProrate - fixedTotal);
-  const totalPctMoney = balForPct * (pctAccum / 100);
-
-  discounts.forEach(disc => {
-    if (disc.type.includes("%")) {
+      // Always from afterProrate, not from remaining balance
       const p = Number(disc.amt||0);
-      disc._calc = pctAccum>0 ? Math.round((p/pctAccum)*totalPctMoney) : 0;
+      disc._calc = Math.round(afterProrate * p / 100);
+      pctTotal += disc._calc;
     }
     const el = document.getElementById(`dc_${disc.id}`);
     if (el) el.textContent = `-${fmtNum(disc._calc||0)}`;
   });
 
-  const totalDiscount = fixedTotal + totalPctMoney;
+  const totalDiscount = fixedTotal + pctTotal;
   const finalAmount   = Math.max(0, afterProrate - totalDiscount);
 
   document.getElementById("displayFinal").textContent = fmtNum(finalAmount);
 
-  // Per cycle
+  // Per Month Payment = finalAmount / total remaining months (always monthly basis)
   const cycleEl = document.getElementById("displayCycle");
-  if (plan === "One-Time") {
-    cycleEl.textContent = fmtKs(finalAmount);
-  } else if (plan === "Termly") {
-    const tg = {1:[],2:[],3:[]};
-    prorate.remainingMonths.forEach(sm => { if(tg[sm.term]) tg[sm.term].push(sm); });
-    const usedTerms = [1,2,3].filter(t => tg[t].length>0).length;
-    cycleEl.textContent = usedTerms>0 ? `≈ ${fmtKs(Math.round(finalAmount/usedTerms))} / term` : "—";
+  const totalRemMonths = prorate.remainingMonths.length;
+  if (totalRemMonths > 0) {
+    cycleEl.textContent = fmtKs(Math.round(finalAmount / totalRemMonths));
   } else {
-    const n = prorate.remainingMonths.length;
-    cycleEl.textContent = n>0 ? `≈ ${fmtKs(Math.round(finalAmount/n))} / month` : "—";
+    cycleEl.textContent = "—";
   }
 
   renderSchedule(finalAmount, prorate, plan);
@@ -841,7 +815,7 @@ function renderSchedule(finalAmount, prorate, plan) {
 function renderTermly(tbody, finalAmount, rem) {
   const tg = {1:[],2:[],3:[]};
   rem.forEach(sm => { if(tg[sm.term]) tg[sm.term].push(sm); });
-  const total = rem.length;
+  const total = rem.length;  // total remaining months
   const termsUsed = [1,2,3].filter(t=>tg[t].length>0);
   const lastT = termsUsed[termsUsed.length-1];
   let rowNum=1, running=0;
@@ -853,7 +827,8 @@ function renderTermly(tbody, finalAmount, rem) {
     const amt = isLast ? finalAmount-running : Math.round(finalAmount*cnt/total);
     if (!isLast) running += amt;
     const due = t===1 ? "Registration Date" : fmtYM(tg[t][0]);
-    const note = `${cnt} mo × ${fmtNum(finalAmount)} ÷ ${total}`;
+    // Note: Final ÷ totalMonthsLeft × monthsInThisTerm
+    const note = `${fmtNum(finalAmount)} ÷ ${total} × ${cnt}`;
     addRow(tbody, rowNum++, tCls[t], `Term ${t}`, due, amt, note);
   }
   addTotalRow(tbody,finalAmount);
@@ -870,7 +845,9 @@ function renderMonthly(tbody, finalAmount, rem) {
     const amt = isLast ? finalAmount-running : per;
     if (!isLast) running += amt;
     const due = i===0 ? "Registration Date" : fmtYM(sm);
-    addRow(tbody, i+1, tCls[sm.term], tLbl[sm.term], due, amt, "");
+    // Note: Final ÷ totalMonthsLeft × 1
+    const note = `${fmtNum(finalAmount)} ÷ ${n} × 1`;
+    addRow(tbody, i+1, tCls[sm.term], tLbl[sm.term], due, amt, note);
   });
   addTotalRow(tbody,finalAmount);
 }
