@@ -544,7 +544,7 @@ input.calc-date              { width: 140px; }
 
     <!-- Per Month Payment — directly below final -->
     <div class="cycle-row">
-      <span>Per Month Payment</span>
+      <span>Per Month Payment <span style="font-weight:400;font-size:11px;opacity:0.75;">(rounded down to 1,000)</span></span>
       <span class="cycle-val" id="displayCycle">—</span>
     </div>
 
@@ -780,11 +780,13 @@ function recalc() {
 
   document.getElementById("displayFinal").textContent = fmtNum(finalAmount);
 
-  // Per Month Payment = finalAmount / total remaining months (always monthly basis)
+  // Per Month Payment = floorK(finalAmount / total remaining months)
+  // matches the rounded installment amount shown in the schedule
   const cycleEl = document.getElementById("displayCycle");
   const totalRemMonths = prorate.remainingMonths.length;
   if (totalRemMonths > 0) {
-    cycleEl.textContent = fmtKs(Math.round(finalAmount / totalRemMonths));
+    const perMonth = floorK(finalAmount / totalRemMonths);
+    cycleEl.textContent = fmtKs(perMonth) + " (est.)";
   } else {
     cycleEl.textContent = "—";
   }
