@@ -2,1039 +2,1027 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<title>Tuition Calculator</title>
+<title>Tuition Fee Calculator</title>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
-:root {
-  --bg:       #f0ede8;
-  --surface:  #faf9f7;
-  --card:     #ffffff;
-  --border:   #e2ddd6;
-  --text:     #1a1714;
-  --muted:    #8a837a;
-  --accent:   #c4501a;
-  --accent2:  #1a6b4a;
-  --accent3:  #1a3a6b;
-  --warn:     #8b1a1a;
-  --shadow:   0 2px 20px rgba(26,23,20,0.08);
-  --shadow-lg:0 8px 40px rgba(26,23,20,0.12);
-  --radius:   12px;
-  --mono:     "DM Mono", monospace;
-  --sans:     "DM Sans", sans-serif;
-  --serif:    "DM Serif Display", serif;
-}
+  :root {
+    --bg:         #f5f5f7;
+    --card:       #ffffff;
+    --text:       #111827;
+    --muted:      #6b7280;
+    --line:       #e5e7eb;
+    --accent:     #0071e3;
+    --accent2:    #059669;
+    --accent2h:   #047857;
+    --danger:     #b91c1c;
+    --dangerBg:   #fff1f2;
+    --pill:       #eef2ff;
+    --pillText:   #3730a3;
+    --shadow:     0 8px 30px rgba(0,0,0,0.08);
+    --input-bd:   #d1d5db;
+    --focus:      rgba(0,113,227,0.25);
+    --t1c:        #c4501a;
+    --t1bg:       #fff5f0;
+    --t1bd:       #ffddd0;
+    --t2c:        #059669;
+    --t2bg:       #f0fdf4;
+    --t2bd:       #bbf7d0;
+    --t3c:        #1d4ed8;
+    --t3bg:       #eff6ff;
+    --t3bd:       #bfdbfe;
+  }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; outline: none; margin: 0; padding: 0; }
 
-body {
-  font-family: var(--sans);
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  padding: 0 0 60px;
-}
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 40px 20px 60px;
+    line-height: 1.5;
+  }
 
-/* ── TOP HEADER ── */
-.page-header {
-  background: var(--text);
-  color: #f0ede8;
-  padding: 28px 40px;
-  display: flex;
-  align-items: baseline;
-  gap: 16px;
-}
+  .container {
+    max-width: 920px;
+    margin: 0 auto;
+    background: var(--card);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    padding: 32px 30px;
+  }
 
-.page-header h1 {
-  font-family: var(--serif);
-  font-size: 28px;
-  font-weight: 400;
-  letter-spacing: -0.3px;
-}
+  h1 {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+    margin-bottom: 4px;
+  }
 
-.page-header span {
-  font-size: 13px;
-  opacity: 0.5;
-  font-weight: 300;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
+  .subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
 
-/* ── MAIN LAYOUT ── */
-.layout {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 32px 24px 0;
-  display: grid;
-  grid-template-columns: 380px 1fr;
-  gap: 24px;
-  align-items: start;
-}
+  h2 {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text);
+    border-bottom: 2px solid var(--line);
+    padding-bottom: 8px;
+    margin: 28px 0 14px;
+  }
 
-/* ── PANEL (left / right cards) ── */
-.panel {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-}
+  /* ── DATA TABLE (matches enrollment page style) ── */
+  .data-table {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
 
-.panel-head {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+  .data-table table { width: 100%; border-collapse: collapse; }
 
-.panel-head .num {
-  width: 26px; height: 26px;
-  border-radius: 50%;
-  background: var(--text);
-  color: #f0ede8;
-  font-size: 12px;
-  font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
+  .data-table td {
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+    padding: 0;
+  }
 
-.panel-head h2 {
-  font-family: var(--sans);
-  font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--text);
-}
+  .data-table tr:last-child td { border-bottom: none; }
 
-.panel-body { padding: 20px; }
+  /* Term stripe header rows */
+  .term-stripe {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 8px 16px !important;
+  }
 
-/* ── SECTION LABEL ── */
-.sect-label {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--muted);
-  margin: 20px 0 10px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--border);
-}
+  .t1-stripe { background: var(--t1bg); color: var(--t1c); border-left: 3px solid var(--t1c); }
+  .t2-stripe { background: var(--t2bg); color: var(--t2c); border-left: 3px solid var(--t2c); }
+  .t3-stripe { background: var(--t3bg); color: var(--t3c); border-left: 3px solid var(--t3c); }
 
-.sect-label:first-child { margin-top: 0; }
+  /* Cell layout inside each TD */
+  .cell {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 16px;
+    flex-wrap: wrap;
+  }
 
-/* ── FIELD ROWS ── */
-.field-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 10px;
-  align-items: end;
-}
+  .cell .t {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    white-space: nowrap;
+  }
 
-.field-row.single { grid-template-columns: 1fr; }
-.field-row.triple { grid-template-columns: 1fr 1fr 1fr; }
+  .cell .t small { font-weight: 400; color: var(--muted); font-size: 11px; margin-left: 4px; }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
+  .cell .v {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-end;
+  }
 
-.field label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
+  /* ── INPUTS ── */
+  input[type="date"],
+  input[type="number"],
+  input[type="text"],
+  select {
+    padding: 9px 12px;
+    font-size: 13px;
+    font-family: inherit;
+    border: 1px solid var(--input-bd);
+    border-radius: 9px;
+    background: #fff;
+    color: var(--text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
 
-.field input[type="date"],
-.field input[type="number"],
-.field input[type="text"],
-.field select {
-  width: 100%;
-  padding: 9px 12px;
-  font-size: 13px;
-  font-family: var(--sans);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface);
-  color: var(--text);
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
+  input:focus, select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--focus);
+  }
 
-.field input:focus,
-.field select:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(196,80,26,0.12);
-}
+  input[type="date"] { width: 145px; }
+  input[type="text"].ay-input { width: 130px; font-weight: 700; }
+  input[type="number"].fee-input { width: 160px; text-align: right; font-weight: 700; letter-spacing: 0.2px; }
+  select.plan-sel { width: 150px; }
+  input.calc-date { width: 160px; }
 
-/* term color chips */
-.term-chip {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
+  .arrow { font-size: 12px; color: var(--muted); font-weight: 700; }
 
-.term-chip.t1 { background: #fff5f0; color: var(--accent); border: 1px solid #ffddd0; }
-.term-chip.t2 { background: #f0faf5; color: var(--accent2); border: 1px solid #c0e8d4; }
-.term-chip.t3 { background: #f0f4fa; color: var(--accent3); border: 1px solid #c0d0e8; }
+  /* ── FEE GRID (3-col tuition inputs) ── */
+  .fee-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    border-top: 1px solid var(--line);
+  }
 
-/* tuition type label */
-.tuition-type-row {
-  display: grid;
-  grid-template-columns: 90px 1fr;
-  gap: 8px;
-  align-items: center;
-  margin-bottom: 8px;
-}
+  .fee-cell {
+    padding: 13px 16px;
+    border-right: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
 
-.tuition-type-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--muted);
-  text-align: right;
-  white-space: nowrap;
-}
+  .fee-cell:last-child { border-right: none; }
 
-/* ── CALC SECTION ── */
-.calc-label {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--muted);
-  margin-bottom: 6px;
-}
+  .fee-cell .fc-lbl {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    white-space: nowrap;
+  }
 
-.plan-select-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 16px;
-}
+  /* ── CALC INPUTS BAR ── */
+  .calc-bar {
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    padding: 16px 18px;
+    background: #f9fafb;
+    border: 1px solid var(--line);
+    border-radius: 13px;
+    margin-bottom: 18px;
+  }
 
-/* ── RIGHT PANEL: RESULTS ── */
-.results-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
+  .cb-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
 
-/* Fee summary block */
-.fee-block {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-}
+  .cb-group label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+  }
 
-.fee-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--border);
-  font-size: 14px;
-}
+  /* ── FEE SUMMARY ── */
+  .fee-summary {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
 
-.fee-row:last-child { border-bottom: none; }
-.fee-row.blue-bg  { background: #eff6ff; }
-.fee-row.green-bg { background: #f0fdf4; }
-.fee-row.orange-bg { background: #fff8f3; }
+  .fs-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 13px 18px;
+    border-bottom: 1px solid var(--line);
+    font-size: 14px;
+    gap: 10px;
+  }
 
-.fee-lbl { font-weight: 600; color: #374151; }
-.fee-lbl.blue   { color: var(--accent3); font-weight: 700; }
-.fee-lbl.green  { color: var(--accent2); font-weight: 700; }
-.fee-lbl.orange { color: var(--accent);  font-weight: 700; }
+  .fs-row:last-child { border-bottom: none; }
+  .fs-row.blue-bg  { background: #eff6ff; }
+  .fs-row.green-bg { background: #f0fdf4; }
 
-.fee-val {
-  font-family: var(--mono);
-  font-weight: 500;
-  font-size: 15px;
-}
+  .fs-lbl { font-weight: 600; color: #374151; }
+  .fs-lbl.blue  { color: #1d4ed8; font-weight: 700; }
+  .fs-lbl.green { color: var(--accent2); font-weight: 700; font-size: 15px; }
 
-.fee-val.blue   { color: var(--accent3); font-weight: 700; }
-.fee-val.green  { color: var(--accent2); font-weight: 700; }
-.fee-val.orange { color: var(--accent);  font-weight: 700; }
-.fee-val.red    { color: var(--warn);    font-weight: 700; }
+  .fs-val {
+    font-weight: 800;
+    font-size: 16px;
+    font-family: "SF Mono","Menlo","Courier New",monospace;
+    white-space: nowrap;
+  }
 
-.prorate-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 3px 9px;
-  background: #eff6ff;
-  color: var(--accent3);
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 700;
-  margin-left: 8px;
-}
+  .fs-val.blue  { color: #1d4ed8; }
+  .fs-val.green { color: var(--accent2); }
+  .fs-val.red   { color: var(--danger); }
 
-/* Discount block inside fee */
-.disc-zone {
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-}
+  .prorate-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-left: 8px;
+  }
 
-.disc-zone-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 20px;
-  background: #fff8f8;
-  border-bottom: 1px solid #fde8e8;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--warn);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
+  /* ── DISCOUNT SECTION ── */
+  .disc-section {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
 
-.btn-add-disc {
-  padding: 4px 12px;
-  font-size: 11px;
-  font-weight: 700;
-  border: 1px dashed var(--warn);
-  border-radius: 6px;
-  background: #fff;
-  color: var(--warn);
-  cursor: pointer;
-  transition: background 0.15s;
-}
+  .disc-hdr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 18px;
+    background: #fff8f8;
+    border-bottom: 1px solid #fde8e8;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--danger);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
 
-.btn-add-disc:hover { background: #fff1f1; }
+  .btn-add-disc {
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    border: 1px dashed var(--danger);
+    border-radius: 6px;
+    background: #fff;
+    color: var(--danger);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
 
-.disc-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 20px;
-  border-bottom: 1px solid #fef2f2;
-  background: #fffafa;
-  font-size: 13px;
-  flex-wrap: wrap;
-}
+  .btn-add-disc:hover { background: var(--dangerBg); }
 
-.disc-item:last-child { border-bottom: none; }
+  .disc-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    border-bottom: 1px solid #fef2f2;
+    background: #fffafa;
+    flex-wrap: wrap;
+  }
 
-.disc-idx { font-weight: 900; color: var(--warn); min-width: 18px; }
+  .disc-row:last-child { border-bottom: none; }
 
-.disc-item select,
-.disc-item input {
-  padding: 5px 8px;
-  font-size: 12px;
-  border: 1px solid #e8d0d0;
-  border-radius: 6px;
-  background: #fff;
-  color: var(--text);
-  font-family: var(--sans);
-}
+  .disc-num { font-weight: 900; color: var(--danger); font-size: 13px; min-width: 16px; }
 
-.disc-item select:focus, .disc-item input:focus {
-  outline: none;
-  border-color: var(--warn);
-}
+  .disc-row select,
+  .disc-row input[type="text"],
+  .disc-row input[type="number"] {
+    padding: 5px 8px;
+    font-size: 12px;
+    border: 1px solid #fca5a5;
+    border-radius: 6px;
+    background: #fff;
+    font-family: inherit;
+  }
 
-.disc-pct-chip {
-  padding: 3px 8px;
-  background: #fff1f1;
-  color: var(--warn);
-  border-radius: 5px;
-  font-size: 11px;
-  font-weight: 800;
-  font-family: var(--mono);
-}
+  .disc-row select:focus,
+  .disc-row input:focus {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 2px rgba(185,28,28,0.12);
+    outline: none;
+  }
 
-.disc-calc-val {
-  margin-left: auto;
-  font-family: var(--mono);
-  font-weight: 700;
-  color: var(--warn);
-  white-space: nowrap;
-}
+  .disc-pct-badge {
+    padding: 3px 8px;
+    background: var(--dangerBg);
+    color: var(--danger);
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 800;
+    font-family: monospace;
+  }
 
-.btn-rm {
-  width: 26px; height: 26px;
-  border: none;
-  background: rgba(139,26,26,0.1);
-  color: var(--warn);
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: 900;
-  display: flex; align-items: center; justify-content: center;
-  transition: background 0.15s;
-}
+  .disc-calc {
+    margin-left: auto;
+    font-weight: 800;
+    color: var(--danger);
+    font-size: 13px;
+    font-family: monospace;
+    white-space: nowrap;
+  }
 
-.btn-rm:hover { background: rgba(139,26,26,0.2); }
+  .btn-rm {
+    width: 28px; height: 28px;
+    border: none;
+    background: rgba(185,28,28,0.1);
+    color: var(--danger);
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
 
-/* Payment Schedule Table */
-.schedule-block {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-}
+  .btn-rm:hover { background: rgba(185,28,28,0.2); }
 
-.schedule-head {
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+  /* ── TOTALS STRIP ── */
+  .totals-strip {
+    padding: 16px 18px;
+    background: #f9fafb;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 18px;
+    border: 1px solid var(--line);
+  }
 
-.schedule-head .num {
-  width: 24px; height: 24px;
-  border-radius: 50%;
-  background: var(--text);
-  color: #f0ede8;
-  font-size: 11px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-}
+  .ts-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+  }
 
-.schedule-head h3 {
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-}
+  .ts-pill {
+    padding: 7px 16px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 14px;
+    font-family: monospace;
+    white-space: nowrap;
+  }
 
-table.sched {
-  width: 100%;
-  border-collapse: collapse;
-}
+  .ts-pill.red   { background: var(--dangerBg); color: var(--danger); }
+  .ts-pill.green { background: rgba(5,150,105,0.1); color: #065f46; }
+  .ts-pill.blue  { background: #0071e3; color: #fff; }
 
-table.sched thead th {
-  background: var(--surface);
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--muted);
-  padding: 10px 20px;
-  border-bottom: 1px solid var(--border);
-  text-align: left;
-}
+  /* ── SCHEDULE TABLE ── */
+  .schedule {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+  }
 
-table.sched tbody td {
-  padding: 12px 20px;
-  font-size: 13px;
-  border-bottom: 1px solid var(--border);
-  vertical-align: middle;
-}
+  .schedule table { width: 100%; border-collapse: collapse; }
 
-table.sched tbody tr:last-child td { border-bottom: none; }
+  .schedule thead th {
+    background: #f9fafb;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+  }
 
-table.sched tbody tr.total-row td {
-  background: #f0fdf4;
-  font-weight: 900;
-  font-size: 14px;
-  color: var(--accent2);
-  border-top: 2px solid var(--border);
-}
+  .schedule tbody td {
+    padding: 13px 16px;
+    font-size: 13px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+  }
 
-table.sched td.amt {
-  text-align: right;
-  font-family: var(--mono);
-  font-weight: 600;
-}
+  .schedule tbody tr:last-child td { border-bottom: none; }
 
-table.sched td.note {
-  font-size: 11px;
-  color: var(--muted);
-  font-style: italic;
-}
+  .schedule tr.total-row td {
+    background: #f0fdf4;
+    font-weight: 900;
+    font-size: 14px;
+    color: var(--accent2);
+    border-top: 2px solid var(--line);
+  }
 
-/* Term color badges in schedule */
-.term-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  margin-right: 6px;
-}
+  .schedule td.amt {
+    text-align: right;
+    font-weight: 700;
+    font-family: "SF Mono","Menlo","Courier New",monospace;
+  }
 
-.term-badge.t1 { background: #fff5f0; color: var(--accent); }
-.term-badge.t2 { background: #f0faf5; color: var(--accent2); }
-.term-badge.t3 { background: #f0f4fa; color: var(--accent3); }
+  .schedule td.note-td {
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
+  }
 
-/* Empty state */
-.empty-state {
-  padding: 40px 20px;
-  text-align: center;
-  color: var(--muted);
-  font-size: 13px;
-}
+  .tbadge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-right: 5px;
+  }
 
-/* Info note */
-.info-note {
-  padding: 10px 20px;
-  font-size: 11px;
-  color: var(--muted);
-  border-top: 1px solid var(--border);
-  background: var(--surface);
-  font-style: italic;
-}
+  .tbadge.t1 { background: var(--t1bg); color: var(--t1c); }
+  .tbadge.t2 { background: var(--t2bg); color: var(--t2c); }
+  .tbadge.t3 { background: var(--t3bg); color: var(--t3c); }
 
-/* ── RESPONSIVE ── */
-@media (max-width: 820px) {
-  .layout { grid-template-columns: 1fr; }
-  .page-header { padding: 20px 24px; }
-}
+  .empty-note {
+    padding: 28px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+  }
 </style>
 </head>
 <body>
+<div class="container">
 
-<div class="page-header">
   <h1>Tuition Fee Calculator</h1>
-  <span>Standalone · Prorate Engine</span>
-</div>
+  <p class="subtitle">Set up master data, choose a payment plan and first calculation date — results update instantly.</p>
 
-<div class="layout">
+  <!-- ══════════════════════════════
+       1. MASTER DATA
+  ══════════════════════════════ -->
+  <h2>1. Master Data</h2>
 
-  <!-- ════════════════════════════════
-       LEFT: MASTER DATA + CALC INPUT
-       ════════════════════════════════ -->
-  <div class="panel">
-    <div class="panel-head">
-      <div class="num">1</div>
-      <h2>Master Data</h2>
+  <div class="data-table">
+    <table>
+      <tbody>
+
+        <!-- Academic Year label -->
+        <tr>
+          <td width="50%">
+            <div class="cell">
+              <div class="t">Academic Year</div>
+              <div class="v">
+                <input type="text" class="ay-input" id="ayLabel" value="AY2026-2027">
+              </div>
+            </div>
+          </td>
+          <td width="50%">
+            <div class="cell" style="color:var(--muted); font-size:12px; font-style:italic;">
+              Enter term start &amp; end dates for each term below.
+            </div>
+          </td>
+        </tr>
+
+        <!-- TERM 1 -->
+        <tr>
+          <td colspan="2" class="term-stripe t1-stripe">◆ Term 1</td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <div class="cell">
+              <div class="t">Term 1 Dates <small>start → end (inclusive)</small></div>
+              <div class="v">
+                <input type="date" id="t1Start" value="2026-06-16">
+                <span class="arrow">→</span>
+                <input type="date" id="t1End" value="2026-09-04">
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <!-- TERM 2 -->
+        <tr>
+          <td colspan="2" class="term-stripe t2-stripe">◆ Term 2</td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <div class="cell">
+              <div class="t">Term 2 Dates <small>start → end (inclusive)</small></div>
+              <div class="v">
+                <input type="date" id="t2Start" value="2026-09-07">
+                <span class="arrow">→</span>
+                <input type="date" id="t2End" value="2026-12-18">
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <!-- TERM 3 -->
+        <tr>
+          <td colspan="2" class="term-stripe t3-stripe">◆ Term 3</td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <div class="cell">
+              <div class="t">Term 3 Dates <small>start → end (inclusive)</small></div>
+              <div class="v">
+                <input type="date" id="t3Start" value="2027-01-05">
+                <span class="arrow">→</span>
+                <input type="date" id="t3End" value="2027-03-31">
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <!-- TUITION FEES -->
+        <tr>
+          <td colspan="2" class="term-stripe" style="background:#f9fafb; color:var(--muted); border-left:none; letter-spacing:0.6px;">
+            Tuition Before Discount (Before Prorate)
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <div class="fee-grid">
+              <div class="fee-cell">
+                <span class="fc-lbl">One-Time (Annual)</span>
+                <input type="number" class="fee-input" id="feeOneTime" value="9000000" min="0">
+              </div>
+              <div class="fee-cell">
+                <span class="fc-lbl">Termly</span>
+                <input type="number" class="fee-input" id="feeTermly" value="10000000" min="0">
+              </div>
+              <div class="fee-cell">
+                <span class="fc-lbl">Monthly</span>
+                <input type="number" class="fee-input" id="feeMonthly" value="12000000" min="0">
+              </div>
+            </div>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══════════════════════════════
+       2. CALCULATING PAYMENT
+  ══════════════════════════════ -->
+  <h2>2. Calculating Payment</h2>
+
+  <!-- Inputs row -->
+  <div class="calc-bar">
+    <div class="cb-group">
+      <label>Payment Plan</label>
+      <select id="paymentPlan" class="plan-sel">
+        <option value="One-Time">One-Time</option>
+        <option value="Termly" selected>Termly</option>
+        <option value="Monthly">Monthly</option>
+      </select>
     </div>
-    <div class="panel-body">
-
-      <!-- TERM 1 -->
-      <div class="sect-label">Academic Year Terms</div>
-
-      <div class="term-chip t1">◆ Term 1</div>
-      <div class="field-row">
-        <div class="field">
-          <label>Start Date</label>
-          <input type="date" id="t1Start" value="2026-06-01">
-        </div>
-        <div class="field">
-          <label>End Date</label>
-          <input type="date" id="t1End" value="2026-08-31">
-        </div>
-      </div>
-
-      <!-- TERM 2 -->
-      <div class="term-chip t2" style="margin-top:14px;">◆ Term 2</div>
-      <div class="field-row">
-        <div class="field">
-          <label>Start Date</label>
-          <input type="date" id="t2Start" value="2026-09-01">
-        </div>
-        <div class="field">
-          <label>End Date</label>
-          <input type="date" id="t2End" value="2026-12-31">
-        </div>
-      </div>
-
-      <!-- TERM 3 -->
-      <div class="term-chip t3" style="margin-top:14px;">◆ Term 3</div>
-      <div class="field-row">
-        <div class="field">
-          <label>Start Date</label>
-          <input type="date" id="t3Start" value="2027-01-01">
-        </div>
-        <div class="field">
-          <label>End Date</label>
-          <input type="date" id="t3End" value="2027-03-31">
-        </div>
-      </div>
-
-      <!-- TUITION BASE FEES -->
-      <div class="sect-label" style="margin-top:22px;">Tuition Before Discount (Before Prorate)</div>
-
-      <div class="tuition-type-row">
-        <span class="tuition-type-label">One-Time</span>
-        <div class="field">
-          <input type="number" id="feeOneTime" placeholder="e.g. 4290000" value="4290000" min="0">
-        </div>
-      </div>
-      <div class="tuition-type-row">
-        <span class="tuition-type-label">Termly</span>
-        <div class="field">
-          <input type="number" id="feeTermly" placeholder="e.g. 4490000" value="4490000" min="0">
-        </div>
-      </div>
-      <div class="tuition-type-row">
-        <span class="tuition-type-label">Monthly</span>
-        <div class="field">
-          <input type="number" id="feeMonthly" placeholder="e.g. 4890000" value="4890000" min="0">
-        </div>
-      </div>
-
-      <!-- DIVIDER -->
-      <div style="height:1px; background:var(--border); margin:22px 0;"></div>
-
-      <!-- CALCULATION INPUTS -->
-      <div class="panel-head" style="margin:-20px -20px 16px; border-radius:0; border-top:none; border-left:none; border-right:none;">
-        <div class="num">2</div>
-        <h2>Calculation</h2>
-      </div>
-
-      <div class="plan-select-row">
-        <div class="field">
-          <label>Payment Plan</label>
-          <select id="paymentPlan">
-            <option value="One-Time">One-Time</option>
-            <option value="Termly" selected>Termly</option>
-            <option value="Monthly">Monthly</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>First Calculation Date</label>
-          <input type="date" id="firstCalcDate" value="2026-08-03">
-        </div>
-      </div>
-
-      <!-- Discounts toggle -->
-      <div class="calc-label">Discounts</div>
-      <div id="discountInputArea" style="margin-bottom:10px;"></div>
-      <button class="btn-add-disc" type="button" onclick="addDiscount()" style="width:100%; padding:9px; border-radius:8px; font-size:12px;">
+    <div class="cb-group">
+      <label>First Calculation Date</label>
+      <input type="date" id="firstCalcDate" class="calc-date" value="2026-08-03">
+    </div>
+    <div class="cb-group" style="margin-left:auto;">
+      <label style="opacity:0;">a</label>
+      <button class="btn-add-disc" type="button" onclick="addDiscount()"
+        style="padding:9px 18px; font-size:12px; border-radius:9px; border-style:solid;">
         + Add Discount
       </button>
-
     </div>
   </div>
 
-  <!-- ════════════════════════════════
-       RIGHT: RESULTS
-       ════════════════════════════════ -->
-  <div class="results-panel">
+  <!-- Fee summary block -->
+  <div class="fee-summary">
 
-    <!-- Fee Summary -->
-    <div class="fee-block">
-      <div class="panel-head">
-        <div class="num" style="background:var(--accent3);">2</div>
-        <h2>Calculating Payment</h2>
+    <!-- Row: Base tuition (before prorate) -->
+    <div class="fs-row blue-bg">
+      <div class="fs-lbl blue">
+        Base Tuition Amount
+        <span style="font-weight:400; font-size:12px; margin-left:4px;">[before PRORATE]</span>
       </div>
-
-      <!-- Base tuition (before prorate) -->
-      <div class="fee-row blue-bg">
-        <div class="fee-lbl blue">Base Tuition Amount <span style="font-weight:400;font-size:12px;">[before PRORATE]</span></div>
-        <div class="fee-val blue" id="displayBase">—</div>
-      </div>
-
-      <!-- Tuition after prorate -->
-      <div class="fee-row">
-        <div>
-          <div class="fee-lbl">Tuition Before Discount <span style="font-weight:400;font-size:12px;">[after PRORATE]</span></div>
-          <div id="prorateDetail" style="font-size:11px; color:var(--muted); margin-top:3px;"></div>
-        </div>
-        <div class="fee-val green" id="displayAfterProrate">—</div>
-      </div>
-
-      <!-- Discount zone -->
-      <div class="disc-zone">
-        <div class="disc-zone-header">
-          <span>Discount</span>
-          <button class="btn-add-disc" type="button" onclick="addDiscount()">[+ Add Discount]</button>
-        </div>
-        <div id="discountDisplayArea"></div>
-      </div>
-
-      <!-- Final amount -->
-      <div class="fee-row green-bg">
-        <div class="fee-lbl green" style="font-size:15px;">Final Tuition Amount After Discount</div>
-        <div class="fee-val green" id="displayFinal">—</div>
-      </div>
-
+      <div class="fs-val blue" id="displayBase">—</div>
     </div>
 
-    <!-- Payment Schedule -->
-    <div class="schedule-block">
-      <div class="schedule-head">
-        <div class="num">3</div>
-        <h3>Tuition Payment Plan</h3>
+    <!-- Row: After prorate -->
+    <div class="fs-row">
+      <div>
+        <span class="fs-lbl">Tuition Before Discount
+          <span style="font-weight:400; font-size:12px;">[after PRORATE]</span>
+        </span>
+        <span id="prorateChip"></span>
       </div>
-      <table class="sched">
-        <thead>
-          <tr>
-            <th width="8%">No</th>
-            <th width="52%">Due Date</th>
-            <th width="22%">Amount</th>
-            <th width="18%">Note</th>
-          </tr>
-        </thead>
-        <tbody id="schedBody">
-          <tr><td colspan="4" class="empty-state">Configure master data and calculation inputs to generate schedule.</td></tr>
-        </tbody>
-      </table>
-      <div class="info-note" id="schedNote" style="display:none;"></div>
+      <div class="fs-val green" id="displayAfterProrate">—</div>
+    </div>
+
+    <!-- Discount section -->
+    <div class="disc-section">
+      <div class="disc-hdr">
+        <span>Discount</span>
+        <button class="btn-add-disc" type="button" onclick="addDiscount()">[+ Add Discount]</button>
+      </div>
+      <div id="discRows"></div>
+    </div>
+
+    <!-- Total discount -->
+    <div class="fs-row">
+      <div class="fs-lbl" style="color:var(--muted);">Total Discount Applied</div>
+      <div class="fs-val red" id="displayTotalDisc">— 0</div>
+    </div>
+
+    <!-- Final amount -->
+    <div class="fs-row green-bg">
+      <div class="fs-lbl green">Final Tuition Amount After Discount</div>
+      <div class="fs-val green" id="displayFinal">—</div>
     </div>
 
   </div>
+
+  <!-- Totals strip -->
+  <div class="totals-strip">
+    <div class="ts-row">
+      <span>Total Discount Applied</span>
+      <span class="ts-pill red" id="ts_disc">0</span>
+    </div>
+    <div class="ts-row">
+      <span>Net Tuition After Discount</span>
+      <span class="ts-pill green" id="ts_net">—</span>
+    </div>
+    <div class="ts-row" style="border-top:1px solid var(--line); padding-top:10px; margin-top:2px;">
+      <span>Per Payment Cycle</span>
+      <span class="ts-pill blue" id="ts_cycle">—</span>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       3. PAYMENT PLAN
+  ══════════════════════════════ -->
+  <h2>3. Tuition Payment Plan</h2>
+
+  <div class="schedule">
+    <table>
+      <thead>
+        <tr>
+          <th width="7%">No</th>
+          <th width="42%">Due Date</th>
+          <th width="26%">Amount</th>
+          <th width="25%">Note</th>
+        </tr>
+      </thead>
+      <tbody id="schedBody">
+        <tr><td colspan="4" class="empty-note">Configure master data above to generate the payment schedule.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════════
+/* ════════════════════════════
    UTILITIES
-═══════════════════════════════════════════════════ */
+════════════════════════════ */
 function parseDate(str) {
-  // Parse "YYYY-MM-DD" without timezone issues
   if (!str) return null;
   const p = str.split("-");
   if (p.length !== 3) return null;
   return { y: parseInt(p[0],10), m: parseInt(p[1],10)-1 }; // m is 0-based
 }
 
+const MN = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+function fmtYM(ym) { return `01 ${MN[ym.m]} ${ym.y}`; }
+
 function fmtKs(n) {
   if (n === null || isNaN(n)) return "—";
   return Math.round(Math.max(0,n)).toLocaleString("en-US") + " ks";
 }
 
-function fmtKsPlain(n) {
+function fmtNum(n) {
   return Math.round(Math.max(0,n)).toLocaleString("en-US");
 }
 
-const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-
-function fmtYM(ym) {
-  return `01 ${MONTH_NAMES[ym.m]} ${ym.y}`;
-}
-
-/* ═══════════════════════════════════════════════════
+/* ════════════════════════════
    SCHOOL MONTH BUILDER
-   Builds ordered list of {y, m, term} for all months
-   covered by the three terms (inclusive of start & end month).
-═══════════════════════════════════════════════════ */
+   Iterates month-by-month through each term's
+   date range, tagging each with its term number.
+════════════════════════════ */
 function buildSchoolMonths() {
-  const terms = [
-    { id:1, start: parseDate(document.getElementById("t1Start").value), end: parseDate(document.getElementById("t1End").value) },
-    { id:2, start: parseDate(document.getElementById("t2Start").value), end: parseDate(document.getElementById("t2End").value) },
-    { id:3, start: parseDate(document.getElementById("t3Start").value), end: parseDate(document.getElementById("t3End").value) }
+  const termDefs = [
+    { id:1, startId:"t1Start", endId:"t1End" },
+    { id:2, startId:"t2Start", endId:"t2End" },
+    { id:3, startId:"t3Start", endId:"t3End" }
   ];
 
   const months = [];
 
-  for (const term of terms) {
-    if (!term.start || !term.end) continue;
-    let cy = term.start.y, cm = term.start.m;
-    while (cy < term.end.y || (cy === term.end.y && cm <= term.end.m)) {
-      months.push({ y: cy, m: cm, term: term.id });
+  for (const td of termDefs) {
+    const s = parseDate(document.getElementById(td.startId).value);
+    const e = parseDate(document.getElementById(td.endId).value);
+    if (!s || !e) continue;
+
+    let cy = s.y, cm = s.m;
+    while (cy < e.y || (cy === e.y && cm <= e.m)) {
+      months.push({ y: cy, m: cm, term: td.id });
       cm++;
       if (cm > 11) { cm = 0; cy++; }
     }
   }
-
   return months;
 }
 
-/* ═══════════════════════════════════════════════════
+/* ════════════════════════════
    PRORATE
-═══════════════════════════════════════════════════ */
+   Counts remaining school months from
+   firstCalcDate (month-inclusive, ignores day).
+════════════════════════════ */
 function getProrateInfo(schoolMonths) {
-  const calcDate = parseDate(document.getElementById("firstCalcDate").value);
-  if (!calcDate || schoolMonths.length === 0) {
-    return { factor: 1, remaining: schoolMonths.length, total: schoolMonths.length, remainingMonths: schoolMonths };
+  const d = parseDate(document.getElementById("firstCalcDate").value);
+  if (!d || schoolMonths.length === 0) {
+    return { factor:1, remaining:schoolMonths.length, total:schoolMonths.length, remainingMonths:[...schoolMonths] };
   }
 
-  const remaining = schoolMonths.filter(sm => {
-    if (sm.y > calcDate.y) return true;
-    if (sm.y === calcDate.y && sm.m >= calcDate.m) return true;
-    return false;
-  });
+  const rem = schoolMonths.filter(sm =>
+    sm.y > d.y || (sm.y === d.y && sm.m >= d.m)
+  );
 
   const total = schoolMonths.length;
-  const factor = total > 0 ? remaining.length / total : 1;
-  return { factor, remaining: remaining.length, total, remainingMonths: remaining };
+  return {
+    factor: total > 0 ? rem.length / total : 1,
+    remaining: rem.length,
+    total,
+    remainingMonths: rem
+  };
 }
 
-/* ═══════════════════════════════════════════════════
+/* ════════════════════════════
    DISCOUNT STATE
-═══════════════════════════════════════════════════ */
+════════════════════════════ */
 let discounts = [];
 
 function addDiscount() {
-  discounts.push({ id: Date.now(), type: "Percent %", desc: "", amt: "" });
-  renderDiscounts();
+  discounts.push({ id: Date.now(), type:"Percent %", desc:"", amt:"" });
+  renderDiscountRows();
   recalc();
 }
 
 function removeDiscount(id) {
   discounts = discounts.filter(d => d.id !== id);
-  renderDiscounts();
+  renderDiscountRows();
   recalc();
 }
 
 function updateDisc(id, field, value) {
   const d = discounts.find(x => x.id === id);
   if (!d) return;
-  if (field === "type") { d.type = value; d.desc = ""; d.amt = ""; renderDiscounts(); }
-  else d[field] = value;
+  if (field === "type") { d.type = value; d.desc = ""; d.amt = ""; renderDiscountRows(); }
+  else { d[field] = value; }
   recalc();
 }
 
-function renderDiscounts() {
-  // Left panel input area
-  const inputArea = document.getElementById("discountInputArea");
-  inputArea.innerHTML = "";
+function renderDiscountRows() {
+  const container = document.getElementById("discRows");
+  container.innerHTML = "";
+
+  if (discounts.length === 0) {
+    container.innerHTML = `<div style="padding:11px 18px;font-size:12px;color:var(--muted);font-style:italic;">No discounts — click [+ Add Discount] to add one.</div>`;
+    return;
+  }
+
   discounts.forEach((disc, idx) => {
-    const div = document.createElement("div");
-    div.style.cssText = "display:flex;gap:6px;align-items:center;margin-bottom:6px;flex-wrap:wrap;";
+    const typeOpts = ["Fixed","Percent %","Sibling %","Early Bird %","Referral","FREE"].map(t =>
+      `<option value="${t}" ${disc.type===t?"selected":""}>${
+        t==="Fixed"?"Fixed Amount" : t==="Referral"?"Referral (Fixed)" : t==="FREE"?"FREE TERMS" : t
+      }</option>`
+    ).join("");
 
-    const typeOpts = ["Fixed","Percent %","Sibling %","Early Bird %","Referral","FREE"]
-      .map(t => `<option value="${t}" ${disc.type===t?"selected":""}>${t==="Fixed"?"Fixed":t==="FREE"?"FREE TERMS":t}</option>`).join("");
-
-    let descHtml = "";
+    let mid = "";
     if (disc.type === "FREE") {
-      const opts = ["FREE_3T","FREE_2T","FREE_1T"].map(v =>
-        `<option value="${v}" ${disc.desc===v?"selected":""}>${v==="FREE_3T"?"Full Year":v==="FREE_2T"?"2 Terms":"1 Term"}</option>`
+      const fOpts = ["FREE_3T","FREE_2T","FREE_1T"].map(v =>
+        `<option value="${v}" ${disc.desc===v?"selected":""}>${
+          v==="FREE_3T"?"Full Year (3 Terms)" : v==="FREE_2T"?"2 Terms" : "1 Term"
+        }</option>`
       ).join("");
-      descHtml = `<select style="font-size:11px;padding:4px 6px;border:1px solid #e8d0d0;border-radius:5px;" onchange="updateDisc(${disc.id},'desc',this.value)">${opts}</select>`;
+      mid = `<select style="width:160px;" onchange="updateDisc(${disc.id},'desc',this.value)">${fOpts}</select>
+             <span style="font-size:11px;color:var(--muted);font-style:italic;">Auto-calculated</span>`;
     } else {
-      descHtml = `<input type="text" placeholder="Label" value="${disc.desc||""}" style="width:90px;font-size:11px;padding:4px 6px;border:1px solid #e8d0d0;border-radius:5px;" oninput="updateDisc(${disc.id},'desc',this.value)">
-                  <input type="number" placeholder="${disc.type.includes("%")?"%":"Amt"}" value="${disc.amt||""}" style="width:70px;font-size:11px;padding:4px 6px;border:1px solid #e8d0d0;border-radius:5px;" oninput="updateDisc(${disc.id},'amt',this.value)">`;
+      const isPct = disc.type.includes("%");
+      mid = `<input type="text" placeholder="Description / label" value="${disc.desc||""}"
+               style="width:170px;" oninput="updateDisc(${disc.id},'desc',this.value)">
+             <input type="number" placeholder="${isPct?'e.g. 10  (%)':'Amount'}" value="${disc.amt||""}"
+               style="width:100px; text-align:right; font-weight:700;"
+               oninput="updateDisc(${disc.id},'amt',this.value)">
+             ${isPct ? `<span class="disc-pct-badge">${disc.amt||0}%</span>` : ""}`;
     }
 
+    const div = document.createElement("div");
+    div.className = "disc-row";
     div.innerHTML = `
-      <span style="font-size:11px;font-weight:900;color:var(--warn);min-width:14px;">${idx+1}</span>
-      <select style="font-size:11px;padding:4px 6px;border:1px solid #e8d0d0;border-radius:5px;font-weight:700;color:var(--warn);" onchange="updateDisc(${disc.id},'type',this.value)">${typeOpts}</select>
-      ${descHtml}
+      <span class="disc-num">${idx+1}</span>
+      <select style="font-weight:700; color:var(--danger); width:155px;"
+        onchange="updateDisc(${disc.id},'type',this.value)">${typeOpts}</select>
+      ${mid}
+      <span class="disc-calc" id="dc_${disc.id}">—</span>
       <button class="btn-rm" type="button" onclick="removeDiscount(${disc.id})">−</button>
     `;
-    inputArea.appendChild(div);
+    container.appendChild(div);
   });
 }
 
-/* ═══════════════════════════════════════════════════
+/* ════════════════════════════
    MAIN RECALC
-═══════════════════════════════════════════════════ */
+════════════════════════════ */
 function recalc() {
   const plan = document.getElementById("paymentPlan").value;
 
-  // 1. Base tuition
+  // 1. Base tuition for selected plan
   const feeMap = {
     "One-Time": Number(document.getElementById("feeOneTime").value) || 0,
-    "Termly":   Number(document.getElementById("feeTermly").value) || 0,
-    "Monthly":  Number(document.getElementById("feeMonthly").value) || 0
+    "Termly":   Number(document.getElementById("feeTermly").value)   || 0,
+    "Monthly":  Number(document.getElementById("feeMonthly").value)  || 0
   };
   const baseTuition = feeMap[plan] || 0;
-  const annualRef   = Number(document.getElementById("feeOneTime").value) || 0;
+  const annualRef   = Number(document.getElementById("feeOneTime").value) || 0; // for FREE TERMS
 
-  // 2. School months & prorate
+  // 2. Build school months + prorate
   const schoolMonths = buildSchoolMonths();
   const prorate = getProrateInfo(schoolMonths);
-  const tuitionAfterProrate = Math.round(baseTuition * prorate.factor);
+  const afterProrate = Math.round(baseTuition * prorate.factor);
 
   // 3. Update displays
-  document.getElementById("displayBase").textContent = fmtKsPlain(baseTuition);
+  document.getElementById("displayBase").textContent = fmtNum(baseTuition);
+  document.getElementById("displayAfterProrate").textContent = fmtNum(afterProrate);
 
-  const afterEl = document.getElementById("displayAfterProrate");
-  afterEl.textContent = fmtKsPlain(tuitionAfterProrate);
-
-  const detailEl = document.getElementById("prorateDetail");
+  // Prorate chip
+  const chipEl = document.getElementById("prorateChip");
   if (prorate.factor < 1) {
-    detailEl.innerHTML = `<span class="prorate-badge">⟳ ${prorate.remaining}/${prorate.total} months remaining</span>`;
+    chipEl.innerHTML = `<span class="prorate-chip">⟳ ${prorate.remaining} / ${prorate.total} months</span>`;
+  } else if (schoolMonths.length > 0) {
+    chipEl.innerHTML = `<span class="prorate-chip" style="background:#f0fdf4;color:var(--accent2);">✓ Full year</span>`;
   } else {
-    detailEl.innerHTML = `<span class="prorate-badge" style="background:#f0fdf4;color:var(--accent2);">✓ Full year</span>`;
+    chipEl.innerHTML = `<span class="prorate-chip" style="background:#fff7ed;color:#b45309;">⚠ No school months found</span>`;
   }
 
-  // 4. Calculate discounts
-  let fixedTotal = 0, percentAccum = 0;
+  // 4. Discounts — two-pass
+  let fixedTotal = 0, pctAccum = 0;
 
+  // Pass 1: collect fixed & accumulate %
   discounts.forEach(disc => {
     if (disc.type === "FREE") {
-      const freeType = disc.desc || "FREE_3T";
-      const frac = freeType==="FREE_3T" ? 1 : freeType==="FREE_2T" ? 2/3 : 1/3;
+      const frac = disc.desc === "FREE_3T" ? 1 : disc.desc === "FREE_2T" ? 2/3 : 1/3;
       disc._calc = Math.round(annualRef * frac * prorate.factor);
       fixedTotal += disc._calc;
     } else if (disc.type === "Fixed" || disc.type === "Referral") {
-      disc._calc = Number(disc.amt||0);
+      disc._calc = Number(disc.amt || 0);
       fixedTotal += disc._calc;
     } else if (disc.type.includes("%")) {
-      disc._pct = Number(disc.amt||0);
-      percentAccum += disc._pct;
+      disc._pct = Number(disc.amt || 0);
+      pctAccum += disc._pct;
     }
   });
 
-  const afterFixed = Math.max(0, tuitionAfterProrate - fixedTotal);
-  const totalPctMoney = afterFixed * (percentAccum / 100);
+  // % applies to balance after fixed deductions
+  const balanceForPct = Math.max(0, afterProrate - fixedTotal);
+  const totalPctMoney = balanceForPct * (pctAccum / 100);
 
+  // Pass 2: assign individual % calc amounts
   discounts.forEach(disc => {
     if (disc.type.includes("%")) {
-      const p = Number(disc.amt||0);
-      disc._calc = percentAccum > 0 ? Math.round((p/percentAccum)*totalPctMoney) : 0;
+      const p = Number(disc.amt || 0);
+      disc._calc = pctAccum > 0 ? Math.round((p / pctAccum) * totalPctMoney) : 0;
     }
+  });
+
+  // Update individual discount displays
+  discounts.forEach(disc => {
+    const el = document.getElementById(`dc_${disc.id}`);
+    if (el) el.textContent = `-${fmtNum(disc._calc || 0)}`;
   });
 
   const totalDiscount = fixedTotal + totalPctMoney;
-  const finalAmount   = Math.max(0, tuitionAfterProrate - totalDiscount);
+  const finalAmount   = Math.max(0, afterProrate - totalDiscount);
 
-  // 5. Render discount display area
-  const dispArea = document.getElementById("discountDisplayArea");
-  dispArea.innerHTML = "";
-  if (discounts.length === 0) {
-    dispArea.innerHTML = `<div style="padding:12px 20px;font-size:12px;color:var(--muted);font-style:italic;">No discounts applied.</div>`;
+  // 5. Summary displays
+  const tdSign = totalDiscount > 0 ? "-" : "";
+  document.getElementById("displayTotalDisc").textContent = `${tdSign}${fmtNum(totalDiscount)}`;
+  document.getElementById("displayFinal").textContent = fmtNum(finalAmount);
+
+  // Totals strip
+  document.getElementById("ts_disc").textContent = `-${fmtKs(totalDiscount)}`;
+  document.getElementById("ts_net").textContent  = fmtKs(finalAmount);
+
+  // Per-cycle amount
+  const cycleEl = document.getElementById("ts_cycle");
+  if (plan === "One-Time") {
+    cycleEl.textContent = fmtKs(finalAmount);
+  } else if (plan === "Termly") {
+    const tg = {1:[],2:[],3:[]};
+    prorate.remainingMonths.forEach(sm => { if(tg[sm.term]) tg[sm.term].push(sm); });
+    const usedTerms = [1,2,3].filter(t => tg[t].length > 0).length;
+    cycleEl.textContent = usedTerms > 0 ? `≈ ${fmtKs(Math.round(finalAmount/usedTerms))} / term` : "—";
   } else {
-    discounts.forEach((disc, idx) => {
-      const label = disc.desc
-        ? `${disc.desc} [${disc.type}]`
-        : `Discount ${idx+1} [${disc.type}]`;
-      const pctChip = disc.type.includes("%") ? `<span class="disc-pct-chip">-${disc.amt||0}%</span>` : "";
-      const div = document.createElement("div");
-      div.className = "disc-item";
-      div.innerHTML = `
-        <span class="disc-idx">${idx+1}</span>
-        <span style="font-weight:700;color:var(--warn);flex:1;">${label}</span>
-        ${pctChip}
-        <span class="disc-calc-val">-${fmtKsPlain(disc._calc||0)}</span>
-      `;
-      dispArea.appendChild(div);
-    });
+    const n = prorate.remainingMonths.length;
+    cycleEl.textContent = n > 0 ? `≈ ${fmtKs(Math.round(finalAmount/n))} / month` : "—";
   }
 
-  document.getElementById("displayFinal").textContent = fmtKsPlain(finalAmount);
-
-  // 6. Payment schedule
-  renderSchedule(finalAmount, prorate, schoolMonths, plan);
+  // 6. Render schedule
+  renderSchedule(finalAmount, prorate, plan);
 }
 
-/* ═══════════════════════════════════════════════════
-   PAYMENT SCHEDULE RENDERER
-═══════════════════════════════════════════════════ */
-function renderSchedule(finalAmount, prorate, schoolMonths, plan) {
+/* ════════════════════════════
+   SCHEDULE RENDERER
+════════════════════════════ */
+function renderSchedule(finalAmount, prorate, plan) {
   const tbody = document.getElementById("schedBody");
-  const noteEl = document.getElementById("schedNote");
   tbody.innerHTML = "";
 
-  if (finalAmount <= 0 || schoolMonths.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" class="empty-state">Configure master data to generate schedule.</td></tr>`;
-    noteEl.style.display = "none";
+  const rem = prorate.remainingMonths;
+
+  if (rem.length === 0 || finalAmount <= 0) {
+    tbody.innerHTML = `<tr><td colspan="4" class="empty-note">No remaining school months. Check term dates and calculation date.</td></tr>`;
     return;
   }
-
-  const remainingMonths = prorate.remainingMonths;
-  const total = remainingMonths.length;
 
   if (plan === "One-Time") {
-    addRow(tbody, 1, "Registration Date", finalAmount, "", null);
+    addRow(tbody, 1, null, null, "Registration Date — Full Payment", finalAmount, "");
     addTotalRow(tbody, finalAmount);
-    noteEl.style.display = "none";
     return;
   }
 
-  if (plan === "Termly") {
-    renderTermly(tbody, noteEl, finalAmount, remainingMonths);
-    return;
-  }
-
-  if (plan === "Monthly") {
-    renderMonthly(tbody, noteEl, finalAmount, remainingMonths);
-    return;
-  }
+  if (plan === "Termly") renderTermly(tbody, finalAmount, rem);
+  else                   renderMonthly(tbody, finalAmount, rem);
 }
 
-function renderTermly(tbody, noteEl, finalAmount, remainingMonths) {
+function renderTermly(tbody, finalAmount, rem) {
   // Group remaining months by term
-  const termGroups = {1:[], 2:[], 3:[]};
-  remainingMonths.forEach(sm => {
-    if (termGroups[sm.term]) termGroups[sm.term].push(sm);
-  });
+  const tg = {1:[], 2:[], 3:[]};
+  rem.forEach(sm => { if (tg[sm.term]) tg[sm.term].push(sm); });
 
-  const totalRemaining = remainingMonths.length;
-  if (totalRemaining === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" class="empty-state">No school months remaining from calculation date.</td></tr>`;
-    noteEl.style.display = "none";
-    return;
-  }
+  const total = rem.length;
+  const termsUsed = [1,2,3].filter(t => tg[t].length > 0);
+  const lastT = termsUsed[termsUsed.length - 1];
 
-  // Due dates: first month of each term in remaining
-  const termDueLabels = { 1:"Registration Date", 2:"", 3:"" };
-  for (const t of [2,3]) {
-    const first = termGroups[t][0];
-    if (first) termDueLabels[t] = fmtYM(first);
-  }
+  let rowNum = 1, running = 0;
+  const tClass = {1:"t1",2:"t2",3:"t3"};
 
-  let rowNum = 1;
-  let runningTotal = 0;
-  const termsInUse = [1,2,3].filter(t => termGroups[t].length > 0);
-  const lastTerm = termsInUse[termsInUse.length-1];
+  for (const t of termsUsed) {
+    const cnt = tg[t].length;
+    const isLast = (t === lastT);
+    const amt = isLast ? finalAmount - running : Math.round(finalAmount * cnt / total);
+    if (!isLast) running += amt;
 
-  const termColors = {1:"t1",2:"t2",3:"t3"};
-  const termLabels = {1:"Term 1",2:"Term 2",3:"Term 3"};
+    // Due date: Term 1 → Registration Date; Term 2,3 → first day of term's first remaining month
+    const dueLabel = t === 1 ? "Registration Date" : fmtYM(tg[t][0]);
+    const note = `${cnt} mo × ${fmtNum(finalAmount)} ÷ ${total}`;
 
-  for (const t of termsInUse) {
-    const cnt = termGroups[t].length;
-    const isLast = t === lastTerm;
-    let amt;
-    if (isLast) {
-      amt = finalAmount - runningTotal;
-    } else {
-      amt = Math.round(finalAmount * cnt / totalRemaining);
-      runningTotal += amt;
-    }
-
-    const note = `${cnt} mo × ${fmtKsPlain(finalAmount)}÷${totalRemaining}`;
-    addRow(tbody, rowNum++, termDueLabels[t], amt, termColors[t], termLabels[t], note);
+    addRow(tbody, rowNum++, tClass[t], `Term ${t}`, dueLabel, amt, note);
   }
 
   addTotalRow(tbody, finalAmount);
-
-  // Info note
-  const termNote = termsInUse.map(t => `Term ${t}: ${termGroups[t].length} month${termGroups[t].length>1?"s":""}`).join(" · ");
-  noteEl.textContent = `Remaining months split: ${termNote} (total ${remainingMonths.length} of ${remainingMonths.length + (/* total school months*/0)} months)`;
-  noteEl.style.display = "block";
 }
 
-function renderMonthly(tbody, noteEl, finalAmount, remainingMonths) {
-  const n = remainingMonths.length;
-  if (n === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" class="empty-state">No school months remaining from calculation date.</td></tr>`;
-    noteEl.style.display = "none";
-    return;
-  }
-
-  const termColors = {1:"t1",2:"t2",3:"t3"};
-  const termLabels = {1:"T1",2:"T2",3:"T3"};
+function renderMonthly(tbody, finalAmount, rem) {
+  const n = rem.length;
   let running = 0;
+  const tClass = {1:"t1",2:"t2",3:"t3"};
+  const tLabel = {1:"T1",2:"T2",3:"T3"};
 
-  remainingMonths.forEach((sm, i) => {
-    const isLast = i === n-1;
+  rem.forEach((sm, i) => {
+    const isLast = (i === n - 1);
     const perMonth = Math.round(finalAmount / n);
     const amt = isLast ? finalAmount - running : perMonth;
     if (!isLast) running += amt;
 
-    const label = i === 0 ? "Registration Date" : fmtYM(sm);
-    addRow(tbody, i+1, label, amt, termColors[sm.term], termLabels[sm.term], null);
+    const dueLabel = i === 0 ? "Registration Date" : fmtYM(sm);
+    addRow(tbody, i+1, tClass[sm.term], tLabel[sm.term], dueLabel, amt, "");
   });
 
   addTotalRow(tbody, finalAmount);
-  noteEl.textContent = `Monthly plan: ${n} installments of approx. ${fmtKs(Math.round(finalAmount/n))} each.`;
-  noteEl.style.display = "block";
 }
 
-function addRow(tbody, no, dateLabel, amount, termClass, termLabel, noteText) {
+function addRow(tbody, no, termClass, termLabel, dateLabel, amount, note) {
   const tr = document.createElement("tr");
-  const badge = termLabel ? `<span class="term-badge ${termClass}">${termLabel}</span>` : "";
-  const noteCell = noteText ? `<td class="note">${noteText}</td>` : `<td></td>`;
+  const badge = termLabel ? `<span class="tbadge ${termClass}">${termLabel}</span>` : "";
   tr.innerHTML = `
     <td>${no}</td>
     <td>${badge}${dateLabel}</td>
     <td class="amt">${fmtKs(amount)}</td>
-    ${noteCell}
+    <td class="note-td">${note}</td>
   `;
   tbody.appendChild(tr);
 }
@@ -1042,22 +1030,23 @@ function addRow(tbody, no, dateLabel, amount, termClass, termLabel, noteText) {
 function addTotalRow(tbody, total) {
   const tr = document.createElement("tr");
   tr.className = "total-row";
-  tr.innerHTML = `<td colspan="2">TOTAL</td><td class="amt">${fmtKs(total)}</td><td></td>`;
+  tr.innerHTML = `<td colspan="2" style="text-align:left; padding-left:16px;">TOTAL</td><td class="amt">${fmtKs(total)}</td><td></td>`;
   tbody.appendChild(tr);
 }
 
-/* ═══════════════════════════════════════════════════
-   EVENT LISTENERS
-═══════════════════════════════════════════════════ */
-const inputIds = ["t1Start","t1End","t2Start","t2End","t3Start","t3End",
-                  "feeOneTime","feeTermly","feeMonthly","paymentPlan","firstCalcDate"];
-inputIds.forEach(id => {
+/* ════════════════════════════
+   EVENT LISTENERS + INIT
+════════════════════════════ */
+["t1Start","t1End","t2Start","t2End","t3Start","t3End",
+ "feeOneTime","feeTermly","feeMonthly","paymentPlan","firstCalcDate"
+].forEach(id => {
   const el = document.getElementById(id);
-  if (el) el.addEventListener("change", recalc);
-  if (el) el.addEventListener("input", recalc);
+  if (!el) return;
+  el.addEventListener("change", recalc);
+  el.addEventListener("input",  recalc);
 });
 
-// Initialize
+renderDiscountRows();
 recalc();
 </script>
 </body>
