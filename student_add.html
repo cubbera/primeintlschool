@@ -647,10 +647,9 @@
   const discountContainer= document.getElementById("discountItemsContainer");
   const planBody         = document.getElementById("planBody");
 
-  // Set defaults
-  const defaultDate = new Date("2026-08-03");
-  firstAttendanceEl.valueAsDate = defaultDate;
-  firstCalcDateEl.valueAsDate   = defaultDate;
+  // Set defaults — set value directly as string to avoid UTC timezone issues
+  firstAttendanceEl.value = "2026-08-03";
+  firstCalcDateEl.value   = "2026-08-03";
 
   // Sync calc date when attendance date changes
   firstAttendanceEl.addEventListener("change", () => {
@@ -762,9 +761,12 @@
       return { factor: 1, remaining: 1, total: 1, label: "" };
     }
 
-    const calcDate = firstCalcDateEl.valueAsDate || new Date();
-    const calcYear = calcDate.getFullYear();
-    const calcMonth = calcDate.getMonth(); // 0-based
+    // Parse date from string "YYYY-MM-DD" directly to avoid UTC timezone offset bug
+    const dateStr = firstCalcDateEl.value;
+    if (!dateStr) return { factor: 1, remaining: 10, total: 10, label: "" };
+    const parts = dateStr.split("-");
+    const calcYear  = parseInt(parts[0], 10);
+    const calcMonth = parseInt(parts[1], 10) - 1; // 0-based
 
     const schoolMonths = getSchoolMonths();
     const total = schoolMonths.length;
@@ -808,23 +810,26 @@
     const year = academicYearEl.value;
     if (year === "SUMMER2026") return null;
 
-    const calcDate = firstCalcDateEl.valueAsDate || new Date();
+    // Parse date string directly to avoid UTC timezone offset bug
+    const dateStr = firstCalcDateEl.value;
+    if (!dateStr) return null;
+    const parts = dateStr.split("-");
+    const calcYear  = parseInt(parts[0], 10);
+    const calcMonth = parseInt(parts[1], 10) - 1; // 0-based
+
     const schoolMonths = getSchoolMonths();
 
     // Term boundaries (index into schoolMonths array, 0-based):
-    // Term 1: indices 0,1,2 (months 1-3 of school year: Jun,Jul,Aug)
-    // Term 2: indices 3,4,5,6 (Sep,Oct,Nov,Dec)
-    // Term 3: indices 7,8,9 (Jan,Feb,Mar)
+    // Term 1: indices 0,1,2 (Jun, Jul, Aug)
+    // Term 2: indices 3,4,5,6 (Sep, Oct, Nov, Dec)
+    // Term 3: indices 7,8,9 (Jan, Feb, Mar)
     const termRanges = [
       { term: 1, start: 0, end: 2 },
       { term: 2, start: 3, end: 6 },
       { term: 3, start: 7, end: 9 }
     ];
 
-    const calcYear  = calcDate.getFullYear();
-    const calcMonth = calcDate.getMonth();
-
-    // Filter to only remaining months
+    // Filter to only remaining months (>= calc date month)
     const remainingIndices = schoolMonths
       .map((sm, i) => ({ sm, i }))
       .filter(({ sm }) => {
@@ -834,7 +839,6 @@
       })
       .map(({ i }) => i);
 
-    // Count remaining months per term
     return termRanges.map(tr => {
       const count = remainingIndices.filter(i => i >= tr.start && i <= tr.end).length;
       return { term: tr.term, count };
@@ -843,11 +847,12 @@
 
   // Monthly split: which months remain
   function getRemainingMonthsList() {
-    const calcDate = firstCalcDateEl.valueAsDate || new Date();
+    const dateStr = firstCalcDateEl.value;
+    if (!dateStr) return [];
+    const parts = dateStr.split("-");
+    const calcYear  = parseInt(parts[0], 10);
+    const calcMonth = parseInt(parts[1], 10) - 1; // 0-based
     const schoolMonths = getSchoolMonths();
-    const calcYear  = calcDate.getFullYear();
-    const calcMonth = calcDate.getMonth();
-
     return schoolMonths.filter(sm => {
       if (sm.y > calcYear) return true;
       if (sm.y === calcYear && sm.m >= calcMonth) return true;
