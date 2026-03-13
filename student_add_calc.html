@@ -690,30 +690,19 @@ function renderDiscountRows() {
   }
 
   discounts.forEach((disc, idx) => {
-    const typeOpts = ["Fixed","Percent %","Sibling %","Early Bird %","Referral","FREE"].map(t =>
+    const typeOpts = ["Fixed","Percent %","Sibling %","Early Bird %","Referral"].map(t =>
       `<option value="${t}" ${disc.type===t?"selected":""}>${
-        t==="Fixed"?"Fixed Amount":t==="Referral"?"Referral (Fixed)":t==="FREE"?"FREE TERMS":t
+        t==="Fixed"?"Fixed Amount":t==="Referral"?"Referral (Fixed)":t
       }</option>`
     ).join("");
 
-    let mid = "";
-    if (disc.type === "FREE") {
-      const fOpts = ["FREE_3T","FREE_2T","FREE_1T"].map(v =>
-        `<option value="${v}" ${disc.desc===v?"selected":""}>${
-          v==="FREE_3T"?"Full Year (3T)":v==="FREE_2T"?"2 Terms":"1 Term"
-        }</option>`
-      ).join("");
-      mid = `<select style="width:140px;" onchange="updateDisc(${disc.id},'desc',this.value)">${fOpts}</select>
-             <span style="font-size:10px;color:var(--muted);">auto</span>`;
-    } else {
-      const isPct = disc.type.includes("%");
-      mid = `<input type="text" placeholder="Label" value="${disc.desc||""}"
+    const isPct = disc.type.includes("%");
+    const mid = `<input type="text" placeholder="Label" value="${disc.desc||""}"
                style="width:150px;" oninput="updateDisc(${disc.id},'desc',this.value)">
              <input type="number" placeholder="${isPct?'%':'Amount'}" value="${disc.amt||""}"
                style="width:80px;text-align:right;font-weight:700;"
                oninput="updateDisc(${disc.id},'amt',this.value)">
              ${isPct ? `<span class="dpct">${disc.amt||0}%</span>` : ""}`;
-    }
 
     const div = document.createElement("div");
     div.className = "disc-row";
@@ -739,7 +728,6 @@ function recalc() {
     "Monthly":  Number(document.getElementById("feeMonthly").value) || 0
   };
   const baseTuition = feeMap[plan] || 0;
-  const annualRef   = Number(document.getElementById("feeOneTime").value) || 0;
 
   // Build months & prorate
   const schoolMonths = buildSchoolMonths();
@@ -766,19 +754,13 @@ function recalc() {
   }
 
   // Discounts — ALL calculated from afterProrate, never cascading
-  // Fixed: face value. Percent: always % of afterProrate regardless of other discounts.
   let fixedTotal = 0, pctTotal = 0;
 
   discounts.forEach(disc => {
-    if (disc.type === "FREE") {
-      const frac = disc.desc==="FREE_3T"?1:disc.desc==="FREE_2T"?2/3:1/3;
-      disc._calc = Math.round(annualRef * frac * prorate.factor);
-      fixedTotal += disc._calc;
-    } else if (disc.type==="Fixed"||disc.type==="Referral") {
+    if (disc.type==="Fixed"||disc.type==="Referral") {
       disc._calc = Number(disc.amt||0);
       fixedTotal += disc._calc;
     } else if (disc.type.includes("%")) {
-      // Always from afterProrate, not from remaining balance
       const p = Number(disc.amt||0);
       disc._calc = Math.round(afterProrate * p / 100);
       pctTotal += disc._calc;
