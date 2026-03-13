@@ -544,7 +544,7 @@ input.calc-date              { width: 140px; }
 
     <!-- Per Month Payment — directly below final -->
     <div class="cycle-row">
-      <span>Per Month Payment <span style="font-weight:400;font-size:11px;opacity:0.75;">(rounded down to 1,000)</span></span>
+      <span>Per Month Payment</span>
       <span class="cycle-val" id="displayCycle">—</span>
     </div>
 
@@ -587,11 +587,9 @@ function fmtKs(n)   { return isNaN(n) ? "—" : Math.round(Math.max(0,n)).toLoca
 function fmtNum(n)  { return Math.round(Math.max(0,n)).toLocaleString("en-US"); }
 
 /* ─── SCHOOL MONTH BUILDER ───
-   Builds unique list of {y, m, term}.
-   Each calendar month is tagged with the FIRST term it belongs to.
-   Deduplication prevents months shared between term boundaries being double-counted.
-   Logic: month-by-month iteration through each term's start→end range.
-   If a month already exists (from an earlier term), it keeps the earlier term tag.
+   Each calendar month is assigned to the term whose START date it falls in or after,
+   but before the NEXT term's start date. This ensures e.g. Sep belongs to T2
+   (T2 starts Sep 7) not T1 (T1 ends Sep 4) — term boundaries defined by starts.
 */
 function buildSchoolMonths() {
   const termDefs = [
@@ -600,26 +598,40 @@ function buildSchoolMonths() {
     { id:3, sId:"t3Start", eId:"t3End" }
   ];
 
-  // Use a Map keyed by "YYYY-MM" to deduplicate
+  const parsed = termDefs.map(td => ({
+    id: td.id,
+    s: parseDate(document.getElementById(td.sId).value),
+    e: parseDate(document.getElementById(td.eId).value)
+  })).filter(td => td.s && td.e);
+
+  if (parsed.length === 0) return [];
+
+  // Collect all unique months across all terms (from first term start to last term end)
   const seen = new Map();
-
-  for (const td of termDefs) {
-    const s = parseDate(document.getElementById(td.sId).value);
-    const e = parseDate(document.getElementById(td.eId).value);
-    if (!s || !e) continue;
-
-    let cy = s.y, cm = s.m;
-    while (cy < e.y || (cy === e.y && cm <= e.m)) {
-      const key = `${cy}-${cm}`;
-      if (!seen.has(key)) {
-        seen.set(key, { y: cy, m: cm, term: td.id });
-      }
+  for (const td of parsed) {
+    let cy = td.s.y, cm = td.s.m;
+    while (cy < td.e.y || (cy === td.e.y && cm <= td.e.m)) {
+      const key = `${cy}-${String(cm).padStart(2,'0')}`;
+      if (!seen.has(key)) seen.set(key, { y: cy, m: cm });
       cm++; if (cm > 11) { cm = 0; cy++; }
     }
   }
 
-  // Return in chronological order
-  return [...seen.values()].sort((a,b) => a.y !== b.y ? a.y-b.y : a.m-b.m);
+  const allMonths = [...seen.values()].sort((a,b) => a.y !== b.y ? a.y-b.y : a.m-b.m);
+
+  // Assign each month to a term: month belongs to term whose start <= month < next term's start
+  // (using year*12+month as comparable integer)
+  const termStarts = parsed.map(td => ({ id: td.id, val: td.s.y*12 + td.s.m }));
+
+  return allMonths.map(mo => {
+    const moVal = mo.y*12 + mo.m;
+    // Find the latest term whose start <= this month
+    let assignedTerm = parsed[0].id;
+    for (const ts of termStarts) {
+      if (moVal >= ts.val) assignedTerm = ts.id;
+    }
+    return { ...mo, term: assignedTerm };
+  });
 }
 
 /* ─── PRORATE ───
@@ -780,13 +792,15 @@ function recalc() {
 
   document.getElementById("displayFinal").textContent = fmtNum(finalAmount);
 
-  // Per Month Payment = floorK(finalAmount / total remaining months)
-  // matches the rounded installment amount shown in the schedule
+  // Per Month Payment = floorK of raw per-month (matches schedule installment amount)
   const cycleEl = document.getElementById("displayCycle");
   const totalRemMonths = prorate.remainingMonths.length;
   if (totalRemMonths > 0) {
-    const perMonth = floorK(finalAmount / totalRemMonths);
-    cycleEl.textContent = fmtKs(perMonth) + " (est.)";
+    const rawPerMonth = finalAmount / totalRemMonths;
+    const floored = floorK(rawPerMonth);
+    // Only append "~" if rounding changed the value
+    const prefix = (floored !== rawPerMonth) ? "≈ " : "";
+    cycleEl.textContent = prefix + fmtKs(floored);
   } else {
     cycleEl.textContent = "—";
   }
@@ -806,7 +820,7 @@ function renderSchedule(finalAmount, prorate, plan) {
   }
 
   if (plan==="One-Time") {
-    addRow(tbody,1,null,null,"Registration Date — Full Payment",finalAmount,"");
+    addRow(tbody,1,null,null,"Registration Date — Full Payment",finalAmount,"");  // no note
     addTotalRow(tbody,finalAmount);
     return;
   }
@@ -861,8 +875,7 @@ function renderMonthly(tbody, finalAmount, rem) {
   rem.forEach((sm, i) => {
     const amt  = i === 0 ? firstAmt : roundedAmt;
     const due  = i === 0 ? "Registration Date" : fmtYM(sm);
-    const note = `${fmtNum(finalAmount)} ÷ ${n} × 1`;
-    addRow(tbody, i+1, tCls[sm.term], tLbl[sm.term], due, amt, note);
+    addRow(tbody, i+1, tCls[sm.term], tLbl[sm.term], due, amt, "");  // no note
   });
   addTotalRow(tbody, finalAmount);
 }
