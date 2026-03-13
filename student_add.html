@@ -483,7 +483,6 @@
               <div class="t">Grade Level</div>
               <div class="v">
                 <select id="grade">
-                  <option value="SR Half-day">SR Half-day</option>
                   <option value="SR Full-day">SR Full-day</option>
                   <option value="EY1" selected>EY1</option>
                   <option value="EY2">EY2</option>
@@ -677,7 +676,6 @@
     if (year === "AY2025-2026") {
       const isInstallment = plan !== "One-Time";
       const prices = {
-        "SR Half-day": [2700000, 3000000],
         "SR Full-day": [3900000, 4200000],
         "EY1":         [3900000, 4200000],
         "EY2":         [3900000, 4200000],
@@ -685,12 +683,11 @@
         "Y2":          [4200000, 4500000],
         "Y3":          [4200000, 4500000]
       };
-      return prices[grade][isInstallment ? 1 : 0] || 0;
+      return prices[grade] ? prices[grade][isInstallment ? 1 : 0] : 0;
     }
 
     if (year === "AY2026-2027") {
       const tbl = {
-        "SR Half-day": {"One-Time":2890000, "Termly":3090000, "Monthly":3290000},
         "SR Full-day": {"One-Time":4290000, "Termly":4490000, "Monthly":4890000},
         "EY1":         {"One-Time":4290000, "Termly":4490000, "Monthly":4890000},
         "EY2":         {"One-Time":4290000, "Termly":4490000, "Monthly":4890000},
@@ -701,24 +698,6 @@
       return (tbl[grade] && tbl[grade][plan]) ? tbl[grade][plan] : 0;
     }
 
-    return 0;
-  }
-
-  // The annual (One-Time) reference fee — used for FREE TERMS discount
-  function getAnnualReference() {
-    const year  = academicYearEl.value;
-    const grade = gradeEl.value;
-    if (year === "SUMMER2026") return 0;
-    if (year === "AY2025-2026") {
-      if (grade === "SR Half-day") return 2700000;
-      if (grade === "SR Full-day" || grade.startsWith("EY")) return 3900000;
-      return 4200000;
-    }
-    if (year === "AY2026-2027") {
-      if (grade === "SR Half-day") return 2890000;
-      if (grade === "SR Full-day" || grade.startsWith("EY")) return 4290000;
-      return 4690000;
-    }
     return 0;
   }
 
