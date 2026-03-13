@@ -812,44 +812,57 @@ function renderSchedule(finalAmount, prorate, plan) {
   else                 renderMonthly(tbody,finalAmount,rem);
 }
 
+// Round down to nearest 1000
+function floorK(n) { return Math.floor(n / 1000) * 1000; }
+
 function renderTermly(tbody, finalAmount, rem) {
   const tg = {1:[],2:[],3:[]};
   rem.forEach(sm => { if(tg[sm.term]) tg[sm.term].push(sm); });
   const total = rem.length;  // total remaining months
   const termsUsed = [1,2,3].filter(t=>tg[t].length>0);
-  const lastT = termsUsed[termsUsed.length-1];
-  let rowNum=1, running=0;
   const tCls = {1:"t1",2:"t2",3:"t3"};
 
-  for (const t of termsUsed) {
-    const cnt = tg[t].length;
-    const isLast = (t===lastT);
-    const amt = isLast ? finalAmount-running : Math.round(finalAmount*cnt/total);
-    if (!isLast) running += amt;
-    const due = t===1 ? "Registration Date" : fmtYM(tg[t][0]);
-    // Note: Final ÷ totalMonthsLeft × monthsInThisTerm
-    const note = `${fmtNum(finalAmount)} ÷ ${total} × ${cnt}`;
-    addRow(tbody, rowNum++, tCls[t], `Term ${t}`, due, amt, note);
-  }
-  addTotalRow(tbody,finalAmount);
+  // Calculate raw amounts for each term slot
+  const slots = termsUsed.map(t => ({
+    t,
+    cnt: tg[t].length,
+    due: t===1 ? "Registration Date" : fmtYM(tg[t][0]),
+    raw: finalAmount * tg[t].length / total
+  }));
+
+  // Payments 2+ (index 1 onwards) are floored to nearest 1000
+  // Payment 1 (first) = finalAmount - sum of all others
+  let sumOthers = 0;
+  slots.forEach((s, i) => {
+    if (i === 0) s.amt = null; // fill in after
+    else { s.amt = floorK(s.raw); sumOthers += s.amt; }
+  });
+  slots[0].amt = finalAmount - sumOthers;
+
+  slots.forEach((s, i) => {
+    const note = `${fmtNum(finalAmount)} ÷ ${total} × ${s.cnt}`;
+    addRow(tbody, i+1, tCls[s.t], `Term ${s.t}`, s.due, s.amt, note);
+  });
+  addTotalRow(tbody, finalAmount);
 }
 
 function renderMonthly(tbody, finalAmount, rem) {
   const n = rem.length;
-  let running = 0;
   const tCls = {1:"t1",2:"t2",3:"t3"};
   const tLbl = {1:"T1",2:"T2",3:"T3"};
-  rem.forEach((sm,i) => {
-    const isLast = (i===n-1);
-    const per = Math.round(finalAmount/n);
-    const amt = isLast ? finalAmount-running : per;
-    if (!isLast) running += amt;
-    const due = i===0 ? "Registration Date" : fmtYM(sm);
-    // Note: Final ÷ totalMonthsLeft × 1
+
+  // Payments 2+ floored to nearest 1000; first payment = remainder
+  const rawPerMonth = finalAmount / n;
+  const roundedAmt  = floorK(rawPerMonth);
+  const firstAmt    = finalAmount - roundedAmt * (n - 1);
+
+  rem.forEach((sm, i) => {
+    const amt  = i === 0 ? firstAmt : roundedAmt;
+    const due  = i === 0 ? "Registration Date" : fmtYM(sm);
     const note = `${fmtNum(finalAmount)} ÷ ${n} × 1`;
     addRow(tbody, i+1, tCls[sm.term], tLbl[sm.term], due, amt, note);
   });
-  addTotalRow(tbody,finalAmount);
+  addTotalRow(tbody, finalAmount);
 }
 
 function addRow(tbody, no, termClass, termLabel, dateLabel, amount, note) {
