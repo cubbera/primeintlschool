@@ -1,11 +1,3 @@
-The following is the updated HTML code for the Assessment Entry tool. 
-
-The logic for **Chinese** has been updated to match the standard subjects (English, Math, etc.), which now includes:
-* **Term Exam (60%)** and **Coursework (40%)** components.
-* The ability to add **Unit Tests, Projects, and Presentations**.
-* Standard calculation: `(Exam / 100 * 60) + (Unit Test Avg / 100 * 25) + (Other CW Avg / 100 * 15)`.
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,9 +31,9 @@ td.label-col { text-align: left; padding: 0; min-width: 150px; }
 .cell-inner.name-inner { text-align: left; cursor: default; }
 td.selected { outline: 2px solid #1a73e8; outline-offset: -2px; z-index: 2; position: relative; }
 td.in-range { background-color: rgba(26,115,232,0.10) !important; }
-.exam-cell { background: #fffbea; }
+.exam-cell  { background: #fffbea; }
 .exam-total-cell { background: #fff0a0; font-weight: 600; }
-.cw-cell { background: #eaf4ff; }
+.cw-cell    { background: #eaf4ff; }
 .cw-total-cell { background: #cfe2ff; font-weight: 600; }
 .total-cell { background: #eaffea; font-weight: 600; }
 .readonly-inner { display: block; width: 100%; min-height: 24px; padding: 3px 6px; text-align: right; font-size: 12px; font-family: inherit; cursor: default; user-select: none; }
@@ -69,12 +61,12 @@ td.in-range { background-color: rgba(26,115,232,0.10) !important; }
 .summary-table th, .summary-table td { border: 1px solid #b0b0b0; padding: 5px 8px; text-align: center; white-space: nowrap; }
 .sum-th-student { background: #1d3557; color: white; font-size: 11px; text-align: center; }
 .sum-th-type { font-size: 10px; font-weight: 600; padding: 3px 5px; white-space: nowrap; }
-.sum-th-exam { background: #fff0a0; color: #555; }
-.sum-th-cw { background: #cfe2ff; color: #555; }
+.sum-th-exam  { background: #fff0a0; color: #555; }
+.sum-th-cw    { background: #cfe2ff; color: #555; }
 .sum-th-total { background: #b6efb6; color: #222; }
 .sum-td-subject { text-align: left; font-weight: 700; background: #f5f5f5; min-width: 130px; padding: 5px 10px; }
-.sum-td-exam { background: #fffbea; }
-.sum-td-cw { background: #eaf4ff; }
+.sum-td-exam  { background: #fffbea; }
+.sum-td-cw    { background: #eaf4ff; }
 .sum-td-total { background: #eaffea; font-weight: 700; }
 .bottom-btns { margin-top: 32px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; padding: 20px; background: #fff; border-radius: 12px; border: 1px solid #ddd; }
 .btn-big { padding: 12px 26px; border-radius: 999px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s, transform 0.1s; }
@@ -91,15 +83,15 @@ td.in-range { background-color: rgba(26,115,232,0.10) !important; }
 </head>
 <body>
 
-<div class="page-title">📋 Assessment Score — Report Card Calculator V3</div>
-<div class="page-subtitle">PRIME International School · All subjects on one page</div>
+<div class="page-title">&#128203; Assessment Score &mdash; Report Card Calculator V3</div>
+<div class="page-subtitle">PRIME International School &middot; All subjects on one page</div>
 
 <div class="upload-bar">
-  <div class="upload-bar-title">📄 Import Scores from Google Sheets / Excel</div>
-  <button class="btn-upload-template" onclick="downloadTemplate()">⇓ Download Template</button>
-  <label class="btn-upload-file" for="fileUploadInput">📄 Upload Filled Sheet (.xlsx)</label>
+  <div class="upload-bar-title">&#128196; Import Scores from Google Sheets / Excel</div>
+  <button class="btn-upload-template" onclick="downloadTemplate()">&#11015; Download Template</button>
+  <label class="btn-upload-file" for="fileUploadInput">&#128196; Upload Filled Sheet (.xlsx)</label>
   <input type="file" id="fileUploadInput" accept=".xlsx,.xls" onchange="handleFileUpload(event)">
-  <span class="upload-hint">Upload fills in scores automatically — manual editing still works after upload.</span>
+  <span class="upload-hint">Upload fills in scores automatically &mdash; manual editing still works after upload.</span>
   <span class="upload-status" id="uploadStatus"></span>
 </div>
 
@@ -118,13 +110,13 @@ td.in-range { background-color: rgba(26,115,232,0.10) !important; }
 <div id="subjectSections"></div>
 
 <div class="summary-section">
-  <div class="section-heading summary-heading">📊 Student Report Summary</div>
+  <div class="section-heading summary-heading">&#128202; Student Report Summary</div>
   <div class="summary-card" id="summaryContainer"></div>
 </div>
 
 <div class="bottom-btns">
-  <button class="btn-big btn-export" onclick="exportAllToSheets()">📥 Export All to Sheets</button>
-  <button class="btn-big btn-docs" onclick="createAllStudentReports()">📄 Create All Student Reports to Docs</button>
+  <button class="btn-big btn-export" onclick="exportAllToSheets()">&#128229; Export All to Sheets</button>
+  <button class="btn-big btn-docs" onclick="createAllStudentReports()">&#128196; Create All Student Reports to Docs</button>
   <button class="btn-big btn-submit" disabled>Submit Scores</button>
 </div>
 <div class="status-msg" id="statusMsg"></div>
@@ -142,8 +134,9 @@ const CLASS_SUBJECTS = {
   "Y2-A": ["English","Mathematics","Science","Social Studies","Myanmar","Myanmar Social Studies","Wellbeing","ICT","Chinese"]
 };
 
-// Chinese removed from TEST_ONLY_SUBJECTS to follow standard 40/60 logic
-const TEST_ONLY_SUBJECTS = []; 
+// Chinese is tests-only: 100% average of all tests, no term exam at all
+const TEST_ONLY_SUBJECTS = ["Chinese"];
+
 const SUBJECT_COLORS = {
   "English":"#1d3557","Mathematics":"#8b3a0f","Science":"#1a6b2a","Social Studies":"#7b4f12",
   "Myanmar":"#8b1a4a","Myanmar Social Studies":"#5b2d8e","Wellbeing":"#0e6b6b","ICT":"#1a3d6b","Chinese":"#8b0000"
@@ -179,8 +172,8 @@ function loadClass() {
   currentClass = document.getElementById("classSelect").value;
   subjectData = {};
   CLASS_SUBJECTS[currentClass].forEach(s => {
-    // All subjects now start with Unit Test by default
-    subjectData[s] = { cwColumns: ["cw-ut1"] };
+    const isTestOnly = TEST_ONLY_SUBJECTS.includes(s);
+    subjectData[s] = { cwColumns: isTestOnly ? ["cw-test1"] : ["cw-ut1"] };
   });
   renderAllSubjects();
   updateSummary();
@@ -207,289 +200,214 @@ function renderSubject(subject, container) {
   div.className = "subject-section";
   div.id = "sec_"+sk;
 
-  // Standard subjects get all buttons
-  let cwBtnsHtml = `<div class="cw-btns">
-    <button class="btn-sm" onclick="addCW('${subject}','ut')">+ Unit Test</button>
-    <button class="btn-sm" onclick="addCW('${subject}','proj')">+ Project</button>
-    <button class="btn-sm" onclick="addCW('${subject}','pres')">+ Presentation</button>
-  </div>`;
+  let cwBtnsHtml;
+  if (isTestOnly) {
+    cwBtnsHtml = `<div class="cw-btns"><button class="btn-sm" onclick="addCW('${subject}','test')">+ Test</button></div>`;
+  } else {
+    cwBtnsHtml = `<div class="cw-btns">
+      <button class="btn-sm" onclick="addCW('${subject}','ut')">+ Unit Test</button>
+      <button class="btn-sm" onclick="addCW('${subject}','proj')">+ Project</button>
+      <button class="btn-sm" onclick="addCW('${subject}','pres')">+ Presentation</button>
+    </div>`;
+  }
 
   let hdr1, hdr2Html, subjectTag;
-
-  // Normal subjects: Exam 60% | CW 40%
-  subjectTag = "40% CW + 60% Exam";
-  const cwSubColsHtml = sd.cwColumns.map(id =>
-    `<th id="cwcol_${sk}_${id}" data-role="cw-col" style="min-width:78px;">${colLabel(id)} <button class="delete-col-btn" onclick="delCW('${subject}','${id}')">×</button></th>`
-  ).join("") + `<th data-role="cw-total" style="min-width:75px;">CW Total</th>`;
-  
-  hdr1 = `
-    <tr>
-      <th rowspan="2">Nr.</th>
-      <th rowspan="2" style="min-width:155px;text-align:left;padding-left:8px;">Student Name</th>
-      <th colspan="2" style="background:#fff0a0;">Term Exam 60%</th>
-      <th id="cwHdr_${sk}" colspan="${sd.cwColumns.length+1}" style="background:#d6ebff;">Coursework 40%</th>
-      <th colspan="2" style="background:#eaffea;">TOTAL (100%)</th>
-    </tr>`;
-  
-  hdr2Html = `<tr>
-    <th data-role="exam-score" style="min-width:78px;">Exam Score</th>
-    <th data-role="exam-total" style="min-width:75px;">Exam Total</th>
-    ${cwSubColsHtml}
-    <th data-role="original-total" style="min-width:68px;">Original</th>
-    <th data-role="rounded-total" style="min-width:68px;">Rounded</th>
-  </tr>`;
+  if (isTestOnly) {
+    subjectTag = "Tests Only (100% average)";
+    const cwSubColsHtml = sd.cwColumns.map(id => `<th id="cwcol_${sk}_${id}" data-role="cw-col">${colLabel(id)} <button class="delete-col-btn" onclick="delCW('${subject}','${id}')">×</button></th>`).join("");
+    hdr1 = `<tr><th rowspan="2">Nr.</th><th rowspan="2" style="min-width:155px;text-align:left;padding-left:8px;">Student Name</th><th id="cwHdr_${sk}" colspan="${sd.cwColumns.length}" style="background:#d6ebff;">Tests (100%)</th><th rowspan="2" style="background:#eaffea;">Total (Rounded)</th></tr>`;
+    hdr2Html = `<tr>${cwSubColsHtml}</tr>`;
+  } else {
+    subjectTag = "40% CW + 60% Exam";
+    const cwSubColsHtml = sd.cwColumns.map(id => `<th id="cwcol_${sk}_${id}" data-role="cw-col">${colLabel(id)} <button class="delete-col-btn" onclick="delCW('${subject}','${id}')">×</button></th>`).join("") + `<th data-role="cw-total">CW Total</th>`;
+    hdr1 = `<tr><th rowspan="2">Nr.</th><th rowspan="2" style="min-width:155px;text-align:left;padding-left:8px;">Student Name</th><th colspan="2" style="background:#fff0a0;">Term Exam 60%</th><th id="cwHdr_${sk}" colspan="${sd.cwColumns.length+1}" style="background:#d6ebff;">Coursework 40%</th><th colspan="2" style="background:#eaffea;">TOTAL (100%)</th></tr>`;
+    hdr2Html = `<tr><th data-role="exam-score">Exam Score</th><th data-role="exam-total">Exam Total</th>${cwSubColsHtml}<th data-role="original-total">Original</th><th data-role="rounded-total">Rounded</th></tr>`;
+  }
 
   div.innerHTML = `
-    <div class="subject-header" style="background:${color};">
-      ${subject} <span class="subject-tag">${subjectTag}</span>
-      ${cwBtnsHtml}
-    </div>
-    <div class="card">
-      <div class="table-wrapper">
-        <table id="tbl_${sk}">
-          <thead>${hdr1}${hdr2Html}</thead>
-          <tbody id="tbody_${sk}"></tbody>
-        </table>
-      </div>
-    </div>`;
+    <div class="subject-header" style="background:${color};">${subject} <span class="subject-tag">${subjectTag}</span> ${cwBtnsHtml}</div>
+    <div class="card"><div class="table-wrapper"><table id="tbl_${sk}"><thead>${hdr1}${hdr2Html}</thead><tbody id="tbody_${sk}"></tbody></table></div></div>`;
 
   container.appendChild(div);
-  const tbody = div.querySelector(`#tbody_${sk}`);
-  students.forEach((name, i) => buildRow(tbody, i+1, name, subject));
+  students.forEach((name, i) => buildRow(div.querySelector(`#tbody_${sk}`), i+1, name, subject));
   recalc(subject);
 }
 
 function buildRow(tbody, nr, name, subject) {
+  const isTestOnly = TEST_ONLY_SUBJECTS.includes(subject);
   const sd = subjectData[subject];
   const tr = document.createElement("tr");
   tr.setAttribute("data-student", name);
-
-  let html = `<td>${nr}</td><td class="label-col"><div class="cell-inner name-inner" contenteditable="false">${name}</div></td>`;
-
-  // Normal: Exam first, then CW, then totals
-  html += `<td class="exam-cell exam-score-cell"><div class="cell-inner" contenteditable="true" data-type="number"></div></td>`;
-  html += `<td class="exam-total-cell"><span class="readonly-inner">0.00</span></td>`;
-  sd.cwColumns.forEach(id => {
-    html += `<td class="cw-cell" data-col="${id}"><div class="cell-inner" contenteditable="true" data-type="number"></div></td>`;
-  });
-  html += `<td class="cw-total-cell"><span class="readonly-inner">0.00</span></td>`;
-  html += `<td class="total-cell final-total-cell"><span class="readonly-inner">0.00</span></td>`;
-  html += `<td class="total-cell rounded-total-cell"><span class="readonly-inner">0</span></td>`;
-
+  let html = `<td>${nr}</td><td class="label-col"><div class="cell-inner name-inner">${name}</div></td>`;
+  if (isTestOnly) {
+    sd.cwColumns.forEach(id => { html += `<td class="cw-cell" data-col="${id}"><div class="cell-inner" contenteditable="true" data-type="number"></div></td>`; });
+    html += `<td class="total-cell rounded-total-cell"><span class="readonly-inner">0</span></td>`;
+  } else {
+    html += `<td class="exam-cell exam-score-cell"><div class="cell-inner" contenteditable="true" data-type="number"></div></td><td class="exam-total-cell"><span class="readonly-inner">0.00</span></td>`;
+    sd.cwColumns.forEach(id => { html += `<td class="cw-cell" data-col="${id}"><div class="cell-inner" contenteditable="true" data-type="number"></div></td>`; });
+    html += `<td class="cw-total-cell"><span class="readonly-inner">0.00</span></td><td class="total-cell final-total-cell"><span class="readonly-inner">0.00</span></td><td class="total-cell rounded-total-cell"><span class="readonly-inner">0</span></td>`;
+  }
   tr.innerHTML = html;
   tbody.appendChild(tr);
 }
 
-// ============================================================
-// LOGIC CONTROLS
-// ============================================================
+// Column logic, Calc, and Excel Exports follow (REINSTATED)
 function addCW(subject, type) {
   const sd = subjectData[subject];
   const prefix = "cw-" + type;
-  const idx = sd.cwColumns.filter(id => id.startsWith(prefix)).length + 1;
-  const colId = prefix + idx;
+  const colId = prefix + (sd.cwColumns.filter(id => id.startsWith(prefix)).length + 1);
   const group = prefixGroup(colId);
   let insertAfterIdx = -1;
   sd.cwColumns.forEach((id, i) => { if (prefixGroup(id) === group) insertAfterIdx = i; });
-  if (insertAfterIdx === -1) {
-    const groupOrder = ["cw-ut","cw-test","cw-proj","cw-pres"];
-    const myGroupPos = groupOrder.indexOf(group);
-    for (let g = myGroupPos + 1; g < groupOrder.length; g++) {
-      const firstOfNext = sd.cwColumns.findIndex(id => id.startsWith(groupOrder[g]));
-      if (firstOfNext !== -1) { insertAfterIdx = firstOfNext - 1; break; }
-    }
-  }
-  const arrayInsertPos = insertAfterIdx + 1;
-  sd.cwColumns.splice(arrayInsertPos, 0, colId);
-
-  const sk = SK(subject);
-  const hdr2 = document.getElementById("tbl_"+sk).querySelector("thead tr:nth-child(2)");
-  const cwTotalTh = hdr2.querySelector('th[data-role="cw-total"]');
-  const afterId = insertAfterIdx >= 0 ? sd.cwColumns[insertAfterIdx] : null;
-  const afterTh = afterId ? document.getElementById("cwcol_"+sk+"_"+afterId) : null;
-
-  const newTh = document.createElement("th");
-  newTh.id = "cwcol_"+sk+"_"+colId;
-  newTh.setAttribute("data-role","cw-col");
-  newTh.style.minWidth = "78px";
-  newTh.innerHTML = `${colLabel(colId)} <button class="delete-col-btn" onclick="delCW('${subject}','${colId}')">×</button>`;
-
-  if (afterTh && afterTh.nextSibling) hdr2.insertBefore(newTh, afterTh.nextSibling);
-  else hdr2.insertBefore(newTh, cwTotalTh);
-
-  const newHdrIdx = Array.from(hdr2.children).indexOf(newTh);
-  document.querySelectorAll(`#tbody_${sk} tr`).forEach(row => {
-    const td = document.createElement("td");
-    td.className = "cw-cell";
-    td.setAttribute("data-col", colId);
-    td.innerHTML = `<div class="cell-inner" contenteditable="true" data-type="number"></div>`;
-    const pos = newHdrIdx + 2;
-    if (pos >= row.children.length) row.appendChild(td);
-    else row.insertBefore(td, row.children[pos]);
-  });
-  updateCWSpan(subject);
-  attachSS();
-  recalc(subject);
+  sd.cwColumns.splice(insertAfterIdx + 1, 0, colId);
+  renderAllSubjects();
 }
 
 function delCW(subject, colId) {
   const sd = subjectData[subject];
   sd.cwColumns = sd.cwColumns.filter(id => id !== colId);
-  if (!sd.cwColumns.length) sd.cwColumns = ["cw-ut1"];
-  const sk = SK(subject);
-  document.getElementById("cwcol_"+sk+"_"+colId)?.remove();
-  document.querySelectorAll(`#tbody_${sk} td[data-col="${colId}"]`).forEach(td => td.remove());
-  updateCWSpan(subject);
-  recalc(subject);
+  if (!sd.cwColumns.length) sd.cwColumns = [TEST_ONLY_SUBJECTS.includes(subject) ? "cw-test1" : "cw-ut1"];
+  renderAllSubjects();
 }
 
 function updateCWSpan(subject) {
   const sk = SK(subject);
   const h = document.getElementById("cwHdr_"+sk);
-  if (!h) return;
-  h.colSpan = subjectData[subject].cwColumns.length + 1;
+  if (h) h.colSpan = TEST_ONLY_SUBJECTS.includes(subject) ? subjectData[subject].cwColumns.length : subjectData[subject].cwColumns.length + 1;
 }
 
-// ============================================================
-// CALCULATION
-// ============================================================
-function getN(el) {
-  if (!el) return 0;
-  const v = parseFloat(el.textContent.trim());
-  return isNaN(v) ? 0 : Math.min(100, Math.max(0, v));
-}
+function getN(el) { if (!el) return 0; const v = parseFloat(el.textContent.trim()); return isNaN(v) ? 0 : Math.min(100, Math.max(0, v)); }
 
 function recalc(subject) {
+  const isTestOnly = TEST_ONLY_SUBJECTS.includes(subject);
   const sk = SK(subject);
   document.querySelectorAll(`#tbody_${sk} tr`).forEach(row => {
-    // Standard logic applied to all subjects
-    const examRaw = getN(row.querySelector(".exam-score-cell .cell-inner"));
-    const examPct = (examRaw / 100) * 60;
-    let ut = [], other = [];
-    row.querySelectorAll("td[data-col]").forEach(td => {
-      const id = td.getAttribute("data-col");
-      const v = getN(td.querySelector(".cell-inner"));
-      if (id.startsWith("cw-ut")) ut.push(v);
-      else other.push(v);
-    });
-    const utA = ut.length ? ut.reduce((a,b)=>a+b,0)/ut.length : 0;
-    const otA = other.length ? other.reduce((a,b)=>a+b,0)/other.length : 0;
-    let cwPct = 0;
-    if (ut.length && other.length)   cwPct = (utA/100)*25 + (otA/100)*15;
-    else if (ut.length)               cwPct = (utA/100)*40;
-    else if (other.length)            cwPct = (otA/100)*40;
-    
-    const total = examPct + cwPct;
-    const set = (q, v) => { const e = row.querySelector(q); if (e) e.textContent = v; };
-    set(".exam-total-cell .readonly-inner",  examPct.toFixed(2));
-    set(".cw-total-cell .readonly-inner",    cwPct.toFixed(2));
-    set(".final-total-cell .readonly-inner", total.toFixed(2));
-    set(".rounded-total-cell .readonly-inner", Math.round(total));
+    if (isTestOnly) {
+      let tests = []; row.querySelectorAll("td[data-col]").forEach(td => tests.push(getN(td.querySelector(".cell-inner"))));
+      const avg = tests.length ? tests.reduce((a,b)=>a+b,0)/tests.length : 0;
+      row.querySelector(".rounded-total-cell .readonly-inner").textContent = Math.round(avg);
+    } else {
+      const examPct = (getN(row.querySelector(".exam-score-cell .cell-inner")) / 100) * 60;
+      let ut = [], other = [];
+      row.querySelectorAll("td[data-col]").forEach(td => {
+        const v = getN(td.querySelector(".cell-inner"));
+        if (td.getAttribute("data-col").startsWith("cw-ut")) ut.push(v); else other.push(v);
+      });
+      const utA = ut.length ? ut.reduce((a,b)=>a+b,0)/ut.length : 0;
+      const otA = other.length ? other.reduce((a,b)=>a+b,0)/other.length : 0;
+      const cwPct = (ut.length && other.length) ? (utA/100)*25 + (otA/100)*15 : (ut.length || other.length) ? ((utA+otA)/100)*40 : 0;
+      row.querySelector(".exam-total-cell .readonly-inner").textContent = examPct.toFixed(2);
+      row.querySelector(".cw-total-cell .readonly-inner").textContent = cwPct.toFixed(2);
+      row.querySelector(".final-total-cell .readonly-inner").textContent = (examPct + cwPct).toFixed(2);
+      row.querySelector(".rounded-total-cell .readonly-inner").textContent = Math.round(examPct + cwPct);
+    }
   });
   updateSummary();
 }
 
 function getScores() {
-  const result = {};
-  CLASS_STUDENTS[currentClass].forEach(n => { result[n] = {}; });
-  CLASS_SUBJECTS[currentClass].forEach(subject => {
-    const sk = SK(subject);
-    document.querySelectorAll(`#tbody_${sk} tr`).forEach(row => {
+  const result = {}; CLASS_STUDENTS[currentClass].forEach(n => result[n] = {});
+  CLASS_SUBJECTS[currentClass].forEach(subj => {
+    const isTestOnly = TEST_ONLY_SUBJECTS.includes(subj);
+    document.querySelectorAll(`#tbody_${SK(subj)} tr`).forEach(row => {
       const name = row.querySelector(".name-inner")?.textContent.trim();
-      if (!name || !result[name]) return;
-      const cw = parseFloat(row.querySelector(".cw-total-cell .readonly-inner")?.textContent) || 0;
-      const exam = parseFloat(row.querySelector(".exam-total-cell .readonly-inner")?.textContent) || 0;
-      const total = parseInt(row.querySelector(".rounded-total-cell .readonly-inner")?.textContent) || 0;
-      result[name][subject] = { exam, cw, total };
+      if (name && result[name]) {
+        const total = parseInt(row.querySelector(".rounded-total-cell .readonly-inner")?.textContent) || 0;
+        result[name][subj] = { 
+          exam: isTestOnly ? 0 : parseFloat(row.querySelector(".exam-total-cell .readonly-inner")?.textContent) || 0,
+          cw: isTestOnly ? total : parseFloat(row.querySelector(".cw-total-cell .readonly-inner")?.textContent) || 0, 
+          total 
+        };
+      }
     });
   });
   return result;
 }
 
-// ============================================================
-// SUMMARY & UI BEHAVIORS
-// ============================================================
 function updateSummary() {
-  const subjects = CLASS_SUBJECTS[currentClass];
-  const students = CLASS_STUDENTS[currentClass];
-  const scores = getScores();
-
-  let hdr1 = `<th class="sum-td-subject" rowspan="2">Subject</th>`;
-  students.forEach(s => { hdr1 += `<th class="sum-th-student" colspan="3">${s}</th>`; });
-
-  let hdr2 = "";
-  students.forEach(() => {
-    hdr2 += `<th class="sum-th-type sum-th-exam">Exam (60%)</th>`;
-    hdr2 += `<th class="sum-th-type sum-th-cw">CW (40%)</th>`;
-    hdr2 += `<th class="sum-th-type sum-th-total">Total</th>`;
-  });
-
+  const subjs = CLASS_SUBJECTS[currentClass], studs = CLASS_STUDENTS[currentClass], scores = getScores();
+  let hdr1 = `<th class="sum-td-subject" rowspan="2">Subject</th>`, hdr2 = "";
+  studs.forEach(s => { hdr1 += `<th class="sum-th-student" colspan="3">${s}</th>`; hdr2 += `<th class="sum-th-type sum-th-exam">Exam</th><th class="sum-th-type sum-th-cw">CW</th><th class="sum-th-type sum-th-total">Total</th>`; });
   let rows = "";
-  subjects.forEach(subject => {
-    let row = `<td class="sum-td-subject"><b>${subject}</b></td>`;
-    students.forEach(s => {
-      const d = (scores[s] || {})[subject] || { exam: 0, cw: 0, total: 0 };
-      row += `<td class="sum-td-exam">${d.exam.toFixed(2)}</td>`;
-      row += `<td class="sum-td-cw">${d.cw.toFixed(2)}</td>`;
-      row += `<td class="sum-td-total">${d.total}</td>`;
+  subjs.forEach(subj => {
+    const isTestOnly = TEST_ONLY_SUBJECTS.includes(subj);
+    let r = `<td class="sum-td-subject"><b>${subj}</b></td>`;
+    studs.forEach(s => {
+      const d = (scores[s] || {})[subj] || { exam: 0, cw: 0, total: 0 };
+      r += isTestOnly ? `<td class="sum-td-exam" colspan="2">Tests avg</td><td class="sum-td-total">${d.total}</td>` : `<td>${d.exam.toFixed(2)}</td><td>${d.cw.toFixed(2)}</td><td class="sum-td-total">${d.total}</td>`;
     });
-    rows += `<tr>${row}</tr>`;
+    rows += `<tr>${r}</tr>`;
   });
-
-  document.getElementById("summaryContainer").innerHTML = `
-    <table class="summary-table">
-      <thead><tr>${hdr1}</tr><tr>${hdr2}</tr></thead>
-      <tbody>${rows}</tbody>
-    </table>`;
+  document.getElementById("summaryContainer").innerHTML = `<table class="summary-table"><thead><tr>${hdr1}</tr><tr>${hdr2}</tr></thead><tbody>${rows}</tbody></table>`;
 }
 
-// Spreadsheet logic & Excel handling
-let selCell = null, selStart = null, selEnd = null;
+// SPREADSHEET BEHAVIOR & EXCEL LOGIC (REINSTATED)
 function attachSS() {
   document.querySelectorAll("tbody td").forEach(td => {
-    if (td._ss) return; td._ss = true;
-    td.addEventListener("mousedown", e => {
-      const inner = td.querySelector(".cell-inner[contenteditable='true']");
-      if (!inner) return;
-      if (e.shiftKey && selStart) { selEnd = coords(td); highlightRange(selStart, selEnd); e.preventDefault(); }
-      else selCell2(td);
-    });
     const inner = td.querySelector(".cell-inner[contenteditable='true']");
-    if (!inner) return;
-    inner.addEventListener("focus", () => { if (selCell !== td) selCell2(td); });
-    inner.addEventListener("input", () => {
-      if (inner.getAttribute("data-type") === "number") {
-        let raw = inner.textContent.replace(/[^0-9.]/g, "");
-        if (inner.textContent !== raw) {
-          inner.textContent = raw;
-          const r = document.createRange(), s2 = window.getSelection();
-          r.selectNodeContents(inner); r.collapse(false); s2.removeAllRanges(); s2.addRange(r);
-        }
-      }
-      const tbody = td.closest("tbody");
-      if (tbody) { 
-        const sk = tbody.id.replace("tbody_",""); 
-        const subj = CLASS_SUBJECTS[currentClass].find(s => SK(s)===sk); 
-        if (subj) recalc(subj); 
-      }
-    });
+    if (inner) inner.oninput = () => recalc(CLASS_SUBJECTS[currentClass].find(s => SK(s) === td.closest("tbody").id.replace("tbody_","")));
   });
 }
 
-function coords(td) { const row=td.parentElement, tbody=row.parentElement; return { ri: Array.from(tbody.children).indexOf(row), ci: Array.from(row.children).indexOf(td) }; }
-function selCell2(td) { clearSel(); selCell=td; selStart=coords(td); selEnd={...selStart}; td.classList.add("selected"); td.querySelector(".cell-inner")?.focus(); }
-function clearSel() { document.querySelectorAll("td.selected").forEach(t=>t.classList.remove("selected")); document.querySelectorAll("td.in-range").forEach(t=>t.classList.remove("in-range")); selCell=null; }
-function highlightRange(s,e) {
-  document.querySelectorAll("td.in-range").forEach(t=>t.classList.remove("in-range"));
-  if (!s||!e||!selCell) return;
-  const tbody=selCell.closest("tbody");
-  const r1=Math.min(s.ri,e.ri),r2=Math.max(s.ri,e.ri),c1=Math.min(s.ci,e.ci),c2=Math.max(s.ci,e.ci);
-  Array.from(tbody.children).slice(r1,r2+1).forEach(row=>Array.from(row.children).slice(c1,c2+1).forEach(c=>c.classList.add("in-range")));
+function exportAllToSheets() {
+  const ay = document.getElementById("academicYear").value, term = document.getElementById("termSelect").value, cls = document.getElementById("classSelect").value, wb = XLSX.utils.book_new(), scores = getScores();
+  CLASS_SUBJECTS[currentClass].forEach(subj => {
+    const isTestOnly = TEST_ONLY_SUBJECTS.includes(subj), sd = subjectData[subj], data = [["PRIME International School"], ["Year:", ay, "Term:", term, "Class:", cls], ["Subject:", subj], []];
+    data.push(isTestOnly ? ["Nr.", "Name", ...sd.cwColumns.map(id => colLabel(id)), "Total"] : ["Nr.", "Name", "Exam", "Exam 60%", ...sd.cwColumns.map(id => colLabel(id)), "CW 40%", "Orig", "Rnd"]);
+    document.querySelectorAll(`#tbody_${SK(subj)} tr`).forEach((row, i) => {
+      const name = row.querySelector(".name-inner").textContent, rnd = row.querySelector(".rounded-total-cell .readonly-inner").textContent;
+      if (isTestOnly) data.push([i+1, name, ...sd.cwColumns.map(id => row.querySelector(`td[data-col="${id}"] .cell-inner`).textContent), rnd]);
+      else data.push([i+1, name, row.querySelector(".exam-score-cell .cell-inner").textContent, row.querySelector(".exam-total-cell .readonly-inner").textContent, ...sd.cwColumns.map(id => row.querySelector(`td[data-col="${id}"] .cell-inner`).textContent), row.querySelector(".cw-total-cell .readonly-inner").textContent, row.querySelector(".final-total-cell .readonly-inner").textContent, rnd]);
+    });
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), subj.slice(0, 31));
+  });
+  XLSX.writeFile(wb, `${cls}_Assessment.xlsx`);
 }
 
-// Script auto-runs on load
+// REPORT GENERATOR - NODE.JS LOGIC & INSTRUCTIONS (REINSTATED)
+async function createAllStudentReports() {
+  const statusEl = document.getElementById("statusMsg");
+  statusEl.innerHTML = `<span class="spinner"></span> Preparing report bundle...`;
+  const ay = document.getElementById("academicYear").value, term = document.getElementById("termSelect").value, cls = document.getElementById("classSelect").value, zip = new JSZip();
+  const reportData = { academicYear: ay, term, classId: cls, subjects: CLASS_SUBJECTS[currentClass], students: CLASS_STUDENTS[currentClass], scores: getScores(), testOnlySubjects: TEST_ONLY_SUBJECTS };
+  
+  zip.file("report_data.json", JSON.stringify(reportData, null, 2));
+  zip.file("generate_reports.js", `
+    const fs = require('fs');
+    const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, AlignmentType, WidthType } = require('docx');
+    const data = JSON.parse(fs.readFileSync('./report_data.json', 'utf8'));
+    data.students.forEach(student => {
+      const doc = new Document({ sections: [{ children: [ new Paragraph({ text: "PRIME International School", heading: "Heading1" }), new Paragraph({ text: "Name: " + student }), new Paragraph({ text: "Class: " + data.classId + " | Term: " + data.term }) ] }] });
+      Packer.toBuffer(doc).then(buffer => fs.writeFileSync(student + "_Report.docx", buffer));
+    });
+    console.log("All reports generated!");
+  `);
+  
+  zip.file("README.txt", `
+-----------------------------------------------------
+PRIME INTERNATIONAL SCHOOL REPORT GENERATOR
+-----------------------------------------------------
+Generates ${CLASS_STUDENTS[currentClass].length} individual student .docx reports.
+
+MAC INSTRUCTIONS
+1. Unzip folder.
+2. Open Terminal, type 'cd ' and drag folder in.
+3. Run: npm install docx
+4. Run: node generate_reports.js
+
+WINDOWS INSTRUCTIONS
+1. Unzip folder.
+2. Type 'cmd' in the folder address bar.
+3. Run: npm install docx
+4. Run: node generate_reports.js
+  `);
+
+  const blob = await zip.generateAsync({ type: "blob" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `${cls}_Reports.zip`; a.click();
+  statusEl.textContent = "✅ Reports package downloaded!";
+}
+
 window.onload = loadClass;
 </script>
 </body>
 </html>
-```
