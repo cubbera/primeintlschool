@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -80,11 +81,14 @@ td.in-range { background-color: rgba(26,115,232,0.10) !important; }
 .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #ccc; border-top-color: #6f42c1; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 </style>
+
 </head>
 <body>
 
 <div class="page-title">&#128203; Assessment Score &mdash; Report Card Calculator V3</div>
 <div class="page-subtitle">PRIME International School &middot; All subjects on one page</div>
+
+<!-- Upload / Template bar -->
 
 <div class="upload-bar">
   <div class="upload-bar-title">&#128196; Import Scores from Google Sheets / Excel</div>
@@ -133,10 +137,8 @@ const CLASS_SUBJECTS = {
   "Y1-A": ["English","Mathematics","Science","Social Studies","Myanmar","Wellbeing","ICT","Chinese"],
   "Y2-A": ["English","Mathematics","Science","Social Studies","Myanmar","Myanmar Social Studies","Wellbeing","ICT","Chinese"]
 };
-
 // Chinese is tests-only: 100% average of all tests, no term exam at all
-const TEST_ONLY_SUBJECTS = ["Chinese"];
-
+const TEST_ONLY_SUBJECTS = [];
 const SUBJECT_COLORS = {
   "English":"#1d3557","Mathematics":"#8b3a0f","Science":"#1a6b2a","Social Studies":"#7b4f12",
   "Myanmar":"#8b1a4a","Myanmar Social Studies":"#5b2d8e","Wellbeing":"#0e6b6b","ICT":"#1a3d6b","Chinese":"#8b0000"
@@ -157,6 +159,8 @@ function colLabel(id) {
   return id;
 }
 
+// Return the prefix group for insertion ordering:
+// all unit-tests together, all tests together, all projects together, all presentations together
 function prefixGroup(id) {
   if (id.startsWith("cw-ut"))   return "cw-ut";
   if (id.startsWith("cw-test")) return "cw-test";
@@ -173,7 +177,8 @@ function loadClass() {
   subjectData = {};
   CLASS_SUBJECTS[currentClass].forEach(s => {
     const isTestOnly = TEST_ONLY_SUBJECTS.includes(s);
-    subjectData[s] = { cwColumns: isTestOnly ? ["cw-test1"] : ["cw-ut1"] };
+    subjectData[s] = { cwColumns: ["cw-test1"] };
+    if (!isTestOnly) subjectData[s].cwColumns = ["cw-ut1"];
   });
   renderAllSubjects();
   updateSummary();
@@ -200,9 +205,13 @@ function renderSubject(subject, container) {
   div.className = "subject-section";
   div.id = "sec_"+sk;
 
+  // ── Button bar ──
   let cwBtnsHtml;
   if (isTestOnly) {
-    cwBtnsHtml = `<div class="cw-btns"><button class="btn-sm" onclick="addCW('${subject}','test')">+ Test</button></div>`;
+    // Chinese: only "+Test" button, no exam column at all
+    cwBtnsHtml = `<div class="cw-btns">
+      <button class="btn-sm" onclick="addCW('${subject}','test')">+ Test</button>
+    </div>`;
   } else {
     cwBtnsHtml = `<div class="cw-btns">
       <button class="btn-sm" onclick="addCW('${subject}','ut')">+ Unit Test</button>
@@ -212,202 +221,796 @@ function renderSubject(subject, container) {
   }
 
   let hdr1, hdr2Html, subjectTag;
+
   if (isTestOnly) {
+    // Chinese: Tests only = 100% average. No exam column.
     subjectTag = "Tests Only (100% average)";
-    const cwSubColsHtml = sd.cwColumns.map(id => `<th id="cwcol_${sk}_${id}" data-role="cw-col">${colLabel(id)} <button class="delete-col-btn" onclick="delCW('${subject}','${id}')">×</button></th>`).join("");
-    hdr1 = `<tr><th rowspan="2">Nr.</th><th rowspan="2" style="min-width:155px;text-align:left;padding-left:8px;">Student Name</th><th id="cwHdr_${sk}" colspan="${sd.cwColumns.length}" style="background:#d6ebff;">Tests (100%)</th><th rowspan="2" style="background:#eaffea;">Total (Rounded)</th></tr>`;
+    const cwSubColsHtml = sd.cwColumns.map(id =>
+      `<th id="cwcol_${sk}_${id}" data-role="cw-col" style="min-width:78px;">${colLabel(id)} <button class="delete-col-btn" onclick="delCW('${subject}','${id}')">×</button></th>`
+    ).join("");
+    hdr1 = `
+      <tr>
+        <th rowspan="2">Nr.</th>
+        <th rowspan="2" style="min-width:155px;text-align:left;padding-left:8px;">Student Name</th>
+        <th id="cwHdr_${sk}" colspan="${sd.cwColumns.length}" style="background:#d6ebff;">Tests (100%)</th>
+        <th rowspan="2" style="background:#eaffea;min-width:68px;">Total (Rounded)</th>
+      </tr>`;
     hdr2Html = `<tr>${cwSubColsHtml}</tr>`;
   } else {
+    // Normal subjects: Exam 60% | CW 40%
     subjectTag = "40% CW + 60% Exam";
-    const cwSubColsHtml = sd.cwColumns.map(id => `<th id="cwcol_${sk}_${id}" data-role="cw-col">${colLabel(id)} <button class="delete-col-btn" onclick="delCW('${subject}','${id}')">×</button></th>`).join("") + `<th data-role="cw-total">CW Total</th>`;
-    hdr1 = `<tr><th rowspan="2">Nr.</th><th rowspan="2" style="min-width:155px;text-align:left;padding-left:8px;">Student Name</th><th colspan="2" style="background:#fff0a0;">Term Exam 60%</th><th id="cwHdr_${sk}" colspan="${sd.cwColumns.length+1}" style="background:#d6ebff;">Coursework 40%</th><th colspan="2" style="background:#eaffea;">TOTAL (100%)</th></tr>`;
-    hdr2Html = `<tr><th data-role="exam-score">Exam Score</th><th data-role="exam-total">Exam Total</th>${cwSubColsHtml}<th data-role="original-total">Original</th><th data-role="rounded-total">Rounded</th></tr>`;
+    const cwSubColsHtml = sd.cwColumns.map(id =>
+      `<th id="cwcol_${sk}_${id}" data-role="cw-col" style="min-width:78px;">${colLabel(id)} <button class="delete-col-btn" onclick="delCW('${subject}','${id}')">×</button></th>`
+    ).join("") + `<th data-role="cw-total" style="min-width:75px;">CW Total</th>`;
+    hdr1 = `
+      <tr>
+        <th rowspan="2">Nr.</th>
+        <th rowspan="2" style="min-width:155px;text-align:left;padding-left:8px;">Student Name</th>
+        <th colspan="2" style="background:#fff0a0;">Term Exam 60%</th>
+        <th id="cwHdr_${sk}" colspan="${sd.cwColumns.length+1}" style="background:#d6ebff;">Coursework 40%</th>
+        <th colspan="2" style="background:#eaffea;">TOTAL (100%)</th>
+      </tr>`;
+    hdr2Html = `<tr>
+      <th data-role="exam-score" style="min-width:78px;">Exam Score</th>
+      <th data-role="exam-total" style="min-width:75px;">Exam Total</th>
+      ${cwSubColsHtml}
+      <th data-role="original-total" style="min-width:68px;">Original</th>
+      <th data-role="rounded-total" style="min-width:68px;">Rounded</th>
+    </tr>`;
   }
 
   div.innerHTML = `
-    <div class="subject-header" style="background:${color};">${subject} <span class="subject-tag">${subjectTag}</span> ${cwBtnsHtml}</div>
-    <div class="card"><div class="table-wrapper"><table id="tbl_${sk}"><thead>${hdr1}${hdr2Html}</thead><tbody id="tbody_${sk}"></tbody></table></div></div>`;
+    <div class="subject-header" style="background:${color};">
+      ${subject} <span class="subject-tag">${subjectTag}</span>
+      ${cwBtnsHtml}
+    </div>
+    <div class="card">
+      <div class="table-wrapper">
+        <table id="tbl_${sk}">
+          <thead>${hdr1}${hdr2Html}</thead>
+          <tbody id="tbody_${sk}"></tbody>
+        </table>
+      </div>
+    </div>`;
 
   container.appendChild(div);
-  students.forEach((name, i) => buildRow(div.querySelector(`#tbody_${sk}`), i+1, name, subject));
+  const tbody = div.querySelector(`#tbody_${sk}`);
+  students.forEach((name, i) => buildRow(tbody, i+1, name, subject));
   recalc(subject);
 }
 
+// ── Build one student row ──
 function buildRow(tbody, nr, name, subject) {
   const isTestOnly = TEST_ONLY_SUBJECTS.includes(subject);
   const sd = subjectData[subject];
   const tr = document.createElement("tr");
   tr.setAttribute("data-student", name);
-  let html = `<td>${nr}</td><td class="label-col"><div class="cell-inner name-inner">${name}</div></td>`;
+
+  let html = `<td>${nr}</td><td class="label-col"><div class="cell-inner name-inner" contenteditable="false">${name}</div></td>`;
+
   if (isTestOnly) {
-    sd.cwColumns.forEach(id => { html += `<td class="cw-cell" data-col="${id}"><div class="cell-inner" contenteditable="true" data-type="number"></div></td>`; });
+    // Chinese: only test columns + rounded total
+    sd.cwColumns.forEach(id => {
+      html += `<td class="cw-cell" data-col="${id}"><div class="cell-inner" contenteditable="true" data-type="number"></div></td>`;
+    });
     html += `<td class="total-cell rounded-total-cell"><span class="readonly-inner">0</span></td>`;
   } else {
-    html += `<td class="exam-cell exam-score-cell"><div class="cell-inner" contenteditable="true" data-type="number"></div></td><td class="exam-total-cell"><span class="readonly-inner">0.00</span></td>`;
-    sd.cwColumns.forEach(id => { html += `<td class="cw-cell" data-col="${id}"><div class="cell-inner" contenteditable="true" data-type="number"></div></td>`; });
-    html += `<td class="cw-total-cell"><span class="readonly-inner">0.00</span></td><td class="total-cell final-total-cell"><span class="readonly-inner">0.00</span></td><td class="total-cell rounded-total-cell"><span class="readonly-inner">0</span></td>`;
+    // Normal: Exam first, then CW, then totals
+    html += `<td class="exam-cell exam-score-cell"><div class="cell-inner" contenteditable="true" data-type="number"></div></td>`;
+    html += `<td class="exam-total-cell"><span class="readonly-inner">0.00</span></td>`;
+    sd.cwColumns.forEach(id => {
+      html += `<td class="cw-cell" data-col="${id}"><div class="cell-inner" contenteditable="true" data-type="number"></div></td>`;
+    });
+    html += `<td class="cw-total-cell"><span class="readonly-inner">0.00</span></td>`;
+    html += `<td class="total-cell final-total-cell"><span class="readonly-inner">0.00</span></td>`;
+    html += `<td class="total-cell rounded-total-cell"><span class="readonly-inner">0</span></td>`;
   }
+
   tr.innerHTML = html;
   tbody.appendChild(tr);
 }
 
-// Column logic, Calc, and Excel Exports follow (REINSTATED)
+// ============================================================
+// ADD / DELETE CW COLUMNS  — inserts beside last of same type
+// ============================================================
 function addCW(subject, type) {
   const sd = subjectData[subject];
   const prefix = "cw-" + type;
-  const colId = prefix + (sd.cwColumns.filter(id => id.startsWith(prefix)).length + 1);
+
+  // New column id
+  const idx = sd.cwColumns.filter(id => id.startsWith(prefix)).length + 1;
+  const colId = prefix + idx;
+
+  // Find insertion position in cwColumns array: after the last column of same prefix group
   const group = prefixGroup(colId);
   let insertAfterIdx = -1;
   sd.cwColumns.forEach((id, i) => { if (prefixGroup(id) === group) insertAfterIdx = i; });
-  sd.cwColumns.splice(insertAfterIdx + 1, 0, colId);
-  renderAllSubjects();
+  if (insertAfterIdx === -1) {
+    // No existing same-group column; insert before first of next group in order
+    const groupOrder = ["cw-ut","cw-test","cw-proj","cw-pres"];
+    const myGroupPos = groupOrder.indexOf(group);
+    for (let g = myGroupPos + 1; g < groupOrder.length; g++) {
+      const firstOfNext = sd.cwColumns.findIndex(id => id.startsWith(groupOrder[g]));
+      if (firstOfNext !== -1) { insertAfterIdx = firstOfNext - 1; break; }
+    }
+    // If still -1, append at end
+  }
+  const arrayInsertPos = insertAfterIdx + 1;
+  sd.cwColumns.splice(arrayInsertPos, 0, colId);
+
+  // ── Update header row 2 ──
+  const sk = SK(subject);
+  const hdr2 = document.getElementById("tbl_"+sk).querySelector("thead tr:nth-child(2)");
+  const cwTotalTh = hdr2.querySelector('th[data-role="cw-total"]');
+
+  // Find the th of the column we insert after (or insert before cwTotal if none)
+  const afterId = insertAfterIdx >= 0 ? sd.cwColumns[insertAfterIdx] : null;
+  const afterTh = afterId ? document.getElementById("cwcol_"+sk+"_"+afterId) : null;
+
+  const newTh = document.createElement("th");
+  newTh.id = "cwcol_"+sk+"_"+colId;
+  newTh.setAttribute("data-role","cw-col");
+  newTh.style.minWidth = "78px";
+  newTh.innerHTML = `${colLabel(colId)} <button class="delete-col-btn" onclick="delCW('${subject}','${colId}')">×</button>`;
+
+  if (afterTh && afterTh.nextSibling) {
+    hdr2.insertBefore(newTh, afterTh.nextSibling);
+  } else {
+    hdr2.insertBefore(newTh, cwTotalTh);
+  }
+
+  // ── Update each student row ──
+  // Determine absolute column index in hdr2 (0-based within hdr2 children)
+  const newHdrIdx = Array.from(hdr2.children).indexOf(newTh);
+
+  document.querySelectorAll(`#tbody_${sk} tr`).forEach(row => {
+    const td = document.createElement("td");
+    td.className = "cw-cell";
+    td.setAttribute("data-col", colId);
+    td.innerHTML = `<div class="cell-inner" contenteditable="true" data-type="number"></div>`;
+    // +2 for Nr and Name columns
+    const pos = newHdrIdx + 2;
+    if (pos >= row.children.length) row.appendChild(td);
+    else row.insertBefore(td, row.children[pos]);
+  });
+
+  updateCWSpan(subject);
+  attachSS();
+  recalc(subject);
 }
 
 function delCW(subject, colId) {
   const sd = subjectData[subject];
   sd.cwColumns = sd.cwColumns.filter(id => id !== colId);
-  if (!sd.cwColumns.length) sd.cwColumns = [TEST_ONLY_SUBJECTS.includes(subject) ? "cw-test1" : "cw-ut1"];
-  renderAllSubjects();
+  if (!sd.cwColumns.length) {
+    // Restore a default based on subject type
+    sd.cwColumns = ["cw-test1"];
+  }
+  const sk = SK(subject);
+  document.getElementById("cwcol_"+sk+"_"+colId)?.remove();
+  document.querySelectorAll(`#tbody_${sk} td[data-col="${colId}"]`).forEach(td => td.remove());
+  updateCWSpan(subject);
+  recalc(subject);
 }
 
 function updateCWSpan(subject) {
   const sk = SK(subject);
   const h = document.getElementById("cwHdr_"+sk);
-  if (h) h.colSpan = TEST_ONLY_SUBJECTS.includes(subject) ? subjectData[subject].cwColumns.length : subjectData[subject].cwColumns.length + 1;
+  if (!h) return;
+  // test-only subjects: colspan = just the test columns (no CW total col)
+  // normal subjects: colspan = test columns + 1 (CW total col)
+  h.colSpan = TEST_ONLY_SUBJECTS.includes(subject)
+    ? subjectData[subject].cwColumns.length
+    : subjectData[subject].cwColumns.length + 1;
 }
 
-function getN(el) { if (!el) return 0; const v = parseFloat(el.textContent.trim()); return isNaN(v) ? 0 : Math.min(100, Math.max(0, v)); }
+// ============================================================
+// CALCULATION
+// ============================================================
+function getN(el) {
+  if (!el) return 0;
+  const v = parseFloat(el.textContent.trim());
+  return isNaN(v) ? 0 : Math.min(100, Math.max(0, v));
+}
 
 function recalc(subject) {
   const isTestOnly = TEST_ONLY_SUBJECTS.includes(subject);
   const sk = SK(subject);
   document.querySelectorAll(`#tbody_${sk} tr`).forEach(row => {
     if (isTestOnly) {
-      let tests = []; row.querySelectorAll("td[data-col]").forEach(td => tests.push(getN(td.querySelector(".cell-inner"))));
+      // Chinese: average all tests = 100%
+      let tests = [];
+      row.querySelectorAll("td[data-col]").forEach(td => {
+        tests.push(getN(td.querySelector(".cell-inner")));
+      });
       const avg = tests.length ? tests.reduce((a,b)=>a+b,0)/tests.length : 0;
-      row.querySelector(".rounded-total-cell .readonly-inner").textContent = Math.round(avg);
+      const rounded = Math.round(avg);
+      const r = row.querySelector(".rounded-total-cell .readonly-inner");
+      if (r) r.textContent = rounded;
     } else {
-      const examPct = (getN(row.querySelector(".exam-score-cell .cell-inner")) / 100) * 60;
+      // Normal: Exam 60% + CW 40%
+      const examRaw = getN(row.querySelector(".exam-score-cell .cell-inner"));
+      const examPct = (examRaw / 100) * 60;
       let ut = [], other = [];
       row.querySelectorAll("td[data-col]").forEach(td => {
+        const id = td.getAttribute("data-col");
         const v = getN(td.querySelector(".cell-inner"));
-        if (td.getAttribute("data-col").startsWith("cw-ut")) ut.push(v); else other.push(v);
+        if (id.startsWith("cw-ut")) ut.push(v);
+        else other.push(v);
       });
-      const utA = ut.length ? ut.reduce((a,b)=>a+b,0)/ut.length : 0;
-      const otA = other.length ? other.reduce((a,b)=>a+b,0)/other.length : 0;
-      const cwPct = (ut.length && other.length) ? (utA/100)*25 + (otA/100)*15 : (ut.length || other.length) ? ((utA+otA)/100)*40 : 0;
-      row.querySelector(".exam-total-cell .readonly-inner").textContent = examPct.toFixed(2);
-      row.querySelector(".cw-total-cell .readonly-inner").textContent = cwPct.toFixed(2);
-      row.querySelector(".final-total-cell .readonly-inner").textContent = (examPct + cwPct).toFixed(2);
-      row.querySelector(".rounded-total-cell .readonly-inner").textContent = Math.round(examPct + cwPct);
+      const utA   = ut.length    ? ut.reduce((a,b)=>a+b,0)/ut.length    : 0;
+      const otA   = other.length ? other.reduce((a,b)=>a+b,0)/other.length : 0;
+      let cwPct = 0;
+      if (ut.length && other.length)   cwPct = (utA/100)*25 + (otA/100)*15;
+      else if (ut.length)               cwPct = (utA/100)*40;
+      else if (other.length)            cwPct = (otA/100)*40;
+      const total = examPct + cwPct;
+      const set = (q, v) => { const e = row.querySelector(q); if (e) e.textContent = v; };
+      set(".exam-total-cell .readonly-inner",  examPct.toFixed(2));
+      set(".cw-total-cell .readonly-inner",    cwPct.toFixed(2));
+      set(".final-total-cell .readonly-inner", total.toFixed(2));
+      set(".rounded-total-cell .readonly-inner", Math.round(total));
     }
   });
   updateSummary();
 }
 
+// ============================================================
+// SCORES
+// ============================================================
 function getScores() {
-  const result = {}; CLASS_STUDENTS[currentClass].forEach(n => result[n] = {});
-  CLASS_SUBJECTS[currentClass].forEach(subj => {
-    const isTestOnly = TEST_ONLY_SUBJECTS.includes(subj);
-    document.querySelectorAll(`#tbody_${SK(subj)} tr`).forEach(row => {
+  const result = {};
+  CLASS_STUDENTS[currentClass].forEach(n => { result[n] = {}; });
+  CLASS_SUBJECTS[currentClass].forEach(subject => {
+    const isTestOnly = TEST_ONLY_SUBJECTS.includes(subject);
+    const sk = SK(subject);
+    document.querySelectorAll(`#tbody_${sk} tr`).forEach(row => {
       const name = row.querySelector(".name-inner")?.textContent.trim();
-      if (name && result[name]) {
+      if (!name || !result[name]) return;
+      if (isTestOnly) {
         const total = parseInt(row.querySelector(".rounded-total-cell .readonly-inner")?.textContent) || 0;
-        result[name][subj] = { 
-          exam: isTestOnly ? 0 : parseFloat(row.querySelector(".exam-total-cell .readonly-inner")?.textContent) || 0,
-          cw: isTestOnly ? total : parseFloat(row.querySelector(".cw-total-cell .readonly-inner")?.textContent) || 0, 
-          total 
-        };
+        result[name][subject] = { exam: 0, cw: total, total };
+      } else {
+        const cw    = parseFloat(row.querySelector(".cw-total-cell .readonly-inner")?.textContent) || 0;
+        const exam  = parseFloat(row.querySelector(".exam-total-cell .readonly-inner")?.textContent) || 0;
+        const total = parseInt(row.querySelector(".rounded-total-cell .readonly-inner")?.textContent) || 0;
+        result[name][subject] = { exam, cw, total };
       }
     });
   });
   return result;
 }
 
+// ============================================================
+// SUMMARY — transposed: students across top, subjects down left
+// Columns: Subject | [per student: Exam | CW | Total] ...
+// ============================================================
 function updateSummary() {
-  const subjs = CLASS_SUBJECTS[currentClass], studs = CLASS_STUDENTS[currentClass], scores = getScores();
-  let hdr1 = `<th class="sum-td-subject" rowspan="2">Subject</th>`, hdr2 = "";
-  studs.forEach(s => { hdr1 += `<th class="sum-th-student" colspan="3">${s}</th>`; hdr2 += `<th class="sum-th-type sum-th-exam">Exam</th><th class="sum-th-type sum-th-cw">CW</th><th class="sum-th-type sum-th-total">Total</th>`; });
-  let rows = "";
-  subjs.forEach(subj => {
-    const isTestOnly = TEST_ONLY_SUBJECTS.includes(subj);
-    let r = `<td class="sum-td-subject"><b>${subj}</b></td>`;
-    studs.forEach(s => {
-      const d = (scores[s] || {})[subj] || { exam: 0, cw: 0, total: 0 };
-      r += isTestOnly ? `<td class="sum-td-exam" colspan="2">Tests avg</td><td class="sum-td-total">${d.total}</td>` : `<td>${d.exam.toFixed(2)}</td><td>${d.cw.toFixed(2)}</td><td class="sum-td-total">${d.total}</td>`;
-    });
-    rows += `<tr>${r}</tr>`;
+  const subjects  = CLASS_SUBJECTS[currentClass];
+  const students  = CLASS_STUDENTS[currentClass];
+  const scores    = getScores();
+
+  let hdr1 = `<th class="sum-td-subject" rowspan="2">Subject</th>`;
+  students.forEach(s => { hdr1 += `<th class="sum-th-student" colspan="3">${s}</th>`; });
+
+  let hdr2 = "";
+  students.forEach(() => {
+    hdr2 += `<th class="sum-th-type sum-th-exam">Exam (60%)</th>`;
+    hdr2 += `<th class="sum-th-type sum-th-cw">CW (40%)</th>`;
+    hdr2 += `<th class="sum-th-type sum-th-total">Total</th>`;
   });
-  document.getElementById("summaryContainer").innerHTML = `<table class="summary-table"><thead><tr>${hdr1}</tr><tr>${hdr2}</tr></thead><tbody>${rows}</tbody></table>`;
+
+  let rows = "";
+  subjects.forEach(subject => {
+    const isTestOnly = TEST_ONLY_SUBJECTS.includes(subject);
+    let row = `<td class="sum-td-subject"><b>${subject}</b></td>`;
+    students.forEach(s => {
+      const d = (scores[s] || {})[subject] || { exam: 0, cw: 0, total: 0 };
+      if (isTestOnly) {
+        row += `<td class="sum-td-exam" colspan="2" style="background:#eaf4ff;font-style:italic;font-size:11px;color:#555;">Tests avg</td>`;
+        row += `<td class="sum-td-total">${d.total}</td>`;
+      } else {
+        row += `<td class="sum-td-exam">${d.exam.toFixed ? d.exam.toFixed(2) : d.exam}</td>`;
+        row += `<td class="sum-td-cw">${d.cw.toFixed ? d.cw.toFixed(2) : d.cw}</td>`;
+        row += `<td class="sum-td-total">${d.total}</td>`;
+      }
+    });
+    rows += `<tr>${row}</tr>`;
+  });
+
+  document.getElementById("summaryContainer").innerHTML = `
+    <table class="summary-table">
+      <thead><tr>${hdr1}</tr><tr>${hdr2}</tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
 }
 
-// SPREADSHEET BEHAVIOR & EXCEL LOGIC (REINSTATED)
+// ============================================================
+// SPREADSHEET BEHAVIOUR
+// ============================================================
+let selCell = null, selStart = null, selEnd = null;
+
 function attachSS() {
   document.querySelectorAll("tbody td").forEach(td => {
-    const inner = td.querySelector(".cell-inner[contenteditable='true']");
-    if (inner) inner.oninput = () => recalc(CLASS_SUBJECTS[currentClass].find(s => SK(s) === td.closest("tbody").id.replace("tbody_","")));
-  });
-}
-
-function exportAllToSheets() {
-  const ay = document.getElementById("academicYear").value, term = document.getElementById("termSelect").value, cls = document.getElementById("classSelect").value, wb = XLSX.utils.book_new(), scores = getScores();
-  CLASS_SUBJECTS[currentClass].forEach(subj => {
-    const isTestOnly = TEST_ONLY_SUBJECTS.includes(subj), sd = subjectData[subj], data = [["PRIME International School"], ["Year:", ay, "Term:", term, "Class:", cls], ["Subject:", subj], []];
-    data.push(isTestOnly ? ["Nr.", "Name", ...sd.cwColumns.map(id => colLabel(id)), "Total"] : ["Nr.", "Name", "Exam", "Exam 60%", ...sd.cwColumns.map(id => colLabel(id)), "CW 40%", "Orig", "Rnd"]);
-    document.querySelectorAll(`#tbody_${SK(subj)} tr`).forEach((row, i) => {
-      const name = row.querySelector(".name-inner").textContent, rnd = row.querySelector(".rounded-total-cell .readonly-inner").textContent;
-      if (isTestOnly) data.push([i+1, name, ...sd.cwColumns.map(id => row.querySelector(`td[data-col="${id}"] .cell-inner`).textContent), rnd]);
-      else data.push([i+1, name, row.querySelector(".exam-score-cell .cell-inner").textContent, row.querySelector(".exam-total-cell .readonly-inner").textContent, ...sd.cwColumns.map(id => row.querySelector(`td[data-col="${id}"] .cell-inner`).textContent), row.querySelector(".cw-total-cell .readonly-inner").textContent, row.querySelector(".final-total-cell .readonly-inner").textContent, rnd]);
+    if (td._ss) return; td._ss = true;
+    td.addEventListener("mousedown", e => {
+      const inner = td.querySelector(".cell-inner[contenteditable='true']");
+      if (!inner) return;
+      if (e.shiftKey && selStart) { selEnd = coords(td); highlightRange(selStart, selEnd); e.preventDefault(); }
+      else selCell2(td);
     });
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), subj.slice(0, 31));
+    const inner = td.querySelector(".cell-inner[contenteditable='true']");
+    if (!inner) return;
+    inner.addEventListener("focus", () => { if (selCell !== td) selCell2(td); });
+    inner.addEventListener("input", () => {
+      if (inner.getAttribute("data-type") === "number") {
+        let raw = inner.textContent.replace(/[^0-9.]/g, "");
+        const p = raw.split("."); if (p.length > 2) raw = p[0]+"."+p.slice(1).join("");
+        if (inner.textContent !== raw) {
+          inner.textContent = raw;
+          const r = document.createRange(), s2 = window.getSelection();
+          r.selectNodeContents(inner); r.collapse(false); s2.removeAllRanges(); s2.addRange(r);
+        }
+      }
+      const tbody = td.closest("tbody");
+      if (tbody) { const sk = tbody.id.replace("tbody_",""); const subj = CLASS_SUBJECTS[currentClass].find(s => SK(s)===sk); if (subj) recalc(subj); }
+    });
+    inner.addEventListener("keydown", e => {
+      const c = coords(td); let next = null;
+      if (e.key==="Tab")        { e.preventDefault(); next = cellAt(td,c.ri,c.ci+1) || cellAt(td,c.ri+1,2); }
+      else if (e.key==="Enter") { e.preventDefault(); next = cellAt(td,c.ri+1,c.ci); }
+      else if (e.key==="ArrowUp")   { e.preventDefault(); next = cellAt(td,c.ri-1,c.ci); }
+      else if (e.key==="ArrowDown") { e.preventDefault(); next = cellAt(td,c.ri+1,c.ci); }
+      if (next) selCell2(next);
+    });
   });
-  XLSX.writeFile(wb, `${cls}_Assessment.xlsx`);
 }
 
-// REPORT GENERATOR - NODE.JS LOGIC & INSTRUCTIONS (REINSTATED)
+function coords(td) { const row=td.parentElement, tbody=row.parentElement; return { ri: Array.from(tbody.children).indexOf(row), ci: Array.from(row.children).indexOf(td) }; }
+function cellAt(ref,ri,ci) { const tbody=ref.closest("tbody"); if(!tbody) return null; const rows=Array.from(tbody.children); if(ri<0||ri>=rows.length) return null; const cells=Array.from(rows[ri].children); if(ci<0||ci>=cells.length) return null; return cells[ci].querySelector(".cell-inner[contenteditable='true']") ? cells[ci] : null; }
+function selCell2(td) { clearSel(); selCell=td; selStart=coords(td); selEnd={...selStart}; td.classList.add("selected"); td.querySelector(".cell-inner")?.focus(); }
+function clearSel() { document.querySelectorAll("td.selected").forEach(t=>t.classList.remove("selected")); document.querySelectorAll("td.in-range").forEach(t=>t.classList.remove("in-range")); selCell=null; }
+function highlightRange(s,e) {
+  document.querySelectorAll("td.in-range").forEach(t=>t.classList.remove("in-range"));
+  if (!s||!e||!selCell) return;
+  const tbody=selCell.closest("tbody"); if (!tbody) return;
+  const r1=Math.min(s.ri,e.ri),r2=Math.max(s.ri,e.ri),c1=Math.min(s.ci,e.ci),c2=Math.max(s.ci,e.ci);
+  Array.from(tbody.children).slice(r1,r2+1).forEach(row=>Array.from(row.children).slice(c1,c2+1).forEach(c=>c.classList.add("in-range")));
+}
+
+document.addEventListener("paste", e => {
+  if (!selCell) return;
+  if (!selCell.querySelector(".cell-inner[contenteditable='true']")) return;
+  e.preventDefault();
+  const text = (e.clipboardData||window.clipboardData).getData("text");
+  const pasteRows = text.split(/\r?\n/).map(r => r.split("\t"));
+  const start = selStart || coords(selCell);
+  const tbody = selCell.closest("tbody"); if (!tbody) return;
+  const bRows = Array.from(tbody.children);
+  pasteRows.forEach((pr, ro) => {
+    const ri = start.ri + ro; if (ri >= bRows.length) return;
+    const cells = Array.from(bRows[ri].children);
+    pr.forEach((val, co) => {
+      const ci = start.ci + co; if (ci >= cells.length) return;
+      const inner = cells[ci].querySelector(".cell-inner[contenteditable='true']"); if (!inner) return;
+      let v = val.trim(); if (inner.getAttribute("data-type")==="number") v = v.replace(/[^0-9.]/g,"");
+      inner.textContent = v; cells[ci].classList.add("paste-flash"); setTimeout(()=>cells[ci].classList.remove("paste-flash"),300);
+    });
+  });
+  const sk = tbody.id.replace("tbody_",""); const subj = CLASS_SUBJECTS[currentClass].find(s=>SK(s)===sk); if (subj) recalc(subj);
+});
+
+document.addEventListener("copy", e => {
+  if (!selStart||!selEnd||!selCell) return;
+  const r1=Math.min(selStart.ri,selEnd.ri),r2=Math.max(selStart.ri,selEnd.ri),c1=Math.min(selStart.ci,selEnd.ci),c2=Math.max(selStart.ci,selEnd.ci);
+  if (r1===r2&&c1===c2) return;
+  e.preventDefault();
+  const tbody = selCell.closest("tbody"); if (!tbody) return;
+  const rows = Array.from(tbody.children); const lines = [];
+  for (let r=r1;r<=r2;r++) { const cells=Array.from(rows[r].children); const cols=[]; for (let c=c1;c<=c2;c++) { const cell=cells[c]; const inner=cell?.querySelector(".cell-inner")||cell?.querySelector(".readonly-inner"); cols.push(inner?inner.textContent.trim():cell?.textContent.trim()||""); } lines.push(cols.join("\t")); }
+  e.clipboardData.setData("text/plain", lines.join("\n"));
+});
+
+// ============================================================
+// EXPORT ALL TO SHEETS
+// ============================================================
+function exportAllToSheets() {
+  const ay    = document.getElementById("academicYear").value;
+  const term  = document.getElementById("termSelect").value;
+  const cls   = document.getElementById("classSelect").value;
+  const subjects = CLASS_SUBJECTS[currentClass], students = CLASS_STUDENTS[currentClass], scores = getScores();
+  const wb = XLSX.utils.book_new();
+
+  subjects.forEach(subject => {
+    const sk = SK(subject), sd = subjectData[subject];
+    const data = [];
+    data.push(["PRIME International School"]);
+    data.push(["Academic Year:",ay,"Term:",term,"Class:",cls]);
+    data.push(["Subject:",subject]);
+    data.push([]);
+    // Column order: Nr, Name, Exam Score, Exam Total, CW cols..., CW Total, Original, Rounded
+    data.push(["Nr.","Student Name","Exam Score","Exam Total (60%)",...sd.cwColumns.map(id=>colLabel(id)),"CW Total (40%)","Original","Rounded"]);
+
+    const tbody = document.getElementById("tbody_"+sk);
+    if (tbody) {
+      Array.from(tbody.querySelectorAll("tr")).forEach((row,i) => {
+        const name = row.querySelector(".name-inner")?.textContent.trim()||"";
+        const examRaw = parseFloat(row.querySelector(".exam-score-cell .cell-inner")?.textContent)||0;
+        const examTot = parseFloat(row.querySelector(".exam-total-cell .readonly-inner")?.textContent)||0;
+        const cwCols  = sd.cwColumns.map(id => parseFloat(row.querySelector(`td[data-col="${id}"] .cell-inner`)?.textContent)||0);
+        const cwTot   = parseFloat(row.querySelector(".cw-total-cell .readonly-inner")?.textContent)||0;
+        const orig    = parseFloat(row.querySelector(".final-total-cell .readonly-inner")?.textContent)||0;
+        const rnd     = parseInt(row.querySelector(".rounded-total-cell .readonly-inner")?.textContent)||0;
+        data.push([i+1, name, examRaw, examTot, ...cwCols, cwTot, orig, rnd]);
+      });
+    }
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    ws["!cols"] = (data[4]||[]).map(()=>({wch:16}));
+    XLSX.utils.book_append_sheet(wb, ws, subject.substring(0,31));
+  });
+
+  // Summary tab — same transposed layout as on-screen
+  const sd2 = [];
+  sd2.push(["PRIME International School — Student Report Summary"]);
+  sd2.push(["Academic Year:",ay,"Term:",term,"Class:",cls]);
+  sd2.push([]);
+  // Header row 1: Subject + each student (spans 3 cols represented by repeating name)
+  sd2.push(["Subject", ...students.flatMap(s=>[s,"",""])]);
+  // Header row 2: sub-headers
+  sd2.push(["",          ...students.flatMap(()=>["Exam (60%)","CW (40%)","Total"])]);
+  subjects.forEach(subject => {
+    const row = [subject, ...students.flatMap(s => {
+      const d = (scores[s]||{})[subject]||{exam:0,cw:0,total:0};
+      return [d.exam.toFixed?d.exam.toFixed(2):d.exam, d.cw.toFixed?d.cw.toFixed(2):d.cw, d.total];
+    })];
+    sd2.push(row);
+  });
+  const ws2 = XLSX.utils.aoa_to_sheet(sd2);
+  ws2["!cols"] = [{wch:22},...students.flatMap(()=>[{wch:12},{wch:10},{wch:10}])];
+  XLSX.utils.book_append_sheet(wb, ws2, "Student Report Summary");
+
+  const fn = `${cls}_${ay.replace(/-/g,"_")}_${term.replace(/\s+/g,"_")}_Assessment.xlsx`;
+  XLSX.writeFile(wb, fn);
+  document.getElementById("statusMsg").textContent = "✅ Exported: "+fn;
+}
+
+// ============================================================
+// CREATE ALL STUDENT REPORTS — cross-platform Node.js bundle
+// ============================================================
 async function createAllStudentReports() {
   const statusEl = document.getElementById("statusMsg");
-  statusEl.innerHTML = `<span class="spinner"></span> Preparing report bundle...`;
-  const ay = document.getElementById("academicYear").value, term = document.getElementById("termSelect").value, cls = document.getElementById("classSelect").value, zip = new JSZip();
-  const reportData = { academicYear: ay, term, classId: cls, subjects: CLASS_SUBJECTS[currentClass], students: CLASS_STUDENTS[currentClass], scores: getScores(), testOnlySubjects: TEST_ONLY_SUBJECTS };
-  
-  zip.file("report_data.json", JSON.stringify(reportData, null, 2));
-  zip.file("generate_reports.js", `
-    const fs = require('fs');
-    const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, AlignmentType, WidthType } = require('docx');
-    const data = JSON.parse(fs.readFileSync('./report_data.json', 'utf8'));
-    data.students.forEach(student => {
-      const doc = new Document({ sections: [{ children: [ new Paragraph({ text: "PRIME International School", heading: "Heading1" }), new Paragraph({ text: "Name: " + student }), new Paragraph({ text: "Class: " + data.classId + " | Term: " + data.term }) ] }] });
-      Packer.toBuffer(doc).then(buffer => fs.writeFileSync(student + "_Report.docx", buffer));
-    });
-    console.log("All reports generated!");
-  `);
-  
-  zip.file("README.txt", `
------------------------------------------------------
-PRIME INTERNATIONAL SCHOOL REPORT GENERATOR
------------------------------------------------------
-Generates ${CLASS_STUDENTS[currentClass].length} individual student .docx reports.
+  statusEl.innerHTML = `<span class="spinner"></span> Preparing report data...`;
+  await new Promise(r => setTimeout(r, 50));
 
-MAC INSTRUCTIONS
-1. Unzip folder.
-2. Open Terminal, type 'cd ' and drag folder in.
-3. Run: npm install docx
-4. Run: node generate_reports.js
+  const ay       = document.getElementById("academicYear").value;
+  const term     = document.getElementById("termSelect").value;
+  const cls      = document.getElementById("classSelect").value;
+  const subjects = CLASS_SUBJECTS[currentClass];
+  const students = CLASS_STUDENTS[currentClass];
+  const scores   = getScores();
 
-WINDOWS INSTRUCTIONS
-1. Unzip folder.
-2. Type 'cmd' in the folder address bar.
-3. Run: npm install docx
-4. Run: node generate_reports.js
-  `);
+  const reportData = { academicYear:ay, term, classId:cls, subjects, students, scores, testOnlySubjects: TEST_ONLY_SUBJECTS };
 
-  const blob = await zip.generateAsync({ type: "blob" });
-  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `${cls}_Reports.zip`; a.click();
-  statusEl.textContent = "✅ Reports package downloaded!";
+  const zip = new JSZip();
+  zip.file("report_data.json",  JSON.stringify(reportData, null, 2));
+  zip.file("generate_reports.js", buildNodeScript(reportData));
+  zip.file("README.txt", buildReadme(cls, term, students.length));
+
+  const blob = await zip.generateAsync({ type:"blob" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href = url; a.download = `${cls}_${term.replace(/\s+/g,"_")}_Reports_Generator.zip`; a.click();
+  URL.revokeObjectURL(url);
+
+  statusEl.textContent = `✅ Package downloaded! See README.txt inside the ZIP for instructions (works on Mac & Windows).`;
 }
 
-window.onload = loadClass;
+function buildReadme(cls, term, count) {
+  const folder = cls+"_"+term.replace(/\s+/g,"_")+"_Reports_Generator";
+  return "PRIME International School - Student Report Generator\n" +
+"=====================================================\n" +
+"Generates "+count+" individual student .docx progress reports.\n\n" +
+"MAC INSTRUCTIONS\n" +
+"-----------------------------------------------------\n" +
+"Step 1 - Unzip this file (double-click the .zip in Finder).\n\n" +
+"Step 2 - Open Terminal.\n" +
+"         (Press Cmd+Space, type Terminal, press Enter)\n\n" +
+"Step 3 - Navigate INTO the unzipped folder.\n" +
+"         EASIEST: type  cd  (with a space), then drag the\n" +
+"         unzipped '"+folder+"' folder\n" +
+"         from Finder into the Terminal window, then press Enter.\n\n" +
+"         OR type manually:\n" +
+"         cd ~/Downloads/"+folder+"\n\n" +
+"Step 4 - Install library (first time only, ~10 sec):\n" +
+"         npm install docx\n\n" +
+"Step 5 - Run the generator:\n" +
+"         node generate_reports.js\n\n" +
+"Step 6 - Done! All .docx files appear in the same folder.\n\n" +
+"WINDOWS INSTRUCTIONS\n" +
+"-----------------------------------------------------\n" +
+"Step 1 - Unzip this file (right-click -> Extract All).\n\n" +
+"Step 2 - Open the unzipped folder in File Explorer.\n\n" +
+"Step 3 - Click the address bar at the top of File Explorer,\n" +
+"         type  cmd  and press Enter.\n" +
+"         (Opens Command Prompt already in the right folder!)\n\n" +
+"Step 4 - Install library (first time only):\n" +
+"         npm install docx\n\n" +
+"Step 5 - Run the generator:\n" +
+"         node generate_reports.js\n\n" +
+"Step 6 - Done! All .docx files appear in the same folder.\n\n" +
+"TROUBLESHOOTING\n" +
+"-----------------------------------------------------\n" +
+"  Error: Cannot find module '.../generate_reports.js'\n" +
+"  -> You ran the command from the wrong folder.\n" +
+"     You MUST cd into the unzipped folder first (Step 3).\n" +
+"     The folder must contain generate_reports.js before running.\n\n" +
+"  node: command not found\n" +
+"  -> Node.js is not installed.\n" +
+"     Download from: https://nodejs.org  (choose LTS)\n\n" +
+"  Cannot find module 'docx'\n" +
+"  -> Run: npm install docx  (Step 4 was skipped)\n\n" +
+"  npm permission error on Mac\n" +
+"  -> Do NOT use sudo. Run: npm install docx --prefix .\n";
+}
+
+// ============================================================
+// TEMPLATE DOWNLOAD
+// ============================================================
+function downloadTemplate() {
+  const ay       = document.getElementById("academicYear").value;
+  const term     = document.getElementById("termSelect").value;
+  const cls      = document.getElementById("classSelect").value;
+  const subjects = CLASS_SUBJECTS[currentClass];
+  const students = CLASS_STUDENTS[currentClass];
+  const wb       = XLSX.utils.book_new();
+
+  subjects.forEach(subject => {
+    const isTestOnly = TEST_ONLY_SUBJECTS.includes(subject);
+    const data = [];
+    data.push(["PRIME International School"]);
+    data.push(["Academic Year:", ay, "Term:", term, "Class:", cls]);
+    data.push(["Subject:", subject]);
+    data.push([]);
+    if (isTestOnly) {
+      // Test-only: Nr | Name | Test 1 | Test 2 | ...
+      data.push(["Nr.", "Student Name", "Test 1", "Test 2", "Test 3"]);
+      students.forEach((name, i) => { data.push([i + 1, name, "", "", ""]); });
+    } else {
+      // Normal: Nr | Name | Exam Score | Unit Test 1 | Unit Test 2 | Project 1
+      data.push(["Nr.", "Student Name", "Exam Score", "Unit Test 1", "Unit Test 2", "Project 1"]);
+      students.forEach((name, i) => { data.push([i + 1, name, "", "", "", ""]); });
+    }
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    ws["!cols"] = [{wch:5},{wch:24},{wch:12},{wch:12},{wch:12},{wch:12},{wch:12}];
+    XLSX.utils.book_append_sheet(wb, ws, subject.substring(0, 31));
+  });
+
+  const fn = `${cls}_${ay.replace(/-/g,"_")}_${term.replace(/\s+/g,"_")}_Template.xlsx`;
+  XLSX.writeFile(wb, fn);
+  document.getElementById("uploadStatus").textContent = "Template downloaded: " + fn;
+}
+
+// ============================================================
+// FILE UPLOAD — position-based parser (works with template format)
+// ============================================================
+function handleFileUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const statusEl = document.getElementById("uploadStatus");
+  statusEl.textContent = "Reading file...";
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const wb = XLSX.read(e.target.result, { type: "binary" });
+
+      const subjects = CLASS_SUBJECTS[currentClass];
+      const normalize = s => String(s || "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+
+      // Build lookup: normalised name -> canonical subject
+      const subjectMap = {};
+      subjects.forEach(s => { subjectMap[normalize(s)] = s; });
+
+      let filled = 0, skipped = [];
+
+      wb.SheetNames.forEach(sheetName => {
+        const subject = subjectMap[normalize(sheetName)];
+        if (!subject) { skipped.push(sheetName); return; }
+
+        const ws       = wb.Sheets[sheetName];
+        const rows     = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
+        const isTestOnly = TEST_ONLY_SUBJECTS.includes(subject);
+
+        // Find header row: look for "Student Name" or "Nr."
+        let hdr = -1;
+        for (let r = 0; r < Math.min(rows.length, 10); r++) {
+          const joined = rows[r].join(" ").toLowerCase();
+          if (joined.includes("student") || joined.includes("nr.")) { hdr = r; break; }
+        }
+        if (hdr < 0) return;
+
+        const headers = rows[hdr].map(h => normalize(h));
+
+        // Find name column
+        const nameCol = headers.findIndex(h => h.includes("student") || h === "name");
+        if (nameCol < 0) return;
+
+        // Collect all numeric-input columns AFTER the name column
+        // Skip known computed/summary columns
+        const skipLabels = new Set(["examtotal", "cwtotal", "cwtotal40", "original", "rounded", "nr", "max", "examtotal60"]);
+        const scoreCols = []; // {idx, isExam, label}
+        headers.forEach((h, i) => {
+          if (i <= nameCol) return;
+          if (skipLabels.has(h) || h === "" || h.includes("total") || h === "max") return;
+          const isExam = h.includes("examscore") || h === "exam";
+          scoreCols.push({ idx: i, isExam, label: rows[hdr][i] });
+        });
+
+        const sk    = SK(subject);
+        const tbody = document.getElementById("tbody_" + sk);
+        if (!tbody) return;
+
+        // Build name -> tr map (case-insensitive, trim)
+        const rowMap = {};
+        Array.from(tbody.querySelectorAll("tr")).forEach(tr => {
+          const nm = (tr.querySelector(".name-inner")?.textContent || "").trim();
+          if (nm) rowMap[nm.toLowerCase()] = tr;
+        });
+
+        for (let r = hdr + 1; r < rows.length; r++) {
+          const row     = rows[r];
+          const rawName = String(row[nameCol] || "").trim();
+          if (!rawName) continue;
+          const tr = rowMap[rawName.toLowerCase()];
+          if (!tr) continue;
+
+          if (isTestOnly) {
+            // Fill editable CW cells (which are the test inputs) in column order
+            const testInputs = Array.from(tr.querySelectorAll(".cw-cell .cell-inner"));
+            let pos = 0;
+            scoreCols.forEach(sc => {
+              if (pos >= testInputs.length) return;
+              const val = row[sc.idx];
+              if (val === "" || val == null) return;
+              const num = parseFloat(val);
+              if (!isNaN(num)) { testInputs[pos].textContent = String(num); pos++; }
+            });
+          } else {
+            // Exam score
+            const examSc = scoreCols.find(sc => sc.isExam);
+            if (examSc) {
+              const val = row[examSc.idx];
+              if (val !== "" && val != null) {
+                const examInput = tr.querySelector(".exam-score-cell .cell-inner");
+                if (examInput) {
+                  const num = parseFloat(val);
+                  if (!isNaN(num)) examInput.textContent = String(num);
+                }
+              }
+            }
+            // CW columns — fill in DOM order (position-based)
+            const cwInputs = Array.from(tr.querySelectorAll(".cw-cell .cell-inner"));
+            const cwScoreCols = scoreCols.filter(sc => !sc.isExam);
+            cwScoreCols.forEach((sc, pos) => {
+              if (pos >= cwInputs.length) return;
+              const val = row[sc.idx];
+              if (val === "" || val == null) return;
+              const num = parseFloat(val);
+              if (!isNaN(num)) cwInputs[pos].textContent = String(num);
+            });
+          }
+          filled++;
+        }
+        recalc(subject);
+      });
+
+      CLASS_SUBJECTS[currentClass].forEach(s => recalc(s));
+      updateSummary();
+
+      const ignoredMsg = skipped.length ? ` · Ignored tabs: ${skipped.join(", ")}` : "";
+      statusEl.textContent = `✅ Loaded! Filled ${filled} student rows${ignoredMsg}`;
+      document.getElementById("fileUploadInput").value = "";
+    } catch(err) {
+      statusEl.textContent = "❌ Error: " + err.message;
+      console.error(err);
+    }
+  };
+  reader.readAsBinaryString(file);
+}
+
+
+// ---- Node.js generator script (base64-encoded to avoid all escaping issues) ----
+const SCRIPT_TEMPLATE_B64 = "IyEvdXNyL2Jpbi9lbnYgbm9kZQovLyBQUklNRSBJbnRlcm5hdGlvbmFsIFNjaG9vbCAtIFN0dWRlbnQgUmVwb3J0IEdlbmVyYXRvcgovLyBDcm9zcy1wbGF0Zm9ybTogbWFjT1MsIFdpbmRvd3MsIExpbnV4Ci8vIFVzYWdlOiBucG0gaW5zdGFsbCBkb2N4ICAgdGhlbiAgIG5vZGUgZ2VuZXJhdGVfcmVwb3J0cy5qcwoKJ3VzZSBzdHJpY3QnOwpjb25zdCBwYXRoID0gcmVxdWlyZSgncGF0aCcpOwpjb25zdCBmcyAgID0gcmVxdWlyZSgnZnMnKTsKCmNvbnN0IHNjcmlwdERpciA9IHBhdGguZGlybmFtZShyZXF1aXJlLm1haW4gPyByZXF1aXJlLm1haW4uZmlsZW5hbWUgOiBfX2ZpbGVuYW1lKTsKcHJvY2Vzcy5jaGRpcihzY3JpcHREaXIpOwoKbGV0IGRvY3g7CnRyeSB7IGRvY3ggPSByZXF1aXJlKCdkb2N4Jyk7IH0KY2F0Y2goZSkgewogIGNvbnNvbGUuZXJyb3IoJ0VSUk9SOiBNaXNzaW5nIGRlcGVuZGVuY3kuIFBsZWFzZSBydW46ICBucG0gaW5zdGFsbCBkb2N4Jyk7CiAgcHJvY2Vzcy5leGl0KDEpOwp9Cgpjb25zdCB7CiAgRG9jdW1lbnQsIFBhY2tlciwgUGFyYWdyYXBoLCBUZXh0UnVuLCBUYWJsZSwgVGFibGVSb3csIFRhYmxlQ2VsbCwKICBJbWFnZVJ1biwgRm9vdGVyLCBBbGlnbm1lbnRUeXBlLCBXaWR0aFR5cGUsIEJvcmRlclN0eWxlLCBTaGFkaW5nVHlwZSwKICBWZXJ0aWNhbEFsaWduLCBUYWJTdG9wVHlwZSwgVGFiU3RvcFBvc2l0aW9uLCBQYWdlTnVtYmVyCn0gPSBkb2N4OwoKY29uc3QgREFUQSA9IF9fREFUQV9KU09OX187CmNvbnN0IExPR09fQjY0ID0gImlWQk9SdzBLR2dvQUFBQU5TVWhFVWdBQUFNZ0FBQURJQ0FJQUFBQWlPam5KQUFBQkNHbERRMUJKUTBNZ1VISnZabWxzWlFBQWVKeGpZR0E4d1FBRUxBWU1ETGw1SlVWQjdrNEtFWkZSQ3V3UEdCaUJFQXdTazRzTEdIQURvS3B2MXlCcUwrdmlVWWNMY0tha0ZpY0Q2UTlBckZJRXRCeG9wQWlRTFpJT1lXdUEyRWtRdGcySVhWNVNVQUprQjREWVJTRkJ6a0IyQ3BDdGtZN0VUa0ppSnhjVWdkVDNBTmsydVRtbHlRaDNNL0NrNW9VR0Eya09JSlpoS0dZSVluQm5jQUw1SDZJa2Z4RURnOFZYQmdibUNRaXhwSmtNRE50YkdSZ2tiaUhFVkJZd01QQzNNREJzTzQ4UVE0UkpRV0pSSWxpSUJZaVowdElZR0Q0dFoyRGdqV1JnRUw3QXdNQVZEUXNJSEc1VEFMdk5uU0VmQ05NWmNoaFNnU0tlREhrTXlReDZRSllSZ3dHRElZTVpBS2JXUHo5SGJPQlFBQUF1dDBsRVFWUjRuTzJkZVp3VXhmbi9uNmVxdStmZWsxMTJsK1Z3dVE5QlJNUUxRU0tvRUZFVEQ3eUNTWDd4aUpwdlRHS01NVkdUbUc4T0UwMU1ZaEFWTmNiYnFIaEVNSGdpWURoRWtmdGNybVdYdlhkblo2YTdxK3I1L1ZFenM4T3lIS0t6TEw5ZnYxLzdndG5lN3FxYTdrOVhQZlhVVTFWSVJPRGg4V1hEam5ZQlBQN2Z4Qk9XUjFid2hPV1JGVHhoZVdRRlQxZ2VXY0VUbGtkVzhJVGxrUlU4WVhsa0JVOVlIbG5CRTVaSFZ2Q0U1WkVWUEdGNVpBVlBXQjVad1JPV1IxYndoT1dSRlR4aGVXUUZUMWdlV2NFVGxrZFc4SVRsa1JVOFlYbGtCVTlZSGxuQkU1WkhWdkNFNVpFVlBHRjVaQVZQV0I1WndST1dSMWJ3aE9XUkZUeGhlV1FGVDFnZVdjRVRsa2RXOElUbGtSVThZWGxrQlU5WUhsbkJFNVpIVnZDRTVaRVZQR0Y1WkFWUFdCNVp3Uk9XUjFid2hPV1JGVHhoZVdRRlQxZ2VXY0VUbGtkVzhJVGxrUlU4WVhsa0JVOVlIbG5CRTVaSFZ2Q0U1WkVWUEdGNVpBVlBXQjVad1JPV1IxYndoT1dSRlR4aGVXUUZUMWdlV2NFVGxrZFc4SVIxMkpBRW9xTmRpR01HVDFpSERYSkFCRkpIdXh6SEJwNndEZ2tCZ051d05ySG1JUm5mUThnOGJSME9uckFPQ1FKSm5qK0VuQ2I3bGErNE5jc0JtZGNtSGhKUFdJY0JNb2JNR3ZZZFRvNzY4SHZLYVFJRVhaTjVIQWhQV0ljQkFaQlNiaHNaT1N5NlE5WjlDdUFaVzRmQUU5WWhJRkJBTGlHVDIrWmlvbFl4eEVTOVYxMGRFazlZaDBKSnhTeDN4eno2N00vTWpDQWdoSHNESUFBZTdaSjFhenhoSFJBQ1JTU1JtV0xUYzNMaGpRWnlFbTFVTUlJaWZhWFRDdWdKNjJCNHdqb2dTRVRJM1RXUDBPSmJER1lRa2lSaG5IS3YyUEdXcy9xdnVyZDR0TXZZZlRHT2RnRzZLNlFBdWFoNlg2NjRtL3R5aUZEWlVYN21neXgvSUh2bmFzcXBJQUJFNzdVOElONnRPUkJJUkxSNkZrZEU1T1JFMmVsL05QdWQ3eTZZaVMzYnlNb0I4Q3o0ZytFSnF6TklBYUpzM1FiMW42QVpWb2xHR1Axalk4Q2w5dnlMc2ZwOVpZWjQzK2tJQU9CNUhBNkkxeFFlRUV6VWduS0FKQlVNTjBiZTdDejZQdCt6V0JrK0dIU2xVWEVoa0FUa1I3dU0zUmV2eGpvZ1pPVVJ0MGkwc1g0WFFHc2xiWDJWVEI4VmpqYkgzbzJrdkY3aHdmR0UxUm5JQUlqbERLQ0M0OEdKc2tBUGl1MWhaQU1SSDNJVlp4WUNlYmZ1NEhoMzV3QVFJZU44OUUra0wxZnVtTWNLUm9LdmtLU0xPUlVBNEhsSEQ0a25yQU9BREVpWVJTY2E1N3drbTdlS21zVjQycjJTR2M3NnAwaUpvMTI0WXdBa0x3TGtnQkNSQkRTVWFCTjdWeGdscDBOOGo2eGJaZlNhd0l3UUFIbjExa0U0Qm9SRm10U3ZtUG9uZVF5UklYWnFTU3RGbE9GcndxUU9pQ0RwZ21LTUhkSUVKeVVKT1NDQWxNQTVBQUFCeTdpS2lKUUNRTkovUWtUR09rOVVLU0lDUU5yL05DSlNoL01nQ05pQnZtMDM0eGdRMXVFZ0ZYSEVJNmhCbEZLTWZjbjJBRkduWGNZdnNZWTdCaXJMYnUzSElpSkVlT3o1Ull1WFY0WkNBYzZRaUtRVVJEcTZnT1huQjg4WVczSEcyQXFmejZkSU1XQ3BxN0NtdnVsUEQ3L2IxR0lIQTZhdTlJUlVBS0NVY2x6VnN5aG4vTmlLMDhkV2hJSUJwZWdBZFF3UndhekgzMTI1dmlvVTlITUVRcFp3WEFQcCtxdkhEeDNZUzBobGNKdzc3K09YNTYyTzVBUUNQak1hVFp3MjlyaXJ2blpLcDNyOTQ2ei9WTzVxOVBsNVM5UXVLd3I5OFBySmtWQlE1LzZQRnhjdlhMbzFIUFJ6aGdRVWJiT1ZVcFNoSGdMaWpCSEF0SW5ETHp6dmhBT1h1YnZRcllXRmlJcmt0TE5HaGdLK0gvLzY5WVJRak9Udjc3amd1RDVGVXNxMm1MTjQ2ZWJyYm4rdXFDQjR5N2NuWGpyOVpDSUNSRVFrb0x4STRGdVhuVGI3cVlXUFByOGNFVTRjVVg3M0xlZEpxYVJ3TjI2cGUrNk41UTg4OXNHb29XVzNmL2ZzOHlZZGY0QjZDNG5VQlZOUERFWUNQLzNkNjhoNExHWlBHSGZjWGJkTTY5dXJrSWkwMEU4NWFXQXNvZTUvOU4zSzNVMVMwSWF0ZXkrL1lDelBTRTBMdmJxMlpmWXpTMXJhWE51MnIvbjYyTXN2T2lWZ21RQ0FDRVRxM0lralFpSGZqKzU1TFo0UW5NR05NODhvNlJGV0djNHl4eFU3cWhyblBMKzBLRDk4NFhrbjZEYTFhNTdDRVVMSENEZi8vTG5lcC94OCtLUjdkdXlxenp5K2R0UHVrZWY4Yi83dzIzNTUvMnRFSktYVXh4VVJFVFcxdEkyWit0dnlrKy84enExUDdadWV1dnUrMTRwUCtHbnZrMy8ycnpkV0VKR1U2aUM1WC8zOXgvcWQvb3NCWjl5OWZGVWxFYW45enQyenQvR2thYjhmY3RZOXd5Zjlhbk5sVFdhQ1FrZ2ltdi8rbXI2bi9uendXZmRNdU9RK0pWVzZoSm5jZXM5TDVlTitmdnprWDlmVXRYWmFqSmZmL1BpTzM3NlNUck03Y3d5NEc0U1FTbEh2c256SGtWSkJhOVJXaW9SUVNwSGppS0VEeW43MzQ2L201UGovOW8vRkw3eTJuREVtcFFJQUlDQWluOC9JenczWmpuU0ZURitsbjhwZHQzejFyRk1ycEdLL2VtQmVWVTBqWTUyYm16cjMwcUxjUk53SkJ2dzlDc0lkK2dSS2taUXFKK3kzVENhRWFteE5yRnl6RzlKOWl4UkxWbXgxSGJKdFVWNlNqd3lWVXBrVmppNWVXVW1PNjBvcHFhR3BUVXJsdWxKS3BYK0VVRktxOGFjTUhENm9GQUN3ZTdlRGNFejRzWFFIS3VDMzlLK01ZZnJITWcybGFQS0VZVU1HRkhKbXpIbitJMWVJWktPR2dJaUd3UTJERXhGbVhHZ1lYRW9DZ0l2UEg4MFoxRGJFM2xxNEhnQ1U2a1JZT25lZlpTaFNoZ0dXYVhUb1NpSWk1Nnd0N2lCaVhvNWZTbGoyU1NWQWV5dkdPQW9odHU2bzYxRVlGcTZVU3NGK0lUY01rVEUwZVBJZ1o0enpmWDRNZzNIT0NuSkRsNTQvQm9BTzNaczkyaHdEd3FJTy8yZUNRQUNjODhISGxRRFNqcXFXSGJzYUVEdElwSk1MdGZnRzlpMEsrQTFGVUxtOS9nc1cwSEZFT0dTTkc5MGJRSzFhWHlXRVpJd1JnQ0pDd0UyVnRaR1FyMSt2L0lRcmxUenltQWhFNUFidjd0WVZBQndUd2pvRVJFUVVDZnNKeUJWdXRNMCsvRXNSR2FZOFVJYzg5K0IvdGwwZ2dqUEc5dmY3emNxZERWdDMxQUVBS1NKRkFQRHhxdTNEQjVVRkF6NGdjS1hPK3ZDTG1ZUU8wOWZWUFRqMmhZV0lpQzJ0Y1FEMEdUd1M5aC9PUmRwMHJxcHBTcmdPSXU5YlhuakUrZXRITFlSMEhEbDJaSi9TSHBHNnB2aW5hM2RCeWwwQ0FPczIxNXcwcW85VUxpSkllWVFCellqWS9WdkFOTWVlc0NqREtwWlNJVURDdGxldnJ3S0UzdVVGZmNvTGlhQlRIMCs2dzZJVUtVV0lPUC85TlFrYjh2UDlrODhjRE5ENVZZZFJJQUFBSVZ3cFJOOWVoWVA3RnptMlhQWnBKUUFRS01aWUxPNDB0OFJHRE83bHVoSVJwT3EwazdBUFVxbTAyUzZsY29XVVVtM2J1WGZaSjF0MFBYZ2s1ZXhhampGaElZRGZaMktxS2VHY01ZWVBQdkgraHNvR1V2SzZLMDgxT0ZPZFRTVkZSRzFsYTJQY05JMVgzL3JrbVZjLzVWejk3T2JKNWFVRlNxa3ZNbFRpT0lLQUROTVlPN0lQNTdCcWZiWHR1Snh4QUZpM3Vib2dMeFR3VzRvQUVZV1F1dEk2aURvS2NrT2NNOVBrMm5JM0RjNDVlL25OVmU4djJ3eUFTaDREd3VyV0R0Sk1DQUFCSmNsTmxYdExldWFhQmdxaHR1Mm9uLzNNaDQrOXNLeTRJUHpqR3laZk1HVzBVaXJUT2FtVndoRGlqbHRUMTZxVTRnenFHcU56NTY5NjhzVVZKd3pyOWNQdlRKeDg1akNsNkFzTzdDU0U0cHdEd0poUmZTTmgvN2FkRGR0MjFBNFpVQVlBSzlkc0h6cXdGQUJNemdsQVNxbElBZkFERHN3Z3pINTZZVkZCT09WN0p5UnNhSTQvL3VKSGQ5dzhHZUJ3cmNLanl6RWpMQURkQWJUKyt0aTcvM3o1SXdTTXgwVjFiVk13R0xqdGhxOTgvYnlSZ3lwS2xWTDdOMmRLS2IvUDJMUzE5cWFmUHVOS1ZWM1R2SE5QaXdLbzZGUHd4UDFYOU95Uko2WGkvSXZXM0k0dERNTUFnR0VEUzhwTGNqZHRxLzk0elU0dHJDMlZkVE12T1FVQVRKTURnQkFrcFFLejh5K29oOWpYYmFyWkdXcE11Ym9JQWFycldocWE0c1lYTG1lWGNjd0lLemw1UWNuZjMvSDFzcExjMWphSE1ZaUUvZUdnVDUvUTZiQU1BVERHWWdreGJHREp3NysvM0hGVlZVM1RnLy80WU81LzF1NnBiZjNPajU1NTRrL2Z5TTBORXRFUnQ0TzY5b2pIYllNakFPU0VnOGNQTHYxc1EvV0tUM2RlY2NHNGh1YW9ZN3Y5K3hRRGdHa2lJRW1wcEpLcFMvZkpGSFZxUkgrODgrc2xSWkVPR1gzM3AwL1ZOclMyMzR6dXpUSHpCZ0NBYmdNUUlDY1M2RldTVzFxY0d3NzZpRUJLZGNpMmpITzBMRE1jOGcycTZQbW51eS81MmpuRHBGQXJWdSs2Ky80M0dPSVhNb2VKQUNDUmNOTUZPR2xVTDlOZ242emREUUFiTnRmMDdKR3I2eXJENEFBZ2xKS0hNcEthVytKSm0xMHBxWlFySkJGOCsvTFRCL1lyQW9CdTczVUhPTmFFQmFDWGZpRklqY1FCWXRLRVArUmxCQ0FWU2FXVW9sL2RPbjNRY1VXQmdQK2xOMWZOZTNjTloreUwrQzBCSUc2N3BwR2N0RE4yMUhINU9ZRnR1eHFycXBzMmJkczdiSENaUG00YUJpTlFVb3BEQ1lzeDVKeHhsdnd4RFk0SVk0N3ZOKzBySjBES3U5dk5PUWFLdUQrSXlWN2U1MnErOURvZW5ERWlDZ1o4di9qUmVWSTVscy8zdTFrTDJtSTJZTWZSdmM5RlBDRU5JeGwrT0xpaXVGL3YzS2FtK09JVlc2cjN0bzRZVXFyUE1VMERDSlVFZVVRaVRqcEw5dkczZEYrT1NXRjlmdlo1RXB3ektkVnBZd1o4N2R4UnJ1dHUzRmI3anhlWE1NYVVPdkpLeTNaRnNxV1R3dS8zalJoU3poaDc4ZldWamhCOWVoVm9KZmtNQm9CQ2tSQkhrcEYra2ZRNzFmMW5ZZjkvSXF5T3p3RVpFdEVQL3Mra3ZCd3I0UFBOZm5ySm5yMk5qTEVqTnJiYW9vNWxHVVJBQ2dGZzNBbDlnMzV6NFlyS2txSUl3MlRBaFdseFFDWFZrZFpZQUVRUWl5ZXE5eloxLzlEZlkwTllpc2dSTGdJcVVxNFVoMzlQbFpCS0VtUG9Da1hVSHBMSkVKV2lYcVVGMTE1NWhwMXc2cHJzZTJjdFFFUXBPdkdMS3lKWFNBWW9sUkpTZHZnN0FSQlIxZDRtSlNXbWxzMDZhV1NmWU5Edys4eFRSaDhIQUlDb0ZQbjlCaUFrSEtlcEphNzJhOUFVa1pLQXlmQkdwUlFwcGY5Ti9yaU9RTVRIbjF2eTlvY0hqTVhvUGh3RHd1S0lETEc2cHNVMERNY1ZMYTIyamhFOXhHVkVBR0E3cXJFNUh2Q2JkWTJ0aU1DdzNiZklHSk5LZmZ1eTA0WU5LallOZkdYZTJqZmUvc3cwZVFmRGpUTmtpSFVOcmFhUHgyTTY5L2ExYlFuQTRBd1IxMjNlczdHeTFoR3VaUnBFVU5HM3FLd2t0N1JIZUZEL0VnQXdEYzRZMXRWSC9hWVpqenRiZHV4bCt6Wm5laHl3dmluR09DcWxmQmJUNFQzN3hBaFpSblZ0eXpOelY1eDYwa0RvOWlGWjNWMVlpcFFrK21UMTlubnZyZ2VHMFpoNDlKbEZEWTF0QjErM21JQ1VVckdFKzlqeml5dDNOekxPVjYzYjgvUXJ5MnhiS0NtMUtMVitBbjdycmx2T2s0NTBsZnIrM1M4OThlS1M2dG9XSVFTUVhuaVVoS1RGS3phLy85OHR5SGhEUytMaHB4YzJ0OGFUUVFzQXBLaTVOWDcvd3d0V3JhblpzYnYxaHR1ZnFkeFo1d3JCR1J2U3YzaGdSYkZsR2tKSXh4WC9mbWZWL1BjMktJYXVnTC9NK1dEOWx1cjBvQ0dSSWxKck4rOSs0KzFWeUhoRGMvd3ZjejVZdUhUendxV2JQMXkyNWNQbFd4WXUyN0pnNGZvNXp5NmVkczJEd05oeHZRc0FvSnNQU0hmcnBscVhiZlkvMzMvOTdkVkNnbUV3SU9hNG9yZ2djUE8zSjU1OFF2OU81eFJRTXNhODhUY1B6TnU0clk1eGd5RW9SVktKRTBlVTNuN3p0RWdvb0lQakllVlcvZE9qQzE1L2EzVXdZTFhGN1lLODRMVlhuSGIybVNNVUVVTzhmL2I4ZHhadGxvU0d3UUNVNDhpeTR2Q3QxMDhlTnJnM0FFVGI0bmY4ZHU2cURYdENRVDh5YW10emN5UEdMMzk0L3ZGRCs3ejg3eFdTNk9KcEp4SFJJMDk5OFBUY0ZjRkFBRGt4QU51VkJzTnZ6amo1NHFrblM2a1l3MGVmZWYrMUJXc1NMbGtHSjRKRTNHRU1LT20ySXdBZ0JWSXExNlVMengzeG8rdlA2ZjZUS2JxMXNEUzI0K3FtSkhVQUhjZGxqQmtwdnhHUmprUGU1eXFsbE9PS2dOL1VEWTZPT0VuWXdtZnhEdEdiS2JlNzBoNEpWd2dnMUM1TkFFallybVh4ak9vQmJjYzFPTk1qZzBUa0NtbVpScXBkUXlFVkFuQyt6eUtsamlzc00zaytFU0JESFlKc1dZWjJ2K3MwVFpNVDZlalFiaTJhdytFWUVOYUJrSW9BNEhQTjM2VGswbGNkNCt5K3lKRE9vVE5OVG1YOUhCNXpSY2tpZGU5YTZXQWNNOExTZzJpS0FFamh2bE9ZWTNHbnBqbFIxUkN2YjA0MHR6blJoTzBJWUVDV3dYT0N2cndjWDBtK3I3d3cyQ012Z0VtYmtvUUNodGsxVXdoQU84YlMwUmF1a0RWTnNWMjFzYjFOVGxNMEVVMDRybFNJNERlTnNOK1hIekdMYy8ybGhZRWV1WDdMYUIvRDFVTU15ZmZubUpnRURRRGRYMWhwVC9PK3I2K3Fib2l2MzlHNGFtdnIycDMxTzJvVERhMTJteTJrMUNjbld5VUVCQ0JrYUJtWUZ6Sjc5ZkNQT3E1dzNKRENNUU43aEFNK0FGQkVXZXBkWmRwQWV4cmFWcXl2KzJoajNib2RqZFZOaWRhWUVvcVVJajBoWDNja0FJRWpHWnhGQXJ3bzEzZGN6NXdSZlhPUDc1OC91RmRPVHNpZm1Td2x2MWgzbDFoM0VSWVI3TytjWlB2ZXY5YVl2VzVueS9JTmUxZHVybDlmMWRiVTZqZ0tUTTRzenJpQlNUc0lBVkx1S3RKZGVyMnN0aVJIS0VkSWs3SHlJdC9FNDBzdVBMWFA0RDc1QUNDVlpJaGYxa3ExaWtqWExBUzBhSFgxcTR0M0xObllVTi9zQUtKcE1vdGplcFpQZWlKK3Fxa0VJaEtLcEFCSFNxbVV6MlFsdWRiUVBua25EU29jTTdDd2YybU9aYmJYWkVvcEJZZ1o4L254aUlOZ3MwQjNFZFlCb09ab1ltdDE2K3JLcG84MzFhL2IxVnBkSDA4SU1Bem10NWpCR1I3QWN0OGZUQTJKRUlEanFwanRodjNzS3lOTFprNFpNS3h2QWV4Ynh4d3hVcEV1MURzcnF4NWZzT25UemMyQ0tPZzNkUnhWcHkvUC91Vk1qOW9vQWxjb3gxRkt5WUNmOVMwS0R1OVhNR1pBd1pBK2VYMktRa0YvWnlGZDNZYWpMeXpkcFU3WTR1Tk50WkxBRmhTTk9YVXQ5dTY2NkxhYXR0MzFpZHJtaE8wcXhwaGxjc3RnRFBWOGxTTWZMOU9lVXFXb0pTN0NGbjU5Zk84YnpoK2FHL1RKZmFOUFA5KzNJTDFXRzI3YzNmakFTMnZmVzEzTEdBdjRUUWFvdm9DUEhCRVlJQ0pJQlk0cmJTR0pLT3czU3ZMODVVV0JmaVhoMG9KZ1FkZ1hEaG9JbUJNMFJnL29BWFFraTZOODZYUURZUkVwb2gvTi91L3JTM2NITFV1UHFTZ2dSR1p3TkExbXBsd04rdytEZkVFNFE2bW9wYzNwWHhyNjZZd1Jwdzh2MWNIQW45ZDhVWW9ZQXdCOGNzSEd2NzIyTVpxUWtZQ1BrTDdjVVplMGxTa1Z1Vks1Z29SVXVpbmtEQmxDd2hVL216SHNHNU9IcENyT284bFJGcFlpWUFpNzY2TVgvZkpkQkFOWittVkQ3Ujg5bkdZdVRXZFdiYnBpYTYvaE9vU2VHQXhqamxMS3ZlbXJnNjZkTnBRQTRQTTRIM1E5MXhxMzczcHk1YitYVnVjRWZad25YU0VIS0ZJbmhmdTgwVENJa0RsQVJZQWNvVFhoRHVzZGZ1YjJDZDBoRnZCb2h5WVRBV0p0VThJVllKbVpBNnVIZTVNeDVUWFFGb2tycFpCS3Q1U1lzcUtoZlhNUzVBd056a3lER1J3eFpTLzdUVWJndSsrbDlkdjN0dDU5OVJqVE1CUWQxalIycmFxZGRhMC9tTFZzZFdWclFZNVBLcElLdElHdUNGeXBoSkJDa2lKQ0lxMHovZTBVRWlqVUZaSEptY0daYVNSSEVPbFFLaVBTMjVKbEhFRGdER01KWlR2S2I3RURyTkhWZFJ4bFllazdVOWVhY0lUeVdZZTdjU2tDSUFNR3FBaHNWOW11SUZKK2t4WGwra29MZ3VVOUFyMEtnL2tSWDhqUFRZTWhvcENVY0ZScnpLbHRTVlRWdFZYVko2b2I0NDFSVnlnd0RSYXd0TVNnSUNmNDRvZDdtcUpMN3IzMmxLRFBQS1MydEtvMlZUWGYrTmNsZStyZGdoeExLbVFJUXFsb1hFcXBmQ2IyeUxGSzh5TmxoZjZ5d21CQnhCLzJHejRMT1VOSmtIQ2hMZWJVdFNSMjEwVjMxaVZxR3VNTnJhNHJGT2ZNYnhtR29hWDVPZW94aHRnYUU5R0U4RnRIdTc0NDZzTFN0bnREaTZzVUhmSUZTMWRPUXBHZGtJNlFBWVAzNnVFYjFyZDRUUC9DWVgxeSs1U0VjME8rUTJZcGxheHRpbS9jRlYyNXVmYS9HK28yN21wcmNXVEFiL2dNMWlQUC81OVZEYmM4OU5HZnJqL1ZiL0tEdlBkYVZWdXJtcTk3WUhGZHM4d0ptMHBDd2hHMjYrWkhyREg5ODA4ZVVqaXFvckIvU1U1ZXhIZklJUnBGc3E0NXNXVjMyK3J0OVN1M05LN2YxVnJiWkFzRlBvdjVUTTd3ME5VWUVYQ0cwWVRiR0UzMHlQSFQwYmJoajdxd0FBQWFXaExVMlYxSUd5aVlETWxTdHF1VWt2a2hhMWovM0ZNRzl4ZzN0R2hJNzd5Z3I3M2pUYVNrT3RDTVBlMW5CYzU0U1VHNHBDQjg1c2dTUldwdFplTzg1YnZtZjd4blo1MGQ5QnM5OC96dnIycTg0OUZsOTE0M0RxRnpaN2NpNG94Vk4wUnYrdHRIRGMweUoyUzJ0TGxTeWVHOUk5UEdsVThhVmRhN09KeVJxMUtTRHJKU21nNllMczRMRmVlRlRoMWVEQUQxTGZIVjI1cVdyTnU3YkZQZHRwcFl6RllHWjM2VG1VWnk1RUM3Vnp2SWpDRzJDZG5RWWtQWjBWOU44cWdMQ3dHZ3RzVTJHR1oyWkxUTFIwZ1FVcmlDRkZIQWhKSzg0UEMra1pPSEZJMGIzS052U1NRZDg2TXRaVjJmSVRMak1EWWlTYTZjQm1Cd051SzR3aEhIRlg3ejNNRnpGMjEvK3IxdFZYVjJZYTd2elJVMXhjOS85cE1aby9iM1FlaEZrV0sydUdYMnN0MzFNdUEzNnB2am8vcmxmblB5Z0xOT0xOV2pNVVFrRmFXTHhBOXZiNVNrWXgyZ01DY3dZVlJnd3FoU3h4VWJkell2V1YrN2RFUGRwcXFXK2hiSFZZb3piaHJNNEl3enpGeDRsVE1Fd3Fhb2dHNFF1WHlVaGFXMXRMMDYyaHB6Q1VpSDdESUVnNkZsc0p3QTc1a2Y2Vk1jR3Q0M2IwVGYzRUc5OGlJaGEvOUV0Q0tKU0FnaGhKQlNLcVdVVXVuVi9RQ0FNY1k1Tnd6RE5FM1ROQmxyanlEUXkrc1ZSdnpmT25mdythZVd6M3BqNDRzTGQ0U0MxcFB2YnV0ZkZybmt6QXFoeU1nY1RpTGlqTjN6OU1lcnRyVWFobUV5Y2NlTVlaZE42RzhtWTk0bFk0d2g2bW1HQUtDVWNsM1hkVjBoaEM0WUpCZHNSbDBxeHBoaEdKeHp2cDhBTGRNWVVWRTRvcUx3TzFPcHBpbTJma2ZUbXNybWRUdWFkOVczMVRZN2JiWVFRa21sYlhrd09UWkZFMVgxMFMvM0dSMFpSOStQQlVTZmJxbmQyUkMzYmFXazRwd0gvVHdTTlBQRFZsR3VyekEzd1BZZGJIR0ZsRUxZdG0zYkNkdTJFNG1FYmR2NnNhVlZsVjcvQXpJaUY5SVAwcktzUUNBUWlVUnljbklpa1lpZXdVd0FVaXJ0SXY5ZzFlNWZQZlBabmdZM0hNQkhiemwxZU4vQ3RGOWV1NGllZm0vanI1OWVnMmlNSFpoMzUxVWpqeXZKQllETUdkVzJiYmUwdExTMHRFU2owVVFpNGVvb21SVHAxalUxMXdpMXFyVHVEY1B3Ky8xK3Y5L244L3Y5UHRPMHVHRjBtQVB0dUtLMkpWN1huR2lNdXRHNFNOaENLYkpNYnBvNHZHOUJ2NTZSbzk0cjdBN0NPb1ExRUlzbjR2RjRQQmFMeCtQeGVFdy9KLzMyNjhLbkgwLzY4OEZ5U3k0NG80aUlNZWIzKy9QeThvcUtpZ29LQ3ZRQW41REs1THlxUG5yN295c1hycTBkTnlqdjBSK005L3NNQkNRZ2hyaCtaOE0xOXk1cGpva3JKNWIvNVBKUkJqZUVsQWJuQU9DNmJsMWRYVzF0Yld0cnErTTRPb3ZNNGgyb1NPbUNaWDdRZ2pNTXc3SXNmeUFRREFSOGdVQW9HQXdHZ3BiVnJjZHpvRnNJSzlXcDFpNGVJWVJ0MjdGWUxCcHRiWXUyeFdJeHg3RmQxMVhKRlJZeC9hZ09sTnJCdjFHSEM3WElFREVTaVpTVmxaV1dsakxHZExVVVRiaTN6MW4rcjRVNzc3enErT3VuRGRVMkV3RmRmOStpdHo2dHZmMlN3ZGVmUDV4STZmQ0lSQ0t4ZS9mdW1wcWFlRHdPcVpidXlJclVvWGlaSUFEajNEUk52OThmRElWQ29YQW9GQW9HZ3o3TFlwenJiTHJKQmdQZFFsaWF0cmEyeHNiR1dDd1dqOGRkMTAzYlJoM2UrQ011c1BhVmFnOGtVakl1WHB0aVVrckhjVnpYRFFhRGZmdjJMUzh2MTltNVF0NzJ5UEszVis1NSsvZm5GT1lFRU9IdGxidS9kZCtpWDg0Y05mUHN3ZHF1dDIxNysvYnR1M2Z2RmtKWWxtWHF4WWNZNDV3anRudmRLVDJZY0VRbFQzL09ySEgxL2RFdGV6Z2NMaWdvc0t4T2JOQ2pRaGNKcTMyYmtRT1RicDY2Y2dvNUVXbGhDU0VTaVVScmEydHpjN05sV2VYbDVhRlFXRThOdmU1UEMzc1ZoZSs2NmtRaDFXWDN2RDFsYksvcnBnNlRVaUppUTBORFZWVVZZeXd2THk4Y0RsdVdwYzN3RGpWV2xyK0N2blhxY0RMdHNsSjFoYkN5c2EzSWw0VWVwSU45bzBrZHgzRWNKeFFLNlY4VHJyajFvZi9lODYyeHl6ZlhMbDFiOTlQTFQ5QkdsUkFpSG84SGc4SE0zcHdlbGVvK2NWSDdRU3E1RjFCMlM1aDlZUkVCb3VPNjBUWTNIYXhKcWYySzBpZWhmdHZhcDZXa0M2ai9ubmx1eHNITWM5Skg5bWw3UUFmOGFXV25MMFZFenRGbkdSMThWS21wRU8wSDljRE81cXFtVDdmV1NRSFRUdTBUc013T1pvd1FFaGwyVEVvSTJ4VlNZYnE2MXNWcFg0OFA5L3N1SGI3SVlYNzlqS1JJRVpIcTVNWUNJQkFRNWVVR0FCaUJ3aXpQL011dUgwdjMwbC8rOThkL21QMk9xekRwYnNybytLVFJScm0yVHpOdlhUcllzdjNVVkVBdnB0dlhqTnNJa0RTZ1V1a2dKWVdWRWl3aUVEQUF3MkRCb0s4Z0o5Q25WLzdnaXFMamgvUWFNckFrRkV6R0FVc2h0ZjlSTDNJMG9DeXZxcmFscENBYzhsazZSaFJTYlRmblhNOFhxcTF2V2JPaGFzM0dQUnUzMVZSVnR6Wkg3WGpDRlVvbE4yMUsvZ3Z0eTBUcXdzRytFUmpwNzVnOEEwQWJFaGxXVnZMbVVNYzNLRFcydU0rTlpZd2x2ek1pS1ZWY0VQemR6eTRZUHJDWG91eE9JT3VLcG5EcTFYLzVlRjF0YnNUS1hDcEl2MGJ0R3NweU1mWlBub2dVS1NsQmIxVGg5eHU5ZSthZU5McjMxQWxEeDU4ODJPYzNBVUJQK2tQRXRQTkp5ME1SRVNtOXhHaHRmY3VDaFJ2ZVdyaHUxYnFxdXZxNEkxekdHRGM0WjlqcDZrcFpObkk2R2xHWk41WWJ2S2EyOVhzenovakZqNzc2cGF4amVCQzZvc2JxMlRPSDF0WVlEQ1VsOTR3NFFHMStZRHJlcllPTnV4ME9PcUFHbVY3b0hZbEFDclc3dG5YejNNOWVlSDNWb09PS0w1azI2dEx6eHhUa2FUT0xpSUNVU29WV0lVTUU1SnUyVmovNTB0STMzMTIzdTZhVk0vVDd6WERZeDdnZjljWkxDdFRuV09DWTloOHQzZjhlSlUvTU9PRmd5U2Z2RWtzUEszSkV6cUJYYWU1aGx1bUxrTjBhU3d0cnlZck4zNy83cFZoQ1lTcDJUOTlHZ3ZhMkQxSjNMRjJCRWFUakhiQ3orcWF6L0pKSkh4SWlJcjFrbnBJRWlLWnArbjNjTkxuZTFTS1djQkp4dDE5NS9qY3ZIWGZCbEpFOWkzSXlGU3VsM0xLajdwOHYvdmY1ZjMvYTNHcUhnNWJQWnlBaUtYSnNHWGVFS3dVQ0dweVpKdU9NSFZMdHlaazZuY3ptU0RuM01vNWt2bUtwNmR6SlNTT3BJZnRreThrd0xkYWsyME1wR3RndmIvYTlWL1hJajBDV2U0aGQ1RzZJeHUyR3hsalNZR2pQRW9uYXgralR4ekVWcjV4cGNuUW9KMUdHaExEZDBKQ0hWMGRJcFJ6YnFXK003YTV1M2xwWnUyckRuaTNiNnhxYTQ0WmhoSUtXd1JrUnhXMFJTN2hsUmVIZXBibTVFYjlsbWdwVUlpRWJtMktWdXh1YVdweEl5REpORGdpT0s5dGlOZ0NWRklXSFZoUVBIOXlyYjNsQldYRnVYbzdQc2l3NDFISldDSUNBak85cnN5Y053ZzZUYTZsRHZ3SGJqVWNkcG9icFh6SStKalhFR0pZVTUzREdEN1JYNTVkSWw3Z2JEaThhODZoQzIzYlVMVnk2OVkxM1ZpLzdkS2Z0eWtqWWJ6QUdRTFlySFZjb1NhbWxSSkF6NXJNTTAyQ0FZRHVxTFdvWDVQc25qdXQvN3FTaEo1L1F0N2d3NzJoL2wwTkEyWnoybmFickhLU0hzZkJRRnhSazN3eFQzejNEaktYbG4yeC80b1VscjcrM1hnZ0toM3lNYVlzcTNVWW53L0NGVUszUlJGRmhZTVpYVDV4eDRVbkg5UzVLcFpsYUdMQmpLNVo5RHBWYmNqQzFLNHJTbllaMGppNTZhOHIwVnQ0ZnJkenk1MGZlVy9icDdvVHJwcVpYcHdhOEFSbGlUc2c2YjlLd203ODVvVSt2UWtpNkhnNXI5L0wvVC9DRTFSRzl6NlgyZHE3ZFZGVlYweXlFRWtJcEJZREFHRE1OOUptc29sOVJuN0pDMFB2NXNHTnArNlN1b2N1YXduWS9FR1RNcnRJZG1BNmpzNGlvYXdoc1A1Qk1aSi9mTzAxdFg5ZEVwajJ4Znhhdzd6d3Z2WE9xN2tFcFJSa2p5SjJqWjZKbWltci9OUGU3cE9Qd1VZZDhEMVR5ZmY4RUdmRkNuV1VCQjB1dGF6ZzZOZFlYN0pTa2IrdmhwSFk0ZWVtdVpQcDVLNlcwWWFWSE9WVjZyZ3dpWjZpck5JYjQrUTJXcEdjcDR6VWp5dGlyVE85SmR2QTBPeXdGa1BscmgwN1MwWjIyMmhYQ0lwTFZlNlA1dVFHZnoyeG9pQm9XejQwRWlSUWlWdGUxaGdOV01HRHVxbXBsSFBWOHdQSmV1YTFSdTdFNURvQlNxdHdjcXlBdkZFczREUTF4cWNqbll5VkZTUmRmdE0yT3hlM2lIamw2SUxtcEthNkFDdk5DUkFSSXJrdk56VzFGUGNJQVRBaTV1N3FGYzBZS0dHSlphYVM1SmVaS1ZWUVFJa1hJT0FCczNGYlgwQkR2VzU1VDJqTVhRQkVna0tyZUd5M01ENXFtZ1loQ2lMMTEwYUllRWRQUUUzaW90cjQxRlBJSGZCWUFBRUswTFJHUHUwV0ZZV3gzQXJmZkJnQmEvbWxWai94QXZ6NkZrS0g0TGR2cjk5YkZ5a3RDdlhzVjZGTnR4MjVvakpjVTV5S2lVcXFtdHFVd1AyeFpoaFo2TEpGWXM2SGVNTm1vb1QwWk1xVWtZNHlJdENkc3pjYWFhTlFkV0ZGUWtKZmN5a1VwV2IyM3RVZGh5REs3TUR5UXNva2V1cEpTbkhQWm5BOCtxaVNpTzM0ei8vVHBzOXRpQ1NrRkVWMSszVFAvZW1PMTR6am56cGh6NHJtelJrK1pkZkczbnlLaXg1OWRPdWlNUDU5MzVlTmp6M2x3OXBNZkVkR0NoUnVIam4vZ0s1Zk1PWG5xUXpOdWVMYXF1b21JNXI2NXBtTGMvZXMyNzlYWjNmUG50My93aTNsRVpOc3VFVDN5OU5LQnA5MWZWZE5FUkZVMXplZGVQbWZNdVErTm5qSnJ4clZQRWRFZkhuei94cCs4UWtSS3lyMTFyVmQrOTdsUmsvODI0YUtIajUvNGw1Lzk3aTNYRlVvcXBkVGt5K1o4Nzg3WGlVZ3BxcWxyT2ZPaTJaVzdtdlN2c1ZqaXhDbC8vZFdmM2lFaTJ4WkVOT2ZaRlZmZStBd1JaUVlpNjVNZFYxeDc2OHVuVDMva3hNa1BQdlhTQ2lKU1NqVTJ4NzUxeXd1anZ2TFhDUmM5TXVLc3Y5eDgrNnZOelhFaVdyNXExNlNMSDRuSFhTS0t0c1VuZmYzaFZldXFkVkl2dkxicXhNbC9PMjM2N0hGVC8zNzY5SWMvWEZwSlJFSzRSTFI1YS8xNVZ6NHg1cHdIeDEvNHlNaXovdnJBSTR2MEUyaG9hanZ6d29jMmJLc2xvdFNPSGxtbks2SlpDRER1S3IyTXRXR1luNjJ2dlgvMklzYjB4aklRZDRScG1zODlmTVdKdzN1ZU83SC9uRDlmREFEMUxjNHBKL1o2YnRhTU41KzU1b3F2alFZQTI2SFNucEVYSDduaStWbVh1QTc5OXE4ZkFvQlUwQm9UZDk3N3Rpc0VFVWtKcnBBQXdEbTZRc3gvYndzaGYyMytCZ0RJendrOFAvdUtVVU9McGs4Wi9QQjlGd09BTGNCeENRQWNJYjc1dlg5SmhhOC9jZVg4WjJjKy9wZUwzbGl3NmVmM3ZvME1wVlFCdi8vNXVlc1dmTEFaRVVoQ0tnQVJFR0hlZTF0aWNWcjQzeDJ0VVZ0UHpKSUNkWnFaNHpOU0tVUll2SHo3bWcxMUg4Nzk5ajAvbWZUK291MEFvSWl1dmZXVjJnYjdsY2N1Zit2WnExOTQ2TEtObGZXem5sd0NBRW9xMjlHM0RwQXc0WkFRRWdEbXZiZmgxbCsrZGR2L2pILzcrWm4vZWU2YWk2WU9udm05bDladTNNc1lyMjlvdS95RzU0WU9MSnovOU16L1BQZU5QLy9xM0FjZVhmcjNmL3dYQUtTa2hJTmQ3TTNwb2pDcDlDTFhyVzJKRzJhT2ZuZng5dmVXVkFLMFd5azVZWi9mTWdJQkl6a1BSMEU0WUVYQ3ZzTDhRQ2hvQVFBQytQMUdYbzZ2YisvOG1aZU4zckNsRGdCYVkvWlhKMWRZQnI5LzlwSmtnQ2dDQUhET1AxeTZJOTdtM25mWDJjKy91a1pJYVZvOEV2YjVMQ01ZTU1NaEM1SUJwUVFBcjcyMXNhbzIvdFJmdjE1ZW1tc2EvTVFSdmY3NXQ0dGYvdmY2N2JzYkRJTnhycTcveGtuMy9QbjlhSnZ0ODJmTzFvRW5YdmprNTdlTUw4Z0p2YlpnZzQ0STZ0VGUxNzhIZldZOFlTLy9iUGQ1a3dZLzlJZUxBT0Q5ajdhdTI5anc3SU9YOXV0ZFlKbm1rSUZGODU2KzV0cXJ4NEhleFo2aFpYRUVzSHljczZUOTk4ZS9mL1M5YjU5eTZiVGpmWllaQ1ZzL3ZHNzgyZU1yL3ZUd0VrUjg3Tm1QOC9JRGY3eHJXbUZCMERLTmlhZjNmK0NlcVgvL3g0cDR3ckZNbyt1amxidElXT20zSlpFUUZYMEtiN3RwL0UvdW1VZEVQcFByQ2tCUEpFd0YzRUlvWkwzNzBmYVozL3ZYdEtzZWYrcWxsZnFNYU5UZVhGbTNhUG1PMy96bGcvTW05UWNBSlJVUy9PNk9LWE9lK1hodlhXdE94SitPZG5waDdtZVRKdlEvZi9KUW9kVGlwZHM1WTBRZ003S0FWQy95azdVMVkwZVhJV091VUloTUtSbzJzS2lrS0xobVl6MEFOalRGTDUwK2JPd0o1WGZkKzNaZWprK2xOamhkdDNGdmJWMzBpb3RHWFhEZWdGZit2ZVlnN2wzR0dCR2NOS3I4c3VuSFgvTS9MMCsrZE02eVQzY0F3TEtQOTV4d2ZNOWcwQlJDNlIwR3BLTGNTQkFBVElQVk5zU21mK09mNTMvanlRdXVlYnEyMFFrRVRGZTREYzJ4c3lmMDF4T1JoQ0FwYWVwWEJtK3RiQUNBenpic25YaGFoVlRrQ2dFQVV0RzRNV1dXeVhkVnQxZ1dweTdmYmFDckF6czV4NXJhdHNuakI1U1g1UDc1a1VXRmVmN1VMSW5rQ2ZxRDQ4Z0JmZkptWGpyNnVxdFBIbjE4Q1FBZ29tSHlIOTh6LzdwYjU5NzRqVEUzWG5NcUFKZ21iMnBPOUNyTnZlYlMwYmYvWm9HUmNuWFhOVVEvWEY3MTVvSk5NMjk2Y1dkVmRPNzhqZnRua1NZbjRtOXNqT21EZWpNUzIzV2pNVkdRbzJ0S2JHcTI3LzdocFBlWGJIOWwvdHI4M0tCdWJWOTlhLzJ1cXVqTW01Ly81NzlXZi94WjdhWnQ5WkRxNWVtTm5ETTdSZHFwK3VNYnozem5oV3RPUGFuUGorNmVUMFE5Q2dNTkRRbDlncEJLejVIWHhSQktoUVArNjJhT3ZmbmJwMXgzOWRod2dBc2hPVE00WW1OempITW1GU21sT01lYStxamZid0JBSk9pcmE0aHhocVJBQ0lVQWJUSHBPaUlTdEtRaVFKQ1NoUHdpYTNWOVBycXFLVXd0YU0wWkFqQWkrdjJkVS83MStyb2xuMVJGVW10czZ2MFg5R2RYcUlIOUN5YWRVVEg5bkdIREJwWUNnQ0lvekF2ODcwK21jSTRubmRoYng5WXhSTVk1RWYzZyt0TmFXaEp6bnYwa1B6Y0lBSysrdGI2b3dQZk5HU2RNbnRELys5OFo5K0d5SFhYMVVRQTl5UWZUMlJrR0E0Q3BrL3F2K0d6UFJ4L3ZOQTFtR0l3eC9Qc1R5dzJEang1UlJrU1dhY2JpSWhRMGIvK2Y4Yi80d3djeDJ3bjZPWkdhOTg2bUc2NFpPM25Dd0NzdkhEbG9RUDRMcjYwQkFLVW80RGM0WjViSlUvRm1JSlVDZ05mZVd2dkM2MnVLQzhPMzNYUjZXMHhFWS9iVVNZTTJiSzE3YStGR1EwOXI1cmhvYWVWLzN0OEFBRXBCT016UG56eGt5b1NCMDg4WkdnNlpqcU1ZdzFOUDZ2M0h2MzhFQUpiSkxjdU14ZTFaVHl5YmV2WWdBSmgrN3FEWDMxcGZ1YlBlc2d6VDVJemhmYk1XOVN2UEt5bU8yTFpyR3F3d1AyQndaaGhkOU1TN2FDWjBjM1BjZFJVQVJLT08zK2NnWWtYZnd1dXZHWGZWVFMrbkc1RzJOaWNXY3ZWbkJIcjN3eDMzUGZSaGMwdGl3bW45SnAwK3dIWEZ6bDNOUXdZVTNYak5LVi85eGo4WFBIdE4zL0o4MnhaTnpYRkV0RXpqcmxzbm5qcDFUc0tXUkRUN3llVTNmV3ZjNVJlTjBxbTk4dWI2UjU5ZmVkc040MXRhRTdGNE1vdFkzSTNGSEFBWU1iamtSOWVmZHZsM1g1ajV0Uk1HVnVRdlhMYnp2VVZiSDdudklwL1BWRXJxUFNtSjRPdFRSN3oxN3RiblgxMmJueGQ0ZWQ2NnRyajR5VTNqZFZJRkJiNy91ZlBOVzI4NHc3TDRpay8zM0Q5N2NUemhYSDN4cU41bGVaUUszekF0ZnVzdjU5bTJPLytEalFQN0Z3WURWaVRrditzSDQ2Ly80ZXVYWFRoOHhPQWVTeitwbVR0djNSL3VtZ0lBcmlzYm0rSnRNZGZ2TjJKdGljYW1oSzVwN3Z6QnhFdXZmWDdLak1jdXYyQkV3bGFQdjdCeXhORGk3MXd4UmtvMVpjS2dTNlp2UC9lS3A3NDE0OFRTNHRDOGR6ZXYyN3ozMlZtWEFpQXBhR3lPLzNIV290eXdiK1N3bmwrZFBMUUw5aC9JcnJCMDJSbkNaZE9IbFplR0FlQ3M4ZjJDQVFzQWxGSlhYalJpNTg2Rzh0S0k3djJjUGI1Zk9KS3N2Y2FlVUZhNXMybFhkVnRyU3l3YWRRQ29YKys4U3k4WXFwUzY5cXFUNmh1am4zeTJzMjk1M3VDQlBhWlBHUWdFa3RTSVFhVVAzRE1sTnljUWk5dm5US3lZZHZZZ0taV1VaQmg0NjNkUDNieTFEb0RPbVhoY2NVRnlTOXh4SjVRTTZKTURBRkxLRzJhT0d6S2d4NVAvV3JWNjA5Nit2U0t2Ly9QcUFmMEtpUlJEZHNuNVE4ckx0RjhLN3ZyaGhLSkNuOEhSVGppMzNYZ2FrWEpkNGh3bm5GSXg0L3dSZFEydFkwYjIvTXFaRmR1cld1eUVhenRDaDc5d3pvam8zSW1EZi9YanhETnoxL1F1aTl6K3ZRbWNNU25sMVJlUHFlaFgrUGh6SzErYXQ2bG5jZWkxSnk0L2ZsZ1pBSlQwRE0rNGNKaGxNczdRdEl3WkZ3NHI3aEVDZ01MODBLdVBYL0hnNHgvTmUzY2JNL0NHcThkZWM5bG9RS1o3K0wrK2JmS1lrYVV2L1h2RDhrL0U0SUg1OS8zeTNKNDlJZ0FRQ1BETEx4cGUxeERmdHJPNWQxbE9WcDk0KzZPbnJ2QzhkL1E0cDQ0bWw5b2hvclJIVVR0T08vTXU2bUVkcFlBWWN2MFprc0Z4QklEdGZ1ZFViZ0N3ejR5RmRoODhVY3FkbU96Ujd6ZmlrWHFubGJZV01rTldGVkJxNFVHVmFVdDBGdGJhZnF6VEFZRDk1eTkxRm1LVW1jaitJelB0ZjFXa1dNZE5OOVNYdFJyMDU2V0xoblNrSk1ZQUVYUklpYTZIQ1VCSm1kNE5RQS96NnNVODA4RW5wQTBwaGtTS0ZERE9BRWhLU29XaUoyTUtBRUFmMTFaVU9sWmQ1NjRYVlU5dmRja1kwd3FGakhsYVVpa2dRSWFrS0hOUVdTckZVdU1zUktRVWNjNzJuK09sUThqMUNmcElaZ0hTTjBIUHBjNUlQdGxMUmFhM3pFaWFnRVRhTnVmcHhOT3BFWUZTVXI5N1JMUnZMdm9PZ0Q0TkdhUjFKcVdpVk1SZjEweE44NkliUExKQ041MUg2bkdzNHduTEl5dDR3dkxJQ3A2d1BMS0NKeXlQck9BSnl5TXJlTUx5eUFxZXNEeXlnaWNzajZ6Z0Njc2pLM2pDOHNnS25yQThzb0luTEkrczRBbkxJeXQ0d3ZMSUNwNndQTEtDSnl5UHJPQUp5eU1yZU1MeXlBcWVzRHl5Z2ljc2o2emdDY3NqSzNqQzhzZ0tuckE4c29JbkxJK3M0QW5MSXl0NHd2TElDcDZ3UExLQ0p5eVByT0FKeXlNcmVNTHl5QXFlc0R5eWdpY3NqNnpnQ2NzakszakM4c2dLbnJBOHNvSW5MSStzNEFuTEl5dDR3dkxJQ3A2d1BMS0NKeXlQck9BSnl5TXJlTUx5eUFxZXNEeXlnaWNzajZ6Z0Njc2pLM2pDOHNnS25yQThzb0luTEkrczRBbkxJeXQ0d3ZMSUNwNndQTEtDSnl5UHJPQUp5eU1yZU1MeXlBcWVzRHl5Z2ljc2o2endmd0hFWEpWWVA2RmdGUUFBQUFCSlJVNUVya0pnZ2c9PSI7CgovLyBQYWdlIGdlb21ldHJ5IChBNCkKY29uc3QgUEFHRV9XID0gMTE5MDY7CmNvbnN0IE1MPTkwMCwgTVI9OTAwLCBNVD05MDAsIE1CPTkwMDsKY29uc3QgQ1cgPSBQQUdFX1cgLSBNTCAtIE1SOwoKLy8gQnJhbmQgY29sb3JzCmNvbnN0IENfTkFWWSAgID0gIjFEMzQ2MSI7CmNvbnN0IENfQkxVRSAgID0gIjJFNUZBMyI7CmNvbnN0IENfVEVBTCAgID0gIjJFNzVCNiI7CmNvbnN0IENfSERSRklMID0gIkJERDdFRSI7CmNvbnN0IENfUk9XQUxUID0gIkVCRjNGQiI7CmNvbnN0IENfR1JOVE9UID0gIkUyRUZEQSI7CmNvbnN0IENfR1JOVFhUID0gIjM3NTYyMyI7CgovLyBCb3JkZXIgaGVscGVycwpjb25zdCBiUyAgID0gKGMsc3opID0+ICh7IHN0eWxlOiBCb3JkZXJTdHlsZS5TSU5HTEUsIHNpemU6IHN6fHw0LCBjb2xvcjogY3x8IkJCQkJCQiIgfSk7CmNvbnN0IGJOICAgPSAoKSAgICAgPT4gKHsgc3R5bGU6IEJvcmRlclN0eWxlLk5PTkUsICAgc2l6ZTogMCwgICAgIGNvbG9yOiAiRkZGRkZGIiB9KTsKY29uc3QgYUIgICA9IChjKSAgICA9PiB7IGNvbnN0IGI9YlMoYyk7IHJldHVybiB7dG9wOmIsYm90dG9tOmIsbGVmdDpiLHJpZ2h0OmJ9OyB9Owpjb25zdCBuQiAgID0gKCkgICAgID0+IHsgY29uc3QgYj1iTigpOyByZXR1cm4ge3RvcDpiLGJvdHRvbTpiLGxlZnQ6YixyaWdodDpifTsgfTsKY29uc3QgYnRCICA9IChjLHN6KSA9PiAoeyB0b3A6Yk4oKSxib3R0b206YlMoYyxzeiksbGVmdDpiTigpLHJpZ2h0OmJOKCkgfSk7CgovLyBDZWxsIGJ1aWxkZXIKZnVuY3Rpb24gbWtDZWxsKHRleHQsIG9wdHMpIHsKICBvcHRzID0gb3B0cyB8fCB7fTsKICB2YXIgYm9sZCAgICA9IG9wdHMuYm9sZCAgICB8fCBmYWxzZTsKICB2YXIgZmlsbCAgICA9IG9wdHMuZmlsbCAgICB8fCAiRkZGRkZGIjsKICB2YXIgYWxpZ24gICA9IG9wdHMuYWxpZ24gICB8fCBBbGlnbm1lbnRUeXBlLkxFRlQ7CiAgdmFyIHcgICAgICAgPSBvcHRzLncgICAgICAgfHwgMjAwMDsKICB2YXIgc3ogICAgICA9IG9wdHMuc3ogICAgICB8fCAyMDsKICB2YXIgY29sb3IgICA9IG9wdHMuY29sb3IgICB8fCAiMUExQTFBIjsKICB2YXIgYm9yZGVycyA9IG9wdHMuYm9yZGVycyB8fCBhQigpOwogIHZhciB2UGFkICAgID0gb3B0cy52UGFkICAgIHx8IDgwOwogIHZhciBoUGFkICAgID0gb3B0cy5oUGFkICAgIHx8IDEyMDsKICByZXR1cm4gbmV3IFRhYmxlQ2VsbCh7CiAgICBib3JkZXJzOiBib3JkZXJzLAogICAgd2lkdGg6IHsgc2l6ZTp3LCB0eXBlOldpZHRoVHlwZS5EWEEgfSwKICAgIHNoYWRpbmc6IHsgZmlsbDpmaWxsLCB0eXBlOlNoYWRpbmdUeXBlLkNMRUFSIH0sCiAgICBtYXJnaW5zOiB7IHRvcDp2UGFkLCBib3R0b206dlBhZCwgbGVmdDpoUGFkLCByaWdodDpoUGFkIH0sCiAgICB2ZXJ0aWNhbEFsaWduOiBWZXJ0aWNhbEFsaWduLkNFTlRFUiwKICAgIGNoaWxkcmVuOiBbbmV3IFBhcmFncmFwaCh7CiAgICAgIGFsaWdubWVudDogYWxpZ24sCiAgICAgIHNwYWNpbmc6IHsgYmVmb3JlOjAsIGFmdGVyOjAgfSwKICAgICAgY2hpbGRyZW46IFtuZXcgVGV4dFJ1bih7IHRleHQ6IFN0cmluZyh0ZXh0PT1udWxsPyIiOnRleHQpLCBib2xkOmJvbGQsIGZvbnQ6IkNhbGlicmkiLCBzaXplOnN6LCBjb2xvcjpjb2xvciB9KV0KICAgIH0pXQogIH0pOwp9CmZ1bmN0aW9uIGhDZWxsKHQsIG9wdHMpIHsKICB2YXIgbyA9IG9wdHMgfHwge307CiAgby5ib2xkICA9IHRydWU7CiAgby5maWxsICA9IG8uZmlsbCAgfHwgQ19IRFJGSUw7CiAgby5hbGlnbiA9IG8uYWxpZ24gfHwgQWxpZ25tZW50VHlwZS5DRU5URVI7CiAgby5jb2xvciA9IG8uY29sb3IgfHwgQ19OQVZZOwogIG8uc3ogICAgPSBvLnN6ICAgIHx8IDIwOwogIHJldHVybiBta0NlbGwodCwgbyk7Cn0KCmZ1bmN0aW9uIHNlY0hlYWRpbmcodGV4dCkgewogIHJldHVybiBuZXcgUGFyYWdyYXBoKHsKICAgIHNwYWNpbmc6IHsgYmVmb3JlOjIwMCwgYWZ0ZXI6ODAgfSwKICAgIGJvcmRlcjogeyBib3R0b206IGJTKENfVEVBTCwgNikgfSwKICAgIGNoaWxkcmVuOiBbbmV3IFRleHRSdW4oeyB0ZXh0OnRleHQsIGJvbGQ6dHJ1ZSwgZm9udDoiQ2FsaWJyaSIsIHNpemU6MjYsIGNvbG9yOkNfTkFWWSB9KV0KICB9KTsKfQoKYXN5bmMgZnVuY3Rpb24gZ2VuZXJhdGVTdHVkZW50KG5hbWUpIHsKICB2YXIgc2MgICAgICAgID0gREFUQS5zY29yZXNbbmFtZV0gfHwge307CiAgdmFyIHBhcGVyU3VicyA9IERBVEEuc3ViamVjdHMuZmlsdGVyKGZ1bmN0aW9uKHMpeyByZXR1cm4gREFUQS50ZXN0T25seVN1YmplY3RzLmluZGV4T2Yocyk8MDsgfSk7CiAgdmFyIHRlc3RTdWJzICA9IERBVEEuc3ViamVjdHMuZmlsdGVyKGZ1bmN0aW9uKHMpeyByZXR1cm4gREFUQS50ZXN0T25seVN1YmplY3RzLmluZGV4T2Yocyk+PTA7IH0pOwogIHZhciBvYnNTdWJzICAgPSBbIlBFIiwiVGFla3dvbmRvIiwiQXJ0IiwiTXVzaWMiXTsKICB2YXIgYWxsQ29tbWVudD0gcGFwZXJTdWJzLmNvbmNhdCh0ZXN0U3Vicyk7CgogIHZhciBsb2dvQnVmID0gQnVmZmVyLmZyb20oTE9HT19CNjQsICJiYXNlNjQiKTsKCiAgLy8gSGVhZGVyIHRhYmxlOiBsb2dvIGxlZnQsIHRpdGxlIHJpZ2h0CiAgdmFyIExPR09fVyAgPSBDVyAtIDgwMDA7CiAgdmFyIFRJVExFX1cgPSBDVyAtIExPR09fVzsKICB2YXIgaGVhZGVyVGFibGUgPSBuZXcgVGFibGUoewogICAgd2lkdGg6IHsgc2l6ZTpDVywgdHlwZTpXaWR0aFR5cGUuRFhBIH0sCiAgICBjb2x1bW5XaWR0aHM6IFtMT0dPX1csIFRJVExFX1ddLAogICAgYm9yZGVyczogeyB0b3A6Yk4oKSwgYm90dG9tOmJTKENfVEVBTCw4KSwgbGVmdDpiTigpLCByaWdodDpiTigpLCBpbnNpZGVIOmJOKCksIGluc2lkZVY6Yk4oKSB9LAogICAgcm93czogWwogICAgICBuZXcgVGFibGVSb3coeyBjaGlsZHJlbjpbCiAgICAgICAgbmV3IFRhYmxlQ2VsbCh7CiAgICAgICAgICBib3JkZXJzOm5CKCksIHdpZHRoOntzaXplOkxPR09fVyx0eXBlOldpZHRoVHlwZS5EWEF9LAogICAgICAgICAgcm93U3BhbjozLCB2ZXJ0aWNhbEFsaWduOlZlcnRpY2FsQWxpZ24uQ0VOVEVSLAogICAgICAgICAgY2hpbGRyZW46W25ldyBQYXJhZ3JhcGgoeyBzcGFjaW5nOnthZnRlcjowfSwgY2hpbGRyZW46WwogICAgICAgICAgICBuZXcgSW1hZ2VSdW4oeyB0eXBlOiJwbmciLCBkYXRhOmxvZ29CdWYsCiAgICAgICAgICAgICAgdHJhbnNmb3JtYXRpb246e3dpZHRoOjc1LGhlaWdodDo3NX0sCiAgICAgICAgICAgICAgYWx0VGV4dDp7dGl0bGU6IlBSSU1FIExvZ28iLGRlc2NyaXB0aW9uOiJQUklNRSBJbnRlcm5hdGlvbmFsIFNjaG9vbCIsbmFtZToibG9nbyJ9IH0pCiAgICAgICAgICBdfSldCiAgICAgICAgfSksCiAgICAgICAgbmV3IFRhYmxlQ2VsbCh7IGJvcmRlcnM6bkIoKSwgd2lkdGg6e3NpemU6VElUTEVfVyx0eXBlOldpZHRoVHlwZS5EWEF9LAogICAgICAgICAgY2hpbGRyZW46W25ldyBQYXJhZ3JhcGgoeyBhbGlnbm1lbnQ6QWxpZ25tZW50VHlwZS5SSUdIVCwgc3BhY2luZzp7YWZ0ZXI6MH0sCiAgICAgICAgICAgIGNoaWxkcmVuOltuZXcgVGV4dFJ1bih7dGV4dDoiUHJvZ3Jlc3MgUmVwb3J0Iixib2xkOnRydWUsc2l6ZTozMixmb250OiJDYWxpYnJpIixjb2xvcjpDX05BVll9KV0gfSldIH0pCiAgICAgIF19KSwKICAgICAgbmV3IFRhYmxlUm93KHsgY2hpbGRyZW46WwogICAgICAgIG5ldyBUYWJsZUNlbGwoeyBib3JkZXJzOm5CKCksIHdpZHRoOntzaXplOlRJVExFX1csdHlwZTpXaWR0aFR5cGUuRFhBfSwKICAgICAgICAgIGNoaWxkcmVuOltuZXcgUGFyYWdyYXBoKHsgYWxpZ25tZW50OkFsaWdubWVudFR5cGUuUklHSFQsIHNwYWNpbmc6e2FmdGVyOjB9LAogICAgICAgICAgICBjaGlsZHJlbjpbbmV3IFRleHRSdW4oe3RleHQ6IkFjYWRlbWljIFllYXIgIitEQVRBLmFjYWRlbWljWWVhcixzaXplOjIyLGZvbnQ6IkNhbGlicmkiLGNvbG9yOkNfQkxVRX0pXSB9KV0gfSkKICAgICAgXX0pLAogICAgICBuZXcgVGFibGVSb3coeyBjaGlsZHJlbjpbCiAgICAgICAgbmV3IFRhYmxlQ2VsbCh7IGJvcmRlcnM6bkIoKSwgd2lkdGg6e3NpemU6VElUTEVfVyx0eXBlOldpZHRoVHlwZS5EWEF9LAogICAgICAgICAgY2hpbGRyZW46W25ldyBQYXJhZ3JhcGgoeyBhbGlnbm1lbnQ6QWxpZ25tZW50VHlwZS5SSUdIVCwgc3BhY2luZzp7YWZ0ZXI6ODB9LAogICAgICAgICAgICBjaGlsZHJlbjpbbmV3IFRleHRSdW4oe3RleHQ6REFUQS50ZXJtLHNpemU6MjIsZm9udDoiQ2FsaWJyaSIsY29sb3I6Q19CTFVFfSldIH0pXSB9KQogICAgICBdfSkKICAgIF0KICB9KTsKCiAgLy8gU3R1ZGVudCBpbmZvICsgYXR0ZW5kYW5jZSBzaWRlLWJ5LXNpZGUKICB2YXIgSU5GT19XID0gTWF0aC5mbG9vcihDVyAqIDAuNTYpOwogIHZhciBBVFRfVyAgPSBDVyAtIElORk9fVzsKICB2YXIgaW5mb0xXID0gMjIwMCwgaW5mb1ZXID0gSU5GT19XIC0gaW5mb0xXIC0gNDA7CiAgZnVuY3Rpb24gaW5mb1JvdyhsYWJlbCwgdmFsdWUpIHsKICAgIHJldHVybiBuZXcgVGFibGVSb3coeyBjaGlsZHJlbjpbCiAgICAgIG1rQ2VsbChsYWJlbCwge2JvbGQ6dHJ1ZSxmaWxsOiJGNUY5RkYiLHc6aW5mb0xXLHN6OjIwLGNvbG9yOkNfTkFWWSx2UGFkOjYwfSksCiAgICAgIG1rQ2VsbCh2YWx1ZSwge3c6aW5mb1ZXLHN6OjIwLHZQYWQ6NjB9KQogICAgXX0pOwogIH0KICB2YXIgc3R1ZGVudEluZm9UYWJsZSA9IG5ldyBUYWJsZSh7CiAgICB3aWR0aDp7c2l6ZTpJTkZPX1ctNDAsdHlwZTpXaWR0aFR5cGUuRFhBfSwgY29sdW1uV2lkdGhzOltpbmZvTFcsaW5mb1ZXXSwKICAgIHJvd3M6WwogICAgICBpbmZvUm93KCJTdHVkZW50J3MgTmFtZSA6IiwgbmFtZSksCiAgICAgIGluZm9Sb3coIlN0dWRlbnQncyBJRCA6IiwgICAiIiksCiAgICAgIGluZm9Sb3coIkNsYXNzIDoiLCAgICAgICAgICBEQVRBLmNsYXNzSWQpLAogICAgICBpbmZvUm93KCJUZWFjaGVyJ3MgTmFtZSA6IiwgIiIpLAogICAgICBpbmZvUm93KCJJc3N1ZSBEYXRlIDoiLCAgICAgIiIpCiAgICBdCiAgfSk7CiAgdmFyIGExPU1hdGguZmxvb3IoKEFUVF9XLTQwKS8zKSwgYTI9TWF0aC5mbG9vcigoQVRUX1ctNDApLzMpLCBhMz1BVFRfVy00MC1hMS1hMjsKICB2YXIgYXR0ZW5kYW5jZVRhYmxlID0gbmV3IFRhYmxlKHsKICAgIHdpZHRoOntzaXplOkFUVF9XLTQwLHR5cGU6V2lkdGhUeXBlLkRYQX0sIGNvbHVtbldpZHRoczpbYTEsYTIsYTNdLAogICAgcm93czpbCiAgICAgIG5ldyBUYWJsZVJvdyh7IGNoaWxkcmVuOlsKICAgICAgICBoQ2VsbCgiVG90YWwgU2Nob29sIERheXMiLHt3OmExfSksIGhDZWxsKCJEYXlzIG9mIFByZXNlbmNlIix7dzphMn0pLCBoQ2VsbCgiRGF5cyBvZiBBYnNlbmNlIix7dzphM30pCiAgICAgIF19KSwKICAgICAgbmV3IFRhYmxlUm93KHsgY2hpbGRyZW46WwogICAgICAgIG1rQ2VsbCgiIix7dzphMSxhbGlnbjpBbGlnbm1lbnRUeXBlLkNFTlRFUix2UGFkOjE0MH0pLAogICAgICAgIG1rQ2VsbCgiIix7dzphMixhbGlnbjpBbGlnbm1lbnRUeXBlLkNFTlRFUix2UGFkOjE0MH0pLAogICAgICAgIG1rQ2VsbCgiIix7dzphMyxhbGlnbjpBbGlnbm1lbnRUeXBlLkNFTlRFUix2UGFkOjE0MH0pCiAgICAgIF19KQogICAgXQogIH0pOwogIHZhciBpbmZvQXR0VGFibGUgPSBuZXcgVGFibGUoewogICAgd2lkdGg6e3NpemU6Q1csdHlwZTpXaWR0aFR5cGUuRFhBfSwgY29sdW1uV2lkdGhzOltJTkZPX1csQVRUX1ddLAogICAgYm9yZGVyczpuQigpLAogICAgcm93czpbbmV3IFRhYmxlUm93KHsgY2hpbGRyZW46WwogICAgICBuZXcgVGFibGVDZWxsKHsgYm9yZGVyczpuQigpLCB3aWR0aDp7c2l6ZTpJTkZPX1csdHlwZTpXaWR0aFR5cGUuRFhBfSwgY2hpbGRyZW46W3N0dWRlbnRJbmZvVGFibGVdIH0pLAogICAgICBuZXcgVGFibGVDZWxsKHsgYm9yZGVyczpuQigpLCB3aWR0aDp7c2l6ZTpBVFRfVyx0eXBlOldpZHRoVHlwZS5EWEF9LCBjaGlsZHJlbjpbCiAgICAgICAgbmV3IFBhcmFncmFwaCh7IHNwYWNpbmc6e2JlZm9yZTowLGFmdGVyOjEwMH0sCiAgICAgICAgICBjaGlsZHJlbjpbbmV3IFRleHRSdW4oe3RleHQ6IkF0dGVuZGFuY2UiLGJvbGQ6dHJ1ZSxzaXplOjIyLGZvbnQ6IkNhbGlicmkiLGNvbG9yOkNfTkFWWX0pXSB9KSwKICAgICAgICBhdHRlbmRhbmNlVGFibGUKICAgICAgXX0pCiAgICBdfSldCiAgfSk7CgogIC8vIFBhcGVyLWJhc2VkIHRlc3QgdGFibGUKICB2YXIgcGMgPSBbMjgwMCwgNzAwLCAxNTAwLCAxNTAwLCBDVy02NTAwXTsKICB2YXIgcGFwZXJUYWJsZSA9IG5ldyBUYWJsZSh7CiAgICB3aWR0aDp7c2l6ZTpDVyx0eXBlOldpZHRoVHlwZS5EWEF9LCBjb2x1bW5XaWR0aHM6cGMsCiAgICByb3dzOlsKICAgICAgbmV3IFRhYmxlUm93KHsgdGFibGVIZWFkZXI6dHJ1ZSwgY2hpbGRyZW46WwogICAgICAgIGhDZWxsKCJQYXBlci1CYXNlZCBUZXN0Iix7dzpwY1swXSxhbGlnbjpBbGlnbm1lbnRUeXBlLkxFRlR9KSwKICAgICAgICBoQ2VsbCgiTWF4Iix7dzpwY1sxXX0pLAogICAgICAgIGhDZWxsKCJUZXJtIEV4YW0gKDYwJSkiLHt3OnBjWzJdfSksCiAgICAgICAgaENlbGwoIkNvdXJzZSBXb3JrICg0MCUpIix7dzpwY1szXX0pLAogICAgICAgIGhDZWxsKCJUT1RBTCIse3c6cGNbNF19KQogICAgICBdfSkKICAgIF0uY29uY2F0KHBhcGVyU3Vicy5tYXAoZnVuY3Rpb24ocyxpKXsKICAgICAgdmFyIGQgPSBzY1tzXXx8e2V4YW06MCxjdzowLHRvdGFsOjB9OwogICAgICB2YXIgZiA9IGklMj09PTA/IkZGRkZGRiI6Q19ST1dBTFQ7CiAgICAgIHJldHVybiBuZXcgVGFibGVSb3coe2NoaWxkcmVuOlsKICAgICAgICBta0NlbGwocywgICB7dzpwY1swXSxmaWxsOmYsYm9sZDp0cnVlLGNvbG9yOkNfTkFWWX0pLAogICAgICAgIG1rQ2VsbCgiMTAwIix7dzpwY1sxXSxmaWxsOmYsYWxpZ246QWxpZ25tZW50VHlwZS5DRU5URVJ9KSwKICAgICAgICBta0NlbGwodHlwZW9mIGQuZXhhbT09PSJudW1iZXIiP2QuZXhhbS50b0ZpeGVkKDIpOmQuZXhhbSx7dzpwY1syXSxmaWxsOmYsYWxpZ246QWxpZ25tZW50VHlwZS5DRU5URVJ9KSwKICAgICAgICBta0NlbGwodHlwZW9mIGQuY3c9PT0ibnVtYmVyIj9kLmN3LnRvRml4ZWQoMik6ZC5jdyx7dzpwY1szXSxmaWxsOmYsYWxpZ246QWxpZ25tZW50VHlwZS5DRU5URVJ9KSwKICAgICAgICBta0NlbGwoZC50b3RhbCx7dzpwY1s0XSxmaWxsOkNfR1JOVE9ULGFsaWduOkFsaWdubWVudFR5cGUuQ0VOVEVSLGJvbGQ6dHJ1ZSxjb2xvcjpDX0dSTlRYVH0pCiAgICAgIF19KTsKICAgIH0pKQogIH0pOwoKICAvLyBDaGluZXNlIC8gdGVzdC1vbmx5IHRhYmxlCiAgdmFyIHRjID0gWzI4MDAsIDcwMCwgQ1ctNDEwNiwgNjA2XTsKICB2YXIgdGVzdE9ubHlUYWJsZSA9IHRlc3RTdWJzLmxlbmd0aCA/IG5ldyBUYWJsZSh7CiAgICB3aWR0aDp7c2l6ZTpDVyx0eXBlOldpZHRoVHlwZS5EWEF9LCBjb2x1bW5XaWR0aHM6dGMsCiAgICByb3dzOlsKICAgICAgbmV3IFRhYmxlUm93KHsgdGFibGVIZWFkZXI6dHJ1ZSwgY2hpbGRyZW46WwogICAgICAgIGhDZWxsKCJQYXBlci1CYXNlZCBUZXN0Iix7dzp0Y1swXSxhbGlnbjpBbGlnbm1lbnRUeXBlLkxFRlR9KSwKICAgICAgICBoQ2VsbCgiTWF4Iix7dzp0Y1sxXX0pLAogICAgICAgIGhDZWxsKCJUZXN0cyAoYXZlcmFnZSAtIDEwMCUpIix7dzp0Y1syXX0pLAogICAgICAgIGhDZWxsKCJUT1RBTCIse3c6dGNbM119KQogICAgICBdfSkKICAgIF0uY29uY2F0KHRlc3RTdWJzLm1hcChmdW5jdGlvbihzLGkpewogICAgICB2YXIgZCA9IHNjW3NdfHx7dG90YWw6MH07CiAgICAgIHZhciBmID0gaSUyPT09MD8iRkZGRkZGIjpDX1JPV0FMVDsKICAgICAgcmV0dXJuIG5ldyBUYWJsZVJvdyh7Y2hpbGRyZW46WwogICAgICAgIG1rQ2VsbChzLCAgIHt3OnRjWzBdLGZpbGw6Zixib2xkOnRydWUsY29sb3I6Q19OQVZZfSksCiAgICAgICAgbWtDZWxsKCIxMDAiLHt3OnRjWzFdLGZpbGw6ZixhbGlnbjpBbGlnbm1lbnRUeXBlLkNFTlRFUn0pLAogICAgICAgIG1rQ2VsbCgiIiwgIHt3OnRjWzJdLGZpbGw6ZixhbGlnbjpBbGlnbm1lbnRUeXBlLkNFTlRFUn0pLAogICAgICAgIG1rQ2VsbChkLnRvdGFsLHt3OnRjWzNdLGZpbGw6Q19HUk5UT1QsYWxpZ246QWxpZ25tZW50VHlwZS5DRU5URVIsYm9sZDp0cnVlLGNvbG9yOkNfR1JOVFhUfSkKICAgICAgXX0pOwogICAgfSkpCiAgfSkgOiBudWxsOwoKICAvLyBPYnNlcnZhdGlvbmFsIGFzc2Vzc21lbnRzCiAgdmFyIG9jPVsyODAwLE1hdGguZmxvb3IoKENXLTI4MDApLzMpLE1hdGguZmxvb3IoKENXLTI4MDApLzMpLENXLTI4MDAtTWF0aC5mbG9vcigoQ1ctMjgwMCkvMykqMl07CiAgdmFyIG9ic1RhYmxlID0gbmV3IFRhYmxlKHsKICAgIHdpZHRoOntzaXplOkNXLHR5cGU6V2lkdGhUeXBlLkRYQX0sIGNvbHVtbldpZHRoczpvYywKICAgIHJvd3M6WwogICAgICBuZXcgVGFibGVSb3coeyB0YWJsZUhlYWRlcjp0cnVlLCBjaGlsZHJlbjpbCiAgICAgICAgaENlbGwoIk9ic2VydmF0aW9uYWwgQXNzZXNzbWVudHMiLHt3Om9jWzBdLGFsaWduOkFsaWdubWVudFR5cGUuTEVGVH0pLAogICAgICAgIGhDZWxsKCJTdHJvbmcgUHJvZmljaWVuY3kiLHt3Om9jWzFdfSksIGhDZWxsKCJQcm9maWNpZW50Iix7dzpvY1syXX0pLCBoQ2VsbCgiRGV2ZWxvcGluZyIse3c6b2NbM119KQogICAgICBdfSkKICAgIF0uY29uY2F0KG9ic1N1YnMubWFwKGZ1bmN0aW9uKHMsaSl7CiAgICAgIHZhciBmPWklMj09PTA/IkZGRkZGRiI6Q19ST1dBTFQ7CiAgICAgIHJldHVybiBuZXcgVGFibGVSb3coe2NoaWxkcmVuOlsKICAgICAgICBta0NlbGwocyx7dzpvY1swXSxmaWxsOmYsYm9sZDp0cnVlLGNvbG9yOkNfTkFWWX0pLAogICAgICAgIG1rQ2VsbCgiIix7dzpvY1sxXSxmaWxsOmYsYWxpZ246QWxpZ25tZW50VHlwZS5DRU5URVIsdlBhZDoxNDB9KSwKICAgICAgICBta0NlbGwoIiIse3c6b2NbMl0sZmlsbDpmLGFsaWduOkFsaWdubWVudFR5cGUuQ0VOVEVSLHZQYWQ6MTQwfSksCiAgICAgICAgbWtDZWxsKCIiLHt3Om9jWzNdLGZpbGw6ZixhbGlnbjpBbGlnbm1lbnRUeXBlLkNFTlRFUix2UGFkOjE0MH0pCiAgICAgIF19KTsKICAgIH0pKQogIH0pOwoKICAvLyBDb21tZW50YXJ5IHRhYmxlIChwYWdlIDIpCiAgdmFyIGNjPVsxODAwLENXLTE4MDBdOwogIHZhciBjb21tZW50VGFibGUgPSBuZXcgVGFibGUoewogICAgd2lkdGg6e3NpemU6Q1csdHlwZTpXaWR0aFR5cGUuRFhBfSwgY29sdW1uV2lkdGhzOmNjLAogICAgcm93czpbCiAgICAgIG5ldyBUYWJsZVJvdyh7IHRhYmxlSGVhZGVyOnRydWUsIGNoaWxkcmVuOlsKICAgICAgICBoQ2VsbCgiU3ViamVjdHMiLHt3OmNjWzBdLGFsaWduOkFsaWdubWVudFR5cGUuTEVGVH0pLAogICAgICAgIGhDZWxsKCJDb21tZW50cyIse3c6Y2NbMV0sYWxpZ246QWxpZ25tZW50VHlwZS5MRUZUfSkKICAgICAgXX0pCiAgICBdLmNvbmNhdChhbGxDb21tZW50Lm1hcChmdW5jdGlvbihzLGkpewogICAgICB2YXIgZj1pJTI9PT0wPyJGRkZGRkYiOkNfUk9XQUxUOwogICAgICByZXR1cm4gbmV3IFRhYmxlUm93KHtjaGlsZHJlbjpbCiAgICAgICAgbWtDZWxsKHMse3c6Y2NbMF0sZmlsbDpmLGJvbGQ6dHJ1ZSxjb2xvcjpDX05BVll9KSwKICAgICAgICBuZXcgVGFibGVDZWxsKHsKICAgICAgICAgIGJvcmRlcnM6YUIoKSwgd2lkdGg6e3NpemU6Y2NbMV0sdHlwZTpXaWR0aFR5cGUuRFhBfSwKICAgICAgICAgIHNoYWRpbmc6e2ZpbGw6Zix0eXBlOlNoYWRpbmdUeXBlLkNMRUFSfSwKICAgICAgICAgIG1hcmdpbnM6e3RvcDo4MCxib3R0b206ODAsbGVmdDoxMjAscmlnaHQ6MTIwfSwKICAgICAgICAgIGNoaWxkcmVuOlsKICAgICAgICAgICAgbmV3IFBhcmFncmFwaCh7c3BhY2luZzp7YmVmb3JlOjAsYWZ0ZXI6MH0sY2hpbGRyZW46W25ldyBUZXh0UnVuKCIiKV19KSwKICAgICAgICAgICAgbmV3IFBhcmFncmFwaCh7c3BhY2luZzp7YmVmb3JlOjAsYWZ0ZXI6MH0sY2hpbGRyZW46W25ldyBUZXh0UnVuKCIiKV19KSwKICAgICAgICAgICAgbmV3IFBhcmFncmFwaCh7c3BhY2luZzp7YmVmb3JlOjAsYWZ0ZXI6MH0sY2hpbGRyZW46W25ldyBUZXh0UnVuKCIiKV19KSwKICAgICAgICAgICAgbmV3IFBhcmFncmFwaCh7c3BhY2luZzp7YmVmb3JlOjAsYWZ0ZXI6MH0sY2hpbGRyZW46W25ldyBUZXh0UnVuKCIiKV19KQogICAgICAgICAgXQogICAgICAgIH0pCiAgICAgIF19KTsKICAgIH0pKQogIH0pOwoKICAvLyBTaWduYXR1cmUgdGFibGUKICB2YXIgc3c9TWF0aC5mbG9vcihDVy8zKTsKICB2YXIgc2lnVGFibGUgPSBuZXcgVGFibGUoewogICAgd2lkdGg6e3NpemU6Q1csdHlwZTpXaWR0aFR5cGUuRFhBfSwgY29sdW1uV2lkdGhzOltzdyxzdyxDVy1zdyoyXSwKICAgIHJvd3M6W25ldyBUYWJsZVJvdyh7Y2hpbGRyZW46WwogICAgICBta0NlbGwoIlByaW5jaXBhbCdzIFNpZ25hdHVyZSIsICAgICB7dzpzdywgICAgIGJvcmRlcnM6YnRCKENfVEVBTCw4KSxib2xkOnRydWUsY29sb3I6Q19OQVZZLHN6OjE4LHZQYWQ6MTIwfSksCiAgICAgIG1rQ2VsbCgiQ2xhc3MgVGVhY2hlcidzIFNpZ25hdHVyZSIsIHt3OnN3LCAgICAgYm9yZGVyczpidEIoQ19URUFMLDgpLGJvbGQ6dHJ1ZSxjb2xvcjpDX05BVlksc3o6MTgsdlBhZDoxMjB9KSwKICAgICAgbWtDZWxsKCJQYXJlbnQncyBTaWduYXR1cmUiLCAgICAgICAge3c6Q1ctc3cqMixib3JkZXJzOmJ0QihDX1RFQUwsOCksYm9sZDp0cnVlLGNvbG9yOkNfTkFWWSxzejoxOCx2UGFkOjEyMH0pCiAgICBdfSldCiAgfSk7CgogIC8vIEZvb3RlcgogIHZhciBmb290ZXIgPSBuZXcgRm9vdGVyKHsgY2hpbGRyZW46W25ldyBQYXJhZ3JhcGgoewogICAgdGFiU3RvcHM6W3t0eXBlOlRhYlN0b3BUeXBlLlJJR0hULHBvc2l0aW9uOlRhYlN0b3BQb3NpdGlvbi5NQVh9XSwKICAgIGJvcmRlcjp7dG9wOmJTKENfVEVBTCw0KX0sCiAgICBzcGFjaW5nOntiZWZvcmU6ODAsYWZ0ZXI6MH0sCiAgICBjaGlsZHJlbjpbCiAgICAgIG5ldyBUZXh0UnVuKHt0ZXh0OiJQUklNRSBJbnRlcm5hdGlvbmFsIFNjaG9vbCAgKiAgUHJvZ3Jlc3MgUmVwb3J0ICAqICAiK0RBVEEudGVybSxmb250OiJDYWxpYnJpIixzaXplOjE2LGNvbG9yOiI4ODg4ODgifSksCiAgICAgIG5ldyBUZXh0UnVuKHt0ZXh0OiJcdCIsZm9udDoiQ2FsaWJyaSIsc2l6ZToxNn0pLAogICAgICBuZXcgVGV4dFJ1bih7dGV4dDoiUGFnZSAiLGZvbnQ6IkNhbGlicmkiLHNpemU6MTYsY29sb3I6Ijg4ODg4OCJ9KSwKICAgICAgbmV3IFRleHRSdW4oe2NoaWxkcmVuOltQYWdlTnVtYmVyLkNVUlJFTlRdLGZvbnQ6IkNhbGlicmkiLHNpemU6MTYsY29sb3I6Ijg4ODg4OCJ9KSwKICAgICAgbmV3IFRleHRSdW4oe3RleHQ6IiAvICIsZm9udDoiQ2FsaWJyaSIsc2l6ZToxNixjb2xvcjoiODg4ODg4In0pLAogICAgICBuZXcgVGV4dFJ1bih7Y2hpbGRyZW46W1BhZ2VOdW1iZXIuVE9UQUxfUEFHRVNdLGZvbnQ6IkNhbGlicmkiLHNpemU6MTYsY29sb3I6Ijg4ODg4OCJ9KQogICAgXQogIH0pXX0pOwoKICAvLyBBc3NlbWJsZSBkb2N1bWVudAogIHZhciBjaGlsZHJlbiA9IFsKICAgIGhlYWRlclRhYmxlLAogICAgbmV3IFBhcmFncmFwaCh7c3BhY2luZzp7YmVmb3JlOjIwMCxhZnRlcjoxNjB9LGNoaWxkcmVuOltdfSksCiAgICBpbmZvQXR0VGFibGUsCiAgICBzZWNIZWFkaW5nKCJQYXBlci1CYXNlZCBBc3Nlc3NtZW50IiksCiAgICBwYXBlclRhYmxlCiAgXTsKICBpZiAodGVzdE9ubHlUYWJsZSkgewogICAgY2hpbGRyZW4ucHVzaChuZXcgUGFyYWdyYXBoKHtzcGFjaW5nOntiZWZvcmU6MTYwLGFmdGVyOjgwfSxjaGlsZHJlbjpbXX0pKTsKICAgIGNoaWxkcmVuLnB1c2godGVzdE9ubHlUYWJsZSk7CiAgfQogIGNoaWxkcmVuLnB1c2goc2VjSGVhZGluZygiT2JzZXJ2YXRpb25hbCBBc3Nlc3NtZW50cyIpKTsKICBjaGlsZHJlbi5wdXNoKG9ic1RhYmxlKTsKICAvLyBQYWdlIDIKICBjaGlsZHJlbi5wdXNoKG5ldyBQYXJhZ3JhcGgoe3BhZ2VCcmVha0JlZm9yZTp0cnVlLHNwYWNpbmc6e2JlZm9yZTowLGFmdGVyOjB9LGNoaWxkcmVuOltdfSkpOwogIGNoaWxkcmVuLnB1c2goaGVhZGVyVGFibGUpOwogIGNoaWxkcmVuLnB1c2gobmV3IFBhcmFncmFwaCh7c3BhY2luZzp7YmVmb3JlOjIwMCxhZnRlcjowfSxjaGlsZHJlbjpbXX0pKTsKICBjaGlsZHJlbi5wdXNoKHNlY0hlYWRpbmcoIkNvbW1lbnRhcnkgU2VjdGlvbiAtICIrREFUQS50ZXJtKSk7CiAgY2hpbGRyZW4ucHVzaChjb21tZW50VGFibGUpOwogIGNoaWxkcmVuLnB1c2gobmV3IFBhcmFncmFwaCh7c3BhY2luZzp7YmVmb3JlOjUwMCxhZnRlcjowfSxjaGlsZHJlbjpbXX0pKTsKICBjaGlsZHJlbi5wdXNoKHNpZ1RhYmxlKTsKCiAgdmFyIGRvYyA9IG5ldyBEb2N1bWVudCh7CiAgICBzZWN0aW9uczpbeyBwcm9wZXJ0aWVzOnsgcGFnZTp7CiAgICAgIHNpemU6e3dpZHRoOlBBR0VfVyxoZWlnaHQ6MTY4Mzh9LAogICAgICBtYXJnaW46e3RvcDpNVCxyaWdodDpNUixib3R0b206TUIsbGVmdDpNTH0KICAgIH19LCBmb290ZXJzOntkZWZhdWx0OmZvb3Rlcn0sIGNoaWxkcmVuOmNoaWxkcmVuIH1dCiAgfSk7CgogIHZhciBidWYgPSBhd2FpdCBQYWNrZXIudG9CdWZmZXIoZG9jKTsKICB2YXIgc2FmZU5hbWUgPSBuYW1lLnJlcGxhY2UoL1tcL1xcOio/Ijw+fF0vZywiXyIpOwogIHZhciBmaWxlbmFtZSA9IHBhdGguam9pbihzY3JpcHREaXIsIERBVEEuYWNhZGVtaWNZZWFyLnJlcGxhY2UoL1xzKy9nLCItIikrIl8iK0RBVEEuY2xhc3NJZCsiXyIrREFUQS50ZXJtLnJlcGxhY2UoL1xzKy9nLCItIikrIl8iK3NhZmVOYW1lKyJfUHJvZ3Jlc3NfUmVwb3J0LmRvY3giKTsKICBmcy53cml0ZUZpbGVTeW5jKGZpbGVuYW1lLCBidWYpOwogIGNvbnNvbGUubG9nKCIgIENyZWF0ZWQ6ICIrcGF0aC5iYXNlbmFtZShmaWxlbmFtZSkpOwp9CgooYXN5bmMgZnVuY3Rpb24oKXsKICBjb25zb2xlLmxvZygiUFJJTUUgSW50ZXJuYXRpb25hbCBTY2hvb2wgLSBSZXBvcnQgR2VuZXJhdG9yIik7CiAgY29uc29sZS5sb2coIkdlbmVyYXRpbmcgIitEQVRBLnN0dWRlbnRzLmxlbmd0aCsiIHN0dWRlbnQgcmVwb3J0cy4uLiIpOwogIHZhciBvaz0wLCBmYWlsPTA7CiAgZm9yICh2YXIgaT0wOyBpPERBVEEuc3R1ZGVudHMubGVuZ3RoOyBpKyspIHsKICAgIHZhciBuYW1lID0gREFUQS5zdHVkZW50c1tpXTsKICAgIHRyeSB7IGF3YWl0IGdlbmVyYXRlU3R1ZGVudChuYW1lKTsgb2srKzsgfQogICAgY2F0Y2goZXJyKSB7IGNvbnNvbGUuZXJyb3IoIiAgRkFJTEVEOiAiK25hbWUrIiAtICIrZXJyLm1lc3NhZ2UpOyBmYWlsKys7IH0KICB9CiAgdmFyIG1zZyA9IGZhaWw9PT0wID8gIkRvbmUhIiA6ICgiRG9uZSB3aXRoICIrZmFpbCsiIGVycm9yKHMpLiIpOwogIGNvbnNvbGUubG9nKG1zZysiICAoIitvaysiIHJlcG9ydHMgY3JlYXRlZCkiKTsKfSkoKTsK";
+
+function buildNodeScript(data) {
+  // atob decodes base64 -> exact UTF-8 bytes -> no JS escaping issues
+  var raw = atob(SCRIPT_TEMPLATE_B64);
+  return raw.replace("__DATA_JSON__", JSON.stringify(data));
+}
+
+
+async function createAllStudentReports() {
+  const statusEl = document.getElementById("statusMsg");
+  statusEl.innerHTML = `<span class="spinner"></span> Preparing report data...`;
+  await new Promise(r => setTimeout(r, 50));
+
+  const ay       = document.getElementById("academicYear").value;
+  const term     = document.getElementById("termSelect").value;
+  const cls      = document.getElementById("classSelect").value;
+  const subjects = CLASS_SUBJECTS[currentClass];
+  const students = CLASS_STUDENTS[currentClass];
+  const scores   = getScores();
+
+  const reportData = { academicYear:ay, term, classId:cls, subjects, students, scores, testOnlySubjects: TEST_ONLY_SUBJECTS };
+
+  const zip = new JSZip();
+  zip.file("report_data.json",  JSON.stringify(reportData, null, 2));
+  zip.file("generate_reports.js", buildNodeScript(reportData));
+  zip.file("README.txt", buildReadme(cls, term, students.length));
+
+  const blob = await zip.generateAsync({ type:"blob" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href = url; a.download = `${cls}_${term.replace(/\s+/g,"_")}_Reports_Generator.zip`; a.click();
+  URL.revokeObjectURL(url);
+
+  statusEl.textContent = `✅ Package downloaded! See README.txt inside the ZIP for instructions (works on Mac & Windows).`;
+}
+
+function buildReadme(cls, term, count) {
+  const folder = cls+"_"+term.replace(/\s+/g,"_")+"_Reports_Generator";
+  return "PRIME International School - Student Report Generator\n" +
+"=====================================================\n" +
+"Generates "+count+" individual student .docx progress reports.\n\n" +
+"MAC INSTRUCTIONS\n" +
+"-----------------------------------------------------\n" +
+"Step 1 - Unzip this file (double-click the .zip in Finder).\n\n" +
+"Step 2 - Open Terminal.\n" +
+"         (Press Cmd+Space, type Terminal, press Enter)\n\n" +
+"Step 3 - Navigate INTO the unzipped folder.\n" +
+"         EASIEST: type  cd  (with a space), then drag the\n" +
+"         unzipped '"+folder+"' folder\n" +
+"         from Finder into the Terminal window, then press Enter.\n\n" +
+"         OR type manually:\n" +
+"         cd ~/Downloads/"+folder+"\n\n" +
+"Step 4 - Install library (first time only, ~10 sec):\n" +
+"         npm install docx\n\n" +
+"Step 5 - Run the generator:\n" +
+"         node generate_reports.js\n\n" +
+"Step 6 - Done! All .docx files appear in the same folder.\n\n" +
+"WINDOWS INSTRUCTIONS\n" +
+"-----------------------------------------------------\n" +
+"Step 1 - Unzip this file (right-click -> Extract All).\n\n" +
+"Step 2 - Open the unzipped folder in File Explorer.\n\n" +
+"Step 3 - Click the address bar at the top of File Explorer,\n" +
+"         type  cmd  and press Enter.\n" +
+"         (Opens Command Prompt already in the right folder!)\n\n" +
+"Step 4 - Install library (first time only):\n" +
+"         npm install docx\n\n" +
+"Step 5 - Run the generator:\n" +
+"         node generate_reports.js\n\n" +
+"Step 6 - Done! All .docx files appear in the same folder.\n\n" +
+"TROUBLESHOOTING\n" +
+"-----------------------------------------------------\n" +
+"  Error: Cannot find module '.../generate_reports.js'\n" +
+"  -> You ran the command from the wrong folder.\n" +
+"     You MUST cd into the unzipped folder first (Step 3).\n" +
+"     The folder must contain generate_reports.js before running.\n\n" +
+"  node: command not found\n" +
+"  -> Node.js is not installed.\n" +
+"     Download from: https://nodejs.org  (choose LTS)\n\n" +
+"  Cannot find module 'docx'\n" +
+"  -> Run: npm install docx  (Step 4 was skipped)\n\n" +
+"  npm permission error on Mac\n" +
+"  -> Do NOT use sudo. Run: npm install docx --prefix .\n";
+}
+
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener("DOMContentLoaded", () => { loadClass(); });
 </script>
+
 </body>
 </html>
