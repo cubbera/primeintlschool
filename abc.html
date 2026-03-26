@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Assessment Entry — PRIME International School</title>
+<style>
+/* Simplified style block for brevity, ensure you use the full styles from your original file */
+* { box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui; background: #f0f2f5; padding: 20px; color: #1d1d1f; }
+/* ... Include all other CSS classes here ... */
+</style>
+</head>
+<body>
+
+<div class="page-title">📝 Assessment Score — Report Card Calculator V3 (Updated)</div>
+<div id="subjectSections"></div>
+
+<script>
+// ============================================================
+// DATA - UPDATED
+// ============================================================
+const CLASS_STUDENTS = {
+  "Y1-A": ["Ye Yint Tayza Hman","Shoon La Woon Htet","Htun Lae Yi Mon","Lwin Aung Hein","Aung Bhone San","Htet Nay Bhone","Sian Vang Huai Kim","Thu Htet Htoo","Khant Su Thar","Lwin Khit","Htut Myat Aung","Myat Shwe Yee Thin","Kaung Khit Han","Linn Pyae Sone Aung","Sai Noon Wan Han","Ngwe Yati Moe","Khant Htet Zen"],
+  "Y2-A": ["Zin Aung Hlaing","Phoo Pyae Heather","Shwe Sin Htet Aung","Thoon Thu San Aung","Linn Phone Khit","Khunn Thansin Han","Lin Thiri Hmue","Yuu Mi Khaing Lin","Yoon Htet Htet"]
+};
+
+const CLASS_SUBJECTS = {
+  "Y1-A": ["English","Mathematics","Science","Social Studies","Myanmar","Wellbeing","ICT","Chinese"],
+  "Y2-A": ["English","Mathematics","Science","Social Studies","Myanmar","Myanmar Social Studies","Wellbeing","ICT","Chinese"]
+};
+
+// Chinese removed from TEST_ONLY_SUBJECTS to match other subjects
+const TEST_ONLY_SUBJECTS = []; 
+
+const SUBJECT_COLORS = {
+  "English":"#1d3557","Mathematics":"#8b3a0f","Science":"#1a6b2a","Social Studies":"#7b4f12",
+  "Myanmar":"#8b1a4a","Myanmar Social Studies":"#5b2d8e","Wellbeing":"#0e6b6b","ICT":"#1a3d6b","Chinese":"#8b0000"
+};
+
+// ... (Rest of the original JavaScript functions: loadClass, renderSubject, buildRow, recalc, etc.) ...
+// Note: Because TEST_ONLY_SUBJECTS is now empty, renderSubject and recalc will 
+// automatically apply the 60/40 split to Chinese.
+
+</script>
+</body>
+</html>
