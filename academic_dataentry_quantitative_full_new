@@ -1,0 +1,495 @@
+The following is the updated HTML code for the Assessment Entry tool. 
+
+The logic for **Chinese** has been updated to match the standard subjects (English, Math, etc.), which now includes:
+* **Term Exam (60%)** and **Coursework (40%)** components.
+* The ability to add **Unit Tests, Projects, and Presentations**.
+* Standard calculation: `(Exam / 100 * 60) + (Unit Test Avg / 100 * 25) + (Other CW Avg / 100 * 15)`.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Assessment Entry — PRIME International School</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<style>
+* { box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui; background: #f0f2f5; padding: 20px; color: #1d1d1f; }
+.page-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.page-subtitle { font-size: 13px; color: #666; margin-bottom: 12px; }
+.dropdown-label { font-size: 13px; font-weight: 600; }
+select { padding: 4px 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 13px; }
+.meta-bar { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 22px; align-items: center; background: #fff; padding: 12px 16px; border-radius: 10px; border: 1px solid #ddd; }
+.subject-section { margin-bottom: 22px; }
+.subject-header { color: white; padding: 9px 14px; border-radius: 10px 10px 0 0; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.subject-tag { font-size: 11px; background: rgba(255,255,255,0.2); padding: 2px 7px; border-radius: 999px; font-weight: 400; }
+.cw-btns { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+.btn-sm { padding: 3px 9px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.4); background: rgba(255,255,255,0.12); color: white; cursor: pointer; font-size: 11px; }
+.btn-sm:hover { background: rgba(255,255,255,0.28); }
+.card { background: #fff; border-radius: 0 0 10px 10px; border: 1px solid #ddd; border-top: none; padding: 12px; }
+.table-wrapper { overflow-x: auto; border: 1px solid #c0c0c0; border-radius: 4px; }
+table { width: 100%; border-collapse: collapse; background: white; font-size: 12px; }
+th, td { border: 1px solid #c0c0c0; padding: 0; text-align: center; }
+th { background: #f3f3f3; font-weight: 600; white-space: nowrap; padding: 5px 8px; border-color: #b0b0b0; font-size: 11px; user-select: none; }
+td:first-child { background: #f0f0f0; color: #999; font-size: 11px; width: 28px; min-width: 28px; user-select: none; padding: 3px; }
+td.label-col { text-align: left; padding: 0; min-width: 150px; }
+.cell-inner { display: block; width: 100%; min-height: 24px; padding: 3px 6px; outline: none; text-align: right; cursor: cell; font-size: 12px; font-family: inherit; }
+.cell-inner.name-inner { text-align: left; cursor: default; }
+td.selected { outline: 2px solid #1a73e8; outline-offset: -2px; z-index: 2; position: relative; }
+td.in-range { background-color: rgba(26,115,232,0.10) !important; }
+.exam-cell { background: #fffbea; }
+.exam-total-cell { background: #fff0a0; font-weight: 600; }
+.cw-cell { background: #eaf4ff; }
+.cw-total-cell { background: #cfe2ff; font-weight: 600; }
+.total-cell { background: #eaffea; font-weight: 600; }
+.readonly-inner { display: block; width: 100%; min-height: 24px; padding: 3px 6px; text-align: right; font-size: 12px; font-family: inherit; cursor: default; user-select: none; }
+.delete-col-btn { font-size: 10px; background: none; border: none; color: #f88; cursor: pointer; margin-left: 2px; }
+@keyframes paste-flash { 0%{background:rgba(26,115,232,0.35);} 100%{background:transparent;} }
+.paste-flash { animation: paste-flash 0.3s ease-out; }
+
+/* upload / template bar */
+.upload-bar { background:#fff; border:1px solid #ddd; border-radius:10px; padding:14px 18px; margin-bottom:18px; display:flex; flex-wrap:wrap; gap:14px; align-items:center; }
+.upload-bar-title { font-size:13px; font-weight:700; color:#1d3461; flex-basis:100%; margin-bottom:2px; }
+.btn-upload-template { background:#e8f0fe; color:#1a73e8; border:1px solid #c5d8ff; border-radius:8px; padding:7px 14px; font-size:12px; font-weight:600; cursor:pointer; }
+.btn-upload-template:hover { background:#d0e4ff; }
+.btn-upload-file { background:#e8f5e9; color:#2d6a4f; border:1px solid #b0ddb8; border-radius:8px; padding:7px 14px; font-size:12px; font-weight:600; cursor:pointer; }
+.btn-upload-file:hover { background:#c8ead0; }
+.upload-hint { font-size:11px; color:#888; }
+#fileUploadInput { display:none; }
+.upload-status { font-size:12px; font-weight:600; color:#2d6a4f; }
+
+/* summary */
+.summary-section { margin-top: 30px; }
+.section-heading { font-size: 17px; font-weight: 700; padding: 10px 16px; border-radius: 10px 10px 0 0; color: white; }
+.summary-heading { background: linear-gradient(135deg, #2d6a4f 0%, #40916c 100%); }
+.summary-card { background: #fff; border-radius: 0 0 10px 10px; border: 1px solid #ddd; border-top: none; padding: 14px; overflow-x: auto; }
+.summary-table { border-collapse: collapse; font-size: 12px; }
+.summary-table th, .summary-table td { border: 1px solid #b0b0b0; padding: 5px 8px; text-align: center; white-space: nowrap; }
+.sum-th-student { background: #1d3557; color: white; font-size: 11px; text-align: center; }
+.sum-th-type { font-size: 10px; font-weight: 600; padding: 3px 5px; white-space: nowrap; }
+.sum-th-exam { background: #fff0a0; color: #555; }
+.sum-th-cw { background: #cfe2ff; color: #555; }
+.sum-th-total { background: #b6efb6; color: #222; }
+.sum-td-subject { text-align: left; font-weight: 700; background: #f5f5f5; min-width: 130px; padding: 5px 10px; }
+.sum-td-exam { background: #fffbea; }
+.sum-td-cw { background: #eaf4ff; }
+.sum-td-total { background: #eaffea; font-weight: 700; }
+.bottom-btns { margin-top: 32px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; padding: 20px; background: #fff; border-radius: 12px; border: 1px solid #ddd; }
+.btn-big { padding: 12px 26px; border-radius: 999px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+.btn-big:active { transform: scale(0.97); }
+.btn-export { background: #0071e3; color: white; }
+.btn-export:hover { background: #005bbd; }
+.btn-docs { background: #6f42c1; color: white; }
+.btn-docs:hover { background: #5a34a0; }
+.btn-submit { background: #b0b0b0; color: #fff; opacity: 0.6; cursor: not-allowed; pointer-events: none; }
+.status-msg { margin-top: 12px; font-size: 13px; color: #2d6a4f; font-weight: 600; min-height: 20px; }
+.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #ccc; border-top-color: #6f42c1; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="page-title">📋 Assessment Score — Report Card Calculator V3</div>
+<div class="page-subtitle">PRIME International School · All subjects on one page</div>
+
+<div class="upload-bar">
+  <div class="upload-bar-title">📄 Import Scores from Google Sheets / Excel</div>
+  <button class="btn-upload-template" onclick="downloadTemplate()">⇓ Download Template</button>
+  <label class="btn-upload-file" for="fileUploadInput">📄 Upload Filled Sheet (.xlsx)</label>
+  <input type="file" id="fileUploadInput" accept=".xlsx,.xls" onchange="handleFileUpload(event)">
+  <span class="upload-hint">Upload fills in scores automatically — manual editing still works after upload.</span>
+  <span class="upload-status" id="uploadStatus"></span>
+</div>
+
+<div class="meta-bar">
+  <span class="dropdown-label">Academic Year:</span>
+  <select id="academicYear"><option>2025-2026</option></select>
+  <span class="dropdown-label">Term:</span>
+  <select id="termSelect"><option>Term 1</option><option>Term 2</option><option>Term 3</option></select>
+  <span class="dropdown-label">Class:</span>
+  <select id="classSelect" onchange="loadClass()">
+    <option value="Y1-A">Y1-A</option>
+    <option value="Y2-A">Y2-A</option>
+  </select>
+</div>
+
+<div id="subjectSections"></div>
+
+<div class="summary-section">
+  <div class="section-heading summary-heading">📊 Student Report Summary</div>
+  <div class="summary-card" id="summaryContainer"></div>
+</div>
+
+<div class="bottom-btns">
+  <button class="btn-big btn-export" onclick="exportAllToSheets()">📥 Export All to Sheets</button>
+  <button class="btn-big btn-docs" onclick="createAllStudentReports()">📄 Create All Student Reports to Docs</button>
+  <button class="btn-big btn-submit" disabled>Submit Scores</button>
+</div>
+<div class="status-msg" id="statusMsg"></div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const CLASS_STUDENTS = {
+  "Y1-A": ["Ye Yint Tayza Hman","Shoon La Woon Htet","Htun Lae Yi Mon","Lwin Aung Hein","Aung Bhone San","Htet Nay Bhone","Sian Vang Huai Kim","Thu Htet Htoo","Khant Su Thar","Lwin Khit","Htut Myat Aung","Myat Shwe Yee Thin","Kaung Khit Han","Linn Pyae Sone Aung","Sai Noon Wan Han","Ngwe Yati Moe","Khant Htet Zen"],
+  "Y2-A": ["Zin Aung Hlaing","Phoo Pyae Heather","Shwe Sin Htet Aung","Thoon Thu San Aung","Linn Phone Khit","Khunn Thansin Han","Lin Thiri Hmue","Yuu Mi Khaing Lin","Yoon Htet Htet"]
+};
+const CLASS_SUBJECTS = {
+  "Y1-A": ["English","Mathematics","Science","Social Studies","Myanmar","Wellbeing","ICT","Chinese"],
+  "Y2-A": ["English","Mathematics","Science","Social Studies","Myanmar","Myanmar Social Studies","Wellbeing","ICT","Chinese"]
+};
+
+// Chinese removed from TEST_ONLY_SUBJECTS to follow standard 40/60 logic
+const TEST_ONLY_SUBJECTS = []; 
+const SUBJECT_COLORS = {
+  "English":"#1d3557","Mathematics":"#8b3a0f","Science":"#1a6b2a","Social Studies":"#7b4f12",
+  "Myanmar":"#8b1a4a","Myanmar Social Studies":"#5b2d8e","Wellbeing":"#0e6b6b","ICT":"#1a3d6b","Chinese":"#8b0000"
+};
+
+let subjectData = {}, currentClass = "Y1-A";
+
+// ============================================================
+// HELPERS
+// ============================================================
+function SK(s) { return s.replace(/\s+/g,"_").replace(/[^a-zA-Z0-9_]/g,""); }
+
+function colLabel(id) {
+  if (id.startsWith("cw-ut"))   return "Unit Test "    + id.replace("cw-ut","");
+  if (id.startsWith("cw-test")) return "Test "         + id.replace("cw-test","");
+  if (id.startsWith("cw-proj")) return "Project "      + id.replace("cw-proj","");
+  if (id.startsWith("cw-pres")) return "Presentation " + id.replace("cw-pres","");
+  return id;
+}
+
+function prefixGroup(id) {
+  if (id.startsWith("cw-ut"))   return "cw-ut";
+  if (id.startsWith("cw-test")) return "cw-test";
+  if (id.startsWith("cw-proj")) return "cw-proj";
+  if (id.startsWith("cw-pres")) return "cw-pres";
+  return "other";
+}
+
+// ============================================================
+// INIT / CLASS LOAD
+// ============================================================
+function loadClass() {
+  currentClass = document.getElementById("classSelect").value;
+  subjectData = {};
+  CLASS_SUBJECTS[currentClass].forEach(s => {
+    // All subjects now start with Unit Test by default
+    subjectData[s] = { cwColumns: ["cw-ut1"] };
+  });
+  renderAllSubjects();
+  updateSummary();
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderAllSubjects() {
+  const container = document.getElementById("subjectSections");
+  container.innerHTML = "";
+  CLASS_SUBJECTS[currentClass].forEach(s => renderSubject(s, container));
+  attachSS();
+}
+
+function renderSubject(subject, container) {
+  const isTestOnly = TEST_ONLY_SUBJECTS.includes(subject);
+  const sd = subjectData[subject];
+  const sk = SK(subject);
+  const color = SUBJECT_COLORS[subject] || "#1d3557";
+  const students = CLASS_STUDENTS[currentClass];
+
+  const div = document.createElement("div");
+  div.className = "subject-section";
+  div.id = "sec_"+sk;
+
+  // Standard subjects get all buttons
+  let cwBtnsHtml = `<div class="cw-btns">
+    <button class="btn-sm" onclick="addCW('${subject}','ut')">+ Unit Test</button>
+    <button class="btn-sm" onclick="addCW('${subject}','proj')">+ Project</button>
+    <button class="btn-sm" onclick="addCW('${subject}','pres')">+ Presentation</button>
+  </div>`;
+
+  let hdr1, hdr2Html, subjectTag;
+
+  // Normal subjects: Exam 60% | CW 40%
+  subjectTag = "40% CW + 60% Exam";
+  const cwSubColsHtml = sd.cwColumns.map(id =>
+    `<th id="cwcol_${sk}_${id}" data-role="cw-col" style="min-width:78px;">${colLabel(id)} <button class="delete-col-btn" onclick="delCW('${subject}','${id}')">×</button></th>`
+  ).join("") + `<th data-role="cw-total" style="min-width:75px;">CW Total</th>`;
+  
+  hdr1 = `
+    <tr>
+      <th rowspan="2">Nr.</th>
+      <th rowspan="2" style="min-width:155px;text-align:left;padding-left:8px;">Student Name</th>
+      <th colspan="2" style="background:#fff0a0;">Term Exam 60%</th>
+      <th id="cwHdr_${sk}" colspan="${sd.cwColumns.length+1}" style="background:#d6ebff;">Coursework 40%</th>
+      <th colspan="2" style="background:#eaffea;">TOTAL (100%)</th>
+    </tr>`;
+  
+  hdr2Html = `<tr>
+    <th data-role="exam-score" style="min-width:78px;">Exam Score</th>
+    <th data-role="exam-total" style="min-width:75px;">Exam Total</th>
+    ${cwSubColsHtml}
+    <th data-role="original-total" style="min-width:68px;">Original</th>
+    <th data-role="rounded-total" style="min-width:68px;">Rounded</th>
+  </tr>`;
+
+  div.innerHTML = `
+    <div class="subject-header" style="background:${color};">
+      ${subject} <span class="subject-tag">${subjectTag}</span>
+      ${cwBtnsHtml}
+    </div>
+    <div class="card">
+      <div class="table-wrapper">
+        <table id="tbl_${sk}">
+          <thead>${hdr1}${hdr2Html}</thead>
+          <tbody id="tbody_${sk}"></tbody>
+        </table>
+      </div>
+    </div>`;
+
+  container.appendChild(div);
+  const tbody = div.querySelector(`#tbody_${sk}`);
+  students.forEach((name, i) => buildRow(tbody, i+1, name, subject));
+  recalc(subject);
+}
+
+function buildRow(tbody, nr, name, subject) {
+  const sd = subjectData[subject];
+  const tr = document.createElement("tr");
+  tr.setAttribute("data-student", name);
+
+  let html = `<td>${nr}</td><td class="label-col"><div class="cell-inner name-inner" contenteditable="false">${name}</div></td>`;
+
+  // Normal: Exam first, then CW, then totals
+  html += `<td class="exam-cell exam-score-cell"><div class="cell-inner" contenteditable="true" data-type="number"></div></td>`;
+  html += `<td class="exam-total-cell"><span class="readonly-inner">0.00</span></td>`;
+  sd.cwColumns.forEach(id => {
+    html += `<td class="cw-cell" data-col="${id}"><div class="cell-inner" contenteditable="true" data-type="number"></div></td>`;
+  });
+  html += `<td class="cw-total-cell"><span class="readonly-inner">0.00</span></td>`;
+  html += `<td class="total-cell final-total-cell"><span class="readonly-inner">0.00</span></td>`;
+  html += `<td class="total-cell rounded-total-cell"><span class="readonly-inner">0</span></td>`;
+
+  tr.innerHTML = html;
+  tbody.appendChild(tr);
+}
+
+// ============================================================
+// LOGIC CONTROLS
+// ============================================================
+function addCW(subject, type) {
+  const sd = subjectData[subject];
+  const prefix = "cw-" + type;
+  const idx = sd.cwColumns.filter(id => id.startsWith(prefix)).length + 1;
+  const colId = prefix + idx;
+  const group = prefixGroup(colId);
+  let insertAfterIdx = -1;
+  sd.cwColumns.forEach((id, i) => { if (prefixGroup(id) === group) insertAfterIdx = i; });
+  if (insertAfterIdx === -1) {
+    const groupOrder = ["cw-ut","cw-test","cw-proj","cw-pres"];
+    const myGroupPos = groupOrder.indexOf(group);
+    for (let g = myGroupPos + 1; g < groupOrder.length; g++) {
+      const firstOfNext = sd.cwColumns.findIndex(id => id.startsWith(groupOrder[g]));
+      if (firstOfNext !== -1) { insertAfterIdx = firstOfNext - 1; break; }
+    }
+  }
+  const arrayInsertPos = insertAfterIdx + 1;
+  sd.cwColumns.splice(arrayInsertPos, 0, colId);
+
+  const sk = SK(subject);
+  const hdr2 = document.getElementById("tbl_"+sk).querySelector("thead tr:nth-child(2)");
+  const cwTotalTh = hdr2.querySelector('th[data-role="cw-total"]');
+  const afterId = insertAfterIdx >= 0 ? sd.cwColumns[insertAfterIdx] : null;
+  const afterTh = afterId ? document.getElementById("cwcol_"+sk+"_"+afterId) : null;
+
+  const newTh = document.createElement("th");
+  newTh.id = "cwcol_"+sk+"_"+colId;
+  newTh.setAttribute("data-role","cw-col");
+  newTh.style.minWidth = "78px";
+  newTh.innerHTML = `${colLabel(colId)} <button class="delete-col-btn" onclick="delCW('${subject}','${colId}')">×</button>`;
+
+  if (afterTh && afterTh.nextSibling) hdr2.insertBefore(newTh, afterTh.nextSibling);
+  else hdr2.insertBefore(newTh, cwTotalTh);
+
+  const newHdrIdx = Array.from(hdr2.children).indexOf(newTh);
+  document.querySelectorAll(`#tbody_${sk} tr`).forEach(row => {
+    const td = document.createElement("td");
+    td.className = "cw-cell";
+    td.setAttribute("data-col", colId);
+    td.innerHTML = `<div class="cell-inner" contenteditable="true" data-type="number"></div>`;
+    const pos = newHdrIdx + 2;
+    if (pos >= row.children.length) row.appendChild(td);
+    else row.insertBefore(td, row.children[pos]);
+  });
+  updateCWSpan(subject);
+  attachSS();
+  recalc(subject);
+}
+
+function delCW(subject, colId) {
+  const sd = subjectData[subject];
+  sd.cwColumns = sd.cwColumns.filter(id => id !== colId);
+  if (!sd.cwColumns.length) sd.cwColumns = ["cw-ut1"];
+  const sk = SK(subject);
+  document.getElementById("cwcol_"+sk+"_"+colId)?.remove();
+  document.querySelectorAll(`#tbody_${sk} td[data-col="${colId}"]`).forEach(td => td.remove());
+  updateCWSpan(subject);
+  recalc(subject);
+}
+
+function updateCWSpan(subject) {
+  const sk = SK(subject);
+  const h = document.getElementById("cwHdr_"+sk);
+  if (!h) return;
+  h.colSpan = subjectData[subject].cwColumns.length + 1;
+}
+
+// ============================================================
+// CALCULATION
+// ============================================================
+function getN(el) {
+  if (!el) return 0;
+  const v = parseFloat(el.textContent.trim());
+  return isNaN(v) ? 0 : Math.min(100, Math.max(0, v));
+}
+
+function recalc(subject) {
+  const sk = SK(subject);
+  document.querySelectorAll(`#tbody_${sk} tr`).forEach(row => {
+    // Standard logic applied to all subjects
+    const examRaw = getN(row.querySelector(".exam-score-cell .cell-inner"));
+    const examPct = (examRaw / 100) * 60;
+    let ut = [], other = [];
+    row.querySelectorAll("td[data-col]").forEach(td => {
+      const id = td.getAttribute("data-col");
+      const v = getN(td.querySelector(".cell-inner"));
+      if (id.startsWith("cw-ut")) ut.push(v);
+      else other.push(v);
+    });
+    const utA = ut.length ? ut.reduce((a,b)=>a+b,0)/ut.length : 0;
+    const otA = other.length ? other.reduce((a,b)=>a+b,0)/other.length : 0;
+    let cwPct = 0;
+    if (ut.length && other.length)   cwPct = (utA/100)*25 + (otA/100)*15;
+    else if (ut.length)               cwPct = (utA/100)*40;
+    else if (other.length)            cwPct = (otA/100)*40;
+    
+    const total = examPct + cwPct;
+    const set = (q, v) => { const e = row.querySelector(q); if (e) e.textContent = v; };
+    set(".exam-total-cell .readonly-inner",  examPct.toFixed(2));
+    set(".cw-total-cell .readonly-inner",    cwPct.toFixed(2));
+    set(".final-total-cell .readonly-inner", total.toFixed(2));
+    set(".rounded-total-cell .readonly-inner", Math.round(total));
+  });
+  updateSummary();
+}
+
+function getScores() {
+  const result = {};
+  CLASS_STUDENTS[currentClass].forEach(n => { result[n] = {}; });
+  CLASS_SUBJECTS[currentClass].forEach(subject => {
+    const sk = SK(subject);
+    document.querySelectorAll(`#tbody_${sk} tr`).forEach(row => {
+      const name = row.querySelector(".name-inner")?.textContent.trim();
+      if (!name || !result[name]) return;
+      const cw = parseFloat(row.querySelector(".cw-total-cell .readonly-inner")?.textContent) || 0;
+      const exam = parseFloat(row.querySelector(".exam-total-cell .readonly-inner")?.textContent) || 0;
+      const total = parseInt(row.querySelector(".rounded-total-cell .readonly-inner")?.textContent) || 0;
+      result[name][subject] = { exam, cw, total };
+    });
+  });
+  return result;
+}
+
+// ============================================================
+// SUMMARY & UI BEHAVIORS
+// ============================================================
+function updateSummary() {
+  const subjects = CLASS_SUBJECTS[currentClass];
+  const students = CLASS_STUDENTS[currentClass];
+  const scores = getScores();
+
+  let hdr1 = `<th class="sum-td-subject" rowspan="2">Subject</th>`;
+  students.forEach(s => { hdr1 += `<th class="sum-th-student" colspan="3">${s}</th>`; });
+
+  let hdr2 = "";
+  students.forEach(() => {
+    hdr2 += `<th class="sum-th-type sum-th-exam">Exam (60%)</th>`;
+    hdr2 += `<th class="sum-th-type sum-th-cw">CW (40%)</th>`;
+    hdr2 += `<th class="sum-th-type sum-th-total">Total</th>`;
+  });
+
+  let rows = "";
+  subjects.forEach(subject => {
+    let row = `<td class="sum-td-subject"><b>${subject}</b></td>`;
+    students.forEach(s => {
+      const d = (scores[s] || {})[subject] || { exam: 0, cw: 0, total: 0 };
+      row += `<td class="sum-td-exam">${d.exam.toFixed(2)}</td>`;
+      row += `<td class="sum-td-cw">${d.cw.toFixed(2)}</td>`;
+      row += `<td class="sum-td-total">${d.total}</td>`;
+    });
+    rows += `<tr>${row}</tr>`;
+  });
+
+  document.getElementById("summaryContainer").innerHTML = `
+    <table class="summary-table">
+      <thead><tr>${hdr1}</tr><tr>${hdr2}</tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+// Spreadsheet logic & Excel handling
+let selCell = null, selStart = null, selEnd = null;
+function attachSS() {
+  document.querySelectorAll("tbody td").forEach(td => {
+    if (td._ss) return; td._ss = true;
+    td.addEventListener("mousedown", e => {
+      const inner = td.querySelector(".cell-inner[contenteditable='true']");
+      if (!inner) return;
+      if (e.shiftKey && selStart) { selEnd = coords(td); highlightRange(selStart, selEnd); e.preventDefault(); }
+      else selCell2(td);
+    });
+    const inner = td.querySelector(".cell-inner[contenteditable='true']");
+    if (!inner) return;
+    inner.addEventListener("focus", () => { if (selCell !== td) selCell2(td); });
+    inner.addEventListener("input", () => {
+      if (inner.getAttribute("data-type") === "number") {
+        let raw = inner.textContent.replace(/[^0-9.]/g, "");
+        if (inner.textContent !== raw) {
+          inner.textContent = raw;
+          const r = document.createRange(), s2 = window.getSelection();
+          r.selectNodeContents(inner); r.collapse(false); s2.removeAllRanges(); s2.addRange(r);
+        }
+      }
+      const tbody = td.closest("tbody");
+      if (tbody) { 
+        const sk = tbody.id.replace("tbody_",""); 
+        const subj = CLASS_SUBJECTS[currentClass].find(s => SK(s)===sk); 
+        if (subj) recalc(subj); 
+      }
+    });
+  });
+}
+
+function coords(td) { const row=td.parentElement, tbody=row.parentElement; return { ri: Array.from(tbody.children).indexOf(row), ci: Array.from(row.children).indexOf(td) }; }
+function selCell2(td) { clearSel(); selCell=td; selStart=coords(td); selEnd={...selStart}; td.classList.add("selected"); td.querySelector(".cell-inner")?.focus(); }
+function clearSel() { document.querySelectorAll("td.selected").forEach(t=>t.classList.remove("selected")); document.querySelectorAll("td.in-range").forEach(t=>t.classList.remove("in-range")); selCell=null; }
+function highlightRange(s,e) {
+  document.querySelectorAll("td.in-range").forEach(t=>t.classList.remove("in-range"));
+  if (!s||!e||!selCell) return;
+  const tbody=selCell.closest("tbody");
+  const r1=Math.min(s.ri,e.ri),r2=Math.max(s.ri,e.ri),c1=Math.min(s.ci,e.ci),c2=Math.max(s.ci,e.ci);
+  Array.from(tbody.children).slice(r1,r2+1).forEach(row=>Array.from(row.children).slice(c1,c2+1).forEach(c=>c.classList.add("in-range")));
+}
+
+// Script auto-runs on load
+window.onload = loadClass;
+</script>
+</body>
+</html>
+```
