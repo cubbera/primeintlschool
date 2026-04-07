@@ -458,7 +458,7 @@
 
 <body>
 <div class="container" id="containerRoot">
-  <h1>Creating Student Enrollment &amp; Tuition Plan v3.3</h1>
+  <h1>Creating Student Enrollment &amp; Tuition Plan v3.4</h1>
 
   <h2>1. Enrollment</h2>
 
@@ -553,7 +553,7 @@
           </td>
           <td>
             <div class="cell">
-              <div class="t">Payment Plan Creation Date</div>
+              <div class="t">First Attendance Date</div>
               <div class="v">
                 <input type="date" id="firstAttendance">
               </div>
@@ -656,6 +656,12 @@ function clearForm() {
 
   recalc();
 }
+
+function getTodayDate() {
+  const d = new Date();
+  return d.toLocaleDateString("en-GB"); // 07/04/2026 format
+}
+
 
   /* =====================================================
      DOM
@@ -1174,23 +1180,19 @@ function clearForm() {
   const prorate      = document.getElementById("tuitionAfterProrate").innerText;
   const finalTuition = document.getElementById("finalTuitionDisplay").innerText;
 
+  const today = getTodayDate();
+
   // ======================
-  // DISCOUNT TABLE
+  // DISCOUNT ROWS INLINE
   // ======================
   let discountRows = "";
   discounts.forEach((d, i) => {
     discountRows += `
       <tr>
-        <td>${i + 1}</td>
-        <td>${d.type}</td>
-        <td>${d.desc || "-"}</td>
+        <td>Discount ${i + 1} - ${d.desc || d.type}</td>
         <td class="right red">-${fmtKsNoSuffix(d._calcAmt || 0)}</td>
       </tr>`;
   });
-
-  if (!discountRows) {
-    discountRows = `<tr><td colspan="4" class="center">No Discounts</td></tr>`;
-  }
 
   // ======================
   // PAYMENT PLAN
@@ -1208,22 +1210,16 @@ function clearForm() {
     }
   });
 
-  // ======================
-  // HTML CONTENT
-  // ======================
   const html = `
   <html>
   <head>
     <title>${fileName}</title>
     <style>
 
-      @page {
-        size: A4;
-        margin: 20mm;
-      }
+      @page { size: A4; margin: 20mm; }
 
       body {
-        font-family: Arial, sans-serif;
+        font-family: Arial;
         width: 210mm;
         margin: 0 auto;
         color: #111;
@@ -1249,10 +1245,6 @@ function clearForm() {
         font-size: 13px;
       }
 
-      .label { font-weight: bold; }
-      .right { text-align: right; }
-      .center { text-align: center; }
-
       table {
         width: 100%;
         border-collapse: collapse;
@@ -1260,17 +1252,14 @@ function clearForm() {
         font-size: 13px;
       }
 
-      th {
-        border-bottom: 1px solid #000;
-        text-align: left;
-        padding: 6px;
-      }
-
-      td {
+      td, th {
         padding: 6px;
         border-bottom: 0.5px solid #ccc;
       }
 
+      th { border-bottom: 1px solid #000; }
+
+      .right { text-align: right; }
       .red { color: #b91c1c; font-weight: bold; }
 
       .total {
@@ -1281,7 +1270,7 @@ function clearForm() {
       }
 
       .signature-area {
-        margin-top: 80px;
+        margin-top: 100px;
         display: flex;
         justify-content: space-between;
       }
@@ -1292,9 +1281,15 @@ function clearForm() {
       }
 
       .line {
-        margin-top: 50px;
+        margin-top: 70px;
         border-top: 1px solid #000;
       }
+
+      .after-line {
+        height: 40px;
+      }
+
+      a { display:none; }
 
     </style>
   </head>
@@ -1304,48 +1299,23 @@ function clearForm() {
     <h1>PRIME INTERNATIONAL SCHOOL</h1>
     <h1>STUDENT TUITION STATEMENT</h1>
 
-    <!-- 1. ENROLLMENT -->
-    <h2>1. Enrollment</h2>
-        <div class="row"><span class="label">Date:</span><span>${firstAttendance}</span></div>
-    <div class="row"><span class="label">Student Name:</span><span>${name}</span></div>
-    <div class="row"><span class="label">Student ID:</span><span>${id}</span></div>
-    <div class="row"><span class="label">Academic Year:</span><span>${academicYear}</span></div>
-    <div class="row"><span class="label">Class:</span><span>${grade}</span></div>
-    <div class="row"><span class="label">Payment Plan:</span><span>${plan}</span></div>
+    <div class="row"><b>Date:</b><span>${today}</span></div>
 
-    <!-- 2. CALCULATION -->
+    <h2>1. Enrollment</h2>
+    <div class="row"><span>Student Name</span><span>${name}</span></div>
+    <div class="row"><span>Student ID</span><span>${id}</span></div>
+    <div class="row"><span>Academic Year</span><span>${academicYear}</span></div>
+    <div class="row"><span>Grade</span><span>${grade}</span></div>
+    <div class="row"><span>Payment Plan</span><span>${plan}</span></div>
+
     <h2>2. Calculating Payment</h2>
     <table>
-      <tr>
-        <td>Base Tuition</td>
-        <td class="right">${baseTuition}</td>
-      </tr>
-      <tr>
-        <td>After Prorate</td>
-        <td class="right">${prorate}</td>
-      </tr>
-    </table>
-
-    <!-- DISCOUNT -->
-    <h3 style="margin-top:20px;">Discount</h3>
-    <table>
-      <tr>
-        <th>No</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th class="right">Amount</th>
-      </tr>
+      <tr><td>Base Tuition</td><td class="right">${baseTuition}</td></tr>
+      <tr><td>After Prorate</td><td class="right">${prorate}</td></tr>
       ${discountRows}
+      <tr><td><b>Final Tuition</b></td><td class="right"><b>${finalTuition}</b></td></tr>
     </table>
 
-    <table>
-      <tr>
-        <td><b>Final Tuition</b></td>
-        <td class="right"><b>${finalTuition}</b></td>
-      </tr>
-    </table>
-
-    <!-- 3. PAYMENT PLAN -->
     <h2>3. Tuition Payment Plan</h2>
     <table>
       <tr>
@@ -1360,15 +1330,16 @@ function clearForm() {
       TOTAL TUITION FEE: ${finalTuition}
     </div>
 
-    <!-- SIGNATURE -->
     <div class="signature-area">
       <div class="sig">
         Parent Name & Signature
         <div class="line"></div>
+        <div class="after-line"></div>
       </div>
       <div class="sig">
         Account Name & Signature
         <div class="line"></div>
+        <div class="after-line"></div>
       </div>
     </div>
 
@@ -1377,22 +1348,14 @@ function clearForm() {
   `;
 
   // ======================
-  // SAVE AS PDF FIRST
-  // ======================
-  const blob = new Blob([html], { type: "text/html" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = fileName;
-  link.click();
-
-  // ======================
-  // THEN PRINT
+  // PRINT (BEST FOR IPAD)
   // ======================
   const printWindow = window.open("", "_blank");
   printWindow.document.write(html);
   printWindow.document.close();
 
   printWindow.onload = () => {
+    printWindow.focus();
     printWindow.print();
   };
 }
@@ -1424,6 +1387,10 @@ firstCalcDateEl.addEventListener("change", recalc);
   handleStudentTypeChange();
   addDiscount();
   recalc();
+
+window.addEventListener("load", () => {
+  recalc();
+});
 
 </script>
 </body>
