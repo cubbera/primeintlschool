@@ -891,7 +891,7 @@ function clearForm(){
       // Build description / amount inputs
       const amtPlaceholder = disc.type.includes("%") ? "%" : "Amount";
       const descHtml = `<input type="text" class="disc-desc" placeholder="Description" value="${disc.desc||""}" 
-                          style="font-size:12px;padding:6px 8px;border:1px solid #e5e7eb;border-radius:6px;max-width:140px;"
+                          style="font-size:12px;padding:6px 8px;border:1px solid #e5e7eb;border-radius:6px;max-width:100px;"
                           oninput="updateDisc(${disc.id},'desc',this.value)">`;
       const amtHtml  = `<input type="number" class="disc-amt" placeholder="${amtPlaceholder}" value="${disc.amt||""}" 
                           style="font-size:12px;padding:6px 8px;border:1px solid #e5e7eb;border-radius:6px;max-width:80px;"
