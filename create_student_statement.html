@@ -458,7 +458,7 @@
 
 <body>
 <div class="container" id="containerRoot">
-  <h1>Creating Student Enrollment &amp; Tuition Plan v3.4</h1>
+  <h1>Creating Student Enrollment &amp; Tuition Plan v3.1</h1>
 
   <h2>1. Enrollment</h2>
 
@@ -483,12 +483,12 @@
               <div class="t">Year Level</div>
               <div class="v">
                 <select id="grade">
-                  <option value="SR" selected>SR</option>
-                  <option value="EY1">EY1</option>
-                  <option value="EY2">EY2</option>
-                  <option value="Y1">Y1</option>
-                  <option value="Y2">Y2</option>
-                  <option value="Y3">Y3</option>
+                  <option value="School Readiness" selected>SR</option>
+                  <option value="Early Years 1">EY1</option>
+                  <option value="Early Years 2">EY2</option>
+                  <option value="Year 1">Y1</option>
+                  <option value="Year 2>Y2</option>
+                  <option value="Year 3">Y3</option>
                 </select>
               </div>
             </div>
@@ -651,7 +651,7 @@ function clearForm() {
   firstCalcDateEl.value   = "2026-06-15";
 
   academicYearEl.value = "AY2026-2027";
-  gradeEl.value = "SR";
+  gradeEl.value = "School Readiness";
   paymentPlanEl.value = "Termly";
 
   recalc();
@@ -659,7 +659,11 @@ function clearForm() {
 
 function getTodayDate() {
   const d = new Date();
-  return d.toLocaleDateString("en-GB"); // 07/04/2026 format
+  const day = String(d.getDate()).padStart(2, "0");
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const month = months[d.getMonth()];
+  const year = d.getFullYear();
+  return `${day}-${month}-${year}`; // e.g. 07-Apr-2026
 }
 
 
@@ -705,24 +709,24 @@ function getTodayDate() {
     if (year === "AY2025-2026") {
       const isInstallment = plan !== "One-Time";
       const prices = {
-        "SR": [3900000, 4200000],
-        "EY1":         [3900000, 4200000],
-        "EY2":         [3900000, 4200000],
-        "Y1":          [4200000, 4500000],
-        "Y2":          [4200000, 4500000],
-        "Y3":          [4200000, 4500000]
+        "School Readiness": [3900000, 4200000],
+        "Early Years 1":         [3900000, 4200000],
+        "Early Years 2":         [3900000, 4200000],
+        "Year 1":          [4200000, 4500000],
+        "Year 2":          [4200000, 4500000],
+        "Year 3":          [4200000, 4500000]
       };
       return prices[grade] ? prices[grade][isInstallment ? 1 : 0] : 0;
     }
 
     if (year === "AY2026-2027") {
       const tbl = {
-        "SR": {"One-Time":4290000, "Termly":4490000, "Monthly":4890000},
-        "EY1":         {"One-Time":4290000, "Termly":4490000, "Monthly":4890000},
-        "EY2":         {"One-Time":4290000, "Termly":4490000, "Monthly":4890000},
-        "Y1":          {"One-Time":4690000, "Termly":4890000, "Monthly":5290000},
-        "Y2":          {"One-Time":4690000, "Termly":4890000, "Monthly":5290000},
-        "Y3":          {"One-Time":4690000, "Termly":4890000, "Monthly":5290000}
+        "School Readiness": {"One-Time":4290000, "Termly":4490000, "Monthly":4890000},
+        "Early Years 1":         {"One-Time":4290000, "Termly":4490000, "Monthly":4890000},
+        "Early Years 2":         {"One-Time":4290000, "Termly":4490000, "Monthly":4890000},
+        "Year 1":          {"One-Time":4690000, "Termly":4890000, "Monthly":5290000},
+        "Year 2":          {"One-Time":4690000, "Termly":4890000, "Monthly":5290000},
+        "Year 3":          {"One-Time":4690000, "Termly":4890000, "Monthly":5290000}
       };
       return (tbl[grade] && tbl[grade][plan]) ? tbl[grade][plan] : 0;
     }
@@ -1299,14 +1303,16 @@ function getTodayDate() {
     <h1>PRIME INTERNATIONAL SCHOOL</h1>
     <h1>STUDENT TUITION STATEMENT</h1>
 
-    <div class="row"><b>Date:</b><span>${today}</span></div>
+  <div style="margin-top:10px; font-size:13px;">
+  <b>Date:</b> ${today}
+</div>
 
     <h2>1. Enrollment</h2>
-    <div class="row"><span>Student Name</span><span>${name}</span></div>
-    <div class="row"><span>Student ID</span><span>${id}</span></div>
-    <div class="row"><span>Academic Year</span><span>${academicYear}</span></div>
-    <div class="row"><span>Grade</span><span>${grade}</span></div>
-    <div class="row"><span>Payment Plan</span><span>${plan}</span></div>
+    <div class="row"><span>Student Name:</span><span>${name}</span></div>
+    <div class="row"><span>Student ID:</span><span>${id}</span></div>
+    <div class="row"><span>Academic Year:</span><span>${academicYear}</span></div>
+    <div class="row"><span>Class:</span><span>${grade}</span></div>
+    <div class="row"><span>Payment Plan:</span><span>${plan}</span></div>
 
     <h2>2. Calculating Payment</h2>
     <table>
