@@ -69,7 +69,7 @@
   input[type="date"],
   input[type="number"] {
     width: 100%;
-    max-width: 400px;
+    max-width: 200px;
     padding: 12px 14px;
     font-size: 14px;
     border: 1px solid var(--input-border);
@@ -483,8 +483,8 @@
               <div class="t">Grade Level</div>
               <div class="v">
                 <select id="grade">
-                  <option value="SR">SR</option>
-                  <option value="EY1" selected>EY1</option>
+                  <option value="SR" selected>SR</option>
+                  <option value="EY1">EY1</option>
                   <option value="EY2">EY2</option>
                   <option value="Y1">Y1</option>
                   <option value="Y2">Y2</option>
@@ -679,7 +679,7 @@ function clearForm(){
     if (year === "AY2025-2026") {
       const isInstallment = plan !== "One-Time";
       const prices = {
-        "SR Full-day": [3900000, 4200000],
+        "SR": [3900000, 4200000],
         "EY1":         [3900000, 4200000],
         "EY2":         [3900000, 4200000],
         "Y1":          [4200000, 4500000],
@@ -691,7 +691,7 @@ function clearForm(){
 
     if (year === "AY2026-2027") {
       const tbl = {
-        "SR Full-day": {"One-Time":4290000, "Termly":4490000, "Monthly":4890000},
+        "SR": {"One-Time":4290000, "Termly":4490000, "Monthly":4890000},
         "EY1":         {"One-Time":4290000, "Termly":4490000, "Monthly":4890000},
         "EY2":         {"One-Time":4290000, "Termly":4490000, "Monthly":4890000},
         "Y1":          {"One-Time":4690000, "Termly":4890000, "Monthly":5290000},
