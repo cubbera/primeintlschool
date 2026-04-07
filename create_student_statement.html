@@ -456,74 +456,84 @@
 </style>
 </head>
 
-
 <body>
-<div class="container">
+<div class="container" id="containerRoot">
+  <h1>Student Enrollment &amp; Tuition Plan V3.1</h1>
 
-<h1>Student Enrollment & Tuition Plan V3.1</h1>
+  <h2>1. Enrollment</h2>
 
-<h2>1. Enrollment</h2>
+  <div class="enroll-table">
+    <table>
+      <tbody>
+        <tr>
+          <td width="50%">
+            <div class="cell">
+              <div class="t">Academic Year</div>
+              <div class="v">
+                <select id="academicYear">
+                  <option value="AY2025-2026">AY2025–2026</option>
+                  <option value="SUMMER2026">Summer 2026</option>
+                  <option value="AY2026-2027" selected>AY2026–2027</option>
+                </select>
+              </div>
+            </div>
+          </td>
+          <td width="50%">
+            <div class="cell">
+              <div class="t">Grade Level</div>
+              <div class="v">
+                <select id="grade">
+                  <option value="SR">SR</option>
+                  <option value="EY1" selected>EY1</option>
+                  <option value="EY2">EY2</option>
+                  <option value="Y1">Y1</option>
+                  <option value="Y2">Y2</option>
+                  <option value="Y3">Y3</option>
+                </select>
+              </div>
+            </div>
+          </td>
+        </tr>
 
-<table>
-<tr>
-<td>
-<div class="cell">
-<span>Academic Year</span>
-<select id="academicYear">
-<option>AY2025–2026</option>
-<option>Summer 2026</option>
-<option selected>AY2026–2027</option>
-</select>
-</div>
-</td>
+        <tr>
+          <td>
+            <div class="cell">
+              <div class="t">Student ID</div>
+                  <input type="text" id="studentIdInput" placeholder="Enter Student ID">
+            </div>
+          </td>
+          <td>
+            <div class="cell">
+              <div class="t">Student Name</div>
+              <div class="v" id="studentNameCell">
+                <input type="text" id="studentName" placeholder="Enter name">
+              </div>
+            </div>
+          </td>
+        </tr>
 
-<td>
-<div class="cell">
-<span>Grade</span>
-<select id="grade">
-<option selected>EY1</option>
-<option>EY2</option>
-<option>Y1</option>
-</select>
-</div>
-</td>
-</tr>
-
-<tr>
-<td>
-<div class="cell">
-<span>Student ID</span>
-<input type="text" id="studentIdInput" placeholder="Enter Student ID">
-</div>
-</td>
-
-<td>
-<div class="cell">
-<span>Student Name</span>
-<input type="text" id="studentName" placeholder="Enter name">
-</div>
-</td>
-</tr>
-
-<tr>
-<td>
-<div class="cell">
-<span>Payment Plan</span>
-<select id="paymentPlan">
-<option>One-Time</option>
-<option selected>Termly</option>
-<option>Monthly</option>
-</select>
-</div>
-</td>
-
-<td>
-<div class="cell">
-<span>First Attendance</span>
-<input type="date" id="firstAttendance" value="2026-06-15">
-</div>
-</td>
-</tr>
+        <tr>
+          <td>
+            <div class="cell">
+              <div class="t">Payment Plan</div>
+              <div class="v">
+                <select id="paymentPlan">
+                  <option value="One-Time">One-Time</option>
+                  <option value="Termly" selected>Termly</option>
+                  <option value="Monthly">Monthly</option>
+                </select>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="cell">
+              <div class="t">First Attendance Date</div>
+              <div class="v">
+                <input type="date" id="firstAttendance">
+              </div>
+            </div>
+          </td>
+        </tr>
 
         <!-- First Calculation Date row -->
         <tr id="calcDateRow">
@@ -593,14 +603,30 @@
     </table>
   </div>
 
-  <div class="action-row">
-    <button class="btn-cancel" type="button" onclick="cancelForm()">[Cancel]</button>
-    <button class="btn-final" type="button" onclick="submitForm()">[Submit]</button>
-  </div>
+<div class="action-row">
+<button class="btn-cancel" onclick="clearForm()">[Clear]</button>
+<button class="btn-final" onclick="saveAndPrint()">[Save and Print]</button>
+</div>
 
 </div>
 
 <script>
+
+  /* ================= CLEAR ================= */
+function clearForm(){
+  if(!confirm("Clear all data?")) return;
+
+  document.querySelectorAll("input").forEach(i=>{
+    if(i.type!=="date") i.value="";
+  });
+
+  document.getElementById("academicYear").value="AY2026–2027";
+  document.getElementById("grade").value="EY1";
+  document.getElementById("paymentPlan").value="Termly";
+  document.getElementById("firstAttendance").value="2026-06-15";
+}
+
+  
   /* =====================================================
      DOM
      ===================================================== */
@@ -1124,25 +1150,6 @@
     r.addEventListener("change", handleStudentTypeChange);
   });
 
-  // Initialize
-  handleStudentTypeChange();
-  addDiscount();
-  recalc();
-
-  
-/* ================= CLEAR ================= */
-function clearForm(){
-  if(!confirm("Clear all data?")) return;
-
-  document.querySelectorAll("input").forEach(i=>{
-    if(i.type!=="date") i.value="";
-  });
-
-  document.getElementById("academicYear").value="AY2026–2027";
-  document.getElementById("grade").value="EY1";
-  document.getElementById("paymentPlan").value="Termly";
-  document.getElementById("firstAttendance").value="2026-06-15";
-}
 
 /* ================= PRINT ================= */
 function saveAndPrint(){
@@ -1205,7 +1212,16 @@ function saveAndPrint(){
   win.document.close();
   setTimeout(()=>win.print(),500);
 }
+
+
+
+
   
+  // Initialize
+  handleStudentTypeChange();
+  addDiscount();
+  recalc();
+
 </script>
 </body>
 </html>
