@@ -1107,7 +1107,7 @@ function clearForm(){
     const fCell = document.getElementById("fatherCell");
 
     if (type === "current") {
-      sId.innerHTML = `<input type="text" id="studentIdSearch" placeholder="Search ID..." style="max-width:200px;" onkeydown="if(event.key==='Enter')searchStudent()">`;
+      sId.innerHTML = `<input type="text" id="studentIdSearch" placeholder="Search ID..." style="max-width:150px;" onkeydown="if(event.key==='Enter')searchStudent()">`;
       sName.innerHTML = `
         <div class="inline-search">
           <input type="text" id="studentNameSearch" placeholder="Search Name..." onkeydown="if(event.key==='Enter')searchStudent()">
@@ -1386,9 +1386,25 @@ function saveAndPrint(){
 
   
   // Initialize
+  window.addEventListener("DOMContentLoaded", () => {
+
+  // Force correct defaults
+  academicYearEl.value = "AY2026-2027";
+  gradeEl.value = "EY1";
+  paymentPlanEl.value = "Termly";
+
+  // Set hidden default dates
+  if(firstAttendanceEl) firstAttendanceEl.value = "2026-06-15";
+  if(firstCalcDateEl) firstCalcDateEl.value = "2026-06-15";
+
   handleStudentTypeChange();
   addDiscount();
-  recalc();
+
+  // Delay recalc slightly to ensure UI is ready
+  setTimeout(() => {
+    recalc();
+  }, 50);
+});
 
 </script>
 </body>
