@@ -458,7 +458,7 @@
 
 <body>
 <div class="container" id="containerRoot">
-  <h1>Student Enrollment &amp; Tuition Plan V3.1</h1>
+  <h1>Creating Student Enrollment &amp; Tuition Plan V3.3</h1>
 
   <h2>1. Enrollment</h2>
 
@@ -1151,68 +1151,226 @@ function clearForm(){
   });
 
 
-/* ================= PRINT ================= */
+  /* =====================================================
+     PRINT
+     ===================================================== */
+<script>
 function saveAndPrint(){
 
-  const name = document.getElementById("studentName").value || "Student";
-  const id   = document.getElementById("studentIdInput").value || "ID";
+  const studentName = document.getElementById("studentName").value || "Student";
+  const studentId   = document.getElementById("studentIdInput").value || "ID";
 
-  const fileName = `AY26-${name}-${id}.pdf`;
+  const academicYear = document.getElementById("academicYear").value;
+  const grade        = document.getElementById("grade").value;
+  const plan         = document.getElementById("paymentPlan").value;
+  const attendDate   = document.getElementById("firstAttendance").value;
+  const calcDate     = document.getElementById("firstCalcDate")?.value || "";
+
+  const fileName = `AY26-${studentName}-${studentId}.pdf`;
 
   const rows = document.querySelectorAll("#planBody tr");
 
-  let planHTML="";
-  rows.forEach(r=>{
-    const tds=r.querySelectorAll("td");
-    if(tds.length===3){
-      planHTML+=`
+  let planHTML = "";
+  rows.forEach(r => {
+    const cols = r.querySelectorAll("td");
+    if (cols.length === 3) {
+      planHTML += `
         <tr>
-          <td>${tds[0].innerText}</td>
-          <td>${tds[1].childNodes[0].nodeValue}</td>
-          <td>${tds[2].innerText}</td>
-        </tr>`;
+          <td>${cols[0].innerText}</td>
+          <td>${cols[1].childNodes[0].nodeValue}</td>
+          <td style="text-align:right;">${cols[2].innerText}</td>
+        </tr>
+      `;
     }
   });
 
-  const win=window.open("");
+  const finalAmount = document.getElementById("finalTuitionDisplay")?.innerText || "";
+
+  const win = window.open("", "_blank");
 
   win.document.write(`
   <html>
   <head>
-  <title>${fileName}</title>
-  <style>
-  body{font-family:Arial;padding:40px}
-  h1{text-align:center}
-  table{width:100%;border-collapse:collapse;margin-top:20px}
-  td,th{border:1px solid #000;padding:10px}
-  .sign{margin-top:60px;display:flex;justify-content:space-between}
-  </style>
+    <title>${fileName}</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 40px;
+        color: #000;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 25px;
+      }
+
+      .school {
+        font-size: 20px;
+        font-weight: bold;
+        letter-spacing: 1px;
+      }
+
+      .title {
+        font-size: 16px;
+        margin-top: 5px;
+      }
+
+      .section {
+        margin-top: 20px;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px 40px;
+        margin-top: 10px;
+        font-size: 14px;
+      }
+
+      .info-item {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px dashed #ccc;
+        padding-bottom: 4px;
+      }
+
+      .label {
+        font-weight: bold;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        font-size: 14px;
+      }
+
+      th, td {
+        border: 1px solid #000;
+        padding: 10px;
+      }
+
+      th {
+        background: #f2f2f2;
+      }
+
+      .total-row td {
+        font-weight: bold;
+        background: #f9f9f9;
+      }
+
+      .signatures {
+        margin-top: 60px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .sign-box {
+        width: 40%;
+        text-align: center;
+        font-size: 13px;
+      }
+
+      .line {
+        margin-top: 40px;
+        border-top: 1px solid #000;
+      }
+
+    </style>
   </head>
+
   <body>
 
-  <h1>Student Statement</h1>
+    <div class="header">
+      <div class="school">PRIME INTERNATIONAL SCHOOL</div>
+      <div class="title">Student Statement</div>
+    </div>
 
-  <p><b>Name:</b> ${name}</p>
-  <p><b>ID:</b> ${id}</p>
+    <div class="section">
+      <div class="info-grid">
 
-  <table>
-  <tr><th>No</th><th>Due Date</th><th>Amount</th></tr>
-  ${planHTML}
-  </table>
+        <div class="info-item">
+          <span class="label">Student Name</span>
+          <span>${studentName}</span>
+        </div>
 
-  <div class="sign">
-    <div>____________________<br>Parent Name & Signature</div>
-    <div>____________________<br>Account Name & Signature</div>
-  </div>
+        <div class="info-item">
+          <span class="label">Student ID</span>
+          <span>${studentId}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="label">Academic Year</span>
+          <span>${academicYear}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="label">Grade</span>
+          <span>${grade}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="label">Payment Plan</span>
+          <span>${plan}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="label">First Attendance</span>
+          <span>${attendDate}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="label">First Calculation</span>
+          <span>${calcDate}</span>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="section">
+      <table>
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Due Date</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          ${planHTML}
+
+          <tr class="total-row">
+            <td colspan="2">TOTAL</td>
+            <td style="text-align:right;">${finalAmount}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="signatures">
+      <div class="sign-box">
+        <div class="line"></div>
+        Parent Name & Signature
+      </div>
+
+      <div class="sign-box">
+        <div class="line"></div>
+        Account Name & Signature
+      </div>
+    </div>
 
   </body>
   </html>
   `);
 
   win.document.close();
-  setTimeout(()=>win.print(),500);
-}
 
+  setTimeout(() => {
+    win.print();
+  }, 500);
+}
+</script>
 
 
 
