@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Student Enrollment & Tuition Plan System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<style>
+  :root{
+    --bg: #f5f5f7;
+    --card: #ffffff;
+    --text: #111827;
+    --muted: #6b7280;
+    --line: #e5e7eb;
+    --accent: #0071e3;
+    --accent-hover: #0077ed;
+    --accent2: #059669;
+    --accent2-hover: #047857;
+    --danger: #b91c1c;
+    --dangerBg: #fff1f2;
+    --pill: #eef2ff;
+    --pillText: #3730a3;
+    --shadow: 0 8px 30px rgba(0,0,0,0.08);
+    --input-border: #d1d5db;
+    --focus-ring: rgba(0, 113, 227, 0.3);
+  }
+
+  * { box-sizing: border-box; outline: none; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 40px 20px;
+    line-height: 1.5;
+  }
+
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: var(--card);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    padding: 30px;
+  }
+
+  h1 {
+    margin: 0 0 20px;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+
+  h2 {
+    margin: 30px 0 15px;
+    font-size: 17px;
+    font-weight: 700;
+    border-bottom: 2px solid var(--line);
+    padding-bottom: 10px;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  select,
+  input[type="text"],
+  input[type="date"],
+  input[type="number"] {
+    width: 100%;
+    max-width: 400px;
+    padding: 12px 14px;
+    font-size: 14px;
+    border: 1px solid var(--input-border);
+    border-radius: 10px;
+    background: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  select:focus, input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--focus-ring);
+  }
+
+  input[disabled] {
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    cursor: not-allowed;
+  }
+
+  .radio-row {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .radio-row label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: background 0.1s;
+  }
+
+  .radio-row label:hover { background: #f9fafb; }
+
+  .pill {
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: var(--pill);
+    color: var(--pillText);
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    font-size: 13px;
+  }
+
+  .amount-pill {
+    padding: 10px 16px;
+    border-radius: 12px;
+    background: rgba(5,150,105,0.12);
+    color: #065f46;
+    font-weight: 900;
+    font-size: 15px;
+    display: inline-block;
+    white-space: nowrap;
+    min-width: 100px;
+    text-align: right;
+  }
+
+  .amount-pill.red {
+    background: var(--dangerBg);
+    color: var(--danger);
+  }
+
+  .amount-pill.blue {
+    background: #0071e3;
+    color: #fff;
+  }
+
+  .enroll-table,
+  .discount-wrap,
+  .plan {
+    margin-top: 15px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    background: #fff;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  thead th {
+    background: #f9fafb;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+  }
+
+  tbody td {
+    padding: 14px 16px;
+    font-size: 14px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  .plan tbody tr:nth-child(even) { background-color: #fbfbfb; }
+
+  .plan td:last-child {
+    text-align: right;
+    font-weight: 700;
+    font-family: "SF Mono", "Monaco", "Courier New", monospace;
+  }
+
+  /* TOTAL row in plan */
+  .plan tbody tr.total-row td {
+    border-top: 2px solid var(--line);
+    font-weight: 900;
+    font-size: 15px;
+    color: var(--accent2);
+    background: #f0fdf4;
+  }
+
+  .cell {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .cell .t {
+    font-weight: 600;
+    white-space: nowrap;
+    color: #374151;
+    min-width: 120px;
+  }
+
+  .cell .v {
+    flex: 1;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .inline-search {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+    flex-wrap: nowrap;
+  }
+
+  .inline-search input { flex: 1; min-width: 150px; }
+
+  .btn-search {
+    padding: 12px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 10px;
+    border: 1px solid var(--input-border);
+    background: #fff;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-search:hover { background: #f3f4f6; border-color: #9ca3af; }
+
+  .btn-add {
+    margin-top: 12px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 10px;
+    border: 1px dashed var(--input-border);
+    background: #fff;
+    color: var(--accent);
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+    transition: all 0.2s;
+  }
+
+  .btn-add:hover { border-color: var(--accent); background: #f0f9ff; }
+
+  .btn-remove {
+    border: none;
+    background: rgba(185,28,28,0.1);
+    color: var(--danger);
+    font-weight: 900;
+    cursor: pointer;
+    font-size: 16px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .btn-remove:hover { background: rgba(185,28,28,0.2); }
+
+  .btn-final {
+    margin-top: 12px;
+    padding: 14px 28px;
+    font-size: 15px;
+    font-weight: 800;
+    border-radius: 14px;
+    border: none;
+    background: var(--accent2);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.2);
+    transition: transform 0.1s, background 0.2s;
+  }
+
+  .btn-cancel {
+    margin-top: 12px;
+    padding: 14px 28px;
+    font-size: 15px;
+    font-weight: 800;
+    border-radius: 14px;
+    border: 1px solid var(--input-border);
+    background: #fff;
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-cancel:hover { background: #f3f4f6; }
+  .btn-final:hover { background: var(--accent2-hover); }
+  .btn-final:active { transform: scale(0.99); }
+
+  /* Fee Summary Section */
+  .fee-summary {
+    margin-top: 15px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .fee-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--line);
+    font-size: 14px;
+  }
+
+  .fee-row:last-child { border-bottom: none; }
+
+  .fee-row.highlight-blue {
+    background: #eff6ff;
+  }
+
+  .fee-row.highlight-green {
+    background: #f0fdf4;
+  }
+
+  .fee-label {
+    font-weight: 700;
+    color: #374151;
+  }
+
+  .fee-label.blue { color: var(--accent); font-size: 15px; }
+  .fee-label.green { color: var(--accent2); }
+
+  .fee-value {
+    font-weight: 900;
+    font-size: 16px;
+    font-family: "SF Mono", monospace;
+  }
+
+  .fee-value.blue { color: var(--accent); }
+  .fee-value.green { color: var(--accent2); }
+  .fee-value.red { color: var(--danger); }
+
+  /* Discount section inside fee summary */
+  .discount-section {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .discount-header {
+    padding: 12px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--danger);
+    background: #fff8f8;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .btn-add-discount-inline {
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 6px;
+    border: 1px dashed var(--danger);
+    background: #fff;
+    color: var(--danger);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-add-discount-inline:hover { background: var(--dangerBg); }
+
+  .discount-item-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    border-bottom: 1px solid #fef2f2;
+    background: #fffafa;
+    font-size: 13px;
+  }
+
+  .discount-item-row:last-child { border-bottom: none; }
+
+  .disc-num {
+    font-weight: 900;
+    color: var(--danger);
+    min-width: 20px;
+  }
+
+  .disc-label {
+    font-weight: 700;
+    color: var(--danger);
+    flex: 1;
+  }
+
+  .disc-pct-badge {
+    padding: 3px 8px;
+    background: var(--dangerBg);
+    color: var(--danger);
+    border-radius: 6px;
+    font-weight: 800;
+    font-size: 12px;
+    font-family: monospace;
+  }
+
+  .disc-calc-val {
+    font-weight: 900;
+    color: var(--danger);
+    font-family: monospace;
+    min-width: 80px;
+    text-align: right;
+  }
+
+  /* Prorate info badge */
+  .prorate-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: #eff6ff;
+    color: var(--accent);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-left: 10px;
+  }
+
+  /* Action Buttons Row */
+  .action-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    justify-content: flex-start;
+  }
+
+  @media (max-width: 768px) {
+    .enroll-table td { display: block; width: 100% !important; }
+    .cell { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .cell .v { width: 100%; }
+    select, input { max-width: 100%; }
+  }
+</style>
+</head>
+
+<body>
+<div class="container" id="containerRoot">
+  <h1>Student Enrollment &amp; Tuition Plan</h1>
+
+  <h2>1. Enrollment</h2>
+
+  <div class="enroll-table">
+    <table>
+      <tbody>
+        <tr>
+          <td width="50%">
+            <div class="cell">
+              <div class="t">Academic Year</div>
+              <div class="v">
+                <select id="academicYear">
+                  <option value="AY2025-2026">AY2025–2026</option>
+                  <option value="SUMMER2026">Summer 2026</option>
+                  <option value="AY2026-2027" selected>AY2026–2027</option>
+                </select>
+              </div>
+            </div>
+          </td>
+          <td width="50%">
+            <div class="cell">
+              <div class="t">Grade Level</div>
+              <div class="v">
+                <select id="grade">
+                  <option value="SR Full-day">SR Full-day</option>
+                  <option value="EY1" selected>EY1</option>
+                  <option value="EY2">EY2</option>
+                  <option value="Y1">Y1</option>
+                  <option value="Y2">Y2</option>
+                  <option value="Y3">Y3</option>
+                </select>
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <div class="cell">
+              <div class="t">Student Type</div>
+              <div class="v radio-row">
+                <label><input type="radio" name="studentType" value="new" checked> New</label>
+                <label><input type="radio" name="studentType" value="returning"> Returning</label>
+                <label><input type="radio" name="studentType" value="current"> Current</label>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="cell">
+              <div class="t">Father's Name</div>
+              <div class="v" id="fatherCell">
+                <input type="text" id="fatherName" placeholder="Enter name">
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <div class="cell">
+              <div class="t">Student ID</div>
+              <div class="v" id="studentIdCell">
+                <span class="pill" id="studentId">---</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="cell">
+              <div class="t">Student Name</div>
+              <div class="v" id="studentNameCell">
+                <input type="text" id="studentName" placeholder="Enter name">
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <div class="cell">
+              <div class="t">Payment Plan</div>
+              <div class="v">
+                <select id="paymentPlan">
+                  <option value="One-Time">One-Time</option>
+                  <option value="Termly" selected>Termly</option>
+                  <option value="Monthly">Monthly</option>
+                </select>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="cell">
+              <div class="t">First Attendance Date</div>
+              <div class="v">
+                <input type="date" id="firstAttendance">
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <!-- First Calculation Date row -->
+        <tr id="calcDateRow">
+          <td></td>
+          <td>
+            <div class="cell">
+              <div class="t">First Calculation Date</div>
+              <div class="v">
+                <input type="date" id="firstCalcDate">
+              </div>
+            </div>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <h2>2. Calculating Payment</h2>
+
+  <div class="fee-summary" id="feeSummary">
+
+    <!-- Base Tuition (before prorate) -->
+    <div class="fee-row highlight-blue">
+      <div class="fee-label blue">Base Tuition Amount [before PRORATE]</div>
+      <div class="fee-value blue" id="baseTuitionDisplay">0</div>
+    </div>
+
+    <!-- Tuition after prorate -->
+    <div class="fee-row">
+      <div>
+        <div class="fee-label">Tuition Before Discount [after PRORATE]</div>
+        <div id="prorateInfoBadge" style="margin-top:4px; font-size:12px; color:var(--muted);"></div>
+      </div>
+      <div class="fee-value green" id="tuitionAfterProrate">0</div>
+    </div>
+
+    <!-- Discount Section -->
+    <div class="discount-section">
+      <div class="discount-header">
+        <span>DISCOUNT</span>
+        <button class="btn-add-discount-inline" type="button" onclick="addDiscount()">[+ Add Discount]</button>
+      </div>
+      <div id="discountItemsContainer"></div>
+    </div>
+
+    <!-- Final Tuition -->
+    <div class="fee-row highlight-green">
+      <div class="fee-label green" style="font-size:15px;">Final Tuition Amount After Discount</div>
+      <div class="fee-value green" id="finalTuitionDisplay">0</div>
+    </div>
+
+  </div>
+
+  <h2>3. Tuition Payment Plan</h2>
+
+  <div class="plan">
+    <table>
+      <thead>
+        <tr>
+          <th width="8%">No</th>
+          <th width="55%">Due Date</th>
+          <th width="37%">Amount</th>
+        </tr>
+      </thead>
+      <tbody id="planBody"></tbody>
+    </table>
+  </div>
+
+  <div class="action-row">
+    <button class="btn-cancel" type="button" onclick="cancelForm()">[Cancel]</button>
+    <button class="btn-final" type="button" onclick="submitForm()">[Submit]</button>
+  </div>
+
+</div>
+
+<script>
+  /* =====================================================
+     DOM
+     ===================================================== */
+  const academicYearEl   = document.getElementById("academicYear");
+  const gradeEl          = document.getElementById("grade");
+  const paymentPlanEl    = document.getElementById("paymentPlan");
+  const firstAttendanceEl= document.getElementById("firstAttendance");
+  const firstCalcDateEl  = document.getElementById("firstCalcDate");
+  const containerRoot    = document.getElementById("containerRoot");
+  const discountContainer= document.getElementById("discountItemsContainer");
+  const planBody         = document.getElementById("planBody");
+
+  // Set defaults — set value directly as string to avoid UTC timezone issues
+  firstAttendanceEl.value = "2026-06-15";
+  firstCalcDateEl.value   = "2026-06-15";
+
+  // Sync calc date when attendance date changes
+  firstAttendanceEl.addEventListener("change", () => {
+    firstCalcDateEl.value = firstAttendanceEl.value;
+    recalc();
+  });
+
+  firstCalcDateEl.addEventListener("change", recalc);
+
+  /* =====================================================
+     DISCOUNT STATE
+     ===================================================== */
+  let discounts = []; // Array of discount objects
+
+  /* =====================================================
+     PRICING DATA
+     ===================================================== */
+  function getBaseTuition() {
+    const year  = academicYearEl.value;
+    const grade = gradeEl.value;
+    const plan  = paymentPlanEl.value;
+
+    if (year === "SUMMER2026") return 850000;
+
+    if (year === "AY2025-2026") {
+      const isInstallment = plan !== "One-Time";
+      const prices = {
+        "SR Full-day": [3900000, 4200000],
+        "EY1":         [3900000, 4200000],
+        "EY2":         [3900000, 4200000],
+        "Y1":          [4200000, 4500000],
+        "Y2":          [4200000, 4500000],
+        "Y3":          [4200000, 4500000]
+      };
+      return prices[grade] ? prices[grade][isInstallment ? 1 : 0] : 0;
+    }
+
+    if (year === "AY2026-2027") {
+      const tbl = {
+        "SR Full-day": {"One-Time":4290000, "Termly":4490000, "Monthly":4890000},
+        "EY1":         {"One-Time":4290000, "Termly":4490000, "Monthly":4890000},
+        "EY2":         {"One-Time":4290000, "Termly":4490000, "Monthly":4890000},
+        "Y1":          {"One-Time":4690000, "Termly":4890000, "Monthly":5290000},
+        "Y2":          {"One-Time":4690000, "Termly":4890000, "Monthly":5290000},
+        "Y3":          {"One-Time":4690000, "Termly":4890000, "Monthly":5290000}
+      };
+      return (tbl[grade] && tbl[grade][plan]) ? tbl[grade][plan] : 0;
+    }
+
+    return 0;
+  }
+
+  /* =====================================================
+     PRORATE LOGIC
+     =====================================================
+     Academic year schedule (month indices, 0=Jan):
+       AY2025-2026: June(5) – March(2) next year  = 10 months
+         [Jun, Jul, Aug, Sep, Oct, Nov, Dec, Jan, Feb, Mar]
+       AY2026-2027: June(5) – March(2) next year  = 10 months  
+         [Jun, Jul, Aug, Sep, Oct, Nov, Dec, Jan, Feb, Mar]
+       SUMMER2026: No prorate (flat rate).
+
+     Prorate = (remainingMonths / totalMonths)
+     remainingMonths = count of school months >= firstCalcDate month (inclusive)
+     ===================================================== */
+
+  // Returns the ordered list of school months as {year, month(0-based)} objects
+  function getSchoolMonths() {
+    const year = academicYearEl.value;
+    if (year === "AY2025-2026") {
+      // June 2025 through March 2026
+      const months = [];
+      for (let m = 5; m <= 11; m++) months.push({y:2025, m});
+      for (let m = 0; m <= 2; m++)  months.push({y:2026, m});
+      return months; // 10 months
+    }
+    if (year === "AY2026-2027") {
+      const months = [];
+      for (let m = 5; m <= 11; m++) months.push({y:2026, m});
+      for (let m = 0; m <= 2; m++)  months.push({y:2027, m});
+      return months;
+    }
+    return []; // Summer: no prorate
+  }
+
+  function getProrateInfo() {
+    const year = academicYearEl.value;
+    if (year === "SUMMER2026") {
+      return { factor: 1, remaining: 1, total: 1, label: "" };
+    }
+
+    // Parse date from string "YYYY-MM-DD" directly to avoid UTC timezone offset bug
+    const dateStr = firstCalcDateEl.value;
+    if (!dateStr) return { factor: 1, remaining: 10, total: 10, label: "" };
+    const parts = dateStr.split("-");
+    const calcYear  = parseInt(parts[0], 10);
+    const calcMonth = parseInt(parts[1], 10) - 1; // 0-based
+
+    const schoolMonths = getSchoolMonths();
+    const total = schoolMonths.length;
+
+    // Count months from calcDate month onwards (inclusive)
+    const remaining = schoolMonths.filter(sm => {
+      if (sm.y > calcYear) return true;
+      if (sm.y === calcYear && sm.m >= calcMonth) return true;
+      return false;
+    }).length;
+
+    const factor = remaining / total;
+    const label = `${remaining}/${total} months remaining`;
+    return { factor, remaining, total, label };
+  }
+
+  /* =====================================================
+     TERMLY SPLIT LOGIC
+     =====================================================
+     Fixed term months (always the same regardless of start):
+       Term 1: months 1-3   (Jun, Jul, Aug)  = 3 months
+       Term 2: months 4-7   (Sep, Oct, Nov, Dec) = 4 months
+       Term 3: months 8-10  (Jan, Feb, Mar)  = 3 months
+
+     But prorate changes how many months the student actually attends.
+     The payment is split proportionally based on REMAINING months per term.
+
+     Example: Student starts Aug (month index 3 in school = Aug, remaining=8 months):
+       Remaining months in Term 1 after Aug: Aug = 1 month
+       Term 2 full: 4 months
+       Term 3 full: 3 months
+       Total remaining: 8 months
+
+       Term 1 payment = finalAmount * 1/8
+       Term 2 payment = finalAmount * 4/8
+       Term 3 payment = finalAmount * 3/8
+     ===================================================== */
+
+  // Returns term breakdown: how many months fall in each term for the student
+  function getTermMonthCounts() {
+    const year = academicYearEl.value;
+    if (year === "SUMMER2026") return null;
+
+    // Parse date string directly to avoid UTC timezone offset bug
+    const dateStr = firstCalcDateEl.value;
+    if (!dateStr) return null;
+    const parts = dateStr.split("-");
+    const calcYear  = parseInt(parts[0], 10);
+    const calcMonth = parseInt(parts[1], 10) - 1; // 0-based
+
+    const schoolMonths = getSchoolMonths();
+
+    // Term boundaries (index into schoolMonths array, 0-based):
+    // Term 1: indices 0,1,2 (Jun, Jul, Aug)
+    // Term 2: indices 3,4,5,6 (Sep, Oct, Nov, Dec)
+    // Term 3: indices 7,8,9 (Jan, Feb, Mar)
+    const termRanges = [
+      { term: 1, start: 0, end: 2 },
+      { term: 2, start: 3, end: 6 },
+      { term: 3, start: 7, end: 9 }
+    ];
+
+    // Filter to only remaining months (>= calc date month)
+    const remainingIndices = schoolMonths
+      .map((sm, i) => ({ sm, i }))
+      .filter(({ sm }) => {
+        if (sm.y > calcYear) return true;
+        if (sm.y === calcYear && sm.m >= calcMonth) return true;
+        return false;
+      })
+      .map(({ i }) => i);
+
+    return termRanges.map(tr => {
+      const count = remainingIndices.filter(i => i >= tr.start && i <= tr.end).length;
+      return { term: tr.term, count };
+    });
+  }
+
+  // Monthly split: which months remain
+  function getRemainingMonthsList() {
+    const dateStr = firstCalcDateEl.value;
+    if (!dateStr) return [];
+    const parts = dateStr.split("-");
+    const calcYear  = parseInt(parts[0], 10);
+    const calcMonth = parseInt(parts[1], 10) - 1; // 0-based
+    const schoolMonths = getSchoolMonths();
+    return schoolMonths.filter(sm => {
+      if (sm.y > calcYear) return true;
+      if (sm.y === calcYear && sm.m >= calcMonth) return true;
+      return false;
+    });
+  }
+
+  /* =====================================================
+     FORMAT
+     ===================================================== */
+  function fmtKs(n) {
+    const val = Math.max(0, Math.round(n));
+    return val.toLocaleString("en-US") + " ks";
+  }
+
+  function fmtKsNoSuffix(n) {
+    const val = Math.max(0, Math.round(n));
+    return val.toLocaleString("en-US");
+  }
+
+  function fmtDateLabel(ym) {
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    return `01 ${months[ym.m]} ${ym.y}`;
+  }
+
+  /* =====================================================
+     DISCOUNT MANAGEMENT
+     ===================================================== */
+  function addDiscount() {
+    const id = Date.now();
+    discounts.push({ id, type: "Percent %", desc: "", amt: "" });
+    renderDiscounts();
+    recalc();
+  }
+
+  function removeDiscount(id) {
+    discounts = discounts.filter(d => d.id !== id);
+    renderDiscounts();
+    recalc();
+  }
+
+  function renderDiscounts() {
+    discountContainer.innerHTML = "";
+    discounts.forEach((disc, idx) => {
+      const div = document.createElement("div");
+      div.className = "discount-item-row";
+      div.dataset.id = disc.id;
+
+      // Build type select
+      const typeOptions = ["Fixed","Percent %","Sibling %","Early Bird %","Referral"].map(t =>
+        `<option value="${t}" ${disc.type===t?"selected":""}>${t==="Fixed"?"Fixed Amount":t==="Referral"?"Referral (Fixed)":t}</option>`
+      ).join("");
+
+      // Build description / amount inputs
+      const amtPlaceholder = disc.type.includes("%") ? "%" : "Amount";
+      const descHtml = `<input type="text" class="disc-desc" placeholder="Description" value="${disc.desc||""}" 
+                          style="font-size:12px;padding:6px 8px;border:1px solid #e5e7eb;border-radius:6px;max-width:140px;"
+                          oninput="updateDisc(${disc.id},'desc',this.value)">`;
+      const amtHtml  = `<input type="number" class="disc-amt" placeholder="${amtPlaceholder}" value="${disc.amt||""}" 
+                          style="font-size:12px;padding:6px 8px;border:1px solid #e5e7eb;border-radius:6px;max-width:80px;"
+                          oninput="updateDisc(${disc.id},'amt',this.value)">`;
+
+      div.innerHTML = `
+        <span class="disc-num">${idx+1}</span>
+        <select class="disc-type" style="font-size:12px;padding:6px 8px;border:1px solid #e5e7eb;border-radius:6px;max-width:150px;font-weight:700;color:var(--danger);"
+          onchange="updateDisc(${disc.id},'type',this.value)">${typeOptions}</select>
+        ${descHtml}
+        ${disc.type.includes("%") ? `<span class="disc-pct-badge" id="pct_${disc.id}">${disc.amt||0}%</span>` : ""}
+        ${amtHtml}
+        <span class="disc-calc-val" id="calc_${disc.id}">0</span>
+        <button class="btn-remove" type="button" onclick="removeDiscount(${disc.id})">−</button>
+      `;
+      discountContainer.appendChild(div);
+    });
+  }
+
+  function updateDisc(id, field, value) {
+    const disc = discounts.find(d => d.id === id);
+    if (!disc) return;
+    disc[field] = value;
+    if (field === "type") {
+      disc.desc = "";
+      disc.amt  = "";
+      renderDiscounts();
+    }
+    recalc();
+  }
+
+  /* =====================================================
+     MAIN CALCULATION
+     ===================================================== */
+  function recalc() {
+    const baseTuition = getBaseTuition();
+    const prorate     = getProrateInfo();
+
+    // Tuition after prorate
+    const tuitionAfterProrate = Math.round(baseTuition * prorate.factor);
+
+    // Update display: base
+    document.getElementById("baseTuitionDisplay").textContent = fmtKsNoSuffix(baseTuition);
+    document.getElementById("tuitionAfterProrate").textContent = fmtKsNoSuffix(tuitionAfterProrate);
+
+    // Prorate badge
+    const badgeEl = document.getElementById("prorateInfoBadge");
+    if (prorate.factor < 1) {
+      badgeEl.innerHTML = `<span class="prorate-info">⟳ Prorated: ${prorate.remaining}/${prorate.total} months</span>`;
+    } else {
+      badgeEl.textContent = "";
+    }
+
+    // Calculate discounts — ALL from tuitionAfterProrate, no cascading
+    let fixedTotal = 0;
+    let pctTotal = 0;
+
+    discounts.forEach(disc => {
+      if (disc.type === "Fixed" || disc.type === "Referral") {
+        disc._calcAmt = Number(disc.amt || 0);
+        fixedTotal += disc._calcAmt;
+      } else if (disc.type.includes("%")) {
+        const pct = Number(disc.amt || 0);
+        disc._calcAmt = Math.round(tuitionAfterProrate * pct / 100);
+        pctTotal += disc._calcAmt;
+      }
+    });
+
+    const totalDiscount = fixedTotal + pctTotal;
+    const finalAmount   = Math.max(0, tuitionAfterProrate - totalDiscount);
+
+    // Update discount calc displays
+    discounts.forEach(disc => {
+      const el = document.getElementById(`calc_${disc.id}`);
+      if (el) el.textContent = `-${fmtKsNoSuffix(disc._calcAmt||0)}`;
+      // Update % badge
+      const pctEl = document.getElementById(`pct_${disc.id}`);
+      if (pctEl) pctEl.textContent = `${disc.amt||0}%`;
+    });
+
+    // Discount label names in display
+    discounts.forEach((disc, idx) => {
+      // Update the label display if there's a custom desc
+    });
+
+    // Final display
+    document.getElementById("finalTuitionDisplay").textContent = fmtKsNoSuffix(finalAmount);
+
+    // Render payment plan
+    renderPaymentSchedule(finalAmount, prorate);
+  }
+
+  /* =====================================================
+     PAYMENT SCHEDULE
+     ===================================================== */
+  function renderPaymentSchedule(finalAmount, prorate) {
+    planBody.innerHTML = "";
+    const plan = paymentPlanEl.value;
+    const year = academicYearEl.value;
+
+    if (year === "SUMMER2026" || plan === "One-Time") {
+      addPlanRow(1, "Registration Date", finalAmount, "");
+      addTotalRow(finalAmount);
+      return;
+    }
+
+    if (plan === "Termly") {
+      renderTermly(finalAmount, prorate);
+      return;
+    }
+
+    if (plan === "Monthly") {
+      renderMonthly(finalAmount, prorate);
+      return;
+    }
+  }
+
+  function floorK(n) { return Math.floor(n / 1000) * 1000; }
+
+  function renderTermly(finalAmount, prorate) {
+    const termCounts = getTermMonthCounts();
+    if (!termCounts) { addPlanRow(1, "Full Payment", finalAmount, ""); addTotalRow(finalAmount); return; }
+
+    const totalRemaining = termCounts.reduce((s, t) => s + t.count, 0);
+    if (totalRemaining === 0) { addPlanRow(1, "Full Payment", finalAmount, ""); addTotalRow(finalAmount); return; }
+
+    const year = academicYearEl.value;
+    const termDates = year === "AY2025-2026"
+      ? ["Registration Date", "01 Sep 2025", "01 Jan 2026"]
+      : ["Registration Date", "01 Sep 2026", "01 Jan 2027"];
+
+    // Build slots for terms with months
+    const slots = termCounts
+      .map((tc, i) => ({ ...tc, dateLabel: termDates[i] }))
+      .filter(tc => tc.count > 0);
+
+    // Payments 2+ (index 1+) floor to nearest 1000; first = finalAmount - sum of rest
+    let sumOthers = 0;
+    slots.forEach((s, i) => {
+      if (i === 0) { s.amt = null; }
+      else { s.amt = floorK(finalAmount * s.count / totalRemaining); sumOthers += s.amt; }
+    });
+    slots[0].amt = finalAmount - sumOthers;
+
+    slots.forEach((s, rowNum) => {
+      const note = `${fmtKsNoSuffix(finalAmount)} ÷ ${totalRemaining} × ${s.count}`;
+      addPlanRow(rowNum + 1, s.dateLabel, s.amt, note);
+    });
+
+    addTotalRow(finalAmount);
+  }
+
+  function renderMonthly(finalAmount, prorate) {
+    const remaining = getRemainingMonthsList();
+    if (remaining.length === 0) { addPlanRow(1, "Full Payment", finalAmount, ""); addTotalRow(finalAmount); return; }
+
+    const n = remaining.length;
+    // Payments 2+ floored to nearest 1000; first = finalAmount - sum of rest
+    const roundedAmt = floorK(finalAmount / n);
+    const firstAmt   = finalAmount - roundedAmt * (n - 1);
+
+    remaining.forEach((ym, i) => {
+      const amt   = i === 0 ? firstAmt : roundedAmt;
+      const label = i === 0 ? "Registration Date" : fmtDateLabel(ym);
+      addPlanRow(i + 1, label, amt, "");
+    });
+
+    addTotalRow(finalAmount);
+  }
+
+  function addPlanRow(no, dateDesc, amount, note) {
+    const tr = document.createElement("tr");
+    const noteHtml = note ? `<br><small style="color:var(--muted);font-size:11px;">${note}</small>` : "";
+    tr.innerHTML = `
+      <td>${no}</td>
+      <td>${dateDesc}${noteHtml}</td>
+      <td>${fmtKs(amount)}</td>
+    `;
+    planBody.appendChild(tr);
+  }
+
+  function addTotalRow(total) {
+    const tr = document.createElement("tr");
+    tr.className = "total-row";
+    tr.innerHTML = `
+      <td colspan="2" style="text-align:left; font-weight:900;">TOTAL</td>
+      <td>${fmtKs(total)}</td>
+    `;
+    planBody.appendChild(tr);
+  }
+
+  /* =====================================================
+     STUDENT TYPE LOGIC
+     ===================================================== */
+  const CURRENT_STUDENT_DIRECTORY = [
+    { id:"PR23001", name:"Aung Aung",     father:"U Ba Maung" },
+    { id:"PR23002", name:"Bo Bo",         father:"U Hla Tun" },
+    { id:"PR23003", name:"Chit Thu",      father:"U Kyaw Swar" },
+    { id:"PR24040", name:"Kyaw Kyaw",     father:"U Mya" },
+    { id:"PR25010", name:"Ye Lin",        father:"U Tun Tun" },
+    { id:"PR25230", name:"Moe Set",       father:"U Aung Naing" },
+    { id:"PR25231", name:"Wai Yan",       father:"U Ko Ko" },
+    { id:"PR25232", name:"Yoon Nadi",     father:"U Zaw Zaw" },
+    { id:"PR25233", name:"Hein Htet",     father:"U Min Min" },
+    { id:"PR25234", name:"Eaindra",       father:"U Thein Lwin" },
+    { id:"PR25235", name:"Myat Noe",      father:"U Aung Kyaw" }
+  ];
+
+  function handleStudentTypeChange() {
+    const type = document.querySelector('input[name="studentType"]:checked').value;
+    const sId   = document.getElementById("studentIdCell");
+    const sName = document.getElementById("studentNameCell");
+    const fCell = document.getElementById("fatherCell");
+
+    if (type === "current") {
+      sId.innerHTML = `<input type="text" id="studentIdSearch" placeholder="Search ID..." style="max-width:200px;" onkeydown="if(event.key==='Enter')searchStudent()">`;
+      sName.innerHTML = `
+        <div class="inline-search">
+          <input type="text" id="studentNameSearch" placeholder="Search Name..." onkeydown="if(event.key==='Enter')searchStudent()">
+          <button class="btn-search" type="button" onclick="searchStudent()">Search</button>
+        </div>`;
+      fCell.innerHTML = `<span class="pill" id="fatherDisplay" style="background:#f3f4f6;color:#111;">—</span>`;
+    } else {
+      const yPrefix = academicYearEl.value.includes("2025") ? "25" : "26";
+      const rnd = Math.floor(100 + Math.random() * 900);
+      sId.innerHTML   = `<span class="pill" id="studentId">PR${yPrefix}${rnd}</span>`;
+      sName.innerHTML = `<input type="text" id="studentName" placeholder="Enter student name">`;
+      fCell.innerHTML = `<input type="text" id="fatherName" placeholder="Enter father's name">`;
+    }
+  }
+
+  function searchStudent() {
+    const idF   = document.getElementById("studentIdSearch");
+    const nameF = document.getElementById("studentNameSearch");
+    const fatEl = document.getElementById("fatherDisplay");
+    const idQ   = idF?.value.trim().toLowerCase() || "";
+    const nameQ = nameF?.value.trim().toLowerCase() || "";
+    let found = null;
+    if (idQ)   found = CURRENT_STUDENT_DIRECTORY.find(s => s.id.toLowerCase() === idQ);
+    if (!found && nameQ) found = CURRENT_STUDENT_DIRECTORY.find(s => s.name.toLowerCase().includes(nameQ));
+    if (found) {
+      if(idF)   idF.value   = found.id;
+      if(nameF) nameF.value = found.name;
+      if(fatEl) { fatEl.textContent = found.father; fatEl.style.background="#eef2ff"; fatEl.style.color="#3730a3"; }
+    } else {
+      if(fatEl) { fatEl.textContent = "Not Found"; fatEl.style.background="#fee2e2"; fatEl.style.color="#b91c1c"; }
+    }
+  }
+
+  function cancelForm() {
+    if (confirm("Cancel enrollment? All data will be cleared.")) location.reload();
+  }
+
+  function submitForm() {
+    alert("Enrollment data validated.\nProceeding to contract generation...");
+  }
+
+  /* =====================================================
+     EVENT LISTENERS
+     ===================================================== */
+  academicYearEl.addEventListener("change", recalc);
+  gradeEl.addEventListener("change", recalc);
+  paymentPlanEl.addEventListener("change", recalc);
+
+  document.querySelectorAll('input[name="studentType"]').forEach(r => {
+    r.addEventListener("change", handleStudentTypeChange);
+  });
+
+  // Initialize
+  handleStudentTypeChange();
+  addDiscount();
+  recalc();
+
+</script>
+</body>
+</html>
