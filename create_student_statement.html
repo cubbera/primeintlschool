@@ -458,7 +458,7 @@
 
 <body>
 <div class="container" id="containerRoot">
-  <h1>Creating Student Enrollment &amp; Tuition Plan v3.2</h1>
+  <h1>Creating Student Enrollment &amp; Tuition Plan v3.3</h1>
 
   <h2>1. Enrollment</h2>
 
@@ -471,8 +471,8 @@
               <div class="t">Academic Year</div>
               <div class="v">
                 <select id="academicYear">
-                  <option value="AY2025-2026">AY2025–2026</option>
-                  <option value="SUMMER2026">Summer 2026</option>
+                  <!--<option value="AY2025-2026">AY2025–2026</option>-->
+                  <!--<option value="SUMMER2026">Summer 2026</option>-->
                   <option value="AY2026-2027" selected>AY2026-2027</option>
                 </select>
               </div>
@@ -480,7 +480,7 @@
           </td>
           <td width="50%">
             <div class="cell">
-              <div class="t">Grade Level</div>
+              <div class="t">Year Level</div>
               <div class="v">
                 <select id="grade">
                   <option value="SR" selected>SR</option>
@@ -553,7 +553,7 @@
           </td>
           <td>
             <div class="cell">
-              <div class="t">First Attendance Date</div>
+              <div class="t">Payment Plan Creation Date</div>
               <div class="v">
                 <input type="date" id="firstAttendance">
               </div>
@@ -1166,11 +1166,6 @@ function clearForm() {
   const id   = document.getElementById("studentId").value || "ID";
   const fileName = `AY26-${name}-${id}.pdf`;
 
-  const printWindow = window.open("", "_blank");
-
-  // =========================
-  // EXTRACT VALUES
-  // =========================
   const academicYear = academicYearEl.value;
   const grade        = gradeEl.value;
   const plan         = paymentPlanEl.value;
@@ -1179,27 +1174,27 @@ function clearForm() {
   const prorate      = document.getElementById("tuitionAfterProrate").innerText;
   const finalTuition = document.getElementById("finalTuitionDisplay").innerText;
 
-  // =========================
-  // DISCOUNTS
-  // =========================
-  let discountHTML = "";
+  // ======================
+  // DISCOUNT TABLE
+  // ======================
+  let discountRows = "";
   discounts.forEach((d, i) => {
-    discountHTML += `
+    discountRows += `
       <tr>
         <td>${i + 1}</td>
         <td>${d.type}</td>
         <td>${d.desc || "-"}</td>
-        <td style="text-align:right;">-${fmtKsNoSuffix(d._calcAmt || 0)}</td>
+        <td class="right red">-${fmtKsNoSuffix(d._calcAmt || 0)}</td>
       </tr>`;
   });
 
-  if (!discountHTML) {
-    discountHTML = `<tr><td colspan="4" style="text-align:center;">No Discounts</td></tr>`;
+  if (!discountRows) {
+    discountRows = `<tr><td colspan="4" class="center">No Discounts</td></tr>`;
   }
 
-  // =========================
-  // PAYMENT PLAN (NO NOTES)
-  // =========================
+  // ======================
+  // PAYMENT PLAN
+  // ======================
   let planRows = "";
   document.querySelectorAll("#planBody tr").forEach(row => {
     const cells = row.querySelectorAll("td");
@@ -1208,177 +1203,193 @@ function clearForm() {
         <tr>
           <td>${cells[0].innerText}</td>
           <td>${cells[1].innerText.split("\n")[0]}</td>
-          <td style="text-align:right;">${cells[2].innerText}</td>
+          <td class="right">${cells[2].innerText}</td>
         </tr>`;
     }
   });
 
-  // =========================
-  // PRINT TEMPLATE
-  // =========================
-  printWindow.document.write(`
-    <html>
-    <head>
-      <title>${fileName}</title>
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          padding: 40px;
-          color: #111;
-        }
+  // ======================
+  // HTML CONTENT
+  // ======================
+  const html = `
+  <html>
+  <head>
+    <title>${fileName}</title>
+    <style>
 
-        h1 {
-          text-align: center;
-          margin-bottom: 5px;
-          font-size: 22px;
-          letter-spacing: 1px;
-        }
+      @page {
+        size: A4;
+        margin: 20mm;
+      }
 
-        h2 {
-          margin-top: 30px;
-          font-size: 16px;
-          border-bottom: 2px solid #000;
-          padding-bottom: 5px;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        width: 210mm;
+        margin: 0 auto;
+        color: #111;
+      }
 
-        .info-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 10px;
-          margin-top: 15px;
-        }
+      h1 {
+        text-align: center;
+        font-size: 20px;
+        margin-bottom: 5px;
+      }
 
-        .info-box {
-          border: 1px solid #000;
-          padding: 8px;
-          font-size: 13px;
-        }
+      h2 {
+        font-size: 15px;
+        margin-top: 25px;
+        border-bottom: 1px solid #000;
+        padding-bottom: 5px;
+      }
 
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-top: 15px;
-        }
+      .row {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 8px;
+        font-size: 13px;
+      }
 
-        th, td {
-          border: 1px solid #000;
-          padding: 8px;
-          font-size: 13px;
-        }
+      .label { font-weight: bold; }
+      .right { text-align: right; }
+      .center { text-align: center; }
 
-        th {
-          background: #f2f2f2;
-        }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        font-size: 13px;
+      }
 
-        .right {
-          text-align: right;
-        }
+      th {
+        border-bottom: 1px solid #000;
+        text-align: left;
+        padding: 6px;
+      }
 
-        .highlight {
-          background: #f9f9f9;
-          font-weight: bold;
-        }
+      td {
+        padding: 6px;
+        border-bottom: 0.5px solid #ccc;
+      }
 
-        .total-box {
-          margin-top: 20px;
-          padding: 12px;
-          border: 2px solid #000;
-          font-weight: bold;
-          font-size: 16px;
-          text-align: right;
-        }
+      .red { color: #b91c1c; font-weight: bold; }
 
-        .footer {
-          margin-top: 60px;
-          display: flex;
-          justify-content: space-between;
-        }
+      .total {
+        margin-top: 15px;
+        text-align: right;
+        font-size: 16px;
+        font-weight: bold;
+      }
 
-        .signature {
-          width: 40%;
-          text-align: center;
-        }
+      .signature-area {
+        margin-top: 80px;
+        display: flex;
+        justify-content: space-between;
+      }
 
-      </style>
-    </head>
+      .sig {
+        width: 40%;
+        text-align: center;
+      }
 
-    <body>
+      .line {
+        margin-top: 50px;
+        border-top: 1px solid #000;
+      }
 
-      <h1>PRIME INTERNATIONAL SCHOOL</h1>
-      <h1>STUDENT TUITION STATEMENT</h1>
+    </style>
+  </head>
 
-      <h2>1. Enrollment</h2>
-      <div class="info-grid">
-        <div class="info-box"><b>Student Name:</b> ${name}</div>
-        <div class="info-box"><b>Student ID:</b> ${id}</div>
-        <div class="info-box"><b>Academic Year:</b> ${academicYear}</div>
-        <div class="info-box"><b>Grade:</b> ${grade}</div>
-        <div class="info-box"><b>Payment Plan:</b> ${plan}</div>
+  <body>
+
+    <h1>PRIME INTERNATIONAL SCHOOL</h1>
+    <h1>STUDENT TUITION STATEMENT</h1>
+
+    <!-- 1. ENROLLMENT -->
+    <h2>1. Enrollment</h2>
+        <div class="row"><span class="label">Date:</span><span>${firstAttendance}</span></div>
+    <div class="row"><span class="label">Student Name:</span><span>${name}</span></div>
+    <div class="row"><span class="label">Student ID:</span><span>${id}</span></div>
+    <div class="row"><span class="label">Academic Year:</span><span>${academicYear}</span></div>
+    <div class="row"><span class="label">Class:</span><span>${grade}</span></div>
+    <div class="row"><span class="label">Payment Plan:</span><span>${plan}</span></div>
+
+    <!-- 2. CALCULATION -->
+    <h2>2. Calculating Payment</h2>
+    <table>
+      <tr>
+        <td>Base Tuition</td>
+        <td class="right">${baseTuition}</td>
+      </tr>
+      <tr>
+        <td>After Prorate</td>
+        <td class="right">${prorate}</td>
+      </tr>
+    </table>
+
+    <!-- DISCOUNT -->
+    <h3 style="margin-top:20px;">Discount</h3>
+    <table>
+      <tr>
+        <th>No</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th class="right">Amount</th>
+      </tr>
+      ${discountRows}
+    </table>
+
+    <table>
+      <tr>
+        <td><b>Final Tuition</b></td>
+        <td class="right"><b>${finalTuition}</b></td>
+      </tr>
+    </table>
+
+    <!-- 3. PAYMENT PLAN -->
+    <h2>3. Tuition Payment Plan</h2>
+    <table>
+      <tr>
+        <th>No</th>
+        <th>Due Date</th>
+        <th class="right">Amount</th>
+      </tr>
+      ${planRows}
+    </table>
+
+    <div class="total">
+      TOTAL TUITION FEE: ${finalTuition}
+    </div>
+
+    <!-- SIGNATURE -->
+    <div class="signature-area">
+      <div class="sig">
+        Parent Name & Signature
+        <div class="line"></div>
       </div>
-
-      <h2>2. Calculating Payment</h2>
-      <table>
-        <tr>
-          <th>Description</th>
-          <th class="right">Amount</th>
-        </tr>
-        <tr>
-          <td>Base Tuition (Before Prorate)</td>
-          <td class="right">${baseTuition}</td>
-        </tr>
-        <tr>
-          <td>Tuition After Prorate</td>
-          <td class="right">${prorate}</td>
-        </tr>
-      </table>
-
-      <h3 style="margin-top:20px;">Discounts</h3>
-      <table>
-        <tr>
-          <th>No</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th class="right">Amount</th>
-        </tr>
-        ${discountHTML}
-      </table>
-
-      <table style="margin-top:15px;">
-        <tr class="highlight">
-          <td>Final Tuition After Discount</td>
-          <td class="right">${finalTuition}</td>
-        </tr>
-      </table>
-
-      <h2>3. Tuition Payment Plan</h2>
-      <table>
-        <tr>
-          <th>No</th>
-          <th>Due Date</th>
-          <th class="right">Amount</th>
-        </tr>
-        ${planRows}
-      </table>
-
-      <div class="total-box">
-        TOTAL TUITION FEE: ${finalTuition}
+      <div class="sig">
+        Account Name & Signature
+        <div class="line"></div>
       </div>
+    </div>
 
-      <div class="footer">
-        <div class="signature">
-          Parent Name & Signature<br><br><br><br><br><br>
-          ________________________
-        </div>
-        <div class="signature">
-          Account Name & Signature<br><br><br><br><br><br>
-          ________________________
-        </div>
-      </div>
+  </body>
+  </html>
+  `;
 
-    </body>
-    </html>
-  `);
+  // ======================
+  // SAVE AS PDF FIRST
+  // ======================
+  const blob = new Blob([html], { type: "text/html" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = fileName;
+  link.click();
 
+  // ======================
+  // THEN PRINT
+  // ======================
+  const printWindow = window.open("", "_blank");
+  printWindow.document.write(html);
   printWindow.document.close();
 
   printWindow.onload = () => {
