@@ -458,88 +458,74 @@
 
 
 <body>
-<div class="container" id="containerRoot">
-  <h1>Student Enrollment &amp; Tuition Plan V3</h1>
+<div class="container">
 
-  <h2>1. Enrollment</h2>
+<h1>Student Enrollment & Tuition Plan</h1>
 
-  <div class="enroll-table">
-    <table>
-      <tbody>
-        <tr>
-          <td width="50%">
-            <div class="cell">
-              <div class="t">Academic Year</div>
-              <div class="v">
-                <select id="academicYear">
-                  <option value="AY2025-2026">AY2025–2026</option>
-                  <option value="SUMMER2026">Summer 2026</option>
-                  <option value="AY2026-2027" selected>AY2026–2027</option>
-                </select>
-              </div>
-            </div>
-          </td>
-          <td width="50%">
-            <div class="cell">
-              <div class="t">Grade Level</div>
-              <div class="v">
-                <select id="grade">
-                  <option value="SR Full-day">SR Full-day</option>
-                  <option value="EY1" selected>EY1</option>
-                  <option value="EY2">EY2</option>
-                  <option value="Y1">Y1</option>
-                  <option value="Y2">Y2</option>
-                  <option value="Y3">Y3</option>
-                </select>
-              </div>
-            </div>
-          </td>
-        </tr>
+<h2>1. Enrollment</h2>
 
-        <!-- ❌ REMOVED Student Type + Father -->
+<table>
+<tr>
+<td>
+<div class="cell">
+<span>Academic Year</span>
+<select id="academicYear">
+<option>AY2025–2026</option>
+<option>Summer 2026</option>
+<option selected>AY2026–2027</option>
+</select>
+</div>
+</td>
 
-        <tr>
-          <td>
-            <div class="cell">
-              <div class="t">Student ID</div>
-              <div class="v">
-                <input type="text" id="studentId" placeholder="Enter Student ID">
-              </div>
-            </div>
-          </td>
-          <td>
-            <div class="cell">
-              <div class="t">Student Name</div>
-              <div class="v">
-                <input type="text" id="studentName" placeholder="Enter name">
-              </div>
-            </div>
-          </td>
-        </tr>
+<td>
+<div class="cell">
+<span>Grade</span>
+<select id="grade">
+<option selected>EY1</option>
+<option>EY2</option>
+<option>Y1</option>
+</select>
+</div>
+</td>
+</tr>
 
-        <tr>
-          <td>
-            <div class="cell">
-              <div class="t">Payment Plan</div>
-              <div class="v">
-                <select id="paymentPlan">
-                  <option value="One-Time">One-Time</option>
-                  <option value="Termly" selected>Termly</option>
-                  <option value="Monthly">Monthly</option>
-                </select>
-              </div>
-            </div>
-          </td>
-          <td>
-            <div class="cell">
-              <div class="t">First Attendance Date</div>
-              <div class="v">
-                <input type="date" id="firstAttendance">
-              </div>
-            </div>
-          </td>
-        </tr>
+<tr>
+<td>
+<div class="cell">
+<span>Student ID</span>
+<input type="text" id="studentIdInput" placeholder="Enter Student ID">
+</div>
+</td>
 
+<td>
+<div class="cell">
+<span>Student Name</span>
+<input type="text" id="studentName" placeholder="Enter name">
+</div>
+</td>
+</tr>
+
+<tr>
+<td>
+<div class="cell">
+<span>Payment Plan</span>
+<select id="paymentPlan">
+<option>One-Time</option>
+<option selected>Termly</option>
+<option>Monthly</option>
+</select>
+</div>
+</td>
+
+<td>
+<div class="cell">
+<span>First Attendance</span>
+<input type="date" id="firstAttendance" value="2026-06-15">
+</div>
+</td>
+</tr>
+
+        <!-- First Calculation Date row -->
         <tr id="calcDateRow">
           <td></td>
           <td>
@@ -555,9 +541,6 @@
       </tbody>
     </table>
   </div>
-
-  <!-- ===== ALL YOUR ORIGINAL CALCULATION + PLAN SECTIONS REMAIN UNCHANGED ===== -->
-
 
   <h2>2. Calculating Payment</h2>
 
@@ -611,8 +594,8 @@
   </div>
 
   <div class="action-row">
-    <button class="btn-cancel" type="button" onclick="clearForm()">[Clear]</button>
-    <button class="btn-final" type="button" onclick="saveAndPrint()">[Save and Print]</button>
+    <button class="btn-cancel" type="button" onclick="cancelForm()">[Cancel]</button>
+    <button class="btn-final" type="button" onclick="submitForm()">[Submit]</button>
   </div>
 
 </div>
@@ -1147,56 +1130,82 @@
   recalc();
 
   
-/* Clear */
-function clearForm() {
-  location.reload();
-}
+/* ================= CLEAR ================= */
+function clearForm(){
+  if(!confirm("Clear all data?")) return;
 
-/* Save + Print */
-function saveAndPrint() {
-  const studentName = document.getElementById("studentName").value || "Student";
-  const studentId   = document.getElementById("studentId").value || "ID";
-
-  const fileName = `AY26-${studentName}-${studentId}.pdf`;
-
-  const clone = document.getElementById("containerRoot").cloneNode(true);
-
-  // Remove calculation notes
-  clone.querySelectorAll("small").forEach(el => el.remove());
-
-  // Remove buttons
-  const actionRow = clone.querySelector(".action-row");
-  if (actionRow) actionRow.remove();
-
-  // Convert inputs to text
-  clone.querySelectorAll("input, select").forEach(el => {
-    const span = document.createElement("div");
-    span.textContent = el.value;
-    span.style.fontWeight = "600";
-    el.parentNode.replaceChild(span, el);
+  document.querySelectorAll("input").forEach(i=>{
+    if(i.type!=="date") i.value="";
   });
 
-  // Add signatures
-  const sig = document.createElement("div");
-  sig.style.marginTop = "60px";
-  sig.innerHTML = `
-    <div style="display:flex; justify-content:space-between;">
-      <div>_________________________<br>Parent Name and Signature</div>
-      <div>_________________________<br>Account Name and Signature</div>
-    </div>
-  `;
-  clone.appendChild(sig);
-
-  html2pdf().set({
-    margin: 0.5,
-    filename: fileName,
-    html2canvas: { scale: 2 },
-    jsPDF: { unit: 'in', format: 'a4' }
-  }).from(clone).save().then(() => {
-    window.print();
-  });
+  document.getElementById("academicYear").value="AY2026–2027";
+  document.getElementById("grade").value="EY1";
+  document.getElementById("paymentPlan").value="Termly";
+  document.getElementById("firstAttendance").value="2026-06-15";
 }
+
+/* ================= PRINT ================= */
+function saveAndPrint(){
+
+  const name = document.getElementById("studentName").value || "Student";
+  const id   = document.getElementById("studentIdInput").value || "ID";
+
+  const fileName = `AY26-${name}-${id}.pdf`;
+
+  const rows = document.querySelectorAll("#planBody tr");
+
+  let planHTML="";
+  rows.forEach(r=>{
+    const tds=r.querySelectorAll("td");
+    if(tds.length===3){
+      planHTML+=`
+        <tr>
+          <td>${tds[0].innerText}</td>
+          <td>${tds[1].childNodes[0].nodeValue}</td>
+          <td>${tds[2].innerText}</td>
+        </tr>`;
+    }
+  });
+
+  const win=window.open("");
+
+  win.document.write(`
+  <html>
+  <head>
+  <title>${fileName}</title>
+  <style>
+  body{font-family:Arial;padding:40px}
+  h1{text-align:center}
+  table{width:100%;border-collapse:collapse;margin-top:20px}
+  td,th{border:1px solid #000;padding:10px}
+  .sign{margin-top:60px;display:flex;justify-content:space-between}
+  </style>
+  </head>
+  <body>
+
+  <h1>Student Statement</h1>
+
+  <p><b>Name:</b> ${name}</p>
+  <p><b>ID:</b> ${id}</p>
+
+  <table>
+  <tr><th>No</th><th>Due Date</th><th>Amount</th></tr>
+  ${planHTML}
+  </table>
+
+  <div class="sign">
+    <div>____________________<br>Parent Name & Signature</div>
+    <div>____________________<br>Account Name & Signature</div>
+  </div>
+
+  </body>
+  </html>
+  `);
+
+  win.document.close();
+  setTimeout(()=>win.print(),500);
+}
+  
 </script>
-
 </body>
 </html>
