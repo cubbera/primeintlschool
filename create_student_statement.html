@@ -5,18 +5,49 @@
 <title>Student Enrollment & Tuition Plan System</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<!-- DOCX LIB -->
+<!-- DOCX -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
+<!-- PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <style>
-/* (UNCHANGED CSS — kept exactly same) */
+/* KEEP ORIGINAL CSS */
+
+/* NEW: Logo + Signature */
+.logo {
+  max-width: 180px;
+  margin-bottom: 10px;
+}
+
+.signature-section {
+  margin-top: 40px;
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.signature-box {
+  width: 45%;
+}
+
+.signature-line {
+  border-top: 1px solid #000;
+  margin-top: 40px;
+  padding-top: 5px;
+  font-size: 13px;
+}
 </style>
 
 </head>
 
 <body>
 <div class="container" id="containerRoot">
+
+  <!-- LOGO -->
+  <img src="https://via.placeholder.com/180x60?text=School+Logo" class="logo" id="logoImg">
+
   <h1>Student Enrollment &amp; Tuition Plan</h1>
 
   <h2>1. Enrollment</h2>
@@ -25,7 +56,6 @@
     <table>
       <tbody>
 
-        <!-- ROW 1 -->
         <tr>
           <td width="50%">
             <div class="cell">
@@ -57,9 +87,6 @@
           </td>
         </tr>
 
-        <!-- REMOVED Student Type & Father -->
-
-        <!-- UPDATED ROW -->
         <tr>
           <td>
             <div class="cell">
@@ -80,7 +107,6 @@
           </td>
         </tr>
 
-        <!-- REST UNCHANGED -->
         <tr>
           <td>
             <div class="cell">
@@ -105,7 +131,7 @@
           </td>
         </tr>
 
-        <tr id="calcDateRow">
+        <tr>
           <td></td>
           <td>
             <div class="cell">
@@ -120,8 +146,6 @@
       </tbody>
     </table>
   </div>
-
-  <!-- KEEP ALL ORIGINAL SECTIONS (UNCHANGED) -->
 
   <h2>2. Calculating Payment</h2>
   <div class="fee-summary" id="feeSummary"></div>
@@ -140,7 +164,16 @@
     </table>
   </div>
 
-  <!-- UPDATED BUTTONS -->
+  <!-- SIGNATURE SECTION -->
+  <div class="signature-section">
+    <div class="signature-box">
+      <div class="signature-line">Parent Name & Signature</div>
+    </div>
+    <div class="signature-box">
+      <div class="signature-line">Accountant Name & Signature</div>
+    </div>
+  </div>
+
   <div class="action-row">
     <button class="btn-cancel" onclick="clearForm()">[Clear]</button>
     <button class="btn-final" onclick="saveAndPrint()">[Save and Print]</button>
@@ -150,12 +183,9 @@
 
 <script>
 
-/* KEEP ALL ORIGINAL JS ABOVE (unchanged) */
+/* KEEP YOUR ORIGINAL JS ABOVE */
 
-
-/* =========================================
-   CLEAR FUNCTION (NEW)
-========================================= */
+/* CLEAR */
 function clearForm() {
   document.querySelectorAll("input").forEach(i => i.value = "");
   document.querySelectorAll("select").forEach(s => s.selectedIndex = 0);
@@ -170,15 +200,14 @@ function clearForm() {
 }
 
 
-/* =========================================
-   SAVE + PRINT (NEW)
-========================================= */
+/* SAVE + PRINT + PDF */
 async function saveAndPrint() {
+
+  const { jsPDF } = window.jspdf;
 
   const studentName = document.getElementById("studentName").value || "Student";
   const studentId   = document.getElementById("studentId").value || "ID";
   const year        = document.getElementById("academicYear").value;
-
   const finalAmount = document.getElementById("finalTuitionDisplay").textContent;
 
   const rows = Array.from(document.querySelectorAll("#planBody tr"))
@@ -188,30 +217,21 @@ async function saveAndPrint() {
       return `${cols[0].innerText}. ${cols[1].childNodes[0].nodeValue.trim()} — ${cols[2].innerText}`;
     });
 
+  /* DOCX */
   const doc = new docx.Document({
     sections: [{
       children: [
-
-        new docx.Paragraph({
-          text: "STUDENT TUITION STATEMENT",
-          heading: docx.HeadingLevel.HEADING_1
-        }),
-
-        new docx.Paragraph(""),
+        new docx.Paragraph("STUDENT TUITION STATEMENT"),
         new docx.Paragraph(`Academic Year: ${year}`),
         new docx.Paragraph(`Student Name: ${studentName}`),
         new docx.Paragraph(`Student ID: ${studentId}`),
-
         new docx.Paragraph(""),
-        new docx.Paragraph("Tuition Payment Schedule:"),
-
         ...rows.map(r => new docx.Paragraph(r)),
-
         new docx.Paragraph(""),
-        new docx.Paragraph({
-          text: `Total Tuition: ${finalAmount}`,
-          bold: true
-        })
+        new docx.Paragraph(`Total Tuition: ${finalAmount}`),
+        new docx.Paragraph(""),
+        new docx.Paragraph("Parent Signature: _______________________"),
+        new docx.Paragraph("Accountant Signature: ____________________")
       ]
     }]
   });
@@ -219,28 +239,53 @@ async function saveAndPrint() {
   const blob = await docx.Packer.toBlob(doc);
   saveAs(blob, `AY26-${studentName}-${studentId}.docx`);
 
-  // PRINT CLEAN VIEW
+  /* PDF */
+  const pdf = new jsPDF();
+  let y = 20;
+
+  pdf.setFontSize(14);
+  pdf.text("STUDENT TUITION STATEMENT", 20, y); y += 10;
+
+  pdf.setFontSize(11);
+  pdf.text(`Academic Year: ${year}`, 20, y); y+=7;
+  pdf.text(`Student Name: ${studentName}`, 20, y); y+=7;
+  pdf.text(`Student ID: ${studentId}`, 20, y); y+=10;
+
+  rows.forEach(r => {
+    pdf.text(r, 20, y);
+    y+=7;
+  });
+
+  y+=5;
+  pdf.text(`Total: ${finalAmount}`, 20, y); y+=20;
+
+  pdf.text("Parent Signature: ____________________", 20, y); y+=15;
+  pdf.text("Accountant Signature: ________________", 20, y);
+
+  pdf.save(`AY26-${studentName}-${studentId}.pdf`);
+
+  /* PRINT */
   const printWindow = window.open("", "_blank");
   printWindow.document.write(`
     <html>
-    <head><title>Print</title></head>
     <body style="font-family:Arial;padding:40px;">
+      <img src="${document.getElementById("logoImg").src}" style="max-width:150px;"><br><br>
       <h2>Student Tuition Statement</h2>
       <p><b>Academic Year:</b> ${year}</p>
       <p><b>Student Name:</b> ${studentName}</p>
       <p><b>Student ID:</b> ${studentId}</p>
-
-      <h3>Payment Plan</h3>
       ${rows.map(r => `<p>${r}</p>`).join("")}
-
       <h3>Total: ${finalAmount}</h3>
+
+      <br><br>
+      <p>Parent Signature: ______________________</p>
+      <p>Accountant Signature: __________________</p>
     </body>
     </html>
   `);
   printWindow.document.close();
   printWindow.print();
 }
-
 
 /* INIT */
 addDiscount();
