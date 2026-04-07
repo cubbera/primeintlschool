@@ -490,7 +490,7 @@
 
 <body>
 <div class="container" id="containerRoot">
-  <h1>Creating Student Enrollment &amp; Tuition Plan V3.6</h1>
+  <h1>Creating Student Enrollment &amp; Tuition Plan v3.3</h1>
   <div class="save-status" id="saveStatus">Last saved: never</div>
 
   <h2>1. Enrollment</h2>
@@ -516,8 +516,8 @@
               <div class="t">Grade Level</div>
               <div class="v">
                 <select id="grade">
-                  <option value="SR">SR</option>
-                  <option value="EY1" selected>EY1</option>
+                  <option value="SR selected">SR</option>
+                  <option value="EY1">EY1</option>
                   <option value="EY2">EY2</option>
                   <option value="Y1">Y1</option>
                   <option value="Y2">Y2</option>
@@ -835,6 +835,7 @@ function addDiscount() {
   discounts.push({ id: Date.now(), type:"Percent %", desc:"", amt:"" });
   renderDiscounts();
   recalc();
+  scheduleAutoSave(); // ADD THIS LINE
 }
 
 function removeDiscount(id) {
@@ -889,6 +890,7 @@ function updateDisc(id, field, value) {
 /* =====================================================
    MAIN CALCULATION
    ===================================================== */
+  
 function recalc() {
   const baseTuition = getBaseTuition();
   const prorate     = getProrateInfo();
@@ -1176,28 +1178,47 @@ function openPrintWindow() {
 /* =====================================================
 EVENT LISTENERS
 ===================================================== */
-academicYearEl.addEventListener(“change”,  () => { recalc(); scheduleAutoSave(); });
-gradeEl.addEventListener(“change”,         () => { recalc(); scheduleAutoSave(); });
-paymentPlanEl.addEventListener(“change”,   () => { recalc(); scheduleAutoSave(); });
+function handleChange() {
+  recalc();
+  scheduleAutoSave();
+}
 
-document.getElementById(“studentIdInput”).addEventListener(“input”, scheduleAutoSave);
-document.getElementById(“studentName”).addEventListener(“input”,    scheduleAutoSave);
+academicYearEl.addEventListener("change", handleChange);
+gradeEl.addEventListener("change", handleChange);
+paymentPlanEl.addEventListener("change", handleChange);
 
+document.getElementById("studentIdInput").addEventListener("input", handleChange);
+document.getElementById("studentName").addEventListener("input", handleChange);
+
+  document.addEventListener("input", (e) => {
+  if (e.target.closest("#containerRoot")) {
+    recalc();
+    scheduleAutoSave();
+  }
+});
+
+document.addEventListener("change", (e) => {
+  if (e.target.closest("#containerRoot")) {
+    recalc();
+    scheduleAutoSave();
+  }
+});
+  
 /* =====================================================
 INIT — restore saved state, then calculate
 ===================================================== */
-window.addEventListener(“DOMContentLoaded”, () => {
-const restored = restoreState();
+window.addEventListener("DOMContentLoaded", () => {
+  const restored = restoreState();
 
-if (!restored) {
-// Fresh defaults
-academicYearEl.value = “AY2026-2027”;
-gradeEl.value        = “EY1”;
-paymentPlanEl.value  = “Termly”;
-// Start with one blank discount row
-addDiscount();
-}
+  if (!restored) {
+    academicYearEl.value = "AY2026-2027";
+    gradeEl.value        = "EY1";
+    paymentPlanEl.value  = "Termly";
+    addDiscount();
+  }
 
+  recalc(); // run immediately
+});
 setTimeout(recalc, 50);
 });
 </script>
