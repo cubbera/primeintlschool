@@ -2,1139 +2,720 @@
 
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Student Enrollment & Tuition Plan System</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-
-<!-- FileSaver for docx download -->
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-
+<meta charset="UTF-8"/>
+<title>Student Statement: Enrollment & Tuition Plan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
-  :root{
-    --bg: #f5f5f7;
-    --card: #ffffff;
-    --text: #111827;
-    --muted: #6b7280;
-    --line: #e5e7eb;
-    --accent: #0071e3;
-    --accent-hover: #0077ed;
-    --accent2: #059669;
-    --accent2-hover: #047857;
-    --danger: #b91c1c;
-    --dangerBg: #fff1f2;
-    --pill: #eef2ff;
-    --pillText: #3730a3;
-    --shadow: 0 8px 30px rgba(0,0,0,0.08);
-    --input-border: #d1d5db;
-    --focus-ring: rgba(0, 113, 227, 0.3);
-  }
+:root{--bg:#f5f5f7;--card:#fff;--text:#111827;--muted:#6b7280;--line:#e5e7eb;--accent:#0071e3;--accent2:#059669;--accent2h:#047857;--danger:#b91c1c;--dangerBg:#fff1f2;--shadow:0 8px 30px rgba(0,0,0,.08);--iborder:#d1d5db;--fring:rgba(0,113,227,.3)}
+*{box-sizing:border-box;outline:none}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);margin:0;padding:40px 20px;line-height:1.5}
+.container{max-width:1000px;margin:0 auto;background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:30px}
+h1{margin:0 0 20px;font-size:24px;font-weight:800;letter-spacing:-.5px}
+h2{margin:30px 0 15px;font-size:17px;font-weight:700;border-bottom:2px solid var(--line);padding-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+select,input[type="text"],input[type="date"],input[type="number"]{width:100%;max-width:400px;padding:12px 14px;font-size:14px;border:1px solid var(--iborder);border-radius:10px;background:#fff;transition:border-color .2s,box-shadow .2s}
+select:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--fring)}
+.enroll-table,.plan{margin-top:15px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+table{width:100%;border-collapse:collapse}
+thead th{background:#f9fafb;font-size:12px;font-weight:700;text-transform:uppercase;color:var(--muted);padding:12px 16px;border-bottom:1px solid var(--line);text-align:left}
+tbody td{padding:14px 16px;font-size:14px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+.plan tbody tr:nth-child(even){background:#fbfbfb}
+.plan td:last-child{text-align:right;font-weight:700;font-family:"SF Mono","Monaco","Courier New",monospace}
+.plan tbody tr.total-row td{border-top:2px solid var(--line);font-weight:900;font-size:15px;color:var(--accent2);background:#f0fdf4}
+.cell{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.cell .t{font-weight:600;white-space:nowrap;color:#374151;min-width:150px}
+.cell .v{flex:1;display:flex;gap:10px;align-items:center}
+.btn-remove{border:none;background:rgba(185,28,28,.1);color:var(--danger);font-weight:900;cursor:pointer;font-size:16px;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.btn-remove:hover{background:rgba(185,28,28,.2)}
+.btn-final{margin-top:12px;padding:14px 28px;font-size:15px;font-weight:800;border-radius:14px;border:none;background:var(--accent2);color:#fff;cursor:pointer;box-shadow:0 4px 6px -1px rgba(5,150,105,.2);transition:transform .1s,background .2s}
+.btn-cancel{margin-top:12px;padding:14px 28px;font-size:15px;font-weight:800;border-radius:14px;border:1px solid var(--iborder);background:#fff;color:var(--text);cursor:pointer;transition:background .2s}
+.btn-cancel:hover{background:#f3f4f6}
+.btn-final:hover{background:var(--accent2h)}
+.btn-final:active{transform:scale(.99)}
+.fee-summary{margin-top:15px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.fee-row{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line);font-size:14px}
+.fee-row:last-child{border-bottom:none}
+.fee-row.hi-blue{background:#eff6ff}
+.fee-row.hi-green{background:#f0fdf4}
+.fee-label{font-weight:700;color:#374151}
+.fee-label.blue{color:var(--accent);font-size:15px}
+.fee-label.green{color:var(--accent2)}
+.fee-value{font-weight:900;font-size:16px;font-family:"SF Mono",monospace}
+.fee-value.blue{color:var(--accent)}
+.fee-value.green{color:var(--accent2)}
+.disc-section{border-bottom:1px solid var(--line)}
+.disc-header{padding:12px 20px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--danger);background:#fff8f8;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.btn-add-disc{padding:4px 12px;font-size:12px;font-weight:700;border-radius:6px;border:1px dashed var(--danger);background:#fff;color:var(--danger);cursor:pointer;transition:all .2s}
+.btn-add-disc:hover{background:var(--dangerBg)}
+.disc-item{display:flex;align-items:center;gap:10px;padding:10px 20px;border-bottom:1px solid #fef2f2;background:#fffafa;font-size:13px}
+.disc-item:last-child{border-bottom:none}
+.disc-num{font-weight:900;color:var(--danger);min-width:20px}
+.disc-pct{padding:3px 8px;background:var(--dangerBg);color:var(--danger);border-radius:6px;font-weight:800;font-size:12px;font-family:monospace}
+.disc-val{font-weight:900;color:var(--danger);font-family:monospace;min-width:80px;text-align:right}
+.prorate-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:#eff6ff;color:var(--accent);border-radius:8px;font-size:12px;font-weight:700;margin-left:10px}
+.action-row{display:flex;gap:12px;margin-top:24px}
+@media(max-width:768px){.enroll-table td{display:block;width:100%!important}.cell{flex-direction:column;align-items:flex-start;gap:6px}.cell .v{width:100%}select,input{max-width:100%}}
 
-  * { box-sizing: border-box; outline: none; }
-
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    margin: 0;
-    padding: 40px 20px;
-    line-height: 1.5;
-  }
-
-  .container {
-    max-width: 1000px;
-    margin: 0 auto;
-    background: var(--card);
-    border-radius: 18px;
-    box-shadow: var(--shadow);
-    padding: 30px;
-  }
-
-  h1 {
-    margin: 0 0 20px;
-    font-size: 24px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    color: var(--text);
-  }
-
-  h2 {
-    margin: 30px 0 15px;
-    font-size: 17px;
-    font-weight: 700;
-    border-bottom: 2px solid var(--line);
-    padding-bottom: 10px;
-    color: var(--text);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  select,
-  input[type="text"],
-  input[type="date"],
-  input[type="number"] {
-    width: 100%;
-    max-width: 400px;
-    padding: 12px 14px;
-    font-size: 14px;
-    border: 1px solid var(--input-border);
-    border-radius: 10px;
-    background: #fff;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-
-  select:focus, input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--focus-ring);
-  }
-
-  input[disabled] {
-    background-color: #f3f4f6;
-    color: #9ca3af;
-    cursor: not-allowed;
-  }
-
-  .pill {
-    padding: 8px 16px;
-    border-radius: 999px;
-    background: var(--pill);
-    color: var(--pillText);
-    font-weight: 700;
-    letter-spacing: 0.3px;
-    font-size: 13px;
-  }
-
-  .enroll-table,
-  .plan {
-    margin-top: 15px;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    overflow: hidden;
-    background: #fff;
-  }
-
-  table { width: 100%; border-collapse: collapse; }
-
-  thead th {
-    background: #f9fafb;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--muted);
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--line);
-    text-align: left;
-  }
-
-  tbody td {
-    padding: 14px 16px;
-    font-size: 14px;
-    border-bottom: 1px solid var(--line);
-    vertical-align: middle;
-  }
-
-  tbody tr:last-child td { border-bottom: none; }
-
-  .plan tbody tr:nth-child(even) { background-color: #fbfbfb; }
-
-  .plan td:last-child {
-    text-align: right;
-    font-weight: 700;
-    font-family: "SF Mono", "Monaco", "Courier New", monospace;
-  }
-
-  .plan tbody tr.total-row td {
-    border-top: 2px solid var(--line);
-    font-weight: 900;
-    font-size: 15px;
-    color: var(--accent2);
-    background: #f0fdf4;
-  }
-
-  .cell {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 15px;
-    flex-wrap: wrap;
-  }
-
-  .cell .t {
-    font-weight: 600;
-    white-space: nowrap;
-    color: #374151;
-    min-width: 120px;
-  }
-
-  .cell .v {
-    flex: 1;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    justify-content: flex-start;
-  }
-
-  .btn-remove {
-    border: none;
-    background: rgba(185,28,28,0.1);
-    color: var(--danger);
-    font-weight: 900;
-    cursor: pointer;
-    font-size: 16px;
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
-  }
-
-  .btn-remove:hover { background: rgba(185,28,28,0.2); }
-
-  .btn-final {
-    margin-top: 12px;
-    padding: 14px 28px;
-    font-size: 15px;
-    font-weight: 800;
-    border-radius: 14px;
-    border: none;
-    background: var(--accent2);
-    color: #fff;
-    cursor: pointer;
-    box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.2);
-    transition: transform 0.1s, background 0.2s;
-  }
-
-  .btn-cancel {
-    margin-top: 12px;
-    padding: 14px 28px;
-    font-size: 15px;
-    font-weight: 800;
-    border-radius: 14px;
-    border: 1px solid var(--input-border);
-    background: #fff;
-    color: var(--text);
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-
-  .btn-cancel:hover { background: #f3f4f6; }
-  .btn-final:hover { background: var(--accent2-hover); }
-  .btn-final:active { transform: scale(0.99); }
-
-  /* Fee Summary Section */
-  .fee-summary {
-    margin-top: 15px;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    overflow: hidden;
-  }
-
-  .fee-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--line);
-    font-size: 14px;
-  }
-
-  .fee-row:last-child { border-bottom: none; }
-  .fee-row.highlight-blue { background: #eff6ff; }
-  .fee-row.highlight-green { background: #f0fdf4; }
-
-  .fee-label { font-weight: 700; color: #374151; }
-  .fee-label.blue { color: var(--accent); font-size: 15px; }
-  .fee-label.green { color: var(--accent2); }
-
-  .fee-value { font-weight: 900; font-size: 16px; font-family: "SF Mono", monospace; }
-  .fee-value.blue { color: var(--accent); }
-  .fee-value.green { color: var(--accent2); }
-  .fee-value.red { color: var(--danger); }
-
-  .discount-section { border-bottom: 1px solid var(--line); }
-
-  .discount-header {
-    padding: 12px 20px;
-    font-size: 13px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--danger);
-    background: #fff8f8;
-    border-bottom: 1px solid var(--line);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .btn-add-discount-inline {
-    padding: 4px 12px;
-    font-size: 12px;
-    font-weight: 700;
-    border-radius: 6px;
-    border: 1px dashed var(--danger);
-    background: #fff;
-    color: var(--danger);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .btn-add-discount-inline:hover { background: var(--dangerBg); }
-
-  .discount-item-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 20px;
-    border-bottom: 1px solid #fef2f2;
-    background: #fffafa;
-    font-size: 13px;
-  }
-
-  .discount-item-row:last-child { border-bottom: none; }
-
-  .disc-num { font-weight: 900; color: var(--danger); min-width: 20px; }
-
-  .disc-pct-badge {
-    padding: 3px 8px;
-    background: var(--dangerBg);
-    color: var(--danger);
-    border-radius: 6px;
-    font-weight: 800;
-    font-size: 12px;
-    font-family: monospace;
-  }
-
-  .disc-calc-val {
-    font-weight: 900;
-    color: var(--danger);
-    font-family: monospace;
-    min-width: 80px;
-    text-align: right;
-  }
-
-  .prorate-info {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
-    background: #eff6ff;
-    color: var(--accent);
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 700;
-    margin-left: 10px;
-  }
-
-  .action-row {
-    display: flex;
-    gap: 12px;
-    margin-top: 24px;
-    justify-content: flex-start;
-  }
-
-  @media (max-width: 768px) {
-    .enroll-table td { display: block; width: 100% !important; }
-    .cell { flex-direction: column; align-items: flex-start; gap: 6px; }
-    .cell .v { width: 100%; }
-    select, input { max-width: 100%; }
-  }
+/* PRINT */
+@media print{
+*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+body{background:#fff!important;padding:0!important;margin:0!important;font-family:Arial,Helvetica,sans-serif!important}
+.no-print,.container{display:none!important}
+#printStatement{display:block!important}
+}
+#printStatement{display:none;font-family:Arial,Helvetica,sans-serif;color:#111;padding:28px 36px;font-size:11pt;line-height:1.6}
 </style>
 
 </head>
-
 <body>
-<div class="container" id="containerRoot">
+
+<div class="container no-print" id="containerRoot">
   <h1>Student Enrollment &amp; Tuition Plan</h1>
 
   <h2>1. Enrollment</h2>
-
   <div class="enroll-table">
-    <table>
-      <tbody>
-        <tr>
-          <td width="50%">
-            <div class="cell">
-              <div class="t">Academic Year</div>
-              <div class="v">
-                <select id="academicYear">
-                  <option value="AY2025-2026">AY2025–2026</option>
-                  <option value="SUMMER2026">Summer 2026</option>
-                  <option value="AY2026-2027" selected>AY2026–2027</option>
-                </select>
-              </div>
-            </div>
-          </td>
-          <td width="50%">
-            <div class="cell">
-              <div class="t">Grade Level</div>
-              <div class="v">
-                <select id="grade">
-                  <option value="SR Full-day">SR Full-day</option>
-                  <option value="EY1" selected>EY1</option>
-                  <option value="EY2">EY2</option>
-                  <option value="Y1">Y1</option>
-                  <option value="Y2">Y2</option>
-                  <option value="Y3">Y3</option>
-                </select>
-              </div>
-            </div>
-          </td>
-        </tr>
-
-
-    <!-- Change 1 & 2: Student Type and Father's Name removed -->
-    <!-- Change 3: Student ID is now a plain text input -->
-    <tr>
-      <td>
-        <div class="cell">
-          <div class="t">Student ID</div>
-          <div class="v">
-            <input type="text" id="studentId" placeholder="Enter Student ID" style="max-width:220px;">
-          </div>
-        </div>
-      </td>
-      <td>
-        <div class="cell">
-          <div class="t">Student Name</div>
-          <div class="v">
+    <table><tbody>
+      <tr>
+        <td width="50%">
+          <div class="cell"><div class="t">Academic Year</div><div class="v">
+            <select id="academicYear">
+              <option value="AY2025-2026">AY2025&#8211;2026</option>
+              <option value="SUMMER2026">Summer 2026</option>
+              <option value="AY2026-2027" selected>AY2026&#8211;2027</option>
+            </select>
+          </div></div>
+        </td>
+        <td width="50%">
+          <div class="cell"><div class="t">Grade Level</div><div class="v">
+            <select id="grade">
+              <option value="SR Full-day">SR Full-day</option>
+              <option value="EY1" selected>EY1</option>
+              <option value="EY2">EY2</option>
+              <option value="Y1">Y1</option>
+              <option value="Y2">Y2</option>
+              <option value="Y3">Y3</option>
+            </select>
+          </div></div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div class="cell"><div class="t">Student ID</div><div class="v">
+            <input type="text" id="studentId" placeholder="Enter Student ID" style="max-width:220px">
+          </div></div>
+        </td>
+        <td>
+          <div class="cell"><div class="t">Student Name</div><div class="v">
             <input type="text" id="studentName" placeholder="Enter name">
-          </div>
-        </div>
-      </td>
-    </tr>
-
-    <tr>
-      <td>
-        <div class="cell">
-          <div class="t">Payment Plan</div>
-          <div class="v">
+          </div></div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div class="cell"><div class="t">Payment Plan</div><div class="v">
             <select id="paymentPlan">
               <option value="One-Time">One-Time</option>
               <option value="Termly" selected>Termly</option>
               <option value="Monthly">Monthly</option>
             </select>
-          </div>
-        </div>
-      </td>
-      <td>
-        <div class="cell">
-          <div class="t">First Attendance Date</div>
-          <div class="v">
+          </div></div>
+        </td>
+        <td>
+          <div class="cell"><div class="t">First Attendance Date</div><div class="v">
             <input type="date" id="firstAttendance">
-          </div>
-        </div>
-      </td>
-    </tr>
-
-    <tr id="calcDateRow">
-      <td></td>
-      <td>
-        <div class="cell">
-          <div class="t">First Calculation Date</div>
-          <div class="v">
+          </div></div>
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <div class="cell"><div class="t">First Calculation Date</div><div class="v">
             <input type="date" id="firstCalcDate">
-          </div>
-        </div>
-      </td>
-    </tr>
-
-  </tbody>
-</table>
-
-
+          </div></div>
+        </td>
+      </tr>
+    </tbody></table>
   </div>
 
   <h2>2. Calculating Payment</h2>
-
-  <div class="fee-summary" id="feeSummary">
-
-
-<div class="fee-row highlight-blue">
-  <div class="fee-label blue">Base Tuition Amount [before PRORATE]</div>
-  <div class="fee-value blue" id="baseTuitionDisplay">0</div>
-</div>
-
-<div class="fee-row">
-  <div>
-    <div class="fee-label">Tuition Before Discount [after PRORATE]</div>
-    <div id="prorateInfoBadge" style="margin-top:4px; font-size:12px; color:var(--muted);"></div>
-  </div>
-  <div class="fee-value green" id="tuitionAfterProrate">0</div>
-</div>
-
-<div class="discount-section">
-  <div class="discount-header">
-    <span>DISCOUNT</span>
-    <button class="btn-add-discount-inline" type="button" onclick="addDiscount()">[+ Add Discount]</button>
-  </div>
-  <div id="discountItemsContainer"></div>
-</div>
-
-<div class="fee-row highlight-green">
-  <div class="fee-label green" style="font-size:15px;">Final Tuition Amount After Discount</div>
-  <div class="fee-value green" id="finalTuitionDisplay">0</div>
-</div>
-
-
+  <div class="fee-summary">
+    <div class="fee-row hi-blue">
+      <div class="fee-label blue">Base Tuition Amount [before PRORATE]</div>
+      <div class="fee-value blue" id="baseTuitionDisplay">0</div>
+    </div>
+    <div class="fee-row">
+      <div>
+        <div class="fee-label">Tuition Before Discount [after PRORATE]</div>
+        <div id="prorateInfoBadge" style="margin-top:4px;font-size:12px;color:var(--muted)"></div>
+      </div>
+      <div class="fee-value green" id="tuitionAfterProrate">0</div>
+    </div>
+    <div class="disc-section">
+      <div class="disc-header">
+        <span>DISCOUNT</span>
+        <button class="btn-add-disc" type="button" onclick="addDiscount()">[+ Add Discount]</button>
+      </div>
+      <div id="discountItemsContainer"></div>
+    </div>
+    <div class="fee-row hi-green">
+      <div class="fee-label green" style="font-size:15px">Final Tuition Amount After Discount</div>
+      <div class="fee-value green" id="finalTuitionDisplay">0</div>
+    </div>
   </div>
 
   <h2>3. Tuition Payment Plan</h2>
-
   <div class="plan">
     <table>
-      <thead>
-        <tr>
-          <th width="8%">No</th>
-          <th width="55%">Due Date</th>
-          <th width="37%">Amount</th>
-        </tr>
-      </thead>
+      <thead><tr><th width="8%">No</th><th width="55%">Due Date</th><th width="37%">Amount</th></tr></thead>
       <tbody id="planBody"></tbody>
     </table>
   </div>
-
-  <!-- Change 4: [Cancel] → [Clear]  |  Change 5: [Submit] → [Save and Print] -->
 
   <div class="action-row">
     <button class="btn-cancel" type="button" onclick="clearForm()">[Clear]</button>
     <button class="btn-final" type="button" onclick="saveAndPrint()">[Save and Print]</button>
   </div>
-
 </div>
 
+<!-- PRINT STATEMENT -->
+
+<div id="printStatement"></div>
+
 <script>
-  /* =====================================================
-     DOM REFS
-     ===================================================== */
-  const academicYearEl    = document.getElementById("academicYear");
-  const gradeEl           = document.getElementById("grade");
-  const paymentPlanEl     = document.getElementById("paymentPlan");
-  const firstAttendanceEl = document.getElementById("firstAttendance");
-  const firstCalcDateEl   = document.getElementById("firstCalcDate");
-  const discountContainer = document.getElementById("discountItemsContainer");
-  const planBody          = document.getElementById("planBody");
+/* ---- HELPERS ---- */
+function fmtKs(n){return Math.max(0,Math.round(n)).toLocaleString("en-US")+" ks";}
+function fmtNum(n){return Math.max(0,Math.round(n)).toLocaleString("en-US");}
+function fmtDateLabel(ym){return"01 "+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][ym.m]+" "+ym.y;}
 
-  // Default dates
-  firstAttendanceEl.value = "2026-06-15";
-  firstCalcDateEl.value   = "2026-06-15";
+/* ---- DOM ---- */
+var ayEl=document.getElementById("academicYear");
+var grEl=document.getElementById("grade");
+var ppEl=document.getElementById("paymentPlan");
+var faEl=document.getElementById("firstAttendance");
+var fcEl=document.getElementById("firstCalcDate");
+var discC=document.getElementById("discountItemsContainer");
+var planB=document.getElementById("planBody");
 
-  firstAttendanceEl.addEventListener("change", () => {
-    firstCalcDateEl.value = firstAttendanceEl.value;
-    recalc();
-  });
-  firstCalcDateEl.addEventListener("change", recalc);
+faEl.value="2026-06-15"; fcEl.value="2026-06-15";
+faEl.addEventListener("change",function(){fcEl.value=faEl.value;recalc();});
+fcEl.addEventListener("change",recalc);
+ayEl.addEventListener("change",recalc);
+grEl.addEventListener("change",recalc);
+ppEl.addEventListener("change",recalc);
 
-  /* =====================================================
-     DISCOUNT STATE
-     ===================================================== */
-  let discounts = [];
-
-  /* =====================================================
-     PRICING DATA
-     ===================================================== */
-  function getBaseTuition() {
-    const year  = academicYearEl.value;
-    const grade = gradeEl.value;
-    const plan  = paymentPlanEl.value;
-
-    if (year === "SUMMER2026") return 850000;
-
-    if (year === "AY2025-2026") {
-      const isInstallment = plan !== "One-Time";
-      const prices = {
-        "SR Full-day": [3900000, 4200000],
-        "EY1":         [3900000, 4200000],
-        "EY2":         [3900000, 4200000],
-        "Y1":          [4200000, 4500000],
-        "Y2":          [4200000, 4500000],
-        "Y3":          [4200000, 4500000]
-      };
-      return prices[grade] ? prices[grade][isInstallment ? 1 : 0] : 0;
-    }
-
-    if (year === "AY2026-2027") {
-      const tbl = {
-        "SR Full-day": {"One-Time":4290000, "Termly":4490000, "Monthly":4890000},
-        "EY1":         {"One-Time":4290000, "Termly":4490000, "Monthly":4890000},
-        "EY2":         {"One-Time":4290000, "Termly":4490000, "Monthly":4890000},
-        "Y1":          {"One-Time":4690000, "Termly":4890000, "Monthly":5290000},
-        "Y2":          {"One-Time":4690000, "Termly":4890000, "Monthly":5290000},
-        "Y3":          {"One-Time":4690000, "Termly":4890000, "Monthly":5290000}
-      };
-      return (tbl[grade] && tbl[grade][plan]) ? tbl[grade][plan] : 0;
-    }
-
-    return 0;
+/* ---- PRICING ---- */
+function getBaseTuition(){
+  var y=ayEl.value,g=grEl.value,p=ppEl.value;
+  if(y==="SUMMER2026")return 850000;
+  if(y==="AY2025-2026"){
+    var inst=p!=="One-Time";
+    var t={"SR Full-day":[3900000,4200000],"EY1":[3900000,4200000],"EY2":[3900000,4200000],"Y1":[4200000,4500000],"Y2":[4200000,4500000],"Y3":[4200000,4500000]};
+    return t[g]?t[g][inst?1:0]:0;
   }
-
-  /* =====================================================
-     PRORATE LOGIC
-     ===================================================== */
-  function getSchoolMonths() {
-    const year = academicYearEl.value;
-    if (year === "AY2025-2026") {
-      const months = [];
-      for (let m = 5; m <= 11; m++) months.push({y:2025, m});
-      for (let m = 0; m <= 2; m++)  months.push({y:2026, m});
-      return months;
-    }
-    if (year === "AY2026-2027") {
-      const months = [];
-      for (let m = 5; m <= 11; m++) months.push({y:2026, m});
-      for (let m = 0; m <= 2; m++)  months.push({y:2027, m});
-      return months;
-    }
-    return [];
+  if(y==="AY2026-2027"){
+    var t2={"SR Full-day":{"One-Time":4290000,"Termly":4490000,"Monthly":4890000},"EY1":{"One-Time":4290000,"Termly":4490000,"Monthly":4890000},"EY2":{"One-Time":4290000,"Termly":4490000,"Monthly":4890000},"Y1":{"One-Time":4690000,"Termly":4890000,"Monthly":5290000},"Y2":{"One-Time":4690000,"Termly":4890000,"Monthly":5290000},"Y3":{"One-Time":4690000,"Termly":4890000,"Monthly":5290000}};
+    return(t2[g]&&t2[g][p])?t2[g][p]:0;
   }
-
-  function getProrateInfo() {
-    const year = academicYearEl.value;
-    if (year === "SUMMER2026") return { factor: 1, remaining: 1, total: 1, label: "" };
-
-    const dateStr = firstCalcDateEl.value;
-    if (!dateStr) return { factor: 1, remaining: 10, total: 10, label: "" };
-    const parts = dateStr.split("-");
-    const calcYear  = parseInt(parts[0], 10);
-    const calcMonth = parseInt(parts[1], 10) - 1;
-
-    const schoolMonths = getSchoolMonths();
-    const total = schoolMonths.length;
-    const remaining = schoolMonths.filter(sm => {
-      if (sm.y > calcYear) return true;
-      if (sm.y === calcYear && sm.m >= calcMonth) return true;
-      return false;
-    }).length;
-
-    return { factor: remaining / total, remaining, total, label: `${remaining}/${total} months remaining` };
-  }
-
-  /* =====================================================
-     TERMLY SPLIT LOGIC
-     ===================================================== */
-  function getTermMonthCounts() {
-    const year = academicYearEl.value;
-    if (year === "SUMMER2026") return null;
-
-    const dateStr = firstCalcDateEl.value;
-    if (!dateStr) return null;
-    const parts = dateStr.split("-");
-    const calcYear  = parseInt(parts[0], 10);
-    const calcMonth = parseInt(parts[1], 10) - 1;
-
-    const schoolMonths = getSchoolMonths();
-    const termRanges = [
-      { term: 1, start: 0, end: 2 },
-      { term: 2, start: 3, end: 6 },
-      { term: 3, start: 7, end: 9 }
-    ];
-
-    const remainingIndices = schoolMonths
-      .map((sm, i) => ({ sm, i }))
-      .filter(({ sm }) => {
-        if (sm.y > calcYear) return true;
-        if (sm.y === calcYear && sm.m >= calcMonth) return true;
-        return false;
-      })
-      .map(({ i }) => i);
-
-    return termRanges.map(tr => {
-      const count = remainingIndices.filter(i => i >= tr.start && i <= tr.end).length;
-      return { term: tr.term, count };
-    });
-  }
-
-  function getRemainingMonthsList() {
-    const dateStr = firstCalcDateEl.value;
-    if (!dateStr) return [];
-    const parts = dateStr.split("-");
-    const calcYear  = parseInt(parts[0], 10);
-    const calcMonth = parseInt(parts[1], 10) - 1;
-    const schoolMonths = getSchoolMonths();
-    return schoolMonths.filter(sm => {
-      if (sm.y > calcYear) return true;
-      if (sm.y === calcYear && sm.m >= calcMonth) return true;
-      return false;
-    });
-  }
-
-  /* =====================================================
-     FORMAT
-     ===================================================== */
-  function fmtKs(n) {
-    return Math.max(0, Math.round(n)).toLocaleString("en-US") + " ks";
-  }
-  function fmtKsNoSuffix(n) {
-    return Math.max(0, Math.round(n)).toLocaleString("en-US");
-  }
-  function fmtDateLabel(ym) {
-    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    return `01 ${months[ym.m]} ${ym.y}`;
-  }
-
-  /* =====================================================
-     DISCOUNT MANAGEMENT
-     ===================================================== */
-  function addDiscount() {
-    const id = Date.now();
-    discounts.push({ id, type: "Percent %", desc: "", amt: "" });
-    renderDiscounts();
-    recalc();
-  }
-
-  function removeDiscount(id) {
-    discounts = discounts.filter(d => d.id !== id);
-    renderDiscounts();
-    recalc();
-  }
-
-  function renderDiscounts() {
-    discountContainer.innerHTML = "";
-    discounts.forEach((disc, idx) => {
-      const div = document.createElement("div");
-      div.className = "discount-item-row";
-
-      const typeOptions = ["Fixed","Percent %","Sibling %","Early Bird %","Referral"].map(t =>
-        `<option value="${t}" ${disc.type===t?"selected":""}>${t==="Fixed"?"Fixed Amount":t==="Referral"?"Referral (Fixed)":t}</option>`
-      ).join("");
-
-      const amtPlaceholder = disc.type.includes("%") ? "%" : "Amount";
-      const descHtml = `<input type="text" placeholder="Description" value="${disc.desc||""}"
-                          style="font-size:12px;padding:6px 8px;border:1px solid #e5e7eb;border-radius:6px;max-width:140px;"
-                          oninput="updateDisc(${disc.id},'desc',this.value)">`;
-      const amtHtml  = `<input type="number" placeholder="${amtPlaceholder}" value="${disc.amt||""}"
-                          style="font-size:12px;padding:6px 8px;border:1px solid #e5e7eb;border-radius:6px;max-width:80px;"
-                          oninput="updateDisc(${disc.id},'amt',this.value)">`;
-
-      div.innerHTML = `
-        <span class="disc-num">${idx+1}</span>
-        <select style="font-size:12px;padding:6px 8px;border:1px solid #e5e7eb;border-radius:6px;max-width:150px;font-weight:700;color:var(--danger);"
-          onchange="updateDisc(${disc.id},'type',this.value)">${typeOptions}</select>
-        ${descHtml}
-        ${disc.type.includes("%") ? `<span class="disc-pct-badge" id="pct_${disc.id}">${disc.amt||0}%</span>` : ""}
-        ${amtHtml}
-        <span class="disc-calc-val" id="calc_${disc.id}">0</span>
-        <button class="btn-remove" type="button" onclick="removeDiscount(${disc.id})">−</button>
-      `;
-      discountContainer.appendChild(div);
-    });
-  }
-
-  function updateDisc(id, field, value) {
-    const disc = discounts.find(d => d.id === id);
-    if (!disc) return;
-    disc[field] = value;
-    if (field === "type") { disc.desc = ""; disc.amt = ""; renderDiscounts(); }
-    recalc();
-  }
-
-  /* =====================================================
-     MAIN CALCULATION
-     ===================================================== */
-  function recalc() {
-    const baseTuition = getBaseTuition();
-    const prorate     = getProrateInfo();
-    const tuitionAfterProrate = Math.round(baseTuition * prorate.factor);
-
-    document.getElementById("baseTuitionDisplay").textContent   = fmtKsNoSuffix(baseTuition);
-    document.getElementById("tuitionAfterProrate").textContent  = fmtKsNoSuffix(tuitionAfterProrate);
-
-    const badgeEl = document.getElementById("prorateInfoBadge");
-    if (prorate.factor < 1) {
-      badgeEl.innerHTML = `<span class="prorate-info">⟳ Prorated: ${prorate.remaining}/${prorate.total} months</span>`;
-    } else {
-      badgeEl.textContent = "";
-    }
-
-    discounts.forEach(disc => {
-      if (disc.type === "Fixed" || disc.type === "Referral") {
-        disc._calcAmt = Number(disc.amt || 0);
-      } else if (disc.type.includes("%")) {
-        const pct = Number(disc.amt || 0);
-        disc._calcAmt = Math.round(tuitionAfterProrate * pct / 100);
-      }
-    });
-
-    const totalDiscount = discounts.reduce((s, d) => s + (d._calcAmt || 0), 0);
-    const finalAmount   = Math.max(0, tuitionAfterProrate - totalDiscount);
-
-    discounts.forEach(disc => {
-      const el = document.getElementById(`calc_${disc.id}`);
-      if (el) el.textContent = `-${fmtKsNoSuffix(disc._calcAmt||0)}`;
-      const pctEl = document.getElementById(`pct_${disc.id}`);
-      if (pctEl) pctEl.textContent = `${disc.amt||0}%`;
-    });
-
-    document.getElementById("finalTuitionDisplay").textContent = fmtKsNoSuffix(finalAmount);
-
-    renderPaymentSchedule(finalAmount, prorate);
-  }
-
-  /* =====================================================
-     PAYMENT SCHEDULE
-     ===================================================== */
-  let _planRows = []; // Clean rows for docx export (no calculation notes)
-
-  function renderPaymentSchedule(finalAmount, prorate) {
-    planBody.innerHTML = "";
-    _planRows = [];
-    const plan = paymentPlanEl.value;
-    const year = academicYearEl.value;
-
-    if (year === "SUMMER2026" || plan === "One-Time") {
-      addPlanRow(1, "Registration Date", finalAmount);
-      addTotalRow(finalAmount);
-      return;
-    }
-    if (plan === "Termly") { renderTermly(finalAmount, prorate); return; }
-    if (plan === "Monthly") { renderMonthly(finalAmount, prorate); return; }
-  }
-
-  function floorK(n) { return Math.floor(n / 1000) * 1000; }
-
-  function renderTermly(finalAmount, prorate) {
-    const termCounts = getTermMonthCounts();
-    if (!termCounts) { addPlanRow(1, "Full Payment", finalAmount); addTotalRow(finalAmount); return; }
-
-    const totalRemaining = termCounts.reduce((s, t) => s + t.count, 0);
-    if (totalRemaining === 0) { addPlanRow(1, "Full Payment", finalAmount); addTotalRow(finalAmount); return; }
-
-    const year = academicYearEl.value;
-    const termDates = year === "AY2025-2026"
-      ? ["Registration Date", "01 Sep 2025", "01 Jan 2026"]
-      : ["Registration Date", "01 Sep 2026", "01 Jan 2027"];
-
-    const slots = termCounts
-      .map((tc, i) => ({ ...tc, dateLabel: termDates[i] }))
-      .filter(tc => tc.count > 0);
-
-    let sumOthers = 0;
-    slots.forEach((s, i) => {
-      if (i === 0) { s.amt = null; }
-      else { s.amt = floorK(finalAmount * s.count / totalRemaining); sumOthers += s.amt; }
-    });
-    slots[0].amt = finalAmount - sumOthers;
-
-    slots.forEach((s, rowNum) => {
-      addPlanRow(rowNum + 1, s.dateLabel, s.amt);
-    });
-    addTotalRow(finalAmount);
-  }
-
-  function renderMonthly(finalAmount, prorate) {
-    const remaining = getRemainingMonthsList();
-    if (remaining.length === 0) { addPlanRow(1, "Full Payment", finalAmount); addTotalRow(finalAmount); return; }
-
-    const n = remaining.length;
-    const roundedAmt = floorK(finalAmount / n);
-    const firstAmt   = finalAmount - roundedAmt * (n - 1);
-
-    remaining.forEach((ym, i) => {
-      const amt   = i === 0 ? firstAmt : roundedAmt;
-      const label = i === 0 ? "Registration Date" : fmtDateLabel(ym);
-      addPlanRow(i + 1, label, amt);
-    });
-    addTotalRow(finalAmount);
-  }
-
-  // No calculation note in DOM either (clean as requested)
-  function addPlanRow(no, dateDesc, amount) {
-    _planRows.push({ no, dateDesc, amount, isTotal: false });
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${no}</td><td>${dateDesc}</td><td>${fmtKs(amount)}</td>`;
-    planBody.appendChild(tr);
-  }
-
-  function addTotalRow(total) {
-    _planRows.push({ no: null, dateDesc: "TOTAL", amount: total, isTotal: true });
-    const tr = document.createElement("tr");
-    tr.className = "total-row";
-    tr.innerHTML = `<td colspan="2" style="text-align:left;font-weight:900;">TOTAL</td><td>${fmtKs(total)}</td>`;
-    planBody.appendChild(tr);
-  }
-
-  /* =====================================================
-     CHANGE 4: CLEAR (resets to defaults)
-     ===================================================== */
-  function clearForm() {
-    academicYearEl.value        = "AY2026-2027";
-    gradeEl.value               = "EY1";
-    paymentPlanEl.value         = "Termly";
-    firstAttendanceEl.value     = "2026-06-15";
-    firstCalcDateEl.value       = "2026-06-15";
-    document.getElementById("studentId").value   = "";
-    document.getElementById("studentName").value = "";
-    discounts = [];
-    renderDiscounts();
-    addDiscount();
-    recalc();
-  }
-
-  /* =====================================================
-     CHANGE 5: SAVE AND PRINT
-     Filename: AY26-StudentName-StudentID.docx
-     ===================================================== */
-  async function saveAndPrint() {
-    const studentName = (document.getElementById("studentName").value || "Student").trim();
-    const studentId   = (document.getElementById("studentId").value   || "ID").trim();
-
-    // Build filename: AY26-StudentName-StudentID.docx
-    const ayVal     = academicYearEl.value; // e.g. "AY2026-2027" or "SUMMER2026"
-    let yearTag = "AY";
-    if (ayVal.startsWith("AY")) {
-      // Extract last 2 digits of start year: AY2026-2027 → "26"
-      yearTag = "AY" + ayVal.replace("AY","").split("-")[0].slice(-2);
-    } else if (ayVal.startsWith("SUMMER")) {
-      yearTag = "Summer" + ayVal.replace("SUMMER","").slice(-2);
-    }
-
-    const safeStudentName = studentName.replace(/\s+/g, "");
-    const safeStudentId   = studentId.replace(/\s+/g, "");
-    const filename = `${yearTag}-${safeStudentName}-${safeStudentId}.docx`;
-
-    // Generate and download .docx
-    try {
-      await generateDocx(filename, {
-        studentName,
-        studentId,
-        academicYear: ayVal,
-        grade: gradeEl.value,
-        payPlan: paymentPlanEl.value,
-        firstAtt:   firstAttendanceEl.value,
-        firstCalc:  firstCalcDateEl.value,
-        baseTuition:         parseInt(document.getElementById("baseTuitionDisplay").textContent.replace(/,/g,"")) || 0,
-        tuitionAfterProrate: parseInt(document.getElementById("tuitionAfterProrate").textContent.replace(/,/g,"")) || 0,
-        finalTuition:        parseInt(document.getElementById("finalTuitionDisplay").textContent.replace(/,/g,"")) || 0,
-        prorateInfo: getProrateInfo(),
-        discounts:   discounts,
-        planRows:    _planRows
-      });
-    } catch(e) {
-      console.error("DOCX generation error:", e);
-      alert("Could not save .docx file: " + e.message);
-    }
-
-    // Open print dialog
-    window.print();
-  }
-
-  /* =====================================================
-     DOCX GENERATOR (browser, docx UMD from CDN)
-     ===================================================== */
-  function loadScript(src) {
-    return new Promise((resolve, reject) => {
-      if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
-      const s = document.createElement("script");
-      s.src = src; s.onload = resolve; s.onerror = reject;
-      document.head.appendChild(s);
-    });
-  }
-
-  async function generateDocx(filename, d) {
-    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.umd.min.js");
-
-    const {
-      Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
-      AlignmentType, BorderStyle, WidthType, ShadingType
-    } = window.docx;
-
-    const bNone = { style: BorderStyle.NONE, size: 0, color: "FFFFFF" };
-    const bThin = { style: BorderStyle.SINGLE, size: 4, color: "CCCCCC" };
-    const bGreen= { style: BorderStyle.SINGLE, size: 8, color: "059669" };
-    const noB   = { top: bNone, bottom: bNone, left: bNone, right: bNone };
-    const thinB = { top: bThin, bottom: bThin, left: bThin, right: bThin };
-
-    // Helper: section heading paragraph
-    function heading(text) {
-      return new Paragraph({
-        spacing: { before: 280, after: 120 },
-        border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: "059669", space: 1 } },
-        children: [new TextRun({ text: text.toUpperCase(), bold: true, size: 24, color: "059669", font: "Arial" })]
-      });
-    }
-
-    // Helper: label/value pair rows for enrollment table
-    function infoRow(label, value) {
-      const cellProps = (w) => ({
-        width: { size: w, type: WidthType.DXA },
-        borders: noB,
-        margins: { top: 60, bottom: 60, left: 80, right: 80 }
-      });
-      return new TableRow({ children: [
-        new TableCell({ ...cellProps(2800), children: [new Paragraph({ children: [new TextRun({ text: label, bold: true, size: 20, font: "Arial" })] })] }),
-        new TableCell({ ...cellProps(6560), children: [new Paragraph({ children: [new TextRun({ text: value, size: 20, font: "Arial" })] })] })
-      ]});
-    }
-
-    // Enrollment table
-    const enrollTable = new Table({
-      width: { size: 9360, type: WidthType.DXA },
-      columnWidths: [2800, 6560],
-      rows: [
-        infoRow("Academic Year:", d.academicYear),
-        infoRow("Grade Level:", d.grade),
-        infoRow("Student ID:", d.studentId),
-        infoRow("Student Name:", d.studentName),
-        infoRow("Payment Plan:", d.payPlan),
-        infoRow("First Attendance Date:", d.firstAtt),
-        infoRow("First Calculation Date:", d.firstCalc),
-      ]
-    });
-
-    // Fee summary table
-    function feeRow(labelText, valueText, labelColor, valueColor, bgFill) {
-      const fill = bgFill || "FFFFFF";
-      return new TableRow({ children: [
-        new TableCell({
-          width: { size: 6560, type: WidthType.DXA },
-          borders: thinB,
-          shading: { fill, type: ShadingType.CLEAR },
-          margins: { top: 80, bottom: 80, left: 120, right: 120 },
-          children: [new Paragraph({ children: [new TextRun({ text: labelText, bold: true, color: labelColor || "374151", size: 22, font: "Arial" })] })]
-        }),
-        new TableCell({
-          width: { size: 2800, type: WidthType.DXA },
-          borders: thinB,
-          shading: { fill, type: ShadingType.CLEAR },
-          margins: { top: 80, bottom: 80, left: 120, right: 120 },
-          children: [new Paragraph({
-            alignment: AlignmentType.RIGHT,
-            children: [new TextRun({ text: valueText, bold: true, color: valueColor || "374151", size: 22, font: "Arial" })]
-          })]
-        })
-      ]});
-    }
-
-    const prorateNote = d.prorateInfo.factor < 1
-      ? `  [Prorated: ${d.prorateInfo.remaining}/${d.prorateInfo.total} months]`
-      : "";
-
-    const discountRows = d.discounts.map((disc, i) => {
-      const lbl = disc.desc ? `Discount ${i+1}: ${disc.type} — ${disc.desc}` : `Discount ${i+1}: ${disc.type}`;
-      const val = `-${fmtKsNoSuffix(disc._calcAmt || 0)} ks`;
-      return feeRow(lbl, val, "B91C1C", "B91C1C", "FFF8F8");
-    });
-
-    const feeSummaryTable = new Table({
-      width: { size: 9360, type: WidthType.DXA },
-      columnWidths: [6560, 2800],
-      rows: [
-        feeRow("Base Tuition Amount [before PRORATE]", fmtKsNoSuffix(d.baseTuition) + " ks", "0071E3", "0071E3", "EFF6FF"),
-        feeRow("Tuition Before Discount [after PRORATE]" + prorateNote, fmtKsNoSuffix(d.tuitionAfterProrate) + " ks", "059669", "059669", "FFFFFF"),
-        ...discountRows,
-        feeRow("Final Tuition Amount After Discount", fmtKsNoSuffix(d.finalTuition) + " ks", "059669", "059669", "F0FDF4"),
-      ]
-    });
-
-    // Payment plan table
-    const planHeaderRow = new TableRow({ children: [
-      new TableCell({
-        width: { size: 760, type: WidthType.DXA }, borders: thinB,
-        shading: { fill: "F9FAFB", type: ShadingType.CLEAR },
-        margins: { top: 80, bottom: 80, left: 100, right: 100 },
-        children: [new Paragraph({ children: [new TextRun({ text: "No", bold: true, size: 20, font: "Arial", color: "6B7280" })] })]
-      }),
-      new TableCell({
-        width: { size: 5800, type: WidthType.DXA }, borders: thinB,
-        shading: { fill: "F9FAFB", type: ShadingType.CLEAR },
-        margins: { top: 80, bottom: 80, left: 100, right: 100 },
-        children: [new Paragraph({ children: [new TextRun({ text: "Due Date", bold: true, size: 20, font: "Arial", color: "6B7280" })] })]
-      }),
-      new TableCell({
-        width: { size: 2800, type: WidthType.DXA }, borders: thinB,
-        shading: { fill: "F9FAFB", type: ShadingType.CLEAR },
-        margins: { top: 80, bottom: 80, left: 100, right: 100 },
-        children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: "Amount", bold: true, size: 20, font: "Arial", color: "6B7280" })] })]
-      })
-    ]});
-
-    const planDataRows = d.planRows.map(row => {
-      if (row.isTotal) {
-        return new TableRow({ children: [
-          new TableCell({
-            columnSpan: 2,
-            width: { size: 6560, type: WidthType.DXA },
-            borders: { top: bGreen, bottom: bThin, left: bThin, right: bNone },
-            shading: { fill: "F0FDF4", type: ShadingType.CLEAR },
-            margins: { top: 80, bottom: 80, left: 100, right: 100 },
-            children: [new Paragraph({ children: [new TextRun({ text: "TOTAL", bold: true, size: 24, color: "059669", font: "Arial" })] })]
-          }),
-          new TableCell({
-            width: { size: 2800, type: WidthType.DXA },
-            borders: { top: bGreen, bottom: bThin, left: bNone, right: bThin },
-            shading: { fill: "F0FDF4", type: ShadingType.CLEAR },
-            margins: { top: 80, bottom: 80, left: 100, right: 100 },
-            children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: fmtKs(row.amount), bold: true, size: 24, color: "059669", font: "Arial" })] })]
-          })
-        ]});
-      }
-      return new TableRow({ children: [
-        new TableCell({
-          width: { size: 760, type: WidthType.DXA }, borders: thinB,
-          margins: { top: 80, bottom: 80, left: 100, right: 100 },
-          children: [new Paragraph({ children: [new TextRun({ text: String(row.no), size: 22, font: "Arial" })] })]
-        }),
-        new TableCell({
-          width: { size: 5800, type: WidthType.DXA }, borders: thinB,
-          margins: { top: 80, bottom: 80, left: 100, right: 100 },
-          children: [new Paragraph({ children: [new TextRun({ text: row.dateDesc, size: 22, font: "Arial" })] })]
-        }),
-        new TableCell({
-          width: { size: 2800, type: WidthType.DXA }, borders: thinB,
-          margins: { top: 80, bottom: 80, left: 100, right: 100 },
-          children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: fmtKs(row.amount), bold: true, size: 22, font: "Arial" })] })]
-        })
-      ]});
-    });
-
-    const paymentTable = new Table({
-      width: { size: 9360, type: WidthType.DXA },
-      columnWidths: [760, 5800, 2800],
-      rows: [planHeaderRow, ...planDataRows]
-    });
-
-    // Assemble document
-    const doc = new Document({
-      sections: [{
-        properties: {
-          page: {
-            size: { width: 12240, height: 15840 },
-            margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 }
-          }
-        },
-        children: [
-          new Paragraph({
-            spacing: { after: 240 },
-            children: [new TextRun({ text: "Student Enrollment & Tuition Plan", bold: true, size: 40, font: "Arial", color: "111827" })]
-          }),
-
-          heading("1. Enrollment"),
-          enrollTable,
-
-          heading("2. Calculating Payment"),
-          feeSummaryTable,
-
-          heading("3. Tuition Payment Plan"),
-          paymentTable,
-        ]
-      }]
-    });
-
-    const blob = await Packer.toBlob(doc);
-    saveAs(blob, filename);
-  }
-
-  /* =====================================================
-     EVENT LISTENERS & INIT
-     ===================================================== */
-  academicYearEl.addEventListener("change", recalc);
-  gradeEl.addEventListener("change", recalc);
-  paymentPlanEl.addEventListener("change", recalc);
-
-  addDiscount();
+  return 0;
+}
+
+/* ---- PRORATE ---- */
+function getSchoolMonths(){
+  var y=ayEl.value,m=[];
+  if(y==="AY2025-2026"){for(var i=5;i<=11;i++)m.push({y:2025,m:i});for(var i=0;i<=2;i++)m.push({y:2026,m:i});}
+  else if(y==="AY2026-2027"){for(var i=5;i<=11;i++)m.push({y:2026,m:i});for(var i=0;i<=2;i++)m.push({y:2027,m:i});}
+  return m;
+}
+function getProrateInfo(){
+  if(ayEl.value==="SUMMER2026")return{factor:1,remaining:1,total:1};
+  var ds=fcEl.value;if(!ds)return{factor:1,remaining:10,total:10};
+  var p=ds.split("-"),calcY=+p[0],calcM=+p[1]-1;
+  var sm=getSchoolMonths(),total=sm.length;
+  var remaining=sm.filter(function(s){return s.y>calcY||(s.y===calcY&&s.m>=calcM);}).length;
+  return{factor:remaining/total,remaining:remaining,total:total};
+}
+function getTermMonthCounts(){
+  if(ayEl.value==="SUMMER2026")return null;
+  var ds=fcEl.value;if(!ds)return null;
+  var p=ds.split("-"),calcY=+p[0],calcM=+p[1]-1;
+  var sm=getSchoolMonths(),terms=[{s:0,e:2},{s:3,e:6},{s:7,e:9}];
+  var ri=[];
+  sm.forEach(function(s,i){if(s.y>calcY||(s.y===calcY&&s.m>=calcM))ri.push(i);});
+  return terms.map(function(t){return{count:ri.filter(function(i){return i>=t.s&&i<=t.e;}).length};});
+}
+function getRemainingMonthsList(){
+  var ds=fcEl.value;if(!ds)return[];
+  var p=ds.split("-"),calcY=+p[0],calcM=+p[1]-1;
+  return getSchoolMonths().filter(function(s){return s.y>calcY||(s.y===calcY&&s.m>=calcM);});
+}
+
+/* ---- DISCOUNTS ---- */
+var discounts=[];
+var _planRows=[];
+
+function addDiscount(){
+  discounts.push({id:Date.now(),type:"Percent %",desc:"",amt:"",_calc:0});
+  renderDiscounts();recalc();
+}
+function removeDiscount(id){
+  discounts=discounts.filter(function(d){return d.id!==id;});renderDiscounts();recalc();
+}
+function updateDisc(id,field,value){
+  var d=discounts.find(function(d){return d.id===id;});if(!d)return;
+  d[field]=value;
+  if(field==="type"){d.desc="";d.amt="";renderDiscounts();}
   recalc();
+}
+function renderDiscounts(){
+  discC.innerHTML="";
+  discounts.forEach(function(d,i){
+    var div=document.createElement("div");div.className="disc-item";
+    var opts=["Fixed","Percent %","Sibling %","Early Bird %","Referral"].map(function(t){
+      return'<option value="'+t+'"'+(d.type===t?" selected":"")+">"+
+        (t==="Fixed"?"Fixed Amount":t==="Referral"?"Referral (Fixed)":t)+"</option>";
+    }).join("");
+    var ph=d.type.indexOf("%")>=0?"%":"Amount";
+    div.innerHTML='<span class="disc-num">'+(i+1)+'</span>'+
+      '<select style="font-size:12px;padding:6px 8px;border:1px solid #e5e7eb;border-radius:6px;max-width:150px;font-weight:700;color:#b91c1c" onchange="updateDisc('+d.id+',\'type\',this.value)">"+opts+"</select>"+
+      '<input type="text" placeholder="Description" value="'+(d.desc||"")+'" style="font-size:12px;padding:6px 8px;border:1px solid #e5e7eb;border-radius:6px;max-width:140px" oninput="updateDisc('+d.id+',\'desc\',this.value)">"+
+      (d.type.indexOf("%")>=0?'<span class="disc-pct" id="pct_'+d.id+'">'+(d.amt||0)+'%</span>':"")+
+      '<input type="number" placeholder="'+ph+'" value="'+(d.amt||"")+'" style="font-size:12px;padding:6px 8px;border:1px solid #e5e7eb;border-radius:6px;max-width:80px" oninput="updateDisc('+d.id+',\'amt\',this.value)">"+
+      '<span class="disc-val" id="calc_'+d.id+'">0</span>'+
+      '<button class="btn-remove" type="button" onclick="removeDiscount('+d.id+')">&#8722;</button>';
+    discC.appendChild(div);
+  });
+}
+
+/* ---- RECALC ---- */
+function recalc(){
+  var base=getBaseTuition(),pr=getProrateInfo(),tap=Math.round(base*pr.factor);
+  document.getElementById("baseTuitionDisplay").textContent=fmtNum(base);
+  document.getElementById("tuitionAfterProrate").textContent=fmtNum(tap);
+  var badge=document.getElementById("prorateInfoBadge");
+  badge.innerHTML=pr.factor<1?'<span class="prorate-badge">&#8635; Prorated: '+pr.remaining+"/"+pr.total+" months</span>":"";
+  discounts.forEach(function(d){
+    if(d.type==="Fixed"||d.type==="Referral")d._calc=Number(d.amt||0);
+    else if(d.type.indexOf("%")>=0)d._calc=Math.round(tap*Number(d.amt||0)/100);
+    else d._calc=0;
+  });
+  var totalDisc=discounts.reduce(function(s,d){return s+(d._calc||0);},0);
+  var final=Math.max(0,tap-totalDisc);
+  discounts.forEach(function(d){
+    var el=document.getElementById("calc_"+d.id);if(el)el.textContent="-"+fmtNum(d._calc||0);
+    var pe=document.getElementById("pct_"+d.id);if(pe)pe.textContent=(d.amt||0)+"%";
+  });
+  document.getElementById("finalTuitionDisplay").textContent=fmtNum(final);
+  renderPlan(final,pr);
+}
+
+/* ---- PLAN ---- */
+function floorK(n){return Math.floor(n/1000)*1000;}
+function renderPlan(final,pr){
+  planB.innerHTML="";_planRows=[];
+  var plan=ppEl.value,year=ayEl.value;
+  if(year==="SUMMER2026"||plan==="One-Time"){addRow(1,"Registration Date",final);addTotal(final);return;}
+  if(plan==="Termly"){renderTermly(final,pr);return;}
+  if(plan==="Monthly"){renderMonthly(final,pr);return;}
+}
+function renderTermly(final,pr){
+  var tc=getTermMonthCounts();
+  if(!tc){addRow(1,"Full Payment",final);addTotal(final);return;}
+  var tot=tc.reduce(function(s,t){return s+t.count;},0);
+  if(tot===0){addRow(1,"Full Payment",final);addTotal(final);return;}
+  var y=ayEl.value;
+  var tDates=y==="AY2025-2026"?["Registration Date","01 Sep 2025","01 Jan 2026"]:["Registration Date","01 Sep 2026","01 Jan 2027"];
+  var slots=tc.map(function(t,i){return{count:t.count,dl:tDates[i]};}).filter(function(t){return t.count>0;});
+  var sum2=0;
+  slots.forEach(function(s,i){if(i===0){s.amt=null;}else{s.amt=floorK(final*s.count/tot);sum2+=s.amt;}});
+  slots[0].amt=final-sum2;
+  slots.forEach(function(s,i){addRow(i+1,s.dl,s.amt);});
+  addTotal(final);
+}
+function renderMonthly(final,pr){
+  var rem=getRemainingMonthsList();
+  if(!rem.length){addRow(1,"Full Payment",final);addTotal(final);return;}
+  var n=rem.length,ra=floorK(final/n),fa2=final-ra*(n-1);
+  rem.forEach(function(ym,i){addRow(i+1,i===0?"Registration Date":fmtDateLabel(ym),i===0?fa2:ra);});
+  addTotal(final);
+}
+function addRow(no,date,amt){
+  _planRows.push({no:no,date:date,amt:amt,isTotal:false});
+  var tr=document.createElement("tr");
+  tr.innerHTML="<td>"+no+"</td><td>"+date+"</td><td>"+fmtKs(amt)+"</td>";
+  planB.appendChild(tr);
+}
+function addTotal(total){
+  _planRows.push({no:null,date:"TOTAL",amt:total,isTotal:true});
+  var tr=document.createElement("tr");tr.className="total-row";
+  tr.innerHTML='<td colspan="2" style="text-align:left;font-weight:900">TOTAL</td><td>'+fmtKs(total)+"</td>";
+  planB.appendChild(tr);
+}
+
+/* ---- CLEAR ---- */
+function clearForm(){
+  ayEl.value="AY2026-2027";grEl.value="EY1";ppEl.value="Termly";
+  faEl.value="2026-06-15";fcEl.value="2026-06-15";
+  document.getElementById("studentId").value="";
+  document.getElementById("studentName").value="";
+  discounts=[];renderDiscounts();addDiscount();recalc();
+}
+
+/* ---- SAVE AND PRINT ---- */
+function saveAndPrint(){
+  var sName=(document.getElementById("studentName").value||"Student").trim();
+  var sId=(document.getElementById("studentId").value||"ID").trim();
+  var ay=ayEl.value,gr=grEl.value,pp=ppEl.value,fa=faEl.value,fc=fcEl.value;
+  var pr=getProrateInfo();
+  var base=getBaseTuition();
+  var tap=Math.round(base*pr.factor);
+  var finalEl=document.getElementById("finalTuitionDisplay").textContent.replace(/,/g,"");
+  var final=parseInt(finalEl)||0;
+  var discSnap=discounts.map(function(d){return{type:d.type,desc:d.desc,amt:d.amt,_calc:d._calc||0};});
+  var planSnap=_planRows.map(function(r){return{no:r.no,date:r.date,amt:r.amt,isTotal:r.isTotal};});
+  var data={sName:sName,sId:sId,ay:ay,gr:gr,pp:pp,fa:fa,fc:fc,pr:pr,base:base,tap:tap,final:final,discounts:discSnap,planRows:planSnap};
+
+  // Build filename
+  var yt="AY";
+  if(ay.indexOf("AY")===0)yt="AY"+ay.replace("AY","").split("-")[0].slice(-2);
+  else if(ay.indexOf("SUMMER")===0)yt="Summer"+ay.replace("SUMMER","").slice(-2);
+  var fname=yt+"-"+sName.replace(/\s+/g,"")+"-"+sId.replace(/\s+/g,"")+".docx";
+
+  // Download docx first, then print
+  buildAndDownloadDocx(fname,data).then(function(){
+    buildPrintStatement(data);
+    setTimeout(function(){window.print();},400);
+  }).catch(function(e){
+    console.error("DOCX error:",e);
+    alert("DOCX save failed: "+e.message+"\n\nOpening print anyway.");
+    buildPrintStatement(data);
+    setTimeout(function(){window.print();},200);
+  });
+}
+
+/* ---- PRINT STATEMENT ---- */
+function buildPrintStatement(d){
+  var stmt=document.getElementById("printStatement");
+  var prorateNote=d.pr.factor<1?" (Prorated: "+d.pr.remaining+"/"+d.pr.total+" months)":"";
+  var totalDisc=d.discounts.reduce(function(s,x){return s+(x._calc||0);},0);
+
+  var discHTML="";
+  d.discounts.forEach(function(x,i){
+    var lbl=x.desc?(x.type+" \u2014 "+x.desc):x.type;
+    discHTML+='<tr style="background:#fffafa"><td style="padding:6px 12px;color:#b91c1c;border-bottom:1px solid #fecaca">'+(i+1)+". "+lbl+'</td><td style="padding:6px 12px;text-align:right;color:#b91c1c;font-weight:700;border-bottom:1px solid #fecaca;font-family:monospace">- '+fmtNum(x._calc||0)+' ks</td></tr>';
+  });
+  if(totalDisc>0){
+    discHTML+='<tr style="background:#fff0f0"><td style="padding:7px 12px;font-weight:700;color:#b91c1c;border-top:1px solid #fecaca">Total Discount</td><td style="padding:7px 12px;text-align:right;font-weight:900;color:#b91c1c;font-family:monospace">- '+fmtNum(totalDisc)+' ks</td></tr>';
+  }
+
+  var planHTML="";
+  d.planRows.forEach(function(r){
+    if(r.isTotal){
+      planHTML+='<tr style="background:#f0fdf4;border-top:2px solid #059669"><td colspan="2" style="padding:9px 12px;font-weight:900;color:#059669;font-size:12pt">TOTAL</td><td style="padding:9px 12px;text-align:right;font-weight:900;color:#059669;font-size:12pt;font-family:monospace">'+fmtKs(r.amt)+'</td></tr>';
+    }else{
+      planHTML+='<tr style="border-bottom:1px solid #e5e7eb"><td style="padding:8px 12px">'+r.no+'</td><td style="padding:8px 12px">'+r.date+'</td><td style="padding:8px 12px;text-align:right;font-weight:700;font-family:monospace">'+fmtKs(r.amt)+'</td></tr>';
+    }
+  });
+
+  var today=new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"long",year:"numeric"});
+
+  stmt.innerHTML=
+    '<div style="border-bottom:3px solid #059669;padding-bottom:16px;margin-bottom:20px">'
+      +'<div style="font-size:8pt;letter-spacing:3px;text-transform:uppercase;color:#9ca3af;margin-bottom:3px">Official Document</div>'
+      +'<div style="font-size:22pt;font-weight:900;color:#059669;margin-bottom:2px">Student Tuition Statement</div>'
+      +'<div style="font-size:10pt;color:#6b7280">Academic Year: <strong style="color:#374151">'+d.ay+'</strong>&nbsp;&nbsp;|&nbsp;&nbsp;Issued: '+today+'</div>'
+    +'</div>'
+
+    // Student info 2-column
+    +'<table style="width:100%;border-collapse:collapse;margin-bottom:20px;font-size:10.5pt">'
+    +'<tr><td style="width:50%;padding:0 20px 0 0;vertical-align:top">'
+      +'<table style="border-collapse:collapse;width:100%">'
+        +'<tr><td style="padding:4px 12px 4px 0;font-weight:700;color:#6b7280;width:120px;font-size:9pt;text-transform:uppercase;letter-spacing:.5px">Student Name</td><td style="padding:4px 0;font-weight:700;color:#111827">'+d.sName+'</td></tr>'
+        +'<tr><td style="padding:4px 12px 4px 0;font-weight:700;color:#6b7280;font-size:9pt;text-transform:uppercase;letter-spacing:.5px">Student ID</td><td style="padding:4px 0">'+d.sId+'</td></tr>'
+        +'<tr><td style="padding:4px 12px 4px 0;font-weight:700;color:#6b7280;font-size:9pt;text-transform:uppercase;letter-spacing:.5px">Grade Level</td><td style="padding:4px 0">'+d.gr+'</td></tr>'
+      +'</table>'
+    +'</td><td style="width:50%;padding:0 0 0 20px;border-left:1px solid #e5e7eb;vertical-align:top">'
+      +'<table style="border-collapse:collapse;width:100%">'
+        +'<tr><td style="padding:4px 12px 4px 0;font-weight:700;color:#6b7280;width:130px;font-size:9pt;text-transform:uppercase;letter-spacing:.5px">Payment Plan</td><td style="padding:4px 0">'+d.pp+'</td></tr>'
+        +'<tr><td style="padding:4px 12px 4px 0;font-weight:700;color:#6b7280;font-size:9pt;text-transform:uppercase;letter-spacing:.5px">First Attendance</td><td style="padding:4px 0">'+d.fa+'</td></tr>'
+        +'<tr><td style="padding:4px 12px 4px 0;font-weight:700;color:#6b7280;font-size:9pt;text-transform:uppercase;letter-spacing:.5px">Calc. Start Date</td><td style="padding:4px 0">'+d.fc+'</td></tr>'
+      +'</table>'
+    +'</td></tr></table>'
+
+    // Fee Summary
+    +'<div style="font-size:8pt;font-weight:900;text-transform:uppercase;letter-spacing:2px;color:#059669;border-bottom:2px solid #059669;padding-bottom:5px;margin-bottom:10px">Fee Summary</div>'
+    +'<table style="width:100%;border-collapse:collapse;margin-bottom:20px;font-size:10.5pt">'
+      +'<tr style="background:#eff6ff"><td style="padding:8px 12px;font-weight:700;color:#0071e3">Base Tuition [before Prorate]</td><td style="padding:8px 12px;text-align:right;font-weight:900;color:#0071e3;font-family:monospace">'+fmtNum(d.base)+' ks</td></tr>'
+      +'<tr><td style="padding:8px 12px;font-weight:700;border-bottom:1px solid #e5e7eb">Tuition Before Discount'+prorateNote+'</td><td style="padding:8px 12px;text-align:right;font-weight:900;color:#059669;font-family:monospace;border-bottom:1px solid #e5e7eb">'+fmtNum(d.tap)+' ks</td></tr>'
+      +discHTML
+      +'<tr style="background:#f0fdf4;border-top:2px solid #059669"><td style="padding:10px 12px;font-weight:900;font-size:12pt;color:#059669">Final Tuition Amount After Discount</td><td style="padding:10px 12px;text-align:right;font-weight:900;font-size:13pt;color:#059669;font-family:monospace">'+fmtNum(d.final)+' ks</td></tr>'
+    +'</table>'
+
+    // Payment Schedule
+    +'<div style="font-size:8pt;font-weight:900;text-transform:uppercase;letter-spacing:2px;color:#059669;border-bottom:2px solid #059669;padding-bottom:5px;margin-bottom:10px">Payment Schedule</div>'
+    +'<table style="width:100%;border-collapse:collapse;margin-bottom:20px;font-size:10.5pt">'
+      +'<thead><tr style="background:#f9fafb">'
+        +'<th style="padding:8px 12px;text-align:left;font-size:8pt;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;width:7%;font-weight:700;border-bottom:1px solid #e5e7eb">No</th>'
+        +'<th style="padding:8px 12px;text-align:left;font-size:8pt;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;font-weight:700;border-bottom:1px solid #e5e7eb">Due Date</th>'
+        +'<th style="padding:8px 12px;text-align:right;font-size:8pt;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;font-weight:700;border-bottom:1px solid #e5e7eb">Amount</th>'
+      +'</tr></thead>'
+      +'<tbody>'+planHTML+'</tbody>'
+    +'</table>'
+
+    // Notes
+    +'<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;padding:10px 14px;margin-bottom:24px;font-size:9pt;color:#6b7280">'
+      +'<strong style="color:#374151">Note:</strong> Please make payment by each due date. Late payments may incur additional charges. For enquiries, please contact the school administration office.'
+    +'</div>'
+
+    // Signatures
+    +'<div style="font-size:8pt;font-weight:900;text-transform:uppercase;letter-spacing:2px;color:#374151;border-bottom:2px solid #e5e7eb;padding-bottom:5px;margin-bottom:18px">Acknowledgement</div>'
+    +'<table style="width:100%;border-collapse:collapse">'
+    +'<tr><td style="width:46%;vertical-align:top;padding-right:20px">'
+      +'<div style="font-size:10pt;font-weight:700;color:#374151;margin-bottom:36px">Parent Name &amp; Signature</div>'
+      +'<div style="border-top:1.5px solid #374151;padding-top:8px;padding-bottom:6px">'
+        +'<span style="font-size:9pt;color:#9ca3af">Name:&nbsp; _______________________________</span>'
+      +'</div>'
+      +'<div style="padding-top:10px">'
+        +'<span style="font-size:9pt;color:#9ca3af">Date:&nbsp;&nbsp; _______________________________</span>'
+      +'</div>'
+    +'</td>'
+    +'<td style="width:8%"></td>'
+    +'<td style="width:46%;vertical-align:top;padding-left:20px;border-left:1px solid #e5e7eb">'
+      +'<div style="font-size:10pt;font-weight:700;color:#374151;margin-bottom:36px">Authorised Signature &amp; Stamp</div>'
+      +'<div style="border-top:1.5px solid #374151;padding-top:8px;padding-bottom:6px">'
+        +'<span style="font-size:9pt;color:#9ca3af">Name:&nbsp; _______________________________</span>'
+      +'</div>'
+      +'<div style="padding-top:10px">'
+        +'<span style="font-size:9pt;color:#9ca3af">Date:&nbsp;&nbsp; _______________________________</span>'
+      +'</div>'
+    +'</td></tr></table>'
+
+    // Footer
+    +'<div style="margin-top:24px;padding-top:10px;border-top:1px solid #e5e7eb;text-align:center;font-size:8pt;color:#d1d5db">'
+      +'This is a computer-generated statement &nbsp;|&nbsp; '+d.ay+' &nbsp;|&nbsp; '+today
+    +'</div>';
+}
+
+/* ---- DOCX (JSZip pure XML) ---- */
+function xe(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+
+function buildAndDownloadDocx(fname,d){
+  return new Promise(function(resolve,reject){
+    if(typeof JSZip==="undefined"){reject(new Error("JSZip not loaded"));return;}
+
+    var pr=d.pr,sName=d.sName,sId=d.sId,ay=d.ay,gr=d.gr,pp=d.pp,fa=d.fa,fc=d.fc;
+    var base=d.base,tap=d.tap,final=d.final,discounts=d.discounts,planRows=d.planRows;
+    var totalDisc=discounts.reduce(function(s,x){return s+(x._calc||0);},0);
+    var prorateNote=pr.factor<1?" (Prorated: "+pr.remaining+"/"+pr.total+" months)":"";
+    var today=new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"long",year:"numeric"});
+
+    /* XML helpers */
+    function rpr(opts){
+      var o=opts||{};
+      var b=o.bold?"<w:b/><w:bCs/>":"";
+      var col=o.color?'<w:color w:val="'+o.color+'"/>':"";
+      var sz=o.size||20;
+      var font=o.font||"Arial";
+      var u=o.underline?'<w:u w:val="single"/>':"";
+      return"<w:rPr>"+b+col+'<w:sz w:val="'+sz+'"/><w:szCs w:val="'+sz+'"/><w:rFonts w:ascii="'+font+'" w:hAnsi="'+font+'"/>'+u+"</w:rPr>";
+    }
+    function run(text,opts){return"<w:r>"+rpr(opts)+"<w:t xml:space=\"preserve\">"+xe(text)+"</w:t></w:r>";}
+    function para(text,opts){
+      var o=opts||{};
+      var jc=o.align&&o.align!=="left"?'<w:jc w:val="'+o.align+'"/>':"";
+      var sp='<w:spacing w:before="'+(o.spBefore||0)+'" w:after="'+(o.spAfter||120)+'"/>';
+      var bdr=o.bottomBorder?'<w:pBdr><w:bottom w:val="single" w:sz="6" w:space="1" w:color="'+(o.bottomBorder)+'"/></w:pBdr>':"";
+      return"<w:p><w:pPr>"+sp+jc+bdr+"</w:pPr>"+run(text,o)+"</w:p>";
+    }
+    function ep(){return'<w:p><w:pPr><w:spacing w:before="0" w:after="80"/></w:pPr></w:p>';}
+    function sh(text){return para(text,{bold:true,size:22,color:"059669",spBefore:240,spAfter:80,bottomBorder:"059669"});}
+
+    /* Table cell */
+    function tc(text,o){
+      o=o||{};
+      var w=o.w||2000;var cs=o.colspan||1;
+      var fill=o.fill?'<w:shd w:val="clear" w:color="auto" w:fill="'+o.fill+'"/>':"";
+      var span=cs>1?'<w:gridSpan w:val="'+cs+'"/>':"";
+      var jc=o.align&&o.align!=="left"?'<w:jc w:val="'+o.align+'"/>':"";
+      var bv=o.noborder?"none":"single";
+      var bc=o.noborder?"FFFFFF":"CCCCCC";
+      var bdr='<w:tcBorders><w:top w:val="'+bv+'" w:sz="4" w:color="'+bc+'"/><w:left w:val="'+bv+'" w:sz="4" w:color="'+bc+'"/><w:bottom w:val="'+bv+'" w:sz="4" w:color="'+bc+'"/><w:right w:val="'+bv+'" w:sz="4" w:color="'+bc+'"/></w:tcBorders>';
+      if(o.topBorderColor){bdr='<w:tcBorders><w:top w:val="single" w:sz="12" w:color="'+o.topBorderColor+'"/><w:left w:val="single" w:sz="4" w:color="CCCCCC"/><w:bottom w:val="single" w:sz="4" w:color="CCCCCC"/><w:right w:val="single" w:sz="4" w:color="CCCCCC"/></w:tcBorders>';}
+      var pt=o.padT!==undefined?o.padT:80,pb=o.padB!==undefined?o.padB:80,pl=o.padL!==undefined?o.padL:120,pr2=o.padR!==undefined?o.padR:120;
+      return"<w:tc><w:tcPr>"+span+'<w:tcW w:w="'+w+'" w:type="dxa"/>'+fill+bdr+'<w:tcMar><w:top w:w="'+pt+'" w:type="dxa"/><w:bottom w:w="'+pb+'" w:type="dxa"/><w:left w:w="'+pl+'" w:type="dxa"/><w:right w:w="'+pr2+'" w:type="dxa"/></w:tcMar></w:tcPr>'
+        +"<w:p><w:pPr><w:spacing w:before=\"0\" w:after=\"0\"/>"+jc+"</w:pPr>"+run(text,o)+"</w:p></w:tc>";
+    }
+
+    /* Info table */
+    var infoTable='<w:tbl><w:tblPr><w:tblW w:w="9360" w:type="dxa"/><w:tblBorders><w:insideH w:val="none"/><w:insideV w:val="none"/></w:tblBorders></w:tblPr>'
+      +'<w:tblGrid><w:gridCol w:w="1800"/><w:gridCol w:w="2880"/><w:gridCol w:w="1800"/><w:gridCol w:w="2880"/></w:tblGrid>'
+      +'<w:tr>'+tc("Student Name",{w:1800,bold:true,color:"6B7280",size:18,noborder:true})+tc(sName,{w:2880,bold:true,color:"111827",size:20,noborder:true})+tc("Payment Plan",{w:1800,bold:true,color:"6B7280",size:18,noborder:true})+tc(pp,{w:2880,size:20,noborder:true})+'</w:tr>'
+      +'<w:tr>'+tc("Student ID",{w:1800,bold:true,color:"6B7280",size:18,noborder:true})+tc(sId,{w:2880,size:20,noborder:true})+tc("First Attendance",{w:1800,bold:true,color:"6B7280",size:18,noborder:true})+tc(fa,{w:2880,size:20,noborder:true})+'</w:tr>'
+      +'<w:tr>'+tc("Grade Level",{w:1800,bold:true,color:"6B7280",size:18,noborder:true})+tc(gr,{w:2880,size:20,noborder:true})+tc("Calc. Start Date",{w:1800,bold:true,color:"6B7280",size:18,noborder:true})+tc(fc,{w:2880,size:20,noborder:true})+'</w:tr>'
+      +'</w:tbl>';
+
+    /* Fee table */
+    function fRow(label,value,fill,lc,vc,topBorder){
+      var fillAttr=fill?'<w:shd w:val="clear" w:color="auto" w:fill="'+fill+'"/>':"";
+      var lrpr=rpr({bold:true,color:lc||"374151",size:20});
+      var vrpr=rpr({bold:true,color:vc||"374151",size:20});
+      var bdrl=topBorder?'<w:tcBorders><w:top w:val="single" w:sz="12" w:color="'+topBorder+'"/></w:tcBorders>':'<w:tcBorders><w:top w:val="single" w:sz="4" w:color="CCCCCC"/><w:left w:val="single" w:sz="4" w:color="CCCCCC"/><w:bottom w:val="single" w:sz="4" w:color="CCCCCC"/><w:right w:val="single" w:sz="4" w:color="CCCCCC"/></w:tcBorders>';
+      var bdrv=topBorder?'<w:tcBorders><w:top w:val="single" w:sz="12" w:color="'+topBorder+'"/></w:tcBorders>':'<w:tcBorders><w:top w:val="single" w:sz="4" w:color="CCCCCC"/><w:left w:val="single" w:sz="4" w:color="CCCCCC"/><w:bottom w:val="single" w:sz="4" w:color="CCCCCC"/><w:right w:val="single" w:sz="4" w:color="CCCCCC"/></w:tcBorders>';
+      return'<w:tr>'
+        +'<w:tc><w:tcPr><w:tcW w:w="7000" w:type="dxa"/>'+fillAttr+bdrl+'<w:tcMar><w:top w:w="80" w:type="dxa"/><w:bottom w:w="80" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:right w:w="120" w:type="dxa"/></w:tcMar></w:tcPr><w:p><w:pPr><w:spacing w:before="0" w:after="0"/></w:pPr><w:r>'+lrpr+'<w:t xml:space="preserve">'+xe(label)+'</w:t></w:r></w:p></w:tc>'
+        +'<w:tc><w:tcPr><w:tcW w:w="2360" w:type="dxa"/>'+fillAttr+bdrv+'<w:tcMar><w:top w:w="80" w:type="dxa"/><w:bottom w:w="80" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:right w:w="120" w:type="dxa"/></w:tcMar></w:tcPr><w:p><w:pPr><w:spacing w:before="0" w:after="0"/><w:jc w:val="right"/></w:pPr><w:r>'+vrpr+'<w:t xml:space="preserve">'+xe(value)+'</w:t></w:r></w:p></w:tc>'
+        +'</w:tr>';
+    }
+    var feeRows=fRow("Base Tuition [before Prorate]",fmtNum(base)+" ks","EFF6FF","0071E3","0071E3")
+      +fRow("Tuition Before Discount"+prorateNote,fmtNum(tap)+" ks",null,"059669","059669");
+    discounts.forEach(function(x,i){
+      var lbl=x.desc?(x.type+" \u2014 "+x.desc):("Discount "+(i+1)+": "+x.type);
+      feeRows+=fRow(lbl,"- "+fmtNum(x._calc||0)+" ks","FFF8F8","B91C1C","B91C1C");
+    });
+    if(totalDisc>0)feeRows+=fRow("Total Discount","- "+fmtNum(totalDisc)+" ks","FFF0F0","B91C1C","B91C1C");
+    feeRows+=fRow("Final Tuition Amount After Discount",fmtNum(final)+" ks","F0FDF4","059669","059669","059669");
+    var feeTable='<w:tbl><w:tblPr><w:tblW w:w="9360" w:type="dxa"/></w:tblPr><w:tblGrid><w:gridCol w:w="7000"/><w:gridCol w:w="2360"/></w:tblGrid>'+feeRows+'</w:tbl>';
+
+    /* Plan table */
+    var planHead='<w:tr>'
+      +tc("No",{w:600,bold:true,color:"6B7280",size:18,fill:"F9FAFB"})
+      +tc("Due Date",{w:6160,bold:true,color:"6B7280",size:18,fill:"F9FAFB"})
+      +tc("Amount",{w:2600,bold:true,color:"6B7280",size:18,fill:"F9FAFB",align:"right"})
+      +'</w:tr>';
+    var planR="";
+    planRows.forEach(function(r){
+      if(r.isTotal){
+        planR+='<w:tr>'
+          +'<w:tc><w:tcPr><w:gridSpan w:val="2"/><w:tcW w:w="6760" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="F0FDF4"/><w:tcBorders><w:top w:val="single" w:sz="12" w:color="059669"/><w:bottom w:val="single" w:sz="4" w:color="CCCCCC"/><w:left w:val="single" w:sz="4" w:color="CCCCCC"/><w:right w:val="single" w:sz="4" w:color="CCCCCC"/></w:tcBorders><w:tcMar><w:top w:w="80" w:type="dxa"/><w:bottom w:w="80" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:right w:w="120" w:type="dxa"/></w:tcMar></w:tcPr><w:p><w:pPr><w:spacing w:before="0" w:after="0"/></w:pPr>'+run("TOTAL",{bold:true,color:"059669",size:22})+"</w:p></w:tc>"
+          +'<w:tc><w:tcPr><w:tcW w:w="2600" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="F0FDF4"/><w:tcBorders><w:top w:val="single" w:sz="12" w:color="059669"/><w:bottom w:val="single" w:sz="4" w:color="CCCCCC"/><w:left w:val="single" w:sz="4" w:color="CCCCCC"/><w:right w:val="single" w:sz="4" w:color="CCCCCC"/></w:tcBorders><w:tcMar><w:top w:w="80" w:type="dxa"/><w:bottom w:w="80" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:right w:w="120" w:type="dxa"/></w:tcMar></w:tcPr><w:p><w:pPr><w:spacing w:before="0" w:after="0"/><w:jc w:val="right"/></w:pPr>'+run(fmtKs(r.amt),{bold:true,color:"059669",size:22})+"</w:p></w:tc>"
+          +'</w:tr>';
+      }else{
+        planR+='<w:tr>'
+          +tc(String(r.no),{w:600,size:20})
+          +tc(r.date,{w:6160,size:20})
+          +tc(fmtKs(r.amt),{w:2600,bold:true,size:20,align:"right"})
+          +'</w:tr>';
+      }
+    });
+    var planTable='<w:tbl><w:tblPr><w:tblW w:w="9360" w:type="dxa"/></w:tblPr><w:tblGrid><w:gridCol w:w="600"/><w:gridCol w:w="6160"/><w:gridCol w:w="2600"/></w:tblGrid>'+planHead+planR+'</w:tbl>';
+
+    /* Signature table */
+    var sigBdr='<w:tcBorders><w:top w:val="single" w:sz="8" w:color="374151"/><w:left w:val="none"/><w:bottom w:val="none"/><w:right w:val="none"/></w:tcBorders>';
+    var sigNoBdr='<w:tcBorders><w:top w:val="none"/><w:left w:val="none"/><w:bottom w:val="none"/><w:right w:val="none"/></w:tcBorders>';
+    var sigTable='<w:tbl><w:tblPr><w:tblW w:w="9360" w:type="dxa"/><w:tblBorders><w:insideH w:val="none"/><w:insideV w:val="none"/></w:tblBorders></w:tblPr>'
+      +'<w:tblGrid><w:gridCol w:w="4500"/><w:gridCol w:w="360"/><w:gridCol w:w="4500"/></w:tblGrid>'
+      // label row
+      +'<w:tr>'
+        +'<w:tc><w:tcPr><w:tcW w:w="4500" w:type="dxa"/>'+sigNoBdr+'<w:tcMar><w:top w:w="0" w:type="dxa"/><w:bottom w:w="400" w:type="dxa"/><w:left w:w="0" w:type="dxa"/><w:right w:w="0" w:type="dxa"/></w:tcMar></w:tcPr><w:p><w:pPr><w:spacing w:before="0" w:after="0"/></w:pPr>'+run("Parent Name & Signature",{bold:true,color:"374151",size:22})+'</w:p></w:tc>'
+        +'<w:tc><w:tcPr><w:tcW w:w="360" w:type="dxa"/>'+sigNoBdr+'</w:tcPr><w:p><w:pPr><w:spacing w:before="0" w:after="0"/></w:pPr></w:p></w:tc>'
+        +'<w:tc><w:tcPr><w:tcW w:w="4500" w:type="dxa"/>'+sigNoBdr+'<w:tcMar><w:top w:w="0" w:type="dxa"/><w:bottom w:w="400" w:type="dxa"/><w:left w:w="0" w:type="dxa"/><w:right w:w="0" w:type="dxa"/></w:tcMar></w:tcPr><w:p><w:pPr><w:spacing w:before="0" w:after="0"/></w:pPr>'+run("Authorised Signature & Stamp",{bold:true,color:"374151",size:22})+'</w:p></w:tc>'
+      +'</w:tr>'
+      // signature line row
+      +'<w:tr>'
+        +'<w:tc><w:tcPr><w:tcW w:w="4500" w:type="dxa"/>'+sigBdr+'<w:tcMar><w:top w:w="80" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:left w:w="0" w:type="dxa"/><w:right w:w="0" w:type="dxa"/></w:tcMar></w:tcPr><w:p><w:pPr><w:spacing w:before="0" w:after="80"/></w:pPr>'+run("Name:  _______________________________",{color:"9CA3AF",size:18})+'</w:p></w:tc>'
+        +'<w:tc><w:tcPr><w:tcW w:w="360" w:type="dxa"/>'+sigNoBdr+'</w:tcPr><w:p><w:pPr><w:spacing w:before="0" w:after="0"/></w:pPr></w:p></w:tc>'
+        +'<w:tc><w:tcPr><w:tcW w:w="4500" w:type="dxa"/>'+sigBdr+'<w:tcMar><w:top w:w="80" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:left w:w="0" w:type="dxa"/><w:right w:w="0" w:type="dxa"/></w:tcMar></w:tcPr><w:p><w:pPr><w:spacing w:before="0" w:after="80"/></w:pPr>'+run("Name:  _______________________________",{color:"9CA3AF",size:18})+'</w:p></w:tc>'
+      +'</w:tr>'
+      // date row
+      +'<w:tr>'
+        +tc("Date:  ________________________________",{w:4500,color:"9CA3AF",size:18,noborder:true,padL:0,padR:0,padT:60,padB:0})
+        +tc("",{w:360,noborder:true})
+        +tc("Date:  ________________________________",{w:4500,color:"9CA3AF",size:18,noborder:true,padL:0,padR:0,padT:60,padB:0})
+      +'</w:tr>'
+      +'</w:tbl>';
+
+    /* Assemble document.xml */
+    var body='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+      +'<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
+      +'<w:body>'
+      // Title
+      +para("Student Tuition Statement",{bold:true,size:40,color:"059669",align:"center",spBefore:0,spAfter:40})
+      +para("Academic Year: "+ay+"     |     Issued: "+today,{size:18,color:"6B7280",align:"center",spBefore:0,spAfter:200})
+      +sh("Student Information")
+      +ep()
+      +infoTable
+      +ep()
+      +sh("Fee Summary")
+      +ep()
+      +feeTable
+      +ep()
+      +sh("Payment Schedule")
+      +ep()
+      +planTable
+      +ep()
+      +para("Note: Please make payment by each due date. Late payments may incur additional charges. For enquiries, please contact the school administration office.",{size:18,color:"6B7280",spBefore:0,spAfter:280})
+      +sh("Acknowledgement")
+      +ep()
+      +sigTable
+      +ep()
+      +ep()
+      +para("This is a computer-generated statement  |  "+ay+"  |  "+today,{size:16,color:"9CA3AF",align:"center",spBefore:100,spAfter:0})
+      +'<w:sectPr>'
+        +'<w:pgSz w:w="12240" w:h="15840"/>'
+        +'<w:pgMar w:top="1080" w:right="1080" w:bottom="1080" w:left="1080" w:header="720" w:footer="720" w:gutter="0"/>'
+      +'</w:sectPr>'
+      +'</w:body></w:document>';
+
+    var rels='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+      +'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+      +'<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>'
+      +'<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
+      +'</Relationships>';
+
+    var rootRels='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+      +'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+      +'<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>'
+      +'</Relationships>';
+
+    var ct='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+      +'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+      +'<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+      +'<Default Extension="xml" ContentType="application/xml"/>'
+      +'<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>'
+      +'<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>'
+      +'<Override PartName="/word/settings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml"/>'
+      +'</Types>';
+
+    var styles='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+      +'<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
+      +'<w:docDefaults><w:rPrDefault><w:rPr>'
+      +'<w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/>'
+      +'<w:sz w:val="20"/><w:szCs w:val="20"/>'
+      +'</w:rPr></w:rPrDefault></w:docDefaults>'
+      +'<w:style w:type="paragraph" w:styleId="Normal" w:default="1"><w:name w:val="Normal"/><w:pPr><w:spacing w:after="120"/></w:pPr></w:style>'
+      +'</w:styles>';
+
+    var settings='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+      +'<w:settings xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
+      +'<w:defaultTabStop w:val="720"/>'
+      +'</w:settings>';
+
+    try{
+      var zip=new JSZip();
+      zip.file("[Content_Types].xml",ct);
+      zip.file("_rels/.rels",rootRels);
+      zip.file("word/document.xml",body);
+      zip.file("word/_rels/document.xml.rels",rels);
+      zip.file("word/styles.xml",styles);
+      zip.file("word/settings.xml",settings);
+
+      zip.generateAsync({type:"blob",mimeType:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"})
+        .then(function(blob){
+          var a=document.createElement("a");
+          a.href=URL.createObjectURL(blob);
+          a.download=fname;
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},3000);
+          resolve();
+        }).catch(reject);
+    }catch(e){reject(e);}
+  });
+}
+
+/* ---- INIT ---- */
+addDiscount();
+recalc();
 </script>
 
 </body>
