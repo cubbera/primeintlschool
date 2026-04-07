@@ -458,7 +458,7 @@
 
 <body>
 <div class="container" id="containerRoot">
-  <h1>Creating Student Enrollment &amp; Tuition Plan v3.1</h1>
+  <h1>Creating Student Enrollment &amp; Tuition Plan v3.2</h1>
 
   <h2>1. Enrollment</h2>
 
@@ -1168,7 +1168,38 @@ function clearForm() {
 
   const printWindow = window.open("", "_blank");
 
-  // Build CLEAN statement (NO inputs, NO notes)
+  // =========================
+  // EXTRACT VALUES
+  // =========================
+  const academicYear = academicYearEl.value;
+  const grade        = gradeEl.value;
+  const plan         = paymentPlanEl.value;
+
+  const baseTuition  = document.getElementById("baseTuitionDisplay").innerText;
+  const prorate      = document.getElementById("tuitionAfterProrate").innerText;
+  const finalTuition = document.getElementById("finalTuitionDisplay").innerText;
+
+  // =========================
+  // DISCOUNTS
+  // =========================
+  let discountHTML = "";
+  discounts.forEach((d, i) => {
+    discountHTML += `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${d.type}</td>
+        <td>${d.desc || "-"}</td>
+        <td style="text-align:right;">-${fmtKsNoSuffix(d._calcAmt || 0)}</td>
+      </tr>`;
+  });
+
+  if (!discountHTML) {
+    discountHTML = `<tr><td colspan="4" style="text-align:center;">No Discounts</td></tr>`;
+  }
+
+  // =========================
+  // PAYMENT PLAN (NO NOTES)
+  // =========================
   let planRows = "";
   document.querySelectorAll("#planBody tr").forEach(row => {
     const cells = row.querySelectorAll("td");
@@ -1177,45 +1208,169 @@ function clearForm() {
         <tr>
           <td>${cells[0].innerText}</td>
           <td>${cells[1].innerText.split("\n")[0]}</td>
-          <td>${cells[2].innerText}</td>
+          <td style="text-align:right;">${cells[2].innerText}</td>
         </tr>`;
     }
   });
 
+  // =========================
+  // PRINT TEMPLATE
+  // =========================
   printWindow.document.write(`
     <html>
     <head>
       <title>${fileName}</title>
       <style>
-        body { font-family: Arial; padding: 40px; }
-        h1 { text-align: center; }
-        table { width:100%; border-collapse: collapse; margin-top:20px; }
-        td, th { border:1px solid #000; padding:8px; }
-        .footer { margin-top:60px; display:flex; justify-content:space-between; }
+        body {
+          font-family: Arial, sans-serif;
+          padding: 40px;
+          color: #111;
+        }
+
+        h1 {
+          text-align: center;
+          margin-bottom: 5px;
+          font-size: 22px;
+          letter-spacing: 1px;
+        }
+
+        h2 {
+          margin-top: 30px;
+          font-size: 16px;
+          border-bottom: 2px solid #000;
+          padding-bottom: 5px;
+        }
+
+        .info-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+          margin-top: 15px;
+        }
+
+        .info-box {
+          border: 1px solid #000;
+          padding: 8px;
+          font-size: 13px;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 15px;
+        }
+
+        th, td {
+          border: 1px solid #000;
+          padding: 8px;
+          font-size: 13px;
+        }
+
+        th {
+          background: #f2f2f2;
+        }
+
+        .right {
+          text-align: right;
+        }
+
+        .highlight {
+          background: #f9f9f9;
+          font-weight: bold;
+        }
+
+        .total-box {
+          margin-top: 20px;
+          padding: 12px;
+          border: 2px solid #000;
+          font-weight: bold;
+          font-size: 16px;
+          text-align: right;
+        }
+
+        .footer {
+          margin-top: 60px;
+          display: flex;
+          justify-content: space-between;
+        }
+
+        .signature {
+          width: 40%;
+          text-align: center;
+        }
+
       </style>
     </head>
+
     <body>
 
-      <h1>STUDENT STATEMENT</h1>
+      <h1>PRIME INTERNATIONAL SCHOOL</h1>
+      <h1>STUDENT TUITION STATEMENT</h1>
 
-      <p><b>Student Name:</b> ${name}</p>
-      <p><b>Student ID:</b> ${id}</p>
-      <p><b>Academic Year:</b> ${academicYearEl.value}</p>
-      <p><b>Grade:</b> ${gradeEl.value}</p>
+      <h2>1. Enrollment</h2>
+      <div class="info-grid">
+        <div class="info-box"><b>Student Name:</b> ${name}</div>
+        <div class="info-box"><b>Student ID:</b> ${id}</div>
+        <div class="info-box"><b>Academic Year:</b> ${academicYear}</div>
+        <div class="info-box"><b>Grade:</b> ${grade}</div>
+        <div class="info-box"><b>Payment Plan:</b> ${plan}</div>
+      </div>
 
-      <h3>Payment Plan</h3>
+      <h2>2. Calculating Payment</h2>
       <table>
-        <tr><th>No</th><th>Due Date</th><th>Amount</th></tr>
+        <tr>
+          <th>Description</th>
+          <th class="right">Amount</th>
+        </tr>
+        <tr>
+          <td>Base Tuition (Before Prorate)</td>
+          <td class="right">${baseTuition}</td>
+        </tr>
+        <tr>
+          <td>Tuition After Prorate</td>
+          <td class="right">${prorate}</td>
+        </tr>
+      </table>
+
+      <h3 style="margin-top:20px;">Discounts</h3>
+      <table>
+        <tr>
+          <th>No</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th class="right">Amount</th>
+        </tr>
+        ${discountHTML}
+      </table>
+
+      <table style="margin-top:15px;">
+        <tr class="highlight">
+          <td>Final Tuition After Discount</td>
+          <td class="right">${finalTuition}</td>
+        </tr>
+      </table>
+
+      <h2>3. Tuition Payment Plan</h2>
+      <table>
+        <tr>
+          <th>No</th>
+          <th>Due Date</th>
+          <th class="right">Amount</th>
+        </tr>
         ${planRows}
       </table>
 
+      <div class="total-box">
+        TOTAL TUITION FEE: ${finalTuition}
+      </div>
+
       <div class="footer">
-        <div>
-          Parent Name & Signature<br><br>
+        <div class="signature">
+          Parent Name & Signature<br><br><br><br><br><br>
           ________________________
         </div>
-        <div>
-          Account Name & Signature<br><br>
+        <div class="signature">
+          Account Name & Signature<br><br><br><br><br><br>
           ________________________
         </div>
       </div>
@@ -1226,7 +1381,6 @@ function clearForm() {
 
   printWindow.document.close();
 
-  // Trigger print + save
   printWindow.onload = () => {
     printWindow.print();
   };
