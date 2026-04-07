@@ -490,7 +490,7 @@
 
 <body>
 <div class="container" id="containerRoot">
-  <h1>Creating Student Enrollment &amp; Tuition Plan v3.3</h1>
+  <h1>Creating Student Enrollment &amp; Tuition Plan v3.5</h1>
   <div class="save-status" id="saveStatus">Last saved: never</div>
 
   <h2>1. Enrollment</h2>
@@ -631,7 +631,6 @@
 <div class="toast" id="toast"></div>
 
 <script>
-
 /* =====================================================
    SAVE / RESTORE STATE
    ===================================================== */
@@ -653,12 +652,8 @@ function saveState(silent) {
   const state = getFormState();
   try {
     localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-    if (!silent) {
-      updateSaveStatus(state.savedAt);
-    }
-  } catch(e) {
-    // localStorage not available (e.g. file:// in strict mode) — silently ignore
-  }
+    if (!silent) updateSaveStatus(state.savedAt);
+  } catch(e) {}
   return state;
 }
 
@@ -666,15 +661,16 @@ function restoreState() {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return false;
+
     const state = JSON.parse(raw);
 
-    if (state.academicYear) document.getElementById("academicYear").value = state.academicYear;
-    if (state.grade)        document.getElementById("grade").value        = state.grade;
-    if (state.paymentPlan)  document.getElementById("paymentPlan").value  = state.paymentPlan;
-    if (state.studentId)    document.getElementById("studentIdInput").value = state.studentId;
-    if (state.studentName)  document.getElementById("studentName").value   = state.studentName;
+    document.getElementById("academicYear").value = state.academicYear || "AY2026-2027";
+    document.getElementById("grade").value        = state.grade || "EY1";
+    document.getElementById("paymentPlan").value  = state.paymentPlan || "Termly";
+    document.getElementById("studentIdInput").value = state.studentId || "";
+    document.getElementById("studentName").value   = state.studentName || "";
 
-    if (Array.isArray(state.discounts) && state.discounts.length > 0) {
+    if (Array.isArray(state.discounts)) {
       discounts = state.discounts;
       renderDiscounts();
     }
@@ -688,39 +684,34 @@ function restoreState() {
 
 function updateSaveStatus(isoStr) {
   const el = document.getElementById("saveStatus");
-  if (!el) return;
   const d = new Date(isoStr);
-  const formatted = d.toLocaleDateString("en-GB", { day:"2-digit", month:"short", year:"numeric" })
-                  + " " + d.toLocaleTimeString("en-GB", { hour:"2-digit", minute:"2-digit", second:"2-digit" });
-  el.textContent = "✓ Last saved: " + formatted;
+  el.textContent = "✓ Last saved: " + d.toLocaleString("en-GB");
   el.className = "save-status saved";
 }
 
-/* Auto-save on any input change */
-let autoSaveTimer = null;
-function scheduleAutoSave() {
-  clearTimeout(autoSaveTimer);
-  const el = document.getElementById("saveStatus");
-  if (el) { el.textContent = "Saving…"; el.className = "save-status saving"; }
-  autoSaveTimer = setTimeout(() => saveState(false), 800);
-}
-
-function showToast(msg, type = "success") {
-  const t = document.getElementById("toast");
-  t.textContent = (type === "success" ? "✓ " : "✗ ") + msg;
-  t.className = "toast show " + type;
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => { t.className = "toast"; }, 3000);
-}
-
 /* =====================================================
-   DOM refs
+   AUTO SAVE + AUTO RECALC (GLOBAL)
    ===================================================== */
-const academicYearEl    = document.getElementById("academicYear");
-const gradeEl           = document.getElementById("grade");
-const paymentPlanEl     = document.getElementById("paymentPlan");
-const discountContainer = document.getElementById("discountItemsContainer");
-const planBody          = document.getElementById("planBody");
+let autoSaveTimer;
+
+function handleChange() {
+  recalc();
+  clearTimeout(autoSaveTimer);
+
+  const el = document.getElementById("saveStatus");
+  el.textContent = "Saving…";
+  el.className = "save-status saving";
+
+  autoSaveTimer = setTimeout(() => saveState(false), 500);
+}
+
+/* GLOBAL LISTENERS (THIS FIXES EVERYTHING) */
+document.addEventListener("input", (e) => {
+  if (e.target.closest("#containerRoot")) handleChange();
+});
+document.addEventListener("change", (e) => {
+  if (e.target.closest("#containerRoot")) handleChange();
+});
 
 /* =====================================================
    DISCOUNT STATE
@@ -731,24 +722,11 @@ let discounts = [];
    PRICING
    ===================================================== */
 function getBaseTuition() {
-  const year  = academicYearEl.value;
+  const year  = academicYear.value;
   const grade = gradeEl.value;
   const plan  = paymentPlanEl.value;
 
   if (year === "SUMMER2026") return 850000;
-
-  if (year === "AY2025-2026") {
-    const isInstallment = plan !== "One-Time";
-    const prices = {
-      "SR":  [3900000, 4200000],
-      "EY1": [3900000, 4200000],
-      "EY2": [3900000, 4200000],
-      "Y1":  [4200000, 4500000],
-      "Y2":  [4200000, 4500000],
-      "Y3":  [4200000, 4500000]
-    };
-    return prices[grade] ? prices[grade][isInstallment ? 1 : 0] : 0;
-  }
 
   if (year === "AY2026-2027") {
     const tbl = {
@@ -759,469 +737,136 @@ function getBaseTuition() {
       "Y2":  {"One-Time":4690000,"Termly":4890000,"Monthly":5290000},
       "Y3":  {"One-Time":4690000,"Termly":4890000,"Monthly":5290000}
     };
-    return (tbl[grade] && tbl[grade][plan]) ? tbl[grade][plan] : 0;
+    return tbl[grade]?.[plan] || 0;
   }
   return 0;
 }
 
 /* =====================================================
-   PRORATE  (always full 10 months — no date input)
-   ===================================================== */
-function getSchoolMonths() {
-  const year = academicYearEl.value;
-  if (year === "AY2025-2026") {
-    const m = [];
-    for (let i=5;i<=11;i++) m.push({y:2025,m:i});
-    for (let i=0;i<=2;i++)  m.push({y:2026,m:i});
-    return m;
-  }
-  if (year === "AY2026-2027") {
-    const m = [];
-    for (let i=5;i<=11;i++) m.push({y:2026,m:i});
-    for (let i=0;i<=2;i++)  m.push({y:2027,m:i});
-    return m;
-  }
-  return [];
-}
-
-/* No prorate (dates turned off) — always factor = 1 */
-function getProrateInfo() {
-  const schoolMonths = getSchoolMonths();
-  const total = schoolMonths.length || 1;
-  return { factor: 1, remaining: total, total, label: "" };
-}
-
-function getTermMonthCounts() {
-  const year = academicYearEl.value;
-  if (year === "SUMMER2026") return null;
-
-  const termRanges = [
-    { term:1, start:0, end:2 },
-    { term:2, start:3, end:6 },
-    { term:3, start:7, end:9 }
-  ];
-
-  const schoolMonths = getSchoolMonths();
-  const allIndices = schoolMonths.map((_,i) => i);
-
-  return termRanges.map(tr => {
-    const count = allIndices.filter(i => i >= tr.start && i <= tr.end).length;
-    return { term: tr.term, count };
-  });
-}
-
-function getRemainingMonthsList() {
-  return getSchoolMonths();
-}
-
-/* =====================================================
    FORMAT
    ===================================================== */
-function fmtKs(n) {
-  return Math.max(0,Math.round(n)).toLocaleString("en-US") + " ks";
-}
-function fmtKsNoSuffix(n) {
-  return Math.max(0,Math.round(n)).toLocaleString("en-US");
-}
-function fmtDateLabel(ym) {
-  const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  return `01 ${months[ym.m]} ${ym.y}`;
+function fmt(n) {
+  return Math.round(n).toLocaleString("en-US");
 }
 
 /* =====================================================
-   DISCOUNT MANAGEMENT
+   DISCOUNTS
    ===================================================== */
 function addDiscount() {
   discounts.push({ id: Date.now(), type:"Percent %", desc:"", amt:"" });
   renderDiscounts();
-  recalc();
-  scheduleAutoSave(); // ADD THIS LINE
+  handleChange();
 }
 
 function removeDiscount(id) {
   discounts = discounts.filter(d => d.id !== id);
   renderDiscounts();
-  recalc();
-  scheduleAutoSave();
-}
-
-function renderDiscounts() {
-  discountContainer.innerHTML = "";
-  discounts.forEach((disc, idx) => {
-    const div = document.createElement("div");
-    div.className = "discount-item-row";
-    div.dataset.id = disc.id;
-
-    const typeOptions = ["Fixed","Percent %","Sibling %","Early Bird %","Referral"].map(t =>
-      `<option value="${t}" ${disc.type===t?"selected":""}>${t==="Fixed"?"Fixed Amount":t==="Referral"?"Referral (Fixed)":t}</option>`
-    ).join("");
-
-    const amtPlaceholder = disc.type.includes("%") ? "%" : "Amount";
-    const descHtml = `<input type="text" class="disc-desc" placeholder="Description" value="${disc.desc||""}" 
-                        style="font-size:12px;padding:6px 8px;border:1px solid #e5e7eb;border-radius:6px;max-width:100px;"
-                        oninput="updateDisc(${disc.id},'desc',this.value)">`;
-    const amtHtml  = `<input type="number" class="disc-amt" placeholder="${amtPlaceholder}" value="${disc.amt||""}" 
-                        style="font-size:12px;padding:6px 8px;border:1px solid #e5e7eb;border-radius:6px;max-width:80px;"
-                        oninput="updateDisc(${disc.id},'amt',this.value)">`;
-
-    div.innerHTML = `
-      <span class="disc-num">${idx+1}</span>
-      <select class="disc-type" style="font-size:12px;padding:6px 8px;border:1px solid #e5e7eb;border-radius:6px;max-width:150px;font-weight:700;color:var(--danger);"
-        onchange="updateDisc(${disc.id},'type',this.value)">${typeOptions}</select>
-      ${descHtml}
-      ${disc.type.includes("%") ? `<span class="disc-pct-badge" id="pct_${disc.id}">${disc.amt||0}%</span>` : ""}
-      ${amtHtml}
-      <span class="disc-calc-val" id="calc_${disc.id}">0</span>
-      <button class="btn-remove" type="button" onclick="removeDiscount(${disc.id})">−</button>
-    `;
-    discountContainer.appendChild(div);
-  });
+  handleChange();
 }
 
 function updateDisc(id, field, value) {
-  const disc = discounts.find(d => d.id === id);
-  if (!disc) return;
-  disc[field] = value;
-  if (field === "type") { disc.desc = ""; disc.amt = ""; renderDiscounts(); }
+  const d = discounts.find(x => x.id === id);
+  if (!d) return;
+  d[field] = value;
   recalc();
-  scheduleAutoSave();
+}
+
+/* SIMPLE CLEAN UI */
+function renderDiscounts() {
+  const container = document.getElementById("discountItemsContainer");
+  container.innerHTML = "";
+
+  discounts.forEach((d, i) => {
+    const el = document.createElement("div");
+    el.style.display = "flex";
+    el.style.gap = "10px";
+    el.style.padding = "10px";
+
+    el.innerHTML = `
+      <b>${i+1}</b>
+      <select onchange="updateDisc(${d.id},'type',this.value)">
+        <option ${d.type==="Fixed"?"selected":""}>Fixed</option>
+        <option ${d.type==="Percent %"?"selected":""}>Percent %</option>
+      </select>
+      <input placeholder="Desc" value="${d.desc}" oninput="updateDisc(${d.id},'desc',this.value)">
+      <input type="number" placeholder="Amt" value="${d.amt}" oninput="updateDisc(${d.id},'amt',this.value)">
+      <span id="calc_${d.id}">0</span>
+      <button onclick="removeDiscount(${d.id})">X</button>
+    `;
+    container.appendChild(el);
+  });
 }
 
 /* =====================================================
-   MAIN CALCULATION
+   CALCULATION
    ===================================================== */
-  
 function recalc() {
-  const baseTuition = getBaseTuition();
-  const prorate     = getProrateInfo();
-  const tuitionAfterProrate = Math.round(baseTuition * prorate.factor);
+  const base = getBaseTuition();
 
-  document.getElementById("baseTuitionDisplay").textContent    = fmtKsNoSuffix(baseTuition);
-  document.getElementById("tuitionAfterProrate").textContent   = fmtKsNoSuffix(tuitionAfterProrate);
-
-  const badgeEl = document.getElementById("prorateInfoBadge");
-  if (prorate.factor < 1) {
-    badgeEl.innerHTML = `<span class="prorate-info">⟳ Prorated: ${prorate.remaining}/${prorate.total} months</span>`;
-  } else {
-    badgeEl.textContent = "";
-  }
+  document.getElementById("baseTuitionDisplay").textContent = fmt(base);
 
   let totalDiscount = 0;
-  discounts.forEach(disc => {
-    if (disc.type === "Fixed" || disc.type === "Referral") {
-      disc._calcAmt = Number(disc.amt || 0);
-    } else if (disc.type.includes("%")) {
-      disc._calcAmt = Math.round(tuitionAfterProrate * Number(disc.amt||0) / 100);
-    }
-    totalDiscount += disc._calcAmt || 0;
+
+  discounts.forEach(d => {
+    let val = 0;
+
+    if (d.type === "Fixed") val = Number(d.amt || 0);
+    else val = base * (Number(d.amt || 0) / 100);
+
+    totalDiscount += val;
+
+    const el = document.getElementById("calc_"+d.id);
+    if (el) el.textContent = "-" + fmt(val);
   });
 
-  const finalAmount = Math.max(0, tuitionAfterProrate - totalDiscount);
+  const final = Math.max(0, base - totalDiscount);
+  document.getElementById("finalTuitionDisplay").textContent = fmt(final);
 
-  discounts.forEach(disc => {
-    const el   = document.getElementById(`calc_${disc.id}`);
-    if (el) el.textContent = `-${fmtKsNoSuffix(disc._calcAmt||0)}`;
-    const pctEl = document.getElementById(`pct_${disc.id}`);
-    if (pctEl) pctEl.textContent = `${disc.amt||0}%`;
-  });
-
-  document.getElementById("finalTuitionDisplay").textContent = fmtKsNoSuffix(finalAmount);
-  renderPaymentSchedule(finalAmount, prorate);
+  renderPlan(final);
 }
 
 /* =====================================================
-   PAYMENT SCHEDULE
+   PAYMENT PLAN
    ===================================================== */
-function renderPaymentSchedule(finalAmount, prorate) {
-  planBody.innerHTML = "";
-  const plan = paymentPlanEl.value;
-  const year = academicYearEl.value;
+function renderPlan(total) {
+  const body = document.getElementById("planBody");
+  body.innerHTML = "";
 
-  if (year === "SUMMER2026" || plan === "One-Time") {
-    addPlanRow(1, "Registration Date", finalAmount, "");
-    addTotalRow(finalAmount);
+  const plan = paymentPlanEl.value;
+
+  if (plan === "One-Time") {
+    addRow(1, "Now", total);
     return;
   }
-  if (plan === "Termly")  { renderTermly(finalAmount, prorate);  return; }
-  if (plan === "Monthly") { renderMonthly(finalAmount, prorate); return; }
+
+  if (plan === "Termly") {
+    const part = Math.floor(total / 3);
+    addRow(1,"Start", total - part*2);
+    addRow(2,"Term 2", part);
+    addRow(3,"Term 3", part);
+  }
+
+  if (plan === "Monthly") {
+    const part = Math.floor(total / 10);
+    for (let i=1;i<=10;i++) {
+      addRow(i,"Month "+i, i===1 ? total - part*9 : part);
+    }
+  }
 }
 
-function floorK(n) { return Math.floor(n / 1000) * 1000; }
-
-function renderTermly(finalAmount) {
-  const termCounts = getTermMonthCounts();
-  if (!termCounts) { addPlanRow(1,"Full Payment",finalAmount,""); addTotalRow(finalAmount); return; }
-
-  const totalRemaining = termCounts.reduce((s,t) => s+t.count, 0);
-  if (totalRemaining === 0) { addPlanRow(1,"Full Payment",finalAmount,""); addTotalRow(finalAmount); return; }
-
-  const year = academicYearEl.value;
-  const termDates = year === "AY2025-2026"
-    ? ["Registration Date","01 Sep 2025","01 Jan 2026"]
-    : ["Registration Date","01 Sep 2026","01 Jan 2027"];
-
-  const slots = termCounts
-    .map((tc,i) => ({...tc, dateLabel: termDates[i]}))
-    .filter(tc => tc.count > 0);
-
-  let sumOthers = 0;
-  slots.forEach((s,i) => {
-    if (i===0) { s.amt=null; }
-    else { s.amt = floorK(finalAmount * s.count / totalRemaining); sumOthers += s.amt; }
-  });
-  slots[0].amt = finalAmount - sumOthers;
-
-  slots.forEach((s,rowNum) => {
-    const note = `${fmtKsNoSuffix(finalAmount)} ÷ ${totalRemaining} × ${s.count}`;
-    addPlanRow(rowNum+1, s.dateLabel, s.amt, note);
-  });
-  addTotalRow(finalAmount);
-}
-
-function renderMonthly(finalAmount) {
-  const remaining = getRemainingMonthsList();
-  if (remaining.length===0) { addPlanRow(1,"Full Payment",finalAmount,""); addTotalRow(finalAmount); return; }
-  const n = remaining.length;
-  const roundedAmt = floorK(finalAmount / n);
-  const firstAmt   = finalAmount - roundedAmt*(n-1);
-  remaining.forEach((ym,i) => {
-    addPlanRow(i+1, i===0?"Registration Date":fmtDateLabel(ym), i===0?firstAmt:roundedAmt, "");
-  });
-  addTotalRow(finalAmount);
-}
-
-function addPlanRow(no, dateDesc, amount, note) {
+function addRow(no, date, amt) {
   const tr = document.createElement("tr");
-  const noteHtml = note ? `<br><small style="color:var(--muted);font-size:11px;">${note}</small>` : "";
-  tr.innerHTML = `<td>${no}</td><td>${dateDesc}${noteHtml}</td><td>${fmtKs(amount)}</td>`;
-  planBody.appendChild(tr);
-}
-
-function addTotalRow(total) {
-  const tr = document.createElement("tr");
-  tr.className = "total-row";
-  tr.innerHTML = `<td colspan="2" style="text-align:left;font-weight:900;">TOTAL</td><td>${fmtKs(total)}</td>`;
+  tr.innerHTML = `<td>${no}</td><td>${date}</td><td>${fmt(amt)}</td>`;
   planBody.appendChild(tr);
 }
 
 /* =====================================================
-   CLEAR
+   INIT
    ===================================================== */
-function clearForm() {
-  if (!confirm("Clear all data? This will also erase the saved draft.")) return;
-  try { localStorage.removeItem(SAVE_KEY); } catch(e) {}
-  document.getElementById("academicYear").value  = "AY2026-2027";
-  document.getElementById("grade").value          = "EY1";
-  document.getElementById("paymentPlan").value    = "Termly";
-  document.getElementById("studentIdInput").value = "";
-  document.getElementById("studentName").value    = "";
-  discounts = [];
-  renderDiscounts();
-  const el = document.getElementById("saveStatus");
-  if (el) { el.textContent = "Last saved: never"; el.className = "save-status"; }
-  recalc();
-}
-
-/* =====================================================
-   SAVE & PRINT
-   ===================================================== */
-function saveAndPrint() {
-  const btn = document.getElementById("savePrintBtn");
-
-  // 1. Show saving state
-  btn.classList.add("saving-state");
-  btn.disabled = true;
-  btn.querySelector(".btn-label").textContent = "Saving…";
-
-  // 2. Auto-save immediately (synchronous localStorage write)
-  const state = saveState(false);
-  showToast("Saved successfully!", "success");
-
-  // 3. Brief delay so user sees the save confirmation, then print
-  setTimeout(() => {
-    btn.classList.remove("saving-state");
-    btn.disabled = false;
-    btn.querySelector(".btn-label").textContent = "[Save & Print]";
-    openPrintWindow();
-  }, 800);
-}
-
-function openPrintWindow() {
-  const studentName = document.getElementById("studentName").value    || "Student";
-  const studentId   = document.getElementById("studentIdInput").value || "ID";
-  const academicYear= document.getElementById("academicYear").value;
-  const grade       = document.getElementById("grade").value;
-  const plan        = document.getElementById("paymentPlan").value;
-  const finalAmount = document.getElementById("finalTuitionDisplay")?.innerText || "";
-  const baseTuition = document.getElementById("baseTuitionDisplay")?.innerText || "";
-  const now         = new Date().toLocaleString("en-GB", {
-    day:"2-digit", month:"short", year:"numeric",
-    hour:"2-digit", minute:"2-digit"
-  });
-
-  // Build discount rows for print
-  let discountRows = "";
-  discounts.forEach((disc, idx) => {
-    const calcEl = document.getElementById(`calc_${disc.id}`);
-    const calcVal = calcEl ? calcEl.textContent : "-0";
-    const label = disc.desc ? `${disc.type} – ${disc.desc}` : disc.type;
-    const pctBadge = disc.type.includes("%") ? ` (${disc.amt||0}%)` : "";
-    discountRows += `
-      <tr style="color:#b91c1c;">
-        <td>${idx+1}. ${label}${pctBadge}</td>
-        <td style="text-align:right; font-family:monospace;">${calcVal} ks</td>
-      </tr>`;
-  });
-
-  // Build plan rows
-  const rows = document.querySelectorAll("#planBody tr");
-  let planHTML = "";
-  rows.forEach(r => {
-    const cols = r.querySelectorAll("td");
-    const isTotalRow = r.classList.contains("total-row");
-    if (cols.length >= 2) {
-      const dateText = cols.length === 3 ? (cols[1].childNodes[0]?.nodeValue || cols[1].innerText) : "";
-      const amtText  = cols.length === 3 ? cols[2].innerText : cols[1].innerText;
-      if (isTotalRow) {
-        planHTML += `<tr style="font-weight:900;background:#f0fdf4;">
-          <td colspan="2" style="font-weight:900;">TOTAL</td>
-          <td style="text-align:right;font-weight:900;font-family:monospace;">${amtText}</td>
-        </tr>`;
-      } else {
-        planHTML += `<tr>
-          <td>${cols[0].innerText}</td>
-          <td>${dateText.trim()}</td>
-          <td style="text-align:right;font-family:monospace;">${amtText}</td>
-        </tr>`;
-      }
-    }
-  });
-
-  const win = window.open("", "_blank");
-  win.document.write(`
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Statement – ${studentName} – ${studentId}</title>
-  <style>
-    @media print {
-      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .no-print { display:none; }
-    }
-    body { font-family: Arial, sans-serif; padding: 40px; color: #000; font-size: 14px; }
-    .header { text-align:center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 15px; }
-    .school { font-size: 20px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; }
-    .doc-title { font-size: 15px; margin-top: 5px; }
-    .meta { font-size: 11px; color: #666; margin-top: 4px; }
-    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px 40px; margin: 18px 0; }
-    .info-item { display:flex; justify-content:space-between; border-bottom:1px dashed #ccc; padding-bottom:4px; }
-    .info-item .lbl { font-weight:bold; }
-    table { width:100%; border-collapse:collapse; margin-top:16px; font-size:14px; }
-    th,td { border:1px solid #ccc; padding:9px 12px; }
-    th { background:#f5f5f5; font-weight:bold; }
-    .section-title { font-size:12px; font-weight:bold; text-transform:uppercase; letter-spacing:0.5px; color:#555; margin-top:20px; margin-bottom:4px; }
-    .fee-summary-table td:last-child { text-align:right; font-family:monospace; }
-    .discount-row { color:#b91c1c; }
-    .final-row td { font-weight:900; background:#f0fdf4; color:#065f46; }
-    .signatures { margin-top: 60px; display:flex; justify-content:space-between; }
-    .sign-box { width:40%; text-align:center; font-size:13px; }
-    .sign-line { margin-top:40px; border-top:1px solid #000; padding-top:6px; }
-    .print-btn { margin-bottom:20px; padding:10px 20px; font-size:14px; font-weight:bold; background:#059669; color:#fff; border:none; border-radius:8px; cursor:pointer; }
-  </style>
-
-</head>
-<body>
-  <button class="print-btn no-print" onclick="window.print()">🖨 Print / Save as PDF</button>
-
-  <div class="header">
-    <div class="school">Prime International School</div>
-    <div class="doc-title">Student Tuition Statement</div>
-    <div class="meta">Printed: ${now}</div>
-  </div>
-
-  <div class="info-grid">
-    <div class="info-item"><span class="lbl">Student Name</span><span>${studentName}</span></div>
-    <div class="info-item"><span class="lbl">Student ID</span><span>${studentId}</span></div>
-    <div class="info-item"><span class="lbl">Academic Year</span><span>${academicYear}</span></div>
-    <div class="info-item"><span class="lbl">Grade Level</span><span>${grade}</span></div>
-    <div class="info-item"><span class="lbl">Payment Plan</span><span>${plan}</span></div>
-  </div>
-
-  <div class="section-title">Fee Summary</div>
-  <table class="fee-summary-table">
-    <tr><td>Base Tuition (before prorate)</td><td>${baseTuition} ks</td></tr>
-    <tr><td>Tuition Before Discount (full year)</td><td>${baseTuition} ks</td></tr>
-    ${discountRows ? `<tr><td colspan="2" style="padding:6px 12px; font-size:12px; font-weight:bold; color:#b91c1c; background:#fff8f8;">Discounts Applied</td></tr>${discountRows}` : ""}
-    <tr class="final-row"><td><strong>Final Tuition After Discount</strong></td><td><strong>${finalAmount} ks</strong></td></tr>
-  </table>
-
-  <div class="section-title" style="margin-top:24px;">Payment Schedule</div>
-  <table>
-    <thead><tr><th>No</th><th>Due Date</th><th>Amount</th></tr></thead>
-    <tbody>${planHTML}</tbody>
-  </table>
-
-  <div class="signatures">
-    <div class="sign-box">
-      <div class="sign-line">Parent Name &amp; Signature</div>
-    </div>
-    <div class="sign-box">
-      <div class="sign-line">Accounts Name &amp; Signature</div>
-    </div>
-  </div>
-</body>
-</html>`);
-  win.document.close();
-  setTimeout(() => win.print(), 600);
-}
-
-/* =====================================================
-EVENT LISTENERS
-===================================================== */
-function handleChange() {
-  recalc();
-  scheduleAutoSave();
-}
-
-academicYearEl.addEventListener("change", handleChange);
-gradeEl.addEventListener("change", handleChange);
-paymentPlanEl.addEventListener("change", handleChange);
-
-document.getElementById("studentIdInput").addEventListener("input", handleChange);
-document.getElementById("studentName").addEventListener("input", handleChange);
-
-  document.addEventListener("input", (e) => {
-  if (e.target.closest("#containerRoot")) {
-    recalc();
-    scheduleAutoSave();
-  }
-});
-
-document.addEventListener("change", (e) => {
-  if (e.target.closest("#containerRoot")) {
-    recalc();
-    scheduleAutoSave();
-  }
-});
-  
-/* =====================================================
-INIT — restore saved state, then calculate
-===================================================== */
 window.addEventListener("DOMContentLoaded", () => {
-  const restored = restoreState();
-
-  if (!restored) {
-    academicYearEl.value = "AY2026-2027";
-    gradeEl.value        = "EY1";
-    paymentPlanEl.value  = "Termly";
-    addDiscount();
-  }
-
-  recalc(); // run immediately
-});
-setTimeout(recalc, 50);
+  restoreState();
+  recalc();
 });
 </script>
-
 </body>
 </html>
