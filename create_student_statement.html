@@ -499,7 +499,9 @@
           <td>
             <div class="cell">
               <div class="t">Student ID</div>
+              <div class="v" id="studentNameCell">
                   <input type="text" id="studentIdInput" placeholder="Enter Student ID">
+                 </div>
             </div>
           </td>
           <td>
@@ -630,7 +632,7 @@ function clearForm(){
     if(i.type!=="date") i.value="";
   });
 
-  document.getElementById("academicYear").value="AY2026–2027";
+  document.getElementById("academicYear").value="AY2026-2027";
   document.getElementById("grade").value="EY1";
   document.getElementById("paymentPlan").value="Termly";
   document.getElementById("firstAttendance").value="2026-06-15";
@@ -1164,7 +1166,7 @@ function clearForm(){
   /* =====================================================
      PRINT
      ===================================================== */
-<script>
+
 function saveAndPrint(){
 
   const studentName = document.getElementById("studentName").value || "Student";
