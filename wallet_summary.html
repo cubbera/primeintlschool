@@ -6,125 +6,171 @@
 <title>Wallet Summary</title>
 
 <style>
-    *{
-        box-sizing:border-box;
-    }
+:root{
+    --text:#1d1d1f;
+    --muted:#6e6e73;
+    --border:#e5e5e7;
+    --header:#f5f5f7;
+    --section:#fafafa;
+    --highlight:#eef2ff;
+    --negative:#d70015;
+}
 
-    body{
-        font-family: Arial, Helvetica, sans-serif;
-        margin:40px;
-        color:#222;
-    }
+*{
+    box-sizing:border-box;
+}
 
-    .header{
-        text-align:center;
-        margin-bottom:50px;
-    }
+body{
+    margin:20px;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",
+                "Segoe UI",sans-serif;
+    font-size:12px;
+    color:var(--text);
+    background:#fff;
+}
 
-    .header h1{
-        margin:0;
-        font-size:48px;
-        font-weight:700;
-        letter-spacing:2px;
-    }
+/* HEADER */
+.header{
+    text-align:center;
+    margin-bottom:10px;
+}
 
-    .header h2{
-        margin-top:20px;
-        font-size:36px;
-        font-weight:700;
-    }
+.header h1{
+    margin:0;
+    font-size:20px;
+    font-weight:700;
+}
 
-    .filter-section{
-        margin-bottom:40px;
-    }
+.header h2{
+    margin:2px 0 0;
+    font-size:13px;
+    font-weight:500;
+    color:var(--muted);
+    letter-spacing:.3px;
+}
 
-    .filter-row{
-        display:flex;
-        align-items:center;
-        flex-wrap:wrap;
-        gap:12px;
-        margin-bottom:20px;
-    }
+/* FILTERS */
+.filters{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    flex-wrap:wrap;
+    margin:12px 0;
+    padding:8px;
+    background:#fafafa;
+    border:1px solid var(--border);
+    border-radius:8px;
+}
 
-    .filter-row label{
-        font-size:18px;
-        font-weight:600;
-    }
+.filters label{
+    font-size:11px;
+    color:var(--muted);
+}
 
-    .filter-row input{
-        width:180px;
-        padding:10px 12px;
-        border:1px solid #ccc;
-        border-radius:4px;
-        font-size:14px;
-    }
+.filters input{
+    height:28px;
+    padding:0 8px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    font-size:12px;
+    width:140px;
+}
 
-    .button-row{
-        display:flex;
-        gap:15px;
-    }
+.btn{
+    height:28px;
+    padding:0 12px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    background:#fff;
+    cursor:pointer;
+    font-size:12px;
+}
 
-    .btn{
-        padding:10px 24px;
-        border:1px solid #999;
-        background:#f5f5f5;
-        cursor:pointer;
-        font-size:15px;
-        border-radius:4px;
-    }
+.btn:hover{
+    background:#f2f2f2;
+}
 
-    .btn:hover{
-        background:#e8e8e8;
-    }
+/* TITLE */
+.title{
+    text-align:center;
+    font-size:12px;
+    color:var(--muted);
+    margin:8px 0 12px;
+}
 
-    .summary-title{
-        margin:50px 0 20px;
-        font-size:24px;
-        font-weight:700;
-    }
+/* TABLE */
+.wrap{
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+}
 
-    table{
-        width:100%;
-        border-collapse:collapse;
-    }
+table{
+    width:100%;
+    border-collapse:collapse;
+}
 
-    th{
-        padding:16px;
-        font-size:18px;
-        text-align:center;
-        border-bottom:2px solid #999;
-    }
+thead th{
+    background:var(--header);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.3px;
+    color:var(--muted);
+    padding:8px 10px;
+    border-bottom:1px solid var(--border);
+    text-align:center;
+}
 
-    td{
-        padding:16px;
-        font-size:16px;
-        border-bottom:1px solid #d5d5d5;
-    }
+td{
+    padding:7px 10px;
+    border-bottom:1px solid #f0f0f0;
+}
 
-    .row-header{
-        font-weight:700;
-        background:#f3f3f3;
-    }
+td:first-child{
+    width:180px;
+    font-weight:500;
+}
 
-    .label{
-        text-align:left;
-        padding-left:25px;
-    }
+.right{
+    text-align:right;
+    white-space:nowrap;
+}
 
-    .amount{
-        text-align:right;
-    }
+/* SECTION ROWS */
+.section td{
+    background:var(--section);
+    font-weight:700;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.4px;
+    color:#444;
+}
 
-    .negative{
-        color:#c62828;
-    }
+/* TOTAL STYLE */
+.total td{
+    background:#f5f5f7;
+    font-weight:700;
+}
 
-    .ending-balance{
-        font-weight:700;
-        background:#f3f3f3;
-    }
+/* ENDING BALANCE */
+.ending td{
+    background:#eaf2ff;
+    font-weight:700;
+}
+
+/* NEGATIVE */
+.negative{
+    color:var(--negative);
+}
+
+/* SPACER */
+.spacer td{
+    padding:3px;
+    border:none;
+}
 </style>
 </head>
+
 <body>
 
 <div class="header">
@@ -132,77 +178,94 @@
     <h2>WALLET SUMMARY</h2>
 </div>
 
-<div class="filter-section">
-    <div class="filter-row">
-        <label>Transaction Date:</label>
+<div class="filters">
+    <label>From</label>
+    <input type="text" value="01-May-2026">
 
-        <input type="text" placeholder="Start Date">
+    <label>To</label>
+    <input type="text" value="26-May-2026">
 
-        <span>-</span>
-
-        <input type="text" placeholder="End Date">
-    </div>
-
-    <div class="button-row">
-        <button type="button" class="btn">Cancel</button>
-        <button type="button" class="btn">Search</button>
-    </div>
+    <button class="btn">Search</button>
 </div>
 
-<div class="summary-title">
-    Wallet Summary from 01-May-2026 to 26-May-2026
+<div class="title">
+    Wallet Position Overview (Multi-Account Summary)
 </div>
 
+<div class="wrap">
 <table>
-    <thead>
-        <tr>
-            <th></th>
-            <th>Petty Cash</th>
-            <th>KPay</th>
-            <th>KBZ Bank</th>
-            <th>AYA Bank</th>
-            <th>CB Bank</th>
-        </tr>
-    </thead>
 
-    <tbody>
-        <tr class="row-header">
-            <td class="label">Beginning Balance</td>
-            <td class="amount">31,000,000</td>
-            <td class="amount">20,000,000</td>
-            <td class="amount">50,000,000</td>
-            <td class="amount">9,000,000</td>
-            <td class="amount">5,000,000</td>
-        </tr>
+<thead>
+<tr>
+    <th>Category</th>
+    <th>Petty Cash</th>
+    <th>KPay</th>
+    <th>KBZ Bank</th>
+    <th>AYA Bank</th>
+    <th>CB Bank</th>
+</tr>
+</thead>
 
-        <tr>
-            <td class="label">Total IN</td>
-            <td class="amount">78,000,000</td>
-            <td class="amount">100,000</td>
-            <td class="amount">150,000</td>
-            <td class="amount">50,000</td>
-            <td class="amount">0</td>
-        </tr>
+<tbody>
 
-        <tr>
-            <td class="label">Total OUT</td>
-            <td class="amount negative">-59,000,000</td>
-            <td class="amount negative">0</td>
-            <td class="amount negative">0</td>
-            <td class="amount negative">0</td>
-            <td class="amount negative">-5,000,000</td>
-        </tr>
+<tr class="section">
+    <td colspan="6">Cash Position</td>
+</tr>
 
-        <tr class="ending-balance">
-            <td class="label">Ending Balance</td>
-            <td class="amount">40,000,000</td>
-            <td class="amount">20,100,000</td>
-            <td class="amount">50,150,000</td>
-            <td class="amount">9,050,000</td>
-            <td class="amount">0</td>
-        </tr>
-    </tbody>
+<tr>
+    <td>Beginning Balance</td>
+    <td class="right">31,000,000</td>
+    <td class="right">20,000,000</td>
+    <td class="right">50,000,000</td>
+    <td class="right">9,000,000</td>
+    <td class="right">5,000,000</td>
+</tr>
+
+<tr>
+    <td>Total In</td>
+    <td class="right">78,000,000</td>
+    <td class="right">100,000</td>
+    <td class="right">150,000</td>
+    <td class="right">50,000</td>
+    <td class="right">0</td>
+</tr>
+
+<tr>
+    <td>Total Out</td>
+    <td class="right negative">(59,000,000)</td>
+    <td class="right">0</td>
+    <td class="right">0</td>
+    <td class="right">0</td>
+    <td class="right negative">(5,000,000)</td>
+</tr>
+
+<tr class="total">
+    <td>Net Movement</td>
+    <td class="right">19,000,000</td>
+    <td class="right">100,000</td>
+    <td class="right">150,000</td>
+    <td class="right">50,000</td>
+    <td class="right negative">(5,000,000)</td>
+</tr>
+
+<tr class="spacer"><td colspan="6"></td></tr>
+
+<tr class="section">
+    <td colspan="6">Closing Position</td>
+</tr>
+
+<tr class="ending">
+    <td>Ending Balance</td>
+    <td class="right">40,000,000</td>
+    <td class="right">20,100,000</td>
+    <td class="right">50,150,000</td>
+    <td class="right">9,050,000</td>
+    <td class="right">0</td>
+</tr>
+
+</tbody>
 </table>
+</div>
 
 </body>
 </html>
