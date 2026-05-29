@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wallet Transaction Report</title>
+
+<style>
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+    }
+
+    body{
+        font-family: Arial, Helvetica, sans-serif;
+        background:#f5f5f5;
+        color:#222;
+        padding:30px;
+    }
+
+    .container{
+        max-width:1300px;
+        margin:auto;
+        background:#fff;
+        padding:40px;
+        box-shadow:0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    .school-name{
+        text-align:center;
+        font-size:42px;
+        font-weight:700;
+        letter-spacing:2px;
+        margin-bottom:15px;
+    }
+
+    .report-title{
+        text-align:center;
+        font-size:28px;
+        font-weight:bold;
+        margin-bottom:50px;
+    }
+
+    .filter-section{
+        display:flex;
+        align-items:center;
+        gap:12px;
+        flex-wrap:wrap;
+        margin-bottom:25px;
+        font-size:18px;
+    }
+
+    .filter-section input[type="date"]{
+        padding:10px 12px;
+        border:1px solid #ccc;
+        border-radius:4px;
+        font-size:15px;
+    }
+
+    .actions{
+        display:flex;
+        gap:15px;
+        margin-bottom:40px;
+    }
+
+    .btn{
+        padding:10px 24px;
+        border:none;
+        border-radius:4px;
+        cursor:pointer;
+        font-size:15px;
+        font-weight:600;
+    }
+
+    .btn-search{
+        background:#222;
+        color:#fff;
+    }
+
+    .btn-search:hover{
+        background:#000;
+    }
+
+    .btn-reset{
+        background:#e5e5e5;
+        color:#222;
+    }
+
+    .btn-reset:hover{
+        background:#d5d5d5;
+    }
+
+    .report-header{
+        font-size:24px;
+        font-weight:700;
+        margin-bottom:15px;
+    }
+
+    .divider{
+        border:none;
+        border-top:2px solid #555;
+        margin-bottom:15px;
+    }
+
+    table{
+        width:100%;
+        border-collapse:collapse;
+    }
+
+    thead th{
+        padding:14px 10px;
+        text-align:left;
+        border-bottom:2px solid #666;
+        font-size:16px;
+        background:#fafafa;
+    }
+
+    tbody td{
+        padding:16px 10px;
+        border-bottom:1px solid #ddd;
+        vertical-align:top;
+        font-size:15px;
+    }
+
+    .text-right{
+        text-align:right;
+    }
+
+    .balance-row{
+        background:#f2f2f2;
+        font-weight:bold;
+    }
+
+    .ending-balance{
+        background:#f2f2f2;
+        font-weight:bold;
+    }
+
+    .negative{
+        color:#d32f2f;
+    }
+
+    .title-cell{
+        line-height:1.5;
+    }
+
+    @media(max-width:768px){
+
+        body{
+            padding:10px;
+        }
+
+        .container{
+            padding:20px;
+            overflow-x:auto;
+        }
+
+        .school-name{
+            font-size:28px;
+        }
+
+        .report-title{
+            font-size:22px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="school-name">
+        PRIME INTERNATIONAL SCHOOL
+    </div>
+
+    <div class="report-title">
+        WALLET TRANSACTION
+    </div>
+
+    <div class="filter-section">
+        <label><strong>Transaction Date:</strong></label>
+
+        <input type="date" id="startDate">
+
+        <span>-</span>
+
+        <input type="date" id="endDate">
+    </div>
+
+    <div class="actions">
+        <button type="reset" class="btn btn-reset">Reset</button>
+        <button type="button" class="btn btn-search">Search</button>
+    </div>
+
+    <div class="report-header">
+        Wallet Transaction from 26-May-2026 to 26-May-2026
+    </div>
+
+    <hr class="divider">
+
+    <table>
+
+        <thead>
+            <tr>
+                <th style="width:60px;">No</th>
+                <th style="width:150px;">Transaction Date</th>
+                <th style="width:180px;">Invoice Number</th>
+                <th>Title</th>
+                <th class="text-right">Petty Cash</th>
+                <th class="text-right">KPay</th>
+                <th class="text-right">KBZ Bank</th>
+                <th class="text-right">AYA Bank</th>
+                <th class="text-right">CB Bank</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            <tr class="balance-row">
+                <td colspan="4">Beginning Balance</td>
+                <td class="text-right">1,000,000</td>
+                <td class="text-right">2,000,000</td>
+                <td class="text-right">50,000,000</td>
+                <td class="text-right">9,000,000</td>
+                <td class="text-right">500,000</td>
+            </tr>
+
+            <tr>
+                <td>1</td>
+                <td>26-May-2026</td>
+                <td>INV-26000001</td>
+                <td class="title-cell">School Registration Fee</td>
+                <td class="text-right">200,000</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+            <tr>
+                <td>2</td>
+                <td>26-May-2026</td>
+                <td>INV-26000002</td>
+                <td class="title-cell">School Registration Fee</td>
+                <td class="text-right">100,000</td>
+                <td class="text-right">100,000</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+            <tr>
+                <td>3</td>
+                <td>26-May-2026</td>
+                <td>INV-26000003</td>
+                <td class="title-cell">School Registration Fee</td>
+                <td></td>
+                <td></td>
+                <td class="text-right">150,000</td>
+                <td class="text-right">50,000</td>
+                <td></td>
+            </tr>
+
+            <tr>
+                <td>4</td>
+                <td>26-May-2026</td>
+                <td>INV-26000004</td>
+                <td class="title-cell">Primary Students Table (2)</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="text-right negative">-500,000</td>
+            </tr>
+
+            <tr class="ending-balance">
+                <td colspan="4">Ending Balance</td>
+                <td class="text-right">1,300,000</td>
+                <td class="text-right">2,100,000</td>
+                <td class="text-right">50,150,000</td>
+                <td class="text-right">9,050,000</td>
+                <td class="text-right">0</td>
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</div>
+
+</body>
+</html>
