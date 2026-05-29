@@ -5,388 +5,326 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Financial Summary Report</title>
 <style>
+:root{
+    --text:#1d1d1f;
+    --muted:#6e6e73;
+    --border:#e5e5e7;
+    --header:#f5f5f7;
+    --section:#fafafa;
+    --subtotal:#f1f3f4;
+    --profit:#e8f5e9;
+    --negative:#d70015;
+}
 *{
     box-sizing:border-box;
 }
 body{
-    font-family:"Segoe UI", Arial, sans-serif;
-    font-size:13px;
-    color:#333;
-    margin:24px;
+    margin:20px;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",
+                "Segoe UI",sans-serif;
+    color:var(--text);
+    font-size:12px;
     background:#fff;
 }
-.report-header{
+.header{
     text-align:center;
-    margin-bottom:24px;
+    margin-bottom:12px;
 }
-.report-header h1{
+.header h1{
     margin:0;
-    font-size:24px;
+    font-size:20px;
     font-weight:700;
-    letter-spacing:.5px;
 }
-.report-header p{
-    margin:4px 0 0;
-    color:#666;
-    font-size:14px;
-}
-.filter-section{
-    display:flex;
-    gap:12px;
-    align-items:end;
-    flex-wrap:wrap;
-    margin-bottom:24px;
-    padding:12px;
-    background:#f8f9fb;
-    border:1px solid #e3e7ee;
-    border-radius:6px;
-}
-.filter-group{
-    display:flex;
-    flex-direction:column;
-}
-.filter-group label{
-    margin-bottom:4px;
+.header p{
+    margin:2px 0 0;
+    color:var(--muted);
     font-size:12px;
-    font-weight:600;
-    color:#555;
 }
-.filter-group input{
-    padding:8px 10px;
-    border:1px solid #ccc;
-    border-radius:4px;
-    min-width:180px;
+.filters{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    margin-bottom:12px;
+    padding:8px;
+    background:#fafafa;
+    border:1px solid var(--border);
+    border-radius:8px;
+}
+.filters label{
+    color:var(--muted);
+    font-size:11px;
+}
+.filters input{
+    height:28px;
+    padding:0 8px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    font-size:12px;
+    width:130px;
 }
 .btn{
-    padding:8px 16px;
-    border:1px solid #c8cdd6;
-    background:#fff;
-    border-radius:4px;
+    height:28px;
+    padding:0 12px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    background:white;
     cursor:pointer;
-    font-size:13px;
+    font-size:12px;
 }
-.btn:hover{
-    background:#f2f4f7;
+.table-wrap{
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
 }
-.section-title{
-    margin:22px 0 8px;
-    font-size:14px;
-    font-weight:700;
-    text-transform:uppercase;
-    color:#2f3b52;
-    letter-spacing:.5px;
-}
-.report-table{
+table{
     width:100%;
     border-collapse:collapse;
-    margin-bottom:18px;
 }
-.report-table th{
-    background:#2f3b52;
-    color:#fff;
-    padding:8px;
-    border:1px solid #2f3b52;
-    font-size:12px;
-    text-align:center;
+thead th{
+    background:var(--header);
+    color:var(--muted);
+    font-weight:600;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.3px;
+    padding:8px 10px;
+    border-bottom:1px solid var(--border);
 }
-.report-table td{
-    border:1px solid #d9dde5;
-    padding:7px 8px;
+tbody td{
+    padding:6px 10px;
+    border-bottom:1px solid #f2f2f2;
 }
-.report-table td:first-child{
-    font-weight:500;
+tbody tr:last-child td{
+    border-bottom:none;
+}
+td:first-child{
+    width:240px;
 }
 .right{
     text-align:right;
+    white-space:nowrap;
 }
-.center{
-    text-align:center;
-}
-.subtotal{
-    background:#eef3f8;
+.section td{
+    background:var(--section);
     font-weight:700;
+    color:#444;
+    text-transform:uppercase;
+    font-size:11px;
+    letter-spacing:.4px;
+    padding-top:7px;
+    padding-bottom:7px;
 }
 .subtotal td{
-    font-weight:700 !important;
-}
-.summary-table .highlight{
-    background:#fff3cd;
+    background:var(--subtotal);
     font-weight:700;
 }
+.net-profit td{
+    background:var(--profit);
+    font-weight:700;
+    font-size:12px;
+}
 .negative{
-    color:#c0392b;
+    color:var(--negative);
 }
-.positive{
-    color:#1e7e34;
-}
-.summary-table td:first-child{
-    font-weight:600;
+.blank td{
+    padding:2px;
+    background:#fff;
+    border-bottom:none;
 }
 </style>
 </head>
 <body>
-<div class="report-header">
+<div class="header">
     <h1>PRIME INTERNATIONAL SCHOOL</h1>
     <p>Financial Summary Report</p>
 </div>
-<div class="filter-section">
-    <div class="filter-group">
-        <label>Academic Year Start</label>
-        <input type="text" value="AY2024-2025">
-    </div>
-    <div class="filter-group">
-        <label>Academic Year End</label>
-        <input type="text" value="AY2026-2027">
-    </div>
+<div class="filters">
+    <label>From</label>
+    <input type="text" value="AY2024-2025">
+    <label>To</label>
+    <input type="text" value="AY2026-2027">
     <button class="btn">Search</button>
-    <button class="btn">Reset</button>
 </div>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+    <th>Description</th>
+    <th>AY24-25</th>
+    <th>Summer25</th>
+    <th>AY25-26</th>
+    <th>Summer26</th>
+    <th>AY26-27</th>
+    <th>Total</th>
+</tr>
+</thead>
+<tbody>
 <!-- INCOME -->
-<div class="section-title">A. Income</div>
-<table class="report-table">
-    <thead>
-        <tr>
-            <th>Income Item</th>
-            <th>AY2024-2025</th>
-            <th>Summer2025</th>
-            <th>AY2025-2026</th>
-            <th>Summer2026</th>
-            <th>AY2026-2027</th>
-            <th>Total</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Tuition Fees</td>
-            <td class="right">15,000,000</td>
-            <td class="right">42,000,000</td>
-            <td class="right">42,000,000</td>
-            <td class="right">62,000,000</td>
-            <td class="right">62,000,000</td>
-            <td class="right">223,000,000</td>
-        </tr>
-        <tr>
-            <td>Material Fees</td>
-            <td class="right">11,000,000</td>
-            <td class="right">54,000,000</td>
-            <td class="right">54,000,000</td>
-            <td class="right">68,000,000</td>
-            <td class="right">68,000,000</td>
-            <td class="right">255,000,000</td>
-        </tr>
-        <tr>
-            <td>Registration Fees</td>
-            <td class="right">5,000,000</td>
-            <td class="right">64,000,000</td>
-            <td class="right">64,000,000</td>
-            <td class="right">62,000,000</td>
-            <td class="right">62,000,000</td>
-            <td class="right">257,000,000</td>
-        </tr>
-        <tr>
-            <td>Uniform Fees</td>
-            <td class="right">3,000,000</td>
-            <td class="right">59,000,000</td>
-            <td class="right">59,000,000</td>
-            <td class="right">46,000,000</td>
-            <td class="right">46,000,000</td>
-            <td class="right">213,000,000</td>
-        </tr>
-        <tr>
-            <td>Other Income</td>
-            <td class="right">12,000,000</td>
-            <td class="right">64,000,000</td>
-            <td class="right">64,000,000</td>
-            <td class="right">117,000,000</td>
-            <td class="right">117,000,000</td>
-            <td class="right">374,000,000</td>
-        </tr>
-        <tr class="subtotal">
-            <td>Total Income</td>
-            <td class="right">46,000,000</td>
-            <td class="right">283,000,000</td>
-            <td class="right">283,000,000</td>
-            <td class="right">355,000,000</td>
-            <td class="right">355,000,000</td>
-            <td class="right">1,322,000,000</td>
-        </tr>
-    </tbody>
-</table>
+<tr class="section">
+    <td colspan="7">Income</td>
+</tr>
+<tr>
+    <td>Tuition Fees</td>
+    <td class="right">15,000,000</td>
+    <td class="right">42,000,000</td>
+    <td class="right">42,000,000</td>
+    <td class="right">62,000,000</td>
+    <td class="right">62,000,000</td>
+    <td class="right">223,000,000</td>
+</tr>
+<tr>
+    <td>Material Fees</td>
+    <td class="right">11,000,000</td>
+    <td class="right">54,000,000</td>
+    <td class="right">54,000,000</td>
+    <td class="right">68,000,000</td>
+    <td class="right">68,000,000</td>
+    <td class="right">255,000,000</td>
+</tr>
+<tr>
+    <td>Registration Fees</td>
+    <td class="right">5,000,000</td>
+    <td class="right">64,000,000</td>
+    <td class="right">64,000,000</td>
+    <td class="right">62,000,000</td>
+    <td class="right">62,000,000</td>
+    <td class="right">257,000,000</td>
+</tr>
+<tr>
+    <td>Uniform Fees</td>
+    <td class="right">3,000,000</td>
+    <td class="right">59,000,000</td>
+    <td class="right">59,000,000</td>
+    <td class="right">46,000,000</td>
+    <td class="right">46,000,000</td>
+    <td class="right">213,000,000</td>
+</tr>
+<tr>
+    <td>Other Income</td>
+    <td class="right">12,000,000</td>
+    <td class="right">64,000,000</td>
+    <td class="right">64,000,000</td>
+    <td class="right">117,000,000</td>
+    <td class="right">117,000,000</td>
+    <td class="right">374,000,000</td>
+</tr>
+<tr class="subtotal">
+    <td>Total Income</td>
+    <td class="right">46,000,000</td>
+    <td class="right">283,000,000</td>
+    <td class="right">283,000,000</td>
+    <td class="right">355,000,000</td>
+    <td class="right">355,000,000</td>
+    <td class="right">1,322,000,000</td>
+</tr>
+<tr class="blank"><td colspan="7"></td></tr>
 <!-- EXPENSE -->
-<div class="section-title">B. Expense</div>
-<table class="report-table">
-    <thead>
-        <tr>
-            <th>Expense Item</th>
-            <th>AY2024-2025</th>
-            <th>Summer2025</th>
-            <th>AY2025-2026</th>
-            <th>Summer2026</th>
-            <th>AY2026-2027</th>
-            <th>Total</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Staff Costs</td>
-            <td class="right negative">(58,000,000)</td>
-            <td></td>
-            <td class="right negative">(62,000,000)</td>
-            <td></td>
-            <td class="right negative">(41,000,000)</td>
-            <td class="right negative">(161,000,000)</td>
-        </tr>
-        <tr>
-            <td>Rent</td>
-            <td class="right negative">(18,000,000)</td>
-            <td></td>
-            <td class="right negative">(43,000,000)</td>
-            <td></td>
-            <td class="right negative">(66,000,000)</td>
-            <td class="right negative">(127,000,000)</td>
-        </tr>
-        <tr class="subtotal">
-            <td>Total Expense</td>
-            <td class="right negative">(324,000,000)</td>
-            <td class="right">0</td>
-            <td class="right negative">(384,000,000)</td>
-            <td class="right">0</td>
-            <td class="right negative">(428,000,000)</td>
-            <td class="right negative">(1,136,000,000)</td>
-        </tr>
-    </tbody>
-</table>
-<!-- FINANCIAL RESULT -->
-<div class="section-title">Financial Result</div>
-<table class="report-table summary-table">
-    <thead>
-        <tr>
-            <th>Description</th>
-            <th>AY2024-2025</th>
-            <th>Summer2025</th>
-            <th>AY2025-2026</th>
-            <th>Summer2026</th>
-            <th>AY2026-2027</th>
-            <th>Total</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Total Income</td>
-            <td class="right">46,000,000</td>
-            <td class="right">283,000,000</td>
-            <td class="right">283,000,000</td>
-            <td class="right">355,000,000</td>
-            <td class="right">355,000,000</td>
-            <td class="right">1,322,000,000</td>
-        </tr>
-        <tr>
-            <td>Total Expense</td>
-            <td class="right negative">(324,000,000)</td>
-            <td class="right">0</td>
-            <td class="right negative">(384,000,000)</td>
-            <td class="right">0</td>
-            <td class="right negative">(428,000,000)</td>
-            <td class="right negative">(1,136,000,000)</td>
-        </tr>
-        <tr class="highlight">
-            <td>Net Profit / Loss</td>
-            <td class="right negative">(278,000,000)</td>
-            <td class="right positive">283,000,000</td>
-            <td class="right negative">(101,000,000)</td>
-            <td class="right positive">355,000,000</td>
-            <td class="right negative">(73,000,000)</td>
-            <td class="right positive">186,000,000</td>
-        </tr>
-    </tbody>
-</table>
+<tr class="section">
+    <td colspan="7">Expense</td>
+</tr>
+<tr>
+    <td>Staff Costs</td>
+    <td class="right negative">(58,000,000)</td>
+    <td></td>
+    <td class="right negative">(62,000,000)</td>
+    <td></td>
+    <td class="right negative">(41,000,000)</td>
+    <td class="right negative">(161,000,000)</td>
+</tr>
+<tr>
+    <td>Rent</td>
+    <td class="right negative">(18,000,000)</td>
+    <td></td>
+    <td class="right negative">(43,000,000)</td>
+    <td></td>
+    <td class="right negative">(66,000,000)</td>
+    <td class="right negative">(127,000,000)</td>
+</tr>
+<tr class="subtotal">
+    <td>Total Expense</td>
+    <td class="right negative">(324,000,000)</td>
+    <td class="right">0</td>
+    <td class="right negative">(384,000,000)</td>
+    <td class="right">0</td>
+    <td class="right negative">(428,000,000)</td>
+    <td class="right negative">(1,136,000,000)</td>
+</tr>
+<!-- PROFIT -->
+<tr class="net-profit">
+    <td>Net Profit / Loss</td>
+    <td class="right negative">(278,000,000)</td>
+    <td class="right">283,000,000</td>
+    <td class="right negative">(101,000,000)</td>
+    <td class="right">355,000,000</td>
+    <td class="right negative">(73,000,000)</td>
+    <td class="right">186,000,000</td>
+</tr>
+<tr class="blank"><td colspan="7"></td></tr>
 <!-- ASSET -->
-<div class="section-title">C. Asset</div>
-<table class="report-table">
-    <thead>
-        <tr>
-            <th>Asset Item</th>
-            <th>AY2024-2025</th>
-            <th>Summer2025</th>
-            <th>AY2025-2026</th>
-            <th>Summer2026</th>
-            <th>AY2026-2027</th>
-            <th>Total</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Construction</td>
-            <td class="right negative">(77,000,000)</td>
-            <td></td>
-            <td class="right negative">(11,000,000)</td>
-            <td></td>
-            <td class="right negative">(16,000,000)</td>
-            <td class="right negative">(104,000,000)</td>
-        </tr>
-        <tr class="subtotal">
-            <td>Total Asset</td>
-            <td class="right negative">(211,000,000)</td>
-            <td class="right">0</td>
-            <td class="right negative">(81,000,000)</td>
-            <td class="right">0</td>
-            <td class="right negative">(56,000,000)</td>
-            <td class="right negative">(348,000,000)</td>
-        </tr>
-    </tbody>
-</table>
+<tr class="section">
+    <td colspan="7">Asset</td>
+</tr>
+<tr>
+    <td>Construction</td>
+    <td class="right negative">(77,000,000)</td>
+    <td></td>
+    <td class="right negative">(11,000,000)</td>
+    <td></td>
+    <td class="right negative">(16,000,000)</td>
+    <td class="right negative">(104,000,000)</td>
+</tr>
+<tr class="subtotal">
+    <td>Total Asset</td>
+    <td class="right negative">(211,000,000)</td>
+    <td class="right">0</td>
+    <td class="right negative">(81,000,000)</td>
+    <td class="right">0</td>
+    <td class="right negative">(56,000,000)</td>
+    <td class="right negative">(348,000,000)</td>
+</tr>
+<tr class="blank"><td colspan="7"></td></tr>
 <!-- INVESTMENT -->
-<div class="section-title">D. Investment</div>
-<table class="report-table">
-    <thead>
-        <tr>
-            <th>Investor</th>
-            <th>AY2024-2025</th>
-            <th>Summer2025</th>
-            <th>AY2025-2026</th>
-            <th>Summer2026</th>
-            <th>AY2026-2027</th>
-            <th>Total</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Partner A</td>
-            <td class="right">100,000,000</td>
-            <td></td>
-            <td class="right">33,000,000</td>
-            <td></td>
-            <td class="right">7,000,000</td>
-            <td class="right">140,000,000</td>
-        </tr>
-        <tr>
-            <td>Partner B</td>
-            <td class="right">114,000,000</td>
-            <td></td>
-            <td class="right">80,000,000</td>
-            <td></td>
-            <td class="right">18,000,000</td>
-            <td class="right">212,000,000</td>
-        </tr>
-        <tr>
-            <td>Partner C</td>
-            <td class="right">114,000,000</td>
-            <td></td>
-            <td class="right">36,000,000</td>
-            <td></td>
-            <td class="right">24,000,000</td>
-            <td class="right">174,000,000</td>
-        </tr>
-        <tr class="subtotal">
-            <td>Total Investment</td>
-            <td class="right">328,000,000</td>
-            <td class="right">0</td>
-            <td class="right">149,000,000</td>
-            <td class="right">0</td>
-            <td class="right">49,000,000</td>
-            <td class="right">526,000,000</td>
-        </tr>
-    </tbody>
+<tr class="section">
+    <td colspan="7">Investment</td>
+</tr>
+<tr>
+    <td>Partner A</td>
+    <td class="right">100,000,000</td>
+    <td></td>
+    <td class="right">33,000,000</td>
+    <td></td>
+    <td class="right">7,000,000</td>
+    <td class="right">140,000,000</td>
+</tr>
+<tr>
+    <td>Partner B</td>
+    <td class="right">114,000,000</td>
+    <td></td>
+    <td class="right">80,000,000</td>
+    <td></td>
+    <td class="right">18,000,000</td>
+    <td class="right">212,000,000</td>
+</tr>
+<tr>
+    <td>Partner C</td>
+    <td class="right">114,000,000</td>
+    <td></td>
+    <td class="right">36,000,000</td>
+    <td></td>
+    <td class="right">24,000,000</td>
+    <td class="right">174,000,000</td>
+</tr>
+<tr class="subtotal">
+    <td>Total Investment</td>
+    <td class="right">328,000,000</td>
+    <td class="right">0</td>
+    <td class="right">149,000,000</td>
+    <td class="right">0</td>
+    <td class="right">49,000,000</td>
+    <td class="right">526,000,000</td>
+</tr>
+</tbody>
 </table>
+</div>
 </body>
 </html>
