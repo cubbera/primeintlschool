@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invoice List</title>
+
+<style>
+:root{
+    --text:#1d1d1f;
+    --muted:#6e6e73;
+    --border:#e5e5e7;
+    --header:#f5f5f7;
+    --negative:#d70015;
+    --section:#fafafa;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:20px;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",
+                "Segoe UI",sans-serif;
+    font-size:12px;
+    color:var(--text);
+    background:#fff;
+}
+
+/* HEADER */
+.header{
+    text-align:center;
+    margin-bottom:10px;
+}
+
+.header h1{
+    margin:0;
+    font-size:20px;
+    font-weight:700;
+}
+
+.header h2{
+    margin:2px 0 0;
+    font-size:13px;
+    font-weight:500;
+    color:var(--muted);
+    letter-spacing:.3px;
+}
+
+/* FILTERS */
+.filters{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    flex-wrap:wrap;
+    margin:12px 0;
+    padding:8px;
+    background:#fafafa;
+    border:1px solid var(--border);
+    border-radius:8px;
+}
+
+.filters input{
+    height:28px;
+    padding:0 8px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    font-size:12px;
+    width:150px;
+}
+
+.btn{
+    height:28px;
+    padding:0 12px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    background:#fff;
+    cursor:pointer;
+    font-size:12px;
+}
+
+.btn:hover{
+    background:#f2f2f2;
+}
+
+/* TABLE WRAP */
+.wrap{
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+}
+
+/* TABLE */
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+thead th{
+    background:var(--header);
+    color:var(--muted);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.3px;
+    padding:8px 8px;
+    border-bottom:1px solid var(--border);
+    text-align:left;
+    white-space:nowrap;
+}
+
+tbody td{
+    padding:7px 8px;
+    border-bottom:1px solid #f0f0f0;
+    vertical-align:top;
+}
+
+/* ALIGNMENT */
+.right{
+    text-align:right;
+    white-space:nowrap;
+}
+
+.center{
+    text-align:center;
+}
+
+/* DESCRIPTION COLUMN */
+.desc{
+    max-width:260px;
+}
+
+/* NEGATIVE VALUES */
+.negative{
+    color:var(--negative);
+}
+
+/* STATUS STYLE */
+.status{
+    font-size:11px;
+    color:var(--muted);
+}
+
+/* SECTION ROW (optional visual grouping) */
+.section td{
+    background:var(--section);
+    font-weight:700;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.4px;
+    color:#444;
+}
+
+/* SMALL SCREEN */
+@media(max-width:900px){
+    body{font-size:11px;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>PRIME INTERNATIONAL SCHOOL</h1>
+    <h2>INVOICE LIST</h2>
+</div>
+
+<div class="filters">
+    <input type="text" value="Invoice Nr">
+    <input type="date" value="2026-03-15">
+    <input type="date" value="2026-04-10">
+    <button class="btn">Search</button>
+    <button class="btn">Cancel</button>
+</div>
+
+<div class="wrap">
+
+<table>
+
+<thead>
+<tr>
+    <th>AY</th>
+    <th>Date</th>
+    <th>Inv No</th>
+    <th>Receipt No</th>
+    <th>Type</th>
+    <th>Category</th>
+    <th>Description</th>
+    <th>Student ID</th>
+    <th>Student Name</th>
+    <th class="right">Amount</th>
+    <th>Status</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr>
+    <td>AY2026-2027</td>
+    <td>15-Mar-26</td>
+    <td>INV20260315</td>
+    <td>OR-1335</td>
+    <td>Income</td>
+    <td>Tuition Fee</td>
+    <td class="desc">Monthly Payment for March 2026</td>
+    <td>PR23056</td>
+    <td>Nyo Nathan</td>
+    <td class="right">105,000</td>
+    <td class="status">Partially Paid</td>
+</tr>
+
+<tr>
+    <td>AY2026-2027</td>
+    <td>15-Mar-26</td>
+    <td>INV20260319</td>
+    <td>OR-1339</td>
+    <td>Asset</td>
+    <td>Furniture</td>
+    <td class="desc">Student Table (20)</td>
+    <td></td>
+    <td></td>
+    <td class="right negative">(500,000)</td>
+    <td class="status">Partially Paid</td>
+</tr>
+
+<tr>
+    <td>AY2026-2027</td>
+    <td>10-Apr-26</td>
+    <td>INV20260410</td>
+    <td></td>
+    <td>Income</td>
+    <td>Uniform Fee</td>
+    <td class="desc">Uniform (S - 1x20000)</td>
+    <td>PR23056</td>
+    <td>Myo Myo</td>
+    <td class="right">20,000</td>
+    <td class="status">Not Yet Paid</td>
+</tr>
+
+<tr>
+    <td>AY2026-2027</td>
+    <td>10-Apr-26</td>
+    <td>INV20260411</td>
+    <td></td>
+    <td>Expense</td>
+    <td>Office</td>
+    <td class="desc">Stationary</td>
+    <td></td>
+    <td></td>
+    <td class="right negative">(20,000)</td>
+    <td class="status">Not Yet Paid</td>
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</body>
+</html>
