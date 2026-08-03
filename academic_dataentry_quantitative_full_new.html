@@ -139,6 +139,16 @@ td.in-range { background-color: rgba(26,115,232,0.10) !important; }
 <div class="status-msg" id="statusMsg"></div>
 
 <script>
+// ============================================================
+// ACTIVE CLASS DATA
+// ============================================================
+
+let CLASS_STUDENTS = [];
+
+let CLASS_SUBJECTS = [];
+
+
+
 
 function loadAcademicYear(){
 
@@ -405,20 +415,59 @@ function prefixGroup(id) {
 }
 
 // ============================================================
-// INIT / CLASS LOAD
+// LOAD CLASS DATA
 // ============================================================
-function loadClass() {
-  currentClass = document.getElementById("classSelect").value;
-  subjectData = {};
-  CLASS_SUBJECTS[currentClass].forEach(s => {
-    const isTestOnly = TEST_ONLY_SUBJECTS.includes(s);
-    subjectData[s] = { cwColumns: ["cw-test1"] };
-    if (!isTestOnly) subjectData[s].cwColumns = ["cw-ut1"];
-  });
-  renderAllSubjects();
-  updateSummary();
-}
 
+function loadClass(){
+
+    const year = document.getElementById("academicYear").value;
+    const className = document.getElementById("classSelect").value;
+
+    currentClass = className;
+
+    const classInfo = SCHOOL_DATA[year].classes[className];
+
+
+    if(!classInfo){
+        return;
+    }
+
+
+    // ========================================================
+    // LOAD STUDENTS
+    // ========================================================
+
+    CLASS_STUDENTS = classInfo.students;
+
+
+    // ========================================================
+    // LOAD SUBJECTS
+    // ========================================================
+
+    const subjectGroup = classInfo.subjectGroup;
+
+    CLASS_SUBJECTS = SUBJECT_GROUPS[subjectGroup];
+
+
+    // Reset existing scores
+    subjectData = {};
+
+
+    CLASS_SUBJECTS.forEach(subject=>{
+
+        subjectData[subject]={};
+
+    });
+
+
+    // Refresh page sections
+
+    renderStudents();
+
+    renderSubjects();
+
+
+}
 // ============================================================
 // RENDER
 // ============================================================
