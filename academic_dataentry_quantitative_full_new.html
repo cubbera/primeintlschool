@@ -54,6 +54,14 @@ td.in-range { background-color: rgba(26,115,232,0.10) !important; }
 .upload-status { font-size:12px; font-weight:600; color:#2d6a4f; }
 
 /* summary */
+.student-id{
+    display:block;
+    font-size:10px;
+    font-weight:400;
+    color:#d8e6ff;
+    margin-top:2px;
+}
+  
 .summary-section { margin-top: 30px; }
 .section-heading { font-size: 17px; font-weight: 700; padding: 10px 16px; border-radius: 10px 10px 0 0; color: white; }
 .summary-heading { background: linear-gradient(135deg, #2d6a4f 0%, #40916c 100%); }
@@ -139,6 +147,14 @@ td.in-range { background-color: rgba(26,115,232,0.10) !important; }
 <div class="status-msg" id="statusMsg"></div>
 
 <script>
+const STUDENT_IDS = {
+    "Ye Yint Tayza Hman": "Y1A001",
+    "Shoon La Woon Htet": "Y1A002",
+    "Htun Lae Yi Mon": "Y1A003",
+    "Lwin Aung Hein": "Y1A004",
+    // ...
+};
+
 // ============================================================
 // ACTIVE CLASS DATA
 // ============================================================
@@ -822,9 +838,23 @@ function updateSummary() {
   const students  = CLASS_STUDENTS;
   const scores    = getScores();
 
-  let hdr1 = `<th class="sum-td-subject" rowspan="2">Subject</th>`;
-  students.forEach(s => { hdr1 += `<th class="sum-th-student" colspan="3">${s}</th>`; });
+// ============================================================
+// new hdr1
+// ============================================================
+let hdr1 = `<th class="sum-td-subject" rowspan="2">Subject</th>`;
+students.forEach(name => {
+    const id = STUDENT_IDS[name] || "";
+    hdr1 += `
+        <th class="sum-th-student" colspan="3">
+            ${name}<br>
+            <span class="student-id">${id}</span>
+        </th>`;
+});
+// ============================================================//
+// new hdr1
+// ============================================================//
 
+  
   let hdr2 = "";
   students.forEach(() => {
     hdr2 += `<th class="sum-th-type sum-th-exam">Exam (60%)</th>`;
