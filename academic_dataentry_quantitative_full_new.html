@@ -100,15 +100,28 @@ td.in-range { background-color: rgba(26,115,232,0.10) !important; }
 </div>
 
 <div class="meta-bar">
+
   <span class="dropdown-label">Academic Year:</span>
-  <select id="academicYear"><option>2025-2026</option></select>
-  <span class="dropdown-label">Term:</span>
-  <select id="termSelect"><option>Term 1</option><option>Term 2</option><option>Term 3</option></select>
-  <span class="dropdown-label">Class:</span>
-  <select id="classSelect" onchange="loadClass()">
-    <option value="Y1-A">Y1-A</option>
-    <option value="Y2-A">Y2-A</option>
+
+  <select id="academicYear" onchange="loadAcademicYear()">
+    <option value="2025-2026">2025-2026</option>
+    <option value="2026-2027">2026-2027</option>
+    <option value="2027-2028">2027-2028</option>
   </select>
+
+  <span class="dropdown-label">Term:</span>
+
+  <select id="termSelect">
+    <option value="Term 1">Term 1</option>
+    <option value="Term 2">Term 2</option>
+    <option value="Term 3">Term 3</option>
+  </select>
+
+  <span class="dropdown-label">Class:</span>
+
+  <select id="classSelect" onchange="loadClass()">
+  </select>
+
 </div>
 
 <div id="subjectSections"></div>
@@ -126,25 +139,247 @@ td.in-range { background-color: rgba(26,115,232,0.10) !important; }
 <div class="status-msg" id="statusMsg"></div>
 
 <script>
+
+function loadAcademicYear(){
+
+    const year=document.getElementById("academicYear").value;
+    const classSelect=document.getElementById("classSelect");
+
+    classSelect.innerHTML="";
+
+    if(year=="2025-2026"){
+
+        classSelect.innerHTML=`
+            <option value="Y1-A">Y1-A</option>
+            <option value="Y2-A">Y2-A</option>
+        `;
+
+    }
+
+    if(year=="2026-2027"){
+
+        classSelect.innerHTML=`
+            <option value="Y1-A">Y1-A</option>
+            <option value="Y1-B">Y1-B</option>
+            <option value="Y2-A">Y2-A</option>
+            <option value="Y3-A">Y3-A</option>
+        `;
+
+    }
+
+    if(year=="2027-2028"){
+
+        classSelect.innerHTML=`
+            <!-- Add classes here later -->
+        `;
+
+    }
+
+    loadClass();
+
+}
+
+window.onload=loadAcademicYear;
+
+  
 // ============================================================
-// DATA
+// ACADEMIC YEAR DATA
 // ============================================================
-const CLASS_STUDENTS = {
-  "Y1-A": ["Ye Yint Tayza Hman","Shoon La Woon Htet","Htun Lae Yi Mon","Lwin Aung Hein","Aung Bhone San","Htet Nay Bhone","Sian Vang Huai Kim","Thu Htet Htoo","Khant Su Thar","Lwin Khit","Htut Myat Aung","Myat Shwe Yee Thin","Kaung Khit Han","Linn Pyae Sone Aung","Sai Noon Wan Han","Ngwe Yati Moe","Khant Htet Zen"],
-  "Y2-A": ["Zin Aung Hlaing","Phoo Pyae Heather","Shwe Sin Htet Aung","Thoon Thu San Aung","Linn Phone Khit","Khunn Thansin Han","Lin Thiri Hmue","Yoon Htet Htet","Yuu Mi Khaing Lin"]
-};
-const CLASS_SUBJECTS = {
-  "Y1-A": ["English","Mathematics","Science","Social Studies","Myanmar","Wellbeing","ICT","Chinese"],
-  "Y2-A": ["English","Mathematics","Science","Social Studies","Myanmar","Myanmar Social Studies","Wellbeing","ICT","Chinese"]
-};
-// Chinese is tests-only: 100% average of all tests, no term exam at all
-const TEST_ONLY_SUBJECTS = [];
-const SUBJECT_COLORS = {
-  "English":"#1d3557","Mathematics":"#8b3a0f","Science":"#1a6b2a","Social Studies":"#7b4f12",
-  "Myanmar":"#8b1a4a","Myanmar Social Studies":"#5b2d8e","Wellbeing":"#0e6b6b","ICT":"#1a3d6b","Chinese":"#8b0000"
+
+const SCHOOL_DATA = {
+
+  // ========================================================
+  // Academic Year 2025-2026
+  // ========================================================
+
+  "2025-2026": {
+
+    classes: {
+
+      "Y1-A": {
+
+        students: [
+          "Ye Yint Tayza Hman",
+          "Shoon La Woon Htet",
+          "Htun Lae Yi Mon",
+          "Lwin Aung Hein",
+          "Aung Bhone San",
+          "Htet Nay Bhone",
+          "Sian Vang Huai Kim",
+          "Thu Htet Htoo",
+          "Khant Su Thar",
+          "Lwin Khit",
+          "Htut Myat Aung",
+          "Myat Shwe Yee Thin",
+          "Kaung Khit Han",
+          "Linn Pyae Sone Aung",
+          "Sai Noon Wan Han",
+          "Ngwe Yati Moe",
+          "Khant Htet Zen"
+        ],
+
+        subjectGroup: "Y1"
+
+      },
+
+      "Y2-A": {
+
+        students: [
+          "Zin Aung Hlaing",
+          "Phoo Pyae Heather",
+          "Shwe Sin Htet Aung",
+          "Thoon Thu San Aung",
+          "Linn Phone Khit",
+          "Khunn Thansin Han",
+          "Lin Thiri Hmue",
+          "Yoon Htet Htet",
+          "Yuu Mi Khaing Lin"
+        ],
+
+        subjectGroup: "Y2"
+
+      }
+
+    }
+
+  },
+
+  // ========================================================
+  // Academic Year 2026-2027
+  // ========================================================
+
+  "2026-2027": {
+
+    classes: {
+
+      "Y1-A": {
+
+        students: [
+
+          // Add students here
+
+        ],
+
+        subjectGroup: "Y1"
+
+      },
+
+      "Y1-B": {
+
+        students: [
+
+          // Add students here
+
+        ],
+
+        subjectGroup: "Y1"
+
+      },
+
+      "Y2-A": {
+
+        students: [
+
+          // Add students here
+
+        ],
+
+        subjectGroup: "Y2"
+
+      },
+
+      "Y3-A": {
+
+        students: [
+
+          // Add students here
+
+        ],
+
+        subjectGroup: "Y2"
+
+      }
+
+    }
+
+  },
+
+  // ========================================================
+  // Academic Year 2027-2028
+  // ========================================================
+
+  "2027-2028": {
+
+    classes: {
+
+      // Copy previous year here
+
+    }
+
+  }
+
 };
 
-let subjectData = {}, currentClass = "Y1-A";
+
+// ============================================================
+// SUBJECT GROUPS
+// ============================================================
+
+const SUBJECT_GROUPS = {
+
+  Y1: [
+    "English",
+    "Mathematics",
+    "Science",
+    "Social Studies",
+    "Myanmar",
+    "Wellbeing",
+    "ICT",
+    "Chinese"
+  ],
+
+  Y2: [
+    "English",
+    "Mathematics",
+    "Science",
+    "Social Studies",
+    "Myanmar",
+    "Myanmar Social Studies",
+    "Wellbeing",
+    "ICT",
+    "Chinese"
+  ]
+
+};
+
+
+// ============================================================
+// SUBJECT SETTINGS
+// ============================================================
+
+const TEST_ONLY_SUBJECTS = [];
+
+const SUBJECT_COLORS = {
+
+  "English":"#1d3557",
+  "Mathematics":"#8b3a0f",
+  "Science":"#1a6b2a",
+  "Social Studies":"#7b4f12",
+  "Myanmar":"#8b1a4a",
+  "Myanmar Social Studies":"#5b2d8e",
+  "Wellbeing":"#0e6b6b",
+  "ICT":"#1a3d6b",
+  "Chinese":"#8b0000"
+
+};
+
+
+// ============================================================
+// CURRENT SELECTION
+// ============================================================
+
+let subjectData = {};
+let currentClass = "";
 
 // ============================================================
 // HELPERS
